@@ -1,0 +1,297 @@
+@unpublished{Ruther2011,
+author = {R\"{u}ther, Heinz and Held, Christoph and Bhurtha, Roshan and Schr\"{o}der, Ralph and Wessels, Stephen},
+booktitle = {Group},
+file = {:home/rickert/.local/share/data/Mendeley Ltd./Mendeley Desktop/Downloaded/R\"{u}ther et al. - 2011 - Challenges in Heritage Documentation with Terrestrial Laser Scanning.pdf:pdf},
+keywords = {cultural heritage,digital preservation,field procedures,registration,surface reconstruction,terrestrial laser scanning,texturing,visualization},
+title = {{Challenges in Heritage Documentation with Terrestrial Laser Scanning}},
+year = {2011}
+}
+@article{Rusu2009,
+annote = {Segmenting and interpreting:
+ Location \& map refinement
+ Object models: grasphing and manipulation
+ Helps with compression
+        
+Classify via:
+ Learnt model
+ Geometric reasoning
+        
+AI better than geometric reasoning because:
+ complicated geomatric primitives are hard to fit
+ Reasons:
+ Noise, occlusions, irregular density
+ High numbers of parameters
+        
+Hierarcical classification
+ Geometry
+ Object type
+        
+Fast pont feature histograms (3d feature descriptor)
+        
+ Copes well with noise
+ Independent of pose
+ Independent of sampling density
+        
+Many point features.
+Not all can deal well with noise.
+Some better for matching correspondences
+        
+---
+Point classification:
+ Create a feature space to detect higher level objects
+        
+SPFH:
+ For each pair in the the point neighbourhood
+ Calculate the darboux
+ Calculate angles between axis
+ Bin summed angles
+        
+FPFH:
+ Add weighted average of neighbour's SPFH},
+author = {Rusu, RB and Holzbach, Andreas and Blodow, Nico},
+file = {:home/rickert/.local/share/data/Mendeley Ltd./Mendeley Desktop/Downloaded/Rusu et al. - 2009 - Fast Geometric Point Labeling using Conditional Random Fields.pdf:pdf},
+isbn = {9781424438044},
+journal = {Intelligent Robots and},
+pages = {7--12},
+title = {{Fast geometric point labeling using conditional random fields}},
+year = {2009}
+}
+@article{Spina2010,
+annote = {Cultural heritage sites exhibit complex and rough surfaces.
+        
+Show how post processing time can be reduced if points are classified as geometries
+        
+Segmenting point clouds in CH sites is hard because of complexity
+        
+Segmentation classifies point clouds into meaningful patches
+        
+Algorithm:
+ Objects constist of sufaces that are not necessarity flat, and edges that are not necesarily straight.
+        
+PCA used to determine if the point is an edge or surface. Use the ratio between eigenvalues to classify point.
+        
+Result is a graph where vertices represent surfaces and edges while edges represent  adjacancy.
+        
+Adjacancy is determined when there is are two points from different sements that fall in the same neighbourhoodset but are of different types.
+        
+Sparse grid use to speed up neighbourhood queries
+        
+Flood fill type algorithm used on classified points to segment.
+      },
+author = {Spina, S and Debattista, K and Bugeja, K},
+doi = {10.2312/VAST/VAST11/041-048},
+file = {:home/rickert/.local/share/data/Mendeley Ltd./Mendeley Desktop/Downloaded/Spina, Debattista, Chalmers - 2010 - Point Cloud Segmentation Pipeline for Cultural Heritage Sites.pdf:pdf},
+journal = {Cultural Heritage},
+number = {0},
+pages = {1--9},
+title = {{Point Cloud Segmentation for Cultural Heritage Sites}},
+volume = {0},
+year = {2011}
+}
+@misc{Carlson2012,
+annote = {Uses autocad engine
+
+        
+Rather slow to load... It actually just crashed
+	Clean command
+
+        
+	Distance threshold
+	Minimum nearest neighbours
+	Remove duplicate points	
+	Extract bare earth
+		Specify center of site
+		Maximum slope
+		Elevation noise tolerance 0-1
+		Only shows the ground afterwards
+
+        
+
+      },
+author = {Carlson},
+title = {{Carlson Point Cloud}},
+url = {http://www.carlsonsw.com/PL\_CS\_PointCloud.html},
+year = {2012}
+}
+@misc{Leica2012,
+author = {Leica},
+title = {{Cyclone}},
+url = {http://hds.leica-geosystems.com/en/Leica-Cyclone\_6515.htm},
+year = {2012}
+}
+@misc{Pointools2012,
+annote = {Pointools 1.5
+	Layers by clicking block
+	Crashed while selecting
+
+        
+	Select:
+		Polygon select (fence select)
+		Rectangle select
+		Fill select based on distance
+			Subtract and add to selection
+			Crashes
+		Cloud select
+			Basically a fill tool based on intensity, colour or greyscale match (useless)
+		Plane select
+			3 points on plane
+			select plane of thickness x
+		Ball select brush
+select in a 3d ball brush				
+	Clipping
+		Clip points so it only shows the ones inside a box
+	Fill select:
+		Based on what metric
+
+        
+
+        
+
+        
+Christopher Schollar has great idea:
+	Take camera location into account when doing clustering},
+author = {Pointools},
+title = {{Pointools Edit}},
+url = {http://www.pointools.com/ptedit\_intro.php},
+year = {2012}
+}
+@misc{Technodigit2012,
+annote = {d reshaper
+	Doesn’t display all points
+	All points are taken into account during operations
+	RGB support
+	Preview for each action
+	Can select clusters on screen
+	Rotate around click point
+	Rotate around x and y axis (screen axis)
+
+        
+	Does meshing of selections
+	Rotations go on after release (like google earth)
+	x-y-z axis label
+
+        
+Ideas:
+	Points being part of more than one layer
+	What about adding to layer? I think you can already merge two clusters
+Commandline for app	
+Select:
+	Contours
+
+        
+Explode
+	Performs clustering based on a maximum distance
+	Keeps only 1000 biggest clouds
+	Clusters become layers
+	Clustering is a problem because of varying density
+	Points are more dense around the camera
+	Some points that should be part of one tree are subclouclouds 
+
+        
+Explode with colour
+	Uses colour similarity
+
+        
+Filter
+	threshold for sparse points
+
+        
+Manual select
+	polygon select
+	delete inside/outside or segment into two pieces
+	Invert selection
+
+        
+Rectangle select
+
+        
+Other things
+	Zooms at mouse coordinates
+	Groups selections
+	Rather slow with large clouds},
+author = {Technodigit},
+title = {{3DReshaper}},
+url = {http://www.3dreshaper.com/en1/En\_software.htm},
+year = {2012}
+}
+@misc{Terrasolid2012,
+annote = {Plugin for bently microstation
+	CAD program
+
+        
+Classify points globally:
+	Ground
+	High/medium/low vegetation
+	Buildings},
+author = {Terrasolid},
+title = {{Terrascan}},
+url = {http://www.terrasolid.fi/en/products/terrascan},
+year = {2012}
+}
+@misc{VirtualGrid2012,
+annote = {	Global classification of (Takes a couple of minutes)
+Ground points
+	Options:
+		Flat or steep region
+Find most points
+Rough points are classified as vegetation
+        
+Vegetation (Rough building edges are misclassified as vegetation)
+	Roughness 0-1
+	Min points
+Building roofs
+	Min height
+	Max slope
+	Min/max points
+Detection of planes
+	Angle tolerance in degrees
+	Min points/max points in plane
+	What direction the plane
+Detection of power lines
+	catenary elasticity
+	max offset
+	tollerance},
+author = {VirtualGrid},
+title = {{VR Mesh Studio}},
+url = {http://www.vrmesh.com/default.asp},
+year = {2012}
+}
+@misc{VisualComputingLaboratory2012,
+annote = {Does point cloud selection using kdtree},
+author = {{Visual Computing Laboratory}},
+title = {{Meshlab}},
+url = {http://meshlab.sourceforge.net/},
+year = {2012}
+}
+@inproceedings{Rusu2011,
+abstract = {With the advent of new, low-cost 3D sensing hardware such as the Kinect, and continued efforts in advanced point cloud processing, 3D perception gains more and more importance in robotics, as well as other fields. In this paper we present one of our most recent initiatives in the areas of point cloud perception: PCL (Point Cloud Library http://pointclouds.org). PCL presents an advanced and extensive approach to the subject of 3D perception, and its meant to provide support for all the common 3D building blocks that applications need. The library contains state-of- the art algorithms for: filtering, feature estimation, surface reconstruction, registration, model fitting and segmentation. PCL is supported by an international community of robotics and perception researchers. We provide a brief walkthrough of PCL including its algorithmic capabilities and implementation strategies. I.},
+author = {Rusu, Radu Bogdan and Cousins, Steve},
+booktitle = {Library},
+chapter = {RUSU11},
+doi = {10.1109/ICRA.2011.5980567},
+file = {:home/rickert/Desktop/icra11\_0.pdf:pdf},
+isbn = {9781612843865},
+number = {2},
+pages = {1--4},
+publisher = {IEEE},
+title = {{3D is here: Point Cloud Library (PCL)}},
+url = {http://www.pointclouds.org/assets/pdf/pcl\_icra2011.pdf},
+volume = {36},
+year = {2011}
+}
+@article{Shapovalov2010,
+abstract = {The problem of laser scan analysis gained significant attention within the last decade. The standard approach to point cloud classification utilizes Markov Random Fields (MRF). Usually, a subclass of MRFs, Associative Markov Networks (AMNs), are used. In AMN the pairwise potential function is constant for a pair of different class labels. In some cases this constraint is too rigorous since it does not allow expressing some natural interactions between objects, such as roof is likely to be above the ground. In this work we use the general form of pairwise potentials instead. We show how to perform a tractable inference in such network using a message-passing based algorithm. Oversegmentation technique is used to subsample a scan; this helps to eliminate noise, improve efficiency and makes possible to use natural edge features. Experiments on two datasets obtained by an airborne laser scanner show that non-associative Markov networks usage leads to improvement in classification accuracy.},
+author = {Shapovalov, Roman and Velizhev, Alexander and Barinova, Olga},
+editor = {Paparoditis, N and Pierrot-Deseilligny, M and Mallet, C and Tournaire, O},
+file = {:home/rickert/.local/share/data/Mendeley Ltd./Mendeley Desktop/Downloaded/Shapovalov, Velizhev, Barinova - 2010 - NON-ASSOCIATIVE MARKOV NETWORKS FOR 3D POINT CLOUD CLASSIFICATION.pdf:pdf},
+institution = {International Society for Photogrammetry and Remote Sensing},
+issn = {16821750},
+journal = {Photogrammetric Computer Vision and Image Analysis},
+keywords = {classification,lidar,markov random fields,point cloud,random forest},
+number = {Part 3A},
+pages = {103--108},
+title = {{Non-associative Markov Network for 3D Point Cloud Classification}},
+url = {http://pcv2010.ign.fr/pdf/partA/shapovalov-pcv2010.pdf.pdf},
+volume = {XXXVIII},
+year = {2010}
+}

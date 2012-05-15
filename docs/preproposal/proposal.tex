@@ -1,0 +1,143 @@
+\documentclass[10pt,twocolumn]{article}
+\usepackage{savetrees}
+%\usepackage[cm]{fullpage}
+%\headheight = 0.0pt
+%\topmargin = 0.0pt
+\usepackage[numbers]{natbib}
+\usepackage{url}
+
+%% Define a new 'leo' style for the package that will use a smaller font.
+\makeatletter
+\def\url@leostyle{%
+  \@ifundefined{selectfont}{\def\UrlFont{\sf}}{\def\UrlFont{\small\ttfamily}}}
+\makeatother
+%% Now actually use the newly defined style.
+\urlstyle{leo}
+
+%\textheight = 692pt
+\title{Fast semi-automated point cloud cleaning}
+\author{Rickert Mulder}
+\begin{document}
+\maketitle
+
+\section{Introduction}
+Point clouds are sets of vertices in three dimensional space that typically represent the surface of an object. They are used in a variety of contexts. In the cultural heritage domain, laser range scanners are used to produce accurate point cloud representations of historically significant sites. In conjunction with site photography, multiple scans can be used to create textured 3D models for preservation and restoration purposes.
+2`1
+% Scans have an intensity value, can have rgb
+% Density of scans
+% planar buildings
+% there are no open source offerings
+% land surveying, producing cad models, cultural heritage
+
+There are a number of steps in the processing pipeline that produce such models \cite{Ruther2011}. One of the earlier steps is referred to as point cloud cleaning. When scanning a heritage site, unwanted artefacts are likely to be present in the resulting point clouds. Examples can include: objects such as power lines or smudges produced by people walking in between the scanner and target object. The point cloud cleaning process involves the removal of such artefacts from a scan.
+
+This process involves lots of manual labour that tends to be time consuming. Some artefacts are harder to remove than others. A typical scan taken on an expedition, may take a single person anywhere between 30 minutes to 2 hours to clean. Given that one requires 500 - 1000 scans to cover a typical heritage site, this stage of the processing pipeline takes a considerable amount of time \cite{Ruther2011}.
+
+The goal of this project is to develop an open source semi-automated system that utilises point cloud classification and segmentation techniques to accelerate the cleaning process. The project will be undertaken in collaboration with the Zamani group \cite{Ruther2011}.
+
+\section{Existing systems}
+Cultural heritage applications of laser rage scanning differs from other domains in that there is a strong emphasis on preserving detail. For many industrial applications, less detail often required. As most point cloud editing packages are not specifically aimed at cultural heritage applications their smart tools may disregard details, which is not acceptable when working with heritage data.
+
+%Secondly, maintaining an accurate representation of a site is of utmost importance. Tools should therefore only remove points and not modify them.
+
+Tools found in existing systems vary in terms of precision and effort required to use them. Simple lasso selection tools are quite common \cite{Pointools2012,Leica2012,Technodigit2012} and can be used to remove virtually all types of artefacts. They may however be tedious to use when noise is not easily isolated. Three dimensional selection brushes are another simple class of tools that may give a user more control over which points are removed \cite{Pointools2012}. Somewhat more intelligent cleaning can be achieved with different families of fill tools. Fill tools recursively add neighbouring points to a selection based on various metrics such as distance or intensity \cite{Pointools2012}. Automatically achieving the correct selection is unlikely, therefore systems may allow one to edit a selection before removing points \cite{Pointools2012}.
+
+Global segmentation or classification schemes can remove a lot of the effort associated with point cloud cleaning. In 3DReshaper \cite{Technodigit2012}, a point clustering approach is used to isolate distinct objects based on the distance between neighbouring points. However, because the point density of a laser scan usually decreases as points fall away from the scanner, this approach tends to produce large clusters close to the origin, and many small groups of clusters further away. Automated classification schemes take higher dimensional features into account in order to identify clusters corresponding to ground points, vegetation and buildings \cite{Terrasolid2012,VirtualGrid2012,Carlson2012}. While this may be of great for land surveyors or architects, such fully automated methods tend to lack the precision required for cultural heritage purposes.
+
+There is certainly room to reduce the amount of productivity one has to sacrifice for precision, especially in open source tools. Meshlab \cite{VisualComputingLaboratory2012}, is currently the only known open source system that provides point cloud cleaning features. It is primarily aimed at processing triangulated meshes and therefore lacks some raw point cloud cleaning features. The recently introduced point editing features, such as point picking and plane selection, performs somewhat sluggish on larger point clouds, and are not very efficient.
+
+%resolution of the scans are also different
+% rotation table is highre
+% land surveying is lower
+% current workflow, select points into new layers using selection tools
+% layers slow down
+
+% no tools have been created specifically for this purpose
+% cleaning can be done at various stages
+% different cost benefits at different parts of the pipeline
+% Meshlab, Meshedit
+
+% system should take intensity values into account
+
+\section{Related work}
+
+% complex geopmetry cannot be discarded
+% what is the model is simplified and then mapped to the complex voints
+% multi resolution kind of
+
+Point cloud segmentation, such as what is needed to clean laser scans, is certainly not a new problem. There is however, very little available research related to the segmentation of cultural heritage data. Some success has been achieved in automatically segmenting sites into surfaces and edges through the use of Principle Component Analysis \cite{Spina2010}. What makes the segmentation of heritage data hard, is that scanned structures can exhibit very complex geometries that is hard to classify \cite{Spina2010}.
+
+%seperate trees for sites
+
+%Segmentation algorithms generally have two passes. The first pass sees that individual points are classified. In the second pass, segmentation is performed by grouping point features into groups that correspond to objects or parts thereof.
+A variety of point classification schemes that are used extensively in robotics, could potentially be exploited in the cultural heritage domain. A variety of point feature algorithms are implemented and freely available in the Point Cloud Library \cite{Rusu2011}. These include the Fast Point Feature Histograms, Spin images, Global Fast Point Feature Histogram \cite{Rusu2011}.
+
+Segmentation can be achieved by using point features to group similar points. Approaches based on machine learning have been shown to be effective \cite{Shapovalov2010,Rusu2009}. However, a simpler approaches based on heuristics \cite{Spina2010} can also be effective.
+
+
+%\subsection{Artifacts types}
+
+
+\section{Aims}
+The aim of this research is to produce a system that will allow users to clean cultural heritage data in a fast and effective manner. The focus will be on finding ways to remove the most problematic artefacts as identified by the Zamani project. In descending order of importance, the focus will thus be on removing vegetation, people, and equipment. 
+
+Existing point feature schemes will be investigated, as well as heuristic and machine learning approaches to segmentation. In order to ensure fast response times, cleaning methods will be accelerated with OpenCL.
+
+The system will be evaluated in a user study. The speed and accuracy of the existing system will be compared to Zamani's current system \cite{Leica2012}. Interviews will also be conducted to assess the usability of the system.
+
+%by comparing the time taken to clean a scan with Zamani's current system \cite{Leica2012} to the new system.
+
+% compare on a feature to fearure basis and wholesale?
+
+% user centered design???
+
+% user study:
+% how fast clean cloud before
+% for fast clean cloud after
+% qualitative overview
+
+%cleaning should be done in real time
+%user testing
+%focus on the problems that will have the biggest effect in terms of time savings
+
+% Should allow them to edit accurately on a specific subspace
+
+%\section{Methods}
+%Find and classify the problems that are most difficult and time consuming
+
+%Chris:
+%    Biggest problems are:
+%		Vegetation (Hard to select trees)
+%		People walking through scans
+%		Boxes such as equipment lying around
+%
+%	Problem is that useful features are scattered across many systems
+%	Systems are proprietary
+%	
+%Systems:
+%	Cyclone:
+%		Select surfaces based on smoothness metric (Fuckin slow)
+%		Use lasso tool
+%	Pointools
+%		Brush select
+%	Kubit
+%	Alice labs studio clouds
+%	Meshlab (really hard to select things)
+%	XGRT: Deals with very large clouds
+%		
+%		
+%Desires:
+%	Intelligent select
+%		Eg. select table and only select surface
+%	Brush type tool (Pointools):
+%		Selects points based on intensity values
+%	
+%	Selection tools for a variety of objects
+%		How to do?
+%		Enumerate all types?
+%		Or create some type of dynamic learning system
+
+\bibliographystyle{plainnat}
+\bibliography{proposal}	
+
+\end{document}

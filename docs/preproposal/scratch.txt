@@ -1,0 +1,74 @@
+\documentclass[10pt,twocolumn]{article}
+\usepackage[cm]{fullpage}
+\textheight = 692pt
+\title{Distributed GPU based point cloud registration}
+\author{Rickert Mulder}
+\begin{document}
+\maketitle
+
+\section{Problem}
+
+It takes 2h for people to clean point clouds
+
+Problems:
+	Intrumental errors, half a laser beam
+	Static noise, doest move
+		Grass
+		Bicycle
+		Powerline
+		Trees
+	Dynamic noise, moves
+		People walk through scan
+		Birds
+
+Existing packages:
+	Select plane
+
+
+Existing methods:
+	Cluster regions and remove small regions - Sonar
+		2d traingulation, lift to 3d grid
+
+	Alexander
+		Use PCL rations to classify points
+
+Metrics
+	Two stage point classifications
+		Local features
+		Clustering local features
+
+
+Over the last 10 years, the Zamani project at the University of Cape Town has used laser range scanning to digitally capture cultural heritage sites in Africa for restoration and conservation purposes. Data sets produced are extremely large and therefore difficult to process.
+Automated methods for transforming data sets to models break down when applied to such large sets, and require manual intervention that can take weeks of hard work.
+
+Laser range scans produce multiple sets of 3D point clouds from different angles. In order to render an accurate geometric site description on single set of coordinates, overlapping point clouds must be aligned. This can usually be performed sequentially on pairs of point clouds by using the Iterative Closest Point algorithm. Multiple independent scans however result in cumulative measurement error that result in inaccurate models. This could be overcome by making parallel point cloud comparisons, instead of pairwise, and using multiple initial conditions. No existing software package currently support simultaneous registration or data sets of this magnitude.
+
+In order to build realistic models of sites, point cloud data must be combined texture information from digital imagery. Images can come from multiple sources including satellite, aerial and terrestrial photographs. Photographs also come from different positions, under different lighting conditions with various focal lengths. Lighting needs to be normalised between photos, camera lens distortions need to be compensated for. Mapping these images onto a geometric model without properly surveyed positions is not very accurate with existing techniques. As with registration of point cloud data, high resolution imagery required for accurate texture mapping at such a large scale, cannot fit into memory and is also computationally expensive.
+
+The proposed project aims develop an accurate and robust multi-modal method for image registration that can deal with large data sets in a distributed fashion by using a GPU cluster.
+
+\section{Research Aims}
+The first objective of this project is to accurately register multiple point clouds of a scene that has been produced by independent scans from multiple locations. They key problem to be overcome is the accumulation of errors that arises from sequential pair-wise matching of multiple cloud points.
+
+The secondary objective is to accurately register texture data with the resulting model through the mapping of digital photography obtained from various sources. These sources include satellite imagery, HDR (High Dynamic Range) images, and digital photographs from both aerial and terrestrial sources. Subtasks include calculating the camera position, taking into account variation in lighting, and reversing camera lens distortions.
+
+\section{Feasibility}
+\begin{itemize}
+\item Proposed supervisor a strong background in Computer Vision, Image Processing and Computer Graphics
+\item GPU accelerated point cloud image registration has been shown to speed up processing  by a factor of 88 (D. Qiu, S. May, A. Nuchter)
+\item Existing open source software tools such as Meshlab (CNR-ISTI Pisa, Italy) can be used to manage some of the processing tasks
+\item If the texture registration component proves too complex, the masters can be scaled back to investigating just this issue. 
+\item Zamani group will contribute expertise on registration technologies and associated software and hardware.
+\item The Center for High Performance Computing (CHPC) has made their GPU cluster available to the department for research purposes 
+\end{itemize}
+
+\section{Impact}
+It is expected that techniques developed in this project will have applicability not only the modeling of cultural heritage sites but also to films, games, virtual environments, and other science and engineering disciplines.
+
+\section{Potential Outputs}
+\begin{itemize}
+\item Open source multi-modal image registration package
+\item Publication of a journal or conference article
+\item Conference presentation
+\end{itemize}
+\end{document}

@@ -7,7 +7,7 @@ cloudclean/CloudClean
 .fuse_*
 
 # Docs
-/docs/*.pdf
+/docs/*/*.pdf
 *.snm
 *.d
 *.fls
@@ -41,3 +41,4 @@ cloudclean/CloudClean
 *.aux.make
 *.auxbbl.make
 *.auxtarget.make
+*.auxbbl.make.temp

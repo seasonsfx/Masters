@@ -161,7 +161,9 @@
   \includegraphics[width=1\textwidth]{pics/cleaning.png}
   \begin{itemize}
   \item
-  Cleaning is the removal of unwanted objects
+  Cleaning is the removal of unwanted objects.
+  \item
+  Involves the classification and segmentation of `noise'.
   \item
   It can happen before or after registration.
   % duplication of work
@@ -174,70 +176,257 @@
   \includegraphics[width=1\textwidth]{pics/cleaning.png}
   \begin{itemize}
   \item
-  Cleaning is a manual task
+  Cleaning is a manual task.
   \item
-  500 - 1000 scans per expedition
+  500 - 1000 scans per expedition.
   \item
-  30 min to 2 hours per scan
+  30 min to 2 hours per scan.
   % duplication of work
   % more memory requirements
   % size of data input should be noted
+  % not only Zamani but also CyArk
   \end{itemize}
 \end{frame}
 
 \subsection{Previous Work}
 
-\begin{frame}{Make Titles Informative.}
+\begin{frame}{Existing software}
+% Existing software is often sluggish also
+% response times plays a big role
+\includegraphics[height=0.10\textheight]{pics/cyclone.jpg}
+\includegraphics[height=0.10\textheight]{pics/pointools.jpg}
+\includegraphics[height=0.10\textheight]{pics/meshlab.png}
+\includegraphics[height=0.10\textheight]{pics/vrmesh.png}
+\includegraphics[height=0.10\textheight]{pics/3dreshaper.jpg}
 
-\begin{figure}[htb]
-\centering
-\includegraphics[width=0.70\textwidth]{pics/3dreshaper.png}
-\caption{Distance clustering \cite{Technodigit2012}}
-\label{fig:dist}
-\end{figure}
-
-\end{frame}
-\begin{frame}{Make Titles Informative.}
-
-\begin{figure}[htb]
-\centering
-\includegraphics[width=0.70\textwidth]{pics/vrmesh.png}
-\caption{Automated segmentation of vegetation \cite{VirtualGrid2012}}
-\label{fig:trees}
-\end{figure}
-
-
-
+\begin{itemize}
+\item Leica Cyclone (used by Zamani)
+\item Pointools Edit (used by CyArk)
+\item Meshlab
+\item VR Mesh Studio
+\item Terrascan
+\item 3D Reshaper
+\item Carlson PointCloud
+\end{itemize}
 
 \end{frame}
 
 
+\begin{frame}{Segmentation and classification tools}
+
+Tools differ with respect to
+\begin{itemize}
+\item the degree of \alert{automation}
+\item degree of \alert{accuracy}
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Simple tools}
+
+Manual\\
+High accuracy\\
+\textbf{Examples:}
+\begin{itemize}
+\item Point picking.
+\item Rectangle select.
+\item Lasso tool.
+\item 3D ball and cube brushes.
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Semi-automated tools}
+
+Manual\\
+Varying accuracy\\
+
+\textbf{Examples:}
+\begin{itemize}
+\item Plane select.
+\item Region growing based on:
+
+\begin{itemize}
+\item Point intensity or colour value.
+\item Point normals.
+\item Distance.
+\end{itemize}
+
+\item Specialised selections.
+\begin{itemize}
+\item Power lines.
+\item Fire hydrants.
+\end{itemize}
+
+
+\end{itemize}
+
+\end{frame}
+
+
+\begin{frame}{Fully automated}
+
+Automatic\\
+Low accuracy\\
+
+\textbf{Examples:}
+\begin{itemize}
+\item Isolated point removal.
+\item Point clustering based on:
+\begin{itemize}
+\item Distance.
+\item Colour/Intensity.
+\end{itemize}
+\item Classification of:
+\begin{itemize}
+\item Ground.
+\item Roofs.
+\item Vegetation.
+\item XYZ planes.
+\end{itemize}
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Issues}
+
+\includegraphics[width=0.50\textwidth]{pics/vrmesh-veg.png}
+\includegraphics[width=0.50\textwidth]{pics/clustering.png}
+
+\begin{itemize}
+\item Noisy structures.
+\item Non uniform point cloud density.
+\end{itemize}
+
+% Distance clustering breaks down
+% Fully automated appoaches have trouble with noisy buidlings
+
+\end{frame}
+
+\begin{frame}{General classification}
+
+\begin{enumerate}
+\item Calculate point features.
+\item Classify points:
+\begin{itemize}
+\item Heuristics.
+\item Probabilistic models.
+\end{itemize}
+\end{enumerate}
+
+\end{frame}
+
+\begin{frame}{Point feature algorithms}
+
+\textbf{Examples:}
+\begin{itemize}
+\item Point normals.
+\item Fast point feature histograms.
+\item Principle component analysis.
+\end{itemize}
+
+\textbf{Considerations:}
+\begin{itemize}
+\item Rotation invariance.
+\item Scale invariance.
+\item Point density invariance.
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Feature classification}
+
+\textbf{Markov models:}
+\begin{itemize}
+\item Conditional Random Fields.
+\item Associative Markov Networks.
+\item Gibbs Random Field
+\end{itemize}
+
+\end{frame}
 
 \section{Proposal}
 
-\subsection{Technology}
+\subsection{Aim}
 
-\begin{frame}{Make Titles Informative.}
+\begin{frame}{Aim}
+Produce semi-automated methods to segment point cloud artefacts in a way that is both fast and accurate.\\
 
-  \includegraphics[width=0.33\textwidth]{pics/opengl.png}
-  \includegraphics[width=0.33\textwidth]{pics/opencl.png}
-  \includegraphics[width=0.33\textwidth]{pics/pointcloudlibrary_vert_large_pos.png}
+\vspace{\baselineskip}
+Focus on cleaning vegetation, equipment, and people.
 
 \end{frame}
 
-\begin{frame}{Make Titles Informative.}
+\begin{frame}{Research Question}
+
+\begin{itemize}
+\item To what degree can semi-automated methods speed up the point cloud cleaning process?
+\item What degree of accuracy can be achieved by semi-automated segmentation methods?
+\item Can probabilistic models be used to improve accuracy without significantly sacrificing performance?
+\item Can probabilistic frameworks be parallelisable in order to mitigate performance penalties?  
+\item Can artefact classes be dynamically learnt and used for semi-automated segmentation?
+\item Which point features are most suitable learning what artefacts?
+\end{itemize}
+
 \end{frame}
 
-\begin{frame}{Make Titles Informative.}
+\subsection{Method}
+
+\begin{frame}{Method}
+  Prototyping with PCL.\\
+  Iterative development.\\
+  Continuous evaluation.\\
 \end{frame}
 
-
-\subsection{Basic Ideas for Proofs/Implementation}
-
-\begin{frame}{Make Titles Informative.}
+\begin{frame}{Method}
+  Prototype point classification schemes.\\
+  Prototype dynamic classification leaning.\\
 \end{frame}
 
-\begin{frame}{Make Titles Informative.}
+\begin{frame}{Technology}
+  \setlength\fboxsep{5pt}
+  \setlength\fboxrule{0.0pt}
+
+  \fbox{\includegraphics[height=0.20\textheight]{pics/qt-logo.png}}
+  \fbox{\includegraphics[height=0.20\textheight]{pics/opencl.png}}
+  \fbox{\includegraphics[height=0.20\textheight]{pics/opengl.png}}
+  \fbox{\includegraphics[height=0.20\textheight]{pics/pcl_vert_large_pos.png}}
+
+\end{frame}
+
+\begin{frame}{Evaluation}
+	User study to measure time and accuracy
+	\begin{enumerate}
+	\item Timed scan cleaning task.
+	\item Accuracy measured relative to a pre cleaned scan.
+	% Point cloud diff
+	\end{enumerate}
+
+\end{frame}
+
+\subsection{Ideas}
+
+\begin{frame}{Feature distance}
+  FPFH calculates 33 bins\\
+  Use euclidean distance in feature space for clustering
+
+\end{frame}
+
+\begin{frame}{Registration based cleaning}
+  Scans overlap so duplicate cleaning is required.
+  \begin{enumerate}
+  \item Clean scan 1
+  \item Register scan A to scan B
+  \item Apply cleaning from scan A to scan B
+  \item Clean clean scan A
+  \end{enumerate}
+
+\end{frame}
+
+\begin{frame}{Factor out distance from source}
+  Distance affects cloud density\\
+  Distance affects reflection of the scanner
 \end{frame}
 
 \begin{frame}{Make Titles Informative.}

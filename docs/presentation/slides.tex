@@ -344,6 +344,8 @@ Low accuracy\\
 \item Gibbs Random Field
 \end{itemize}
 
+\textbf{Heuristic reasoning}
+
 \end{frame}
 
 \section{Proposal}
@@ -351,10 +353,15 @@ Low accuracy\\
 \subsection{Aim}
 
 \begin{frame}{Aim}
-Produce semi-automated methods to segment point cloud artefacts in a way that is both fast and accurate.\\
+\begin{itemize}
 
-\vspace{\baselineskip}
+\item
+Produce semi-automated methods to segment point cloud artefacts in a way that is both fast and accurate.
+
+\item
 Focus on cleaning vegetation, equipment, and people.
+\end{itemize}
+
 
 \end{frame}
 
@@ -374,14 +381,19 @@ Focus on cleaning vegetation, equipment, and people.
 \subsection{Method}
 
 \begin{frame}{Method}
-  Prototyping with PCL.\\
-  Iterative development.\\
-  Continuous evaluation.\\
-\end{frame}
 
-\begin{frame}{Method}
-  Prototype point classification schemes.\\
-  Prototype dynamic classification leaning.\\
+\begin{itemize}
+\item Investigate:
+\begin{itemize}
+  \item Point features.
+  \item Heuristic classification.
+  \item Probabilistic classification.
+  \item Machine learning.
+\end{itemize}
+\item Iterative Prototyping.
+\item Continuous evaluation.
+\end{itemize}
+
 \end{frame}
 
 \begin{frame}{Technology}
@@ -396,20 +408,25 @@ Focus on cleaning vegetation, equipment, and people.
 \end{frame}
 
 \begin{frame}{Evaluation}
-	User study to measure time and accuracy
+	\begin{itemize}
+	\item Expert opinion
+	\item User study to measure time and accuracy
 	\begin{enumerate}
 	\item Timed scan cleaning task.
 	\item Accuracy measured relative to a pre cleaned scan.
 	% Point cloud diff
 	\end{enumerate}
+	\end{itemize}
 
 \end{frame}
 
 \subsection{Ideas}
 
-\begin{frame}{Feature distance}
-  FPFH calculates 33 bins\\
-  Use euclidean distance in feature space for clustering
+\begin{frame}{Feature space distance}
+\begin{itemize}
+\item FPFH calculates 33 bins
+\item Use euclidean distance between two points in feature space for clustering in the point's neighbourhood.
+\end{itemize}  
 
 \end{frame}
 
@@ -424,15 +441,14 @@ Focus on cleaning vegetation, equipment, and people.
 
 \end{frame}
 
-\begin{frame}{Factor out distance from source}
-  Distance affects cloud density\\
-  Distance affects reflection of the scanner
+\begin{frame}{Factor out distance during classification}
+A point's distance from the scanner determines:
+\begin{itemize}
+\item Cloud density.
+\item Intensity of light returned to the scanner.
+\end{itemize}
+  
 \end{frame}
-
-\begin{frame}{Make Titles Informative.}
-\end{frame}
-
-
 
 \section*{Summary}
 
@@ -441,25 +457,15 @@ Focus on cleaning vegetation, equipment, and people.
   % Keep the summary *very short*.
   \begin{itemize}
   \item
-    The \alert{first main message} of your talk in one or two lines.
+    Cleaning point clouds is time consuming.
   \item
-    The \alert{second main message} of your talk in one or two lines.
+    Speed up with semi-automated methods.
   \item
-    Perhaps a \alert{third message}, but not more than that.
+    Maintain accuracy.
   \end{itemize}
   
   % The following outlook is optional.
-  \vskip0pt plus.5fill
-  \begin{itemize}
-  \item
-    Outlook
-    \begin{itemize}
-    \item
-      Something you haven't solved.
-    \item
-      Something else you haven't solved.
-    \end{itemize}
-  \end{itemize}
+  %\vskip0pt plus.5fill
 \end{frame}
 
 
@@ -469,30 +475,30 @@ Focus on cleaning vegetation, equipment, and people.
 \section<presentation>*{\appendixname}
 \subsection<presentation>*{For Further Reading}
 
-\begin{frame}[allowframebreaks]
-  \frametitle<presentation>{For Further Reading}
-    
-  \begin{thebibliography}{10}
-    
-  \beamertemplatebookbibitems
-  % Start with overview books.
-
-  \bibitem{Author1990}
-    A.~Author.
-    \newblock {\em Handbook of Everything}.
-    \newblock Some Press, 1990.
- 
-    
-  \beamertemplatearticlebibitems
-  % Followed by interesting articles. Keep the list short. 
-
-  \bibitem{Someone2000}
-    S.~Someone.
-    \newblock On this and that.
-    \newblock {\em Journal of This and That}, 2(1):50--100,
-    2000.
-  \end{thebibliography}
-\end{frame}
+%\begin{frame}[allowframebreaks]
+%  \frametitle<presentation>{For Further Reading}
+%    
+%  \begin{thebibliography}{10}
+%    
+%  \beamertemplatebookbibitems
+%  % Start with overview books.
+%
+%  \bibitem{Author1990}
+%    A.~Author.
+%    \newblock {\em Handbook of Everything}.
+%    \newblock Some Press, 1990.
+% 
+%    
+%  \beamertemplatearticlebibitems
+%  % Followed by interesting articles. Keep the list short. 
+%
+%  \bibitem{Someone2000}
+%    S.~Someone.
+%    \newblock On this and that.
+%    \newblock {\em Journal of This and That}, 2(1):50--100,
+%    2000.
+%  \end{thebibliography}
+%\end{frame}
 
 \end{document}
 

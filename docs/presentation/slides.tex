@@ -373,7 +373,6 @@ Focus on cleaning vegetation, equipment, and people.
 \item Can probabilistic models be used to improve accuracy without significantly sacrificing performance?
 \item Can probabilistic frameworks be parallelisable in order to mitigate performance penalties?  
 \item Can artefact classes be dynamically learnt and used for semi-automated segmentation?
-\item Which point features are most suitable learning what artefacts?
 \end{itemize}
 
 \end{frame}
@@ -396,6 +395,15 @@ Focus on cleaning vegetation, equipment, and people.
 
 \end{frame}
 
+\begin{frame}{System}
+  \begin{itemize}
+\item Facilitate semi automated cleaning
+\item Responsiveness: Push load to GPU
+\item Input: single scans in PTX format of around 16 million points
+\end{itemize}
+
+\end{frame}
+
 \begin{frame}{Technology}
   \setlength\fboxsep{5pt}
   \setlength\fboxrule{0.0pt}
@@ -411,11 +419,14 @@ Focus on cleaning vegetation, equipment, and people.
 	\begin{itemize}
 	\item Expert opinion
 	\item User study to measure time and accuracy
-	\begin{enumerate}
+	\begin{itemize}
 	\item Timed scan cleaning task.
 	\item Accuracy measured relative to a pre cleaned scan.
+	\begin{itemize}
+	\item Point cloud diffs.
+	\end{itemize}
 	% Point cloud diff
-	\end{enumerate}
+	\end{itemize}
 	\end{itemize}
 
 \end{frame}

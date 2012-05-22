@@ -58,8 +58,8 @@
   University of Cape Town
 }
 
-\date[CFP 2003] % (optional, should be abbreviation of conference name)
-{Masters Proposal}
+%\date[CFP 2003] % (optional, should be abbreviation of conference name)
+%{Masters Proposal}
 % - Either use conference name or its abbreviation.
 % - Not really informative to the audience, more for people (including
 %   yourself) who are reading the slides online
@@ -367,6 +367,7 @@ Low accuracy\\
 \textbf{Examples:}
 \begin{itemize}
 \item Point normals.
+\item Curvature.
 \item Fast point feature histograms.
 \item Principle component analysis.
 \end{itemize}
@@ -383,6 +384,7 @@ Low accuracy\\
 \begin{column}{0.5\textwidth}
 
 \includegraphics[width=1\textwidth]{pics/features.png}
+\includegraphics[width=1\textwidth]{pics/classification.png}
 
 \end{column}
 
@@ -399,7 +401,7 @@ Low accuracy\\
 \textbf{Markov models:}
 \begin{itemize}
 \item Conditional Random Fields.
-\item Associative Markov Networks.
+\item Non-Associative Markov Networks.
 \end{itemize}
 
 % should say how they are benficial and computational cost
@@ -460,7 +462,7 @@ Focus on cleaning vegetation, equipment, and people.
   \item Point features.
   \item Heuristic classification.
   \item Probabilistic classification.
-  \item Machine learning.
+  \item Feature learning.
 \end{itemize}
 \item Iterative Prototyping.
 \item Continuous evaluation.
@@ -498,28 +500,6 @@ Focus on cleaning vegetation, equipment, and people.
 
 \end{frame}
 
-\begin{frame}{Evaluation}
-	\begin{itemize}
-	\item Expert opinion
-	\item User study to measure time and accuracy
-	\begin{itemize}
-	\item Timed scan cleaning task.
-	\item Accuracy measured relative to a pre cleaned scan.
-	\begin{itemize}
-	\item Diff with precleaned cloud
-	\end{itemize}
-	% Point cloud diff
-	\end{itemize}
-	\end{itemize}
-
-\centering
-\includegraphics[width=0.5\textwidth]{pics/diff.png}
-
-\end{frame}
-
-\subsection{Ideas}
-
-
 \begin{frame}{Feature space distance}
 
 \begin{columns}[T]
@@ -527,7 +507,7 @@ Focus on cleaning vegetation, equipment, and people.
 \begin{column}{0.5\textwidth}
 
 \begin{itemize}
-\item FPFH calculates 33 bins
+\item FPFH signature has 33 bins
 \item Use euclidean distance between two points in feature space for clustering in the point's neighbourhood.
 \end{itemize}  
 
@@ -592,10 +572,27 @@ A point's distance from the scanner determines:
 \end{column}
 
 \end{columns}
+\end{frame}
 
+\subsection{Evaluation}
 
+\begin{frame}{Evaluation}
+	\begin{itemize}
+	\item Expert opinion
+	\item User study to measure time and accuracy
+	\begin{itemize}
+	\item Timed scan cleaning task.
+	\item Accuracy measured relative to a pre cleaned scan.
+	\begin{itemize}
+	\item Diff with precleaned cloud
+	\end{itemize}
+	% Point cloud diff
+	\end{itemize}
+	\end{itemize}
 
-  
+\centering
+\includegraphics[width=0.5\textwidth]{pics/diff.png}
+
 \end{frame}
 
 \section*{Summary}

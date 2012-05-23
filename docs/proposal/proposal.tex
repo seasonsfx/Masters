@@ -44,16 +44,28 @@ There are a number of steps in the processing pipeline that produce such models 
 
 This process involves lots of manual labour that tends to be time consuming. Some artefacts are harder to remove than others. A typical scan taken on an expedition, may take a single person anywhere between 30 minutes to 2 hours to clean. Given that one requires 500 - 1000 scans to cover a typical heritage site, this stage of the processing pipeline takes a considerable amount of time \cite{Ruther2011}.
 
-The goal of this project is to develop an open source semi-automated system that utilises point cloud classification and segmentation techniques to accelerate the cleaning process. The project will be undertaken in collaboration with the Zamani group \cite{Ruther2011}.
+The objective of this project is to develop an open source semi-automated system to accelerate the cleaning process.
 
-\section{Point cloud cleaning}
-Point cloud cleaning implies the classification of points, grouping points corresponding to noise before removing it. Segmentation can be performed manually by the user or can be fully automated. Between these two extremes there are semi automated approaches that lets the user manually segment the point cloud while automating subtasks to various degrees. More automated approaches save time but can compromise accuracy.
+In the next section point cloud cleaning will be defined. This will be followed by a discussion of shortcomings in existing systems and a overview of related work. The subsequent section will outline the project aims after which research questions will be formulated. Research methods will then be discussed. Finally the project time line will be presented.
 
-In the cultural heritage domain there is a strong emphasis on preserving detail. Every point is considered valuable information. It is thus very important that noise is correctly classified and segmented. In most industrial applications, the level of detail is reduced by creating CAD models, once the necessary features have been identified. As most point cloud editing packages are not specifically aimed at cultural heritage applications. Intelligent segmentation tools from such packages may exhibit some inaccuracies that can lead to valid points being discarded which is unacceptable when working with heritage data.
+%The project will be undertaken in collaboration with the Zamani group \cite{Ruther2011}.
 
-\section{Related work}
+\section{Background}
+
+\subsection{Point cloud cleaning}
+Point cloud cleaning implies the classification of points, grouping points corresponding to noise before removing it. Segmentation can be performed manually by the user or can be fully automated. Between these two extremes there are semi automated methods that let the user automatically segment local features. Automated approaches can save time but can compromise accuracy.
 
 \subsection{Existing systems}
+In the cultural heritage domain there is a strong emphasis on preserving detail. Every point is considered valuable information. It is thus very important that noise is correctly classified.
+
+Manual segmentation tools allow users to to achieve the highest degree of accuracy. Lasso selection is one such tool that is available in a number of of commercial packages. \cite{Pointools2012,Leica2012,Technodigit2012}. It allows the user to draw a two dimensional polygon around points displayed on screen. Unfortunately, hidden points behind the intended selection may be removed accidentally. Therefore, it may be tedious to use when noise is not easily isolated. Despite this issue, it is currently the primary point cloud cleaning method used by members of the Zamani project. Three dimensional selection brushes can give a user more control over which points are removed \cite{Pointools2012}. They are however still highly manual and time consuming.
+
+
+Somewhat more intelligent cleaning can be achieved with different families of fill tools. Fill tools recursively add neighbouring points to a selection based on various metrics such as distance or intensity \cite{Pointools2012}. Automatically achieving the correct selection is unlikely, therefore systems may allow one to edit a selection before removing points \cite{Pointools2012}.
+
+
+For most industrial applications, once the necessary features in a point cloud have been identified, the level of detail is reduced by creating CAD models. The majority of point cloud editing packages cater for such applications. Segmentation tools from such packages may thus exhibit some inaccuracies that may lead to valid points being discarded which is unacceptable when working with heritage data.
+
 
 \begin{figure}[htb]
 \centering
@@ -96,7 +108,7 @@ In the cultural heritage domain there is a strong emphasis on preserving detail.
 \end{table*}
 
 
-Simple lasso selection tools are quite common \cite{Pointools2012,Leica2012,Technodigit2012} and can be used to remove virtually all types of artefacts. They may however be tedious to use when noise is not easily isolated. Three dimensional selection brushes are another simple class of tools that may give a user more control over which points are removed \cite{Pointools2012}. Somewhat more intelligent cleaning can be achieved with different families of fill tools. Fill tools recursively add neighbouring points to a selection based on various metrics such as distance or intensity \cite{Pointools2012}. Automatically achieving the correct selection is unlikely, therefore systems may allow one to edit a selection before removing points \cite{Pointools2012}.
+
 
 Global segmentation or classification schemes can remove a lot of the effort associated with point cloud cleaning. In 3DReshaper \cite{Technodigit2012}, a point clustering approach is used to isolate distinct objects based on the distance between neighbouring points. However, because the point density of a laser scan usually decreases as points fall away from the scanner, this approach tends to produce large clusters close to the origin, and many small groups of clusters further away. Automated classification schemes take higher dimensional features into account in order to identify clusters corresponding to ground points, vegetation and buildings \cite{Terrasolid2012,VirtualGrid2012,Carlson2012}. While this may be of great for land surveyors or architects, such fully automated methods tend to lack the precision required for cultural heritage purposes.
 
@@ -116,7 +128,7 @@ There is certainly room to reduce the amount of productivity one has to sacrific
 % system should take intensity values into account
 
 
-\subsection{Segmentation methods}
+\subsection{Related work}
 
 % complex geopmetry cannot be discarded
 % what is the model is simplified and then mapped to the complex voints
@@ -191,9 +203,6 @@ Quantitative study (Expert users)
 	Should be experienced
 
 The system will be evaluated in a user study. The speed and accuracy of the existing system will be compared to Zamani's current system \cite{Leica2012}. Interviews will also be conducted to assess the usability of the system.
-
-\section{Expected outcomes}
-Geomatics very happy
 
 \subsection{Milestones}
 \begin{tabular}{llr}

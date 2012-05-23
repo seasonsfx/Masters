@@ -1,0 +1,40 @@
+On way is to use a lot of features like curvature, stdev of normals, intensity distribution and use together with a classifier such as ANN (probably bad) or Suport Vector Machines
+
+http://www.pointclouds.org/blog/trcs/mattia/all.php
+
+libsvm
+
+I need to create a tool to highlight points in a diff.
+
+Could click on a tree or make a rough selection using a rectangular box or cylinder. Use mouse wheel to change Z coordinate.
+
+(webgl point cloud viewer)
+
+http://graphics.cs.msu.ru/en/science/research/3dpoint/classification
+
+Use many steps
+    1. Find the ground plane
+    2. Distribution of Z coordinates
+    3. Many features for each point (computationally intense)
+    4. Classify only medoid (point closest to all points in cluster)
+
+
+Supervised learning algorithms:
+    SVM
+    AdaBoost
+    Random forest
+
+Problem is that is only airborn scans
+Very low resolution
+Errors still present    
+    
+https://sites.google.com/site/kittipat/vegfilterlidar
+    
+I will take a more local approach vs global.
+High premium on accuracy
+Vegetation
+Random objects
+People
+
+Proposal:
+http://classes.soe.ucsc.edu/cmpe200/Fall09/hws/

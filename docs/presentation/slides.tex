@@ -199,31 +199,31 @@
 \includegraphics[height=0.10\textheight]{pics/vrmesh.png}
 \includegraphics[height=0.10\textheight]{pics/3dreshaper.jpg}
 
-\vskip0pt plus.5fill
-
-Existing tools vary in terms of
 \begin{itemize}
-\item automation
-\item accuracy
+\item Leica Cyclone (used by Zamani)
+\item Pointools Edit (used by CyArk)
+\item Meshlab
+\item VR Mesh Studio
+\item Terrascan
+\item 3D Reshaper
+\item Carlson PointCloud
 \end{itemize}
-
-%\begin{itemize}
-%\item Leica Cyclone (used by Zamani)
-%\item Pointools Edit (used by CyArk)
-%\item Meshlab
-%\item VR Mesh Studio
-%\item Terrascan
-%\item 3D Reshaper
-%\item Carlson PointCloud
-%\end{itemize}
 
 \end{frame}
 
 
+\begin{frame}{Segmentation and classification tools}
+
+Tools differ with respect to
+\begin{itemize}
+\item the degree of \alert{automation}
+\item degree of \alert{accuracy}
+\end{itemize}
+
+\end{frame}
+
 \begin{frame}{Simple tools}
 
-\begin{columns}[T]
-\begin{column}{0.5\textwidth}
 Manual\\
 High accuracy\\
 \textbf{Examples:}
@@ -231,27 +231,16 @@ High accuracy\\
 \item Point picking.
 \item Rectangle select.
 \item Lasso tool.
-\item 3D selection brushes.
+\item 3D ball and cube brushes.
 \end{itemize}
-
-\end{column}
-\begin{column}{0.5\textwidth}
-\includegraphics[width=1\textwidth]{pics/lasso.png}
-\end{column}
-
-\end{columns}
 
 \end{frame}
 
 \begin{frame}{Semi-automated tools}
 
-
-\begin{columns}[T]
-\begin{column}{0.5\textwidth}
-
 Manual\\
 Varying accuracy\\
-Not suitable for all artefacts\\
+
 \textbf{Examples:}
 \begin{itemize}
 \item Plane select.
@@ -268,22 +257,14 @@ Not suitable for all artefacts\\
 \item Power lines.
 \item Fire hydrants.
 \end{itemize}
+
+
 \end{itemize}
-
-\end{column}
-\begin{column}{0.5\textwidth}
-\includegraphics[width=1\textwidth]{pics/plane.png}
-\end{column}
-
-\end{columns}
 
 \end{frame}
 
 
 \begin{frame}{Fully automated}
-
-\begin{columns}[T]
-\begin{column}{0.5\textwidth}
 
 Automatic\\
 Low accuracy\\
@@ -306,15 +287,6 @@ Low accuracy\\
 
 \end{itemize}
 
-\end{column}
-
-\begin{column}{0.5\textwidth}
-
-\includegraphics[width=1\textwidth]{pics/3DReshaper_auto_pt_cloud_seg.jpg}
-
-\end{column}
-\end{columns}
-
 \end{frame}
 
 \begin{frame}{Issues}
@@ -325,6 +297,7 @@ Low accuracy\\
 \begin{itemize}
 \item Noisy structures.
 \item Non uniform point cloud density.
+%\item Software is costly or slow.
 \end{itemize}
 
 % Distance clustering breaks down
@@ -333,9 +306,6 @@ Low accuracy\\
 \end{frame}
 
 \begin{frame}{General classification}
-
-\begin{columns}[T]
-\begin{column}{0.5\textwidth}
 
 \begin{enumerate}
 \item Calculate point features.
@@ -346,23 +316,9 @@ Low accuracy\\
 \end{itemize}
 \end{enumerate}
 
-\end{column}
-
-\begin{column}{0.5\textwidth}
-
-\includegraphics[width=1\textwidth]{pics/segmentation.png}
-
-\end{column}
-
-\end{columns}
-
-
 \end{frame}
 
 \begin{frame}{Point feature algorithms}
-
-\begin{columns}[T]
-\begin{column}{0.5\textwidth}
 
 \textbf{Examples:}
 \begin{itemize}
@@ -378,46 +334,18 @@ Low accuracy\\
 \item Point density invariance.
 \end{itemize}
 
-\end{column}
-
-\begin{column}{0.5\textwidth}
-
-\includegraphics[width=1\textwidth]{pics/features.png}
-
-\end{column}
-
-\end{columns}
-
 \end{frame}
 
-\begin{frame}{Point classification}
+\begin{frame}{Feature classification}
 
-\begin{columns}[T]
-\begin{column}{0.5\textwidth}
-
-\textbf{Heuristic reasoning}\\
 \textbf{Markov models:}
 \begin{itemize}
 \item Conditional Random Fields.
 \item Associative Markov Networks.
+\item Gibbs Random Field
 \end{itemize}
 
-% should say how they are benficial and computational cost
-% expain how they work
-% cleaner segmentation
-% results from robotics
-
-\end{column}
-
-\begin{column}{0.5\textwidth}
-%\vskip0pt plus.5fill
-\includegraphics[width=1\textwidth]{pics/crf.png}
-
-
-\end{column}
-
-\end{columns}
-
+\textbf{Heuristic reasoning}
 
 \end{frame}
 
@@ -438,7 +366,7 @@ Focus on cleaning vegetation, equipment, and people.
 
 \end{frame}
 
-\begin{frame}{Research Questions?}
+\begin{frame}{Research Question}
 
 \begin{itemize}
 \item To what degree can semi-automated methods speed up the point cloud cleaning process?
@@ -469,32 +397,22 @@ Focus on cleaning vegetation, equipment, and people.
 \end{frame}
 
 \begin{frame}{System}
+  \begin{itemize}
+\item Facilitate semi automated cleaning
+\item Responsiveness: Push load to GPU
+\item Input: single scans in PTX format of around 16 million points
+\end{itemize}
 
+\end{frame}
+
+\begin{frame}{Technology}
   \setlength\fboxsep{5pt}
   \setlength\fboxrule{0.0pt}
 
-  \fbox{\includegraphics[height=0.15\textheight]{pics/qt-logo.png}}
-  \fbox{\includegraphics[height=0.15\textheight]{pics/opencl.png}}
-  \fbox{\includegraphics[height=0.15\textheight]{pics/opengl.png}}
-  \fbox{\includegraphics[height=0.15\textheight]{pics/pcl_vert_large_pos.png}}
-
-\begin{itemize}
-\item Synthesis of semi-automated segmentation methods.
-\item Facilitate fast and accurate cleaning.
-\item Focus of responsiveness.
-\begin{itemize}
-\item Avoid transfers.
-\item Push load to GPU.
-\end{itemize}
-\item Input:
-\begin{itemize}
-\item Individual scans.
-\item Leica PTX format.
-\item Around 16 million points. % 64 MB in memory 250 on file
-\item XYZI values.
-\end{itemize}
-
-\end{itemize}
+  \fbox{\includegraphics[height=0.20\textheight]{pics/qt-logo.png}}
+  \fbox{\includegraphics[height=0.20\textheight]{pics/opencl.png}}
+  \fbox{\includegraphics[height=0.20\textheight]{pics/opengl.png}}
+  \fbox{\includegraphics[height=0.20\textheight]{pics/pcl_vert_large_pos.png}}
 
 \end{frame}
 
@@ -506,95 +424,41 @@ Focus on cleaning vegetation, equipment, and people.
 	\item Timed scan cleaning task.
 	\item Accuracy measured relative to a pre cleaned scan.
 	\begin{itemize}
-	\item Diff with precleaned cloud
+	\item Point cloud diffs.
 	\end{itemize}
 	% Point cloud diff
 	\end{itemize}
 	\end{itemize}
 
-\centering
-\includegraphics[width=0.5\textwidth]{pics/diff.png}
-
 \end{frame}
 
 \subsection{Ideas}
 
-
 \begin{frame}{Feature space distance}
-
-\begin{columns}[T]
-
-\begin{column}{0.5\textwidth}
-
 \begin{itemize}
 \item FPFH calculates 33 bins
 \item Use euclidean distance between two points in feature space for clustering in the point's neighbourhood.
 \end{itemize}  
 
-\end{column}
-
-\begin{column}{0.5\textwidth}
-
-\includegraphics[width=1\textwidth]{pics/fpfh.png}
-
-\end{column}
-
-\end{columns}
-
 \end{frame}
 
-
 \begin{frame}{Registration based cleaning}
-
-\begin{columns}[T]
-
-\begin{column}{0.5\textwidth}
-
   Scans overlap so duplicate cleaning is required.
   \begin{enumerate}
-  \item Clean scan A
+  \item Clean scan 1
   \item Register scan A to scan B
   \item Apply cleaning from scan A to scan B
   \item Clean clean scan A
   \end{enumerate}
 
-\end{column}
-
-\begin{column}{0.5\textwidth}
-
-\includegraphics[width=1\textwidth]{pics/registration_outdoor.png}
-
-\end{column}
-
-\end{columns}
-
 \end{frame}
 
-\begin{frame}{Factor out distance}
-
-\begin{columns}[T]
-
-\begin{column}{0.5\textwidth}
-
+\begin{frame}{Factor out distance during classification}
 A point's distance from the scanner determines:
 \begin{itemize}
 \item Cloud density.
 \item Intensity of light returned to the scanner.
 \end{itemize}
-
-\end{column}
-
-\begin{column}{0.5\textwidth}
-
-\includegraphics[width=1\textwidth]{pics/clustering.png}
-% Many classification schemes does not take distance into account 
-
-\end{column}
-
-\end{columns}
-
-
-
   
 \end{frame}
 

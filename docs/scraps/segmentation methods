@@ -38,3 +38,18 @@ People
 
 Proposal:
 http://classes.soe.ucsc.edu/cmpe200/Fall09/hws/
+
+What are graph cuts?
+
+Could normalise the cloud and then apply cleaning to corresponding regions in the unclened cloud
+Could morphology work?
+
+Detect what you want and subtract from that.
+make mini clusters with the same density
+    maybe: is it a solid?
+    
+Can use feature distace to limit clustering
+
+
+What if semantic labels are applied to isolated points before cleaning
+

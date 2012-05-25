@@ -1,0 +1,8 @@
+*~
+*.a
+*.dll
+*.so
+*.o
+CloudClean
+glsdk
+moc_*.cpp

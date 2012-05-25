@@ -26,7 +26,18 @@ HEADERS  += cloudclean.h viewpane.h \
 
 FORMS    += cloudclean.ui
 
-unix {
-    CONFIG += link_pkgconfig
-    PKGCONFIG += pcl_io-1.5 pcl_common-1.5 pcl_features-1.5 pcl_kdtree-1.5 pcl_visualization-1.5
-}
+INCLUDEPATH +=  "/usr/include/pcl-1.5/" \
+                 "/usr/include/flann/" \
+                 "/usr/include/eigen3/" \
+
+LIBS += -lpcl_io \
+        -lpcl_common  \
+        -lpcl_features  \
+        -lpcl_kdtree  \
+        -lpcl_visualization \
+        -lpcl_search
+
+#unix {
+#    CONFIG += link_pkgconfig
+#    PKGCONFIG += pcl_io-1.5 pcl_common-1.5 pcl_features-1.5 pcl_kdtree-1.5 pcl_visualization-1.5
+#}

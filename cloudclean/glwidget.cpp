@@ -363,7 +363,10 @@ void GLWidget::clickity(int x, int y){
 
             // fill
             // Update buffer
-            glBufferSubData(GL_ARRAY_BUFFER, 4*sizeof(float)*current, 4*sizeof(float), empty);
+            //glBufferSubData(GL_ARRAY_BUFFER, 4*sizeof(float)*current, 4*sizeof(float), empty);
+            int offset = 4*sizeof(float)*current;
+            m_vertexBuffer.write(offset, reinterpret_cast<const void *> (empty), sizeof(empty));
+
             filled[current] = true;
 
             int idx;

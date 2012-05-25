@@ -35,7 +35,8 @@ LIBS += -lpcl_io \
         -lpcl_features  \
         -lpcl_kdtree  \
         -lpcl_visualization \
-        -lpcl_search
+        -lpcl_search \
+        -lGLU
 
 #unix {
 #    CONFIG += link_pkgconfig

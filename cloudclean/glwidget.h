@@ -3,7 +3,7 @@
 
 #define GL3_PROTOTYPES
 #include <GL3/gl3.h>
-
+#include <GL/glu.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -27,6 +27,8 @@ protected:
     virtual void resizeGL( int w, int h );
     virtual void paintGL();
 
+    void clickity(int x, int y);
+
     void mouseDoubleClickEvent ( QMouseEvent * event );
     void mouseMoveEvent ( QMouseEvent * event );
     void mousePressEvent ( QMouseEvent * event );
@@ -34,7 +36,6 @@ protected:
     void wheelEvent ( QWheelEvent * event );
     void keyPressEvent ( QKeyEvent * event );
     bool eventFilter(QObject *object, QEvent *event);
-    void clickity(int x, int y);
 
 public slots:
     void reloadCloud();
@@ -56,6 +57,15 @@ private:
 
     Qt::MouseButton mouseDown;
     bool mouseDrag;
+    bool moved;
+
+    //TODO: Move out of here
+    bool sampling;
+    bool filling;
+    int vals_in_range;
+    std::vector<pcl::FPFHSignature33> stats;
+    pcl::FPFHSignature33 mean;
+    pcl::FPFHSignature33 stdev;
 
     boost::shared_ptr<glutil::ViewPole> viewPole;
     boost::shared_ptr<glutil::ObjectPole> objtPole;

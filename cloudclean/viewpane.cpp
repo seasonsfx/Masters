@@ -58,11 +58,11 @@ void ViewPane::initializeGL(){
     m_vertexBuffer.create();
     m_vertexBuffer.setUsagePattern( QGLBuffer::DynamicDraw );
 
-    float points[] = { -0.5f, -0.5f, 0.0f, 1.0f,
+    /*float points[] = { -0.5f, -0.5f, 0.0f, 1.0f,
                             0.5f, -0.5f, 0.0f, 1.0f,
                             0.0f,  0.5f, 0.0f, 1.0f };
     m_vertexBuffer.allocate( points, 3 * 4 * sizeof( float ) );
-
+*/
     if ( !m_vertexBuffer.bind() )
     {
         qWarning() << "Could not bind vertex buffer to the context";

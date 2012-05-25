@@ -10,20 +10,16 @@ CloudClean::CloudClean(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    connect(ui->openButton, SIGNAL(pressed()),
-                      this, SLOT(loadScan()));
+    connect(ui->openButton, SIGNAL(pressed()), this, SLOT(loadScan()));
 
     if( !(AppData::Instance()->cloud->points.size() || loadScan()) ){
         exit(0);
     }
 
+    // Add GL widget to window
     GLWidget * glwidget = new GLWidget;
     ui->gl->addWidget(glwidget);
-
-    connect(this, SIGNAL(reloadCloud()),
-                      glwidget, SLOT(reloadCloud()) );
-
-    
+    connect(this, SIGNAL(reloadCloud()), glwidget, SLOT(reloadCloud()) );
 }
 
 CloudClean::~CloudClean()

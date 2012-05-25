@@ -1,5 +1,5 @@
 # Code
-cloudclean/CloudClean
+/cloudclean/CloudClean
 *.o
 *.a
 *.so

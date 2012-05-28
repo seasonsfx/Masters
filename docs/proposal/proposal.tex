@@ -7,6 +7,14 @@
 \usepackage{graphicx}
 \usepackage{multirow}
 \usepackage{array}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks,%
+    citecolor=black,%
+    filecolor=black,%
+    linkcolor=black,%
+    urlcolor=black
+}
 
 \usepackage{amsfonts}
 \newcommand{\tickYes}{\checkmark}
@@ -32,7 +40,14 @@
 \maketitle
 
 \section{Introduction}
-Point clouds are sets of vertices in three dimensional space that typically represent the surface of an object. They are used in a variety of contexts. In the cultural heritage domain, laser range scanners are used to produce accurate point cloud representations of historically significant sites. In conjunction with site photography, multiple scans from different angles can be used to create 3D models for preservation and restoration purposes.
+The Zamani Project is an initiative aimed towards digitally preserving cultural heritage sites in Africa. This goal is achieved by visiting culturally significant sites and documenting their spatial domain. The end result are highly accurate 3D models of documented sites.
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=0.45\textwidth]{pics/pipeline.png}
+\caption{Processing pipeline \cite{Ruther2011}}
+\label{fig:pipeline}
+\end{figure}
 
 % Scans have an intensity value, can have rgb
 % Density of scans
@@ -40,24 +55,23 @@ Point clouds are sets of vertices in three dimensional space that typically repr
 % there are no open source offerings
 % land surveying, producing cad models, cultural heritage
 
-There are a number of steps in the processing pipeline that produce such models \cite{Ruther2011}. One of the earlier steps is referred to as point cloud cleaning. When scanning a heritage site, unwanted artefacts are likely to be present in the resulting point clouds. Examples can include: objects such as power lines or smudges produced by people walking in between the scanner and target object. The point cloud cleaning process involves the removal of such artefacts from a scan.
+The 3D models that are produced is the product of a processing pipeline that starts with data acquisition (see \autoref{fig:pipeline}) \cite{Ruther2011}. Laser rage scanners and optical cameras are used to capture the spatial domain. Following this, the point clouds acquired need to be cleaned and registered onto one coordinate space. Cleaning can be performed before or after registration. The surface reconstruction step triangulates the point cloud and produces a geometric model. Missing data or holes can be automatically filled during this step or manually afterwards. Finally, site photography is used to texture the model.
 
-This process involves lots of manual labour that tends to be time consuming. Some artefacts are harder to remove than others. A typical scan taken on an expedition, may take a single person anywhere between 30 minutes to 2 hours to clean. Given that one requires 500 - 1000 scans to cover a typical heritage site, this stage of the processing pipeline takes a considerable amount of time \cite{Ruther2011}.
+The focus of this project is on the cleaning step of this pipeline. Cleaning involves the removal of unwanted noise from point clouds. Noise can be classified into three categories. Static noise, dynamic noise and instrument noise. Static noise are unwanted objects that do not move. Examples can include vegetation, cars and equipment. Dynamic noise are unwanted objects, such as birds or people, that move through the scan. Instrument noise occurs when part of laser beam hits a near objects and part of it hits a far object. The result is that the average distance of the two objects is recorded.
 
-The objective of this project is to develop an open source semi-automated system to accelerate the cleaning process.
+A typical scan may take an experienced person anywhere between 30 minutes to 2 hours to clean. Given that one requires 500 - 1000 scans to cover a typical heritage site, this stage of the processing pipeline takes a considerable amount of time \cite{Ruther2011}.
 
-In the next section point cloud cleaning will be defined. This will be followed by a discussion of shortcomings in existing systems and a overview of related work. The subsequent section will outline the project aims after which research questions will be formulated. Research methods will then be discussed. Finally the project time line will be presented.
+In the Zamani project, vegetation is considered to be the most problematic type of noise. The objective of this project is to develop a system to accelerate the removal of vegetation from point clouds.
 
-%The project will be undertaken in collaboration with the Zamani group \cite{Ruther2011}.
+In the next section shortcomings in existing systems and a overview of related work. The subsequent section will outline the project aims after which research questions will be formulated. Research methods will then be discussed. Finally the project time line will be presented.
 
 \section{Background}
 
-\subsection{Point cloud cleaning}
-Point cloud cleaning implies the classification of points, grouping points corresponding to noise before removing it. Segmentation can be performed manually by the user or can be fully automated. Between these two extremes there are semi automated methods that let the user automatically segment local features. Automated approaches can save time but can compromise accuracy.
+Point cloud cleaning implies the classification and grouping of point corresponding to noise. This classification can be performed manually by the user or it can be fully automated. In between these two extremes there are semi automated methods that let the user automatically segment local features. Automated approaches can save time but can compromise accuracy.
+
+In the cultural heritage domain there is a strong emphasis on preserving detail. Every point is considered valuable information. It is thus very important that noise is accurately classified.
 
 \subsection{Existing systems}
-In the cultural heritage domain there is a strong emphasis on preserving detail. Every point is considered valuable information. It is thus very important that noise is correctly classified.
-
 Manual segmentation tools allow users to to achieve the highest degree of accuracy. Lasso selection is one such tool that is available in a number of of commercial packages. \cite{Pointools2012,Leica2012,Technodigit2012}. It allows the user to draw a two dimensional polygon around points displayed on screen. Unfortunately, hidden points behind the intended selection may be removed accidentally. Therefore, it may be tedious to use when noise is not easily isolated. Despite this issue, it is currently the primary point cloud cleaning method used by members of the Zamani project. Three dimensional selection brushes can give a user more control over which points are removed \cite{Pointools2012}. They are however still highly manual and time consuming.
 
 
@@ -69,14 +83,14 @@ For most industrial applications, once the necessary features in a point cloud h
 
 \begin{figure}[htb]
 \centering
-\includegraphics[width=0.45\textwidth]{3dreshaper.png}
+\includegraphics[width=0.45\textwidth]{pics/3dreshaper.png}
 \caption{Distance clustering \cite{Technodigit2012}}
 \label{fig:dist}
 \end{figure}
 
 \begin{figure}[htb]
 \centering
-\includegraphics[width=0.45\textwidth]{vrmesh.png}
+\includegraphics[width=0.45\textwidth]{pics/vrmesh-veg.png}
 \caption{Automated segmentation of vegetation \cite{VirtualGrid2012}}
 \label{fig:trees}
 \end{figure}

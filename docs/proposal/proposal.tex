@@ -63,30 +63,19 @@ A typical scan may take an experienced person anywhere between 30 minutes to 2 h
 
 In the Zamani project, vegetation is considered to be the most problematic type of noise. The objective of this project is to develop a system to accelerate the removal of vegetation from point clouds.
 
-In the next section shortcomings in existing systems and a overview of related work. The subsequent section will outline the project aims after which research questions will be formulated. Research methods will then be discussed. Finally the project time line will be presented.
+In the next section shortcomings in existing systems and a overview of related work is presented. The subsequent section will outline the project aims and research questions. Research methods will then be discussed. Finally the project time line will be presented.
 
 \section{Background}
 
-Point cloud cleaning implies the classification and grouping of point corresponding to noise. This classification can be performed manually by the user or it can be fully automated. In between these two extremes there are semi automated methods that let the user automatically segment local features. Automated approaches can save time but can compromise accuracy.
+Point cloud cleaning implies the classification and segmengation of points corresponding to noise. This classification can be performed manually by the user or it can be automated. Various degrees of automation allows users to save time by offloading some aspects of a task to an algorithm. Automation can however compromise accuracy.
 
 In the cultural heritage domain there is a strong emphasis on preserving detail. Every point is considered valuable information. It is thus very important that noise is accurately classified.
 
 \subsection{Existing systems}
-Manual segmentation tools allow users to to achieve the highest degree of accuracy. Lasso selection is one such tool that is available in a number of of commercial packages. \cite{Pointools2012,Leica2012,Technodigit2012}. It allows the user to draw a two dimensional polygon around points displayed on screen. Unfortunately, hidden points behind the intended selection may be removed accidentally. Therefore, it may be tedious to use when noise is not easily isolated. Despite this issue, it is currently the primary point cloud cleaning method used by members of the Zamani project. Three dimensional selection brushes can give a user more control over which points are removed \cite{Pointools2012}. They are however still highly manual and time consuming.
+Manual segmentation tools allow users to to achieve the highest degree of accuracy. Lasso selection is one such tool that is available in a number of commercial packages. \cite{Pointools2012,Leica2012,Technodigit2012}. It allows the user to draw a two dimensional polygon around points on screen. Unfortunately, hidden points behind the intended selection may be removed accidentally. Foe this reason it may be tedious to use when noise is hard to isolate. Despite it's shortcomings, it is currently the primary point cloud cleaning method used by members of the Zamani project. Selection brushes can give a user more control over which points are removed \cite{Pointools2012} but are still time consuming.
 
 
-Somewhat more intelligent cleaning can be achieved with different families of fill tools. Fill tools recursively add neighbouring points to a selection based on various metrics such as distance or intensity \cite{Pointools2012}. Automatically achieving the correct selection is unlikely, therefore systems may allow one to edit a selection before removing points \cite{Pointools2012}.
-
-
-For most industrial applications, once the necessary features in a point cloud have been identified, the level of detail is reduced by creating CAD models. The majority of point cloud editing packages cater for such applications. Segmentation tools from such packages may thus exhibit some inaccuracies that may lead to valid points being discarded which is unacceptable when working with heritage data.
-
-
-\begin{figure}[htb]
-\centering
-\includegraphics[width=0.45\textwidth]{pics/3dreshaper.png}
-\caption{Distance clustering \cite{Technodigit2012}}
-\label{fig:dist}
-\end{figure}
+A limited degree of automated cleaning can be achieved with different families of fill tools. Fill tools recursively add neighbouring points to a selection based on metrics such as distance or intensity \cite{Pointools2012}. Filling tools are however of little use because they fail to descriminate well between different types of objects. Pointools Edit \cite{Pointools2012} allows one to perform plane selection. While this tool is undoubtedly useful in many cases, not all selections are planar.
 
 \begin{figure}[htb]
 \centering
@@ -95,17 +84,32 @@ For most industrial applications, once the necessary features in a point cloud h
 \label{fig:trees}
 \end{figure}
 
-\begin{table*}
+Fully automated segmentation tools are found in many tools industial packages. Packages exists that automatically segment a laser range scan into ground points, vegitation and buildings \cite{Terrasolid2012,VirtualGrid2012,Carlson2012}. Vegetation detection in VR Mesh Studio \cite{Terrasolid2012} is based on a noise metric. In the heritage domain buildings often exhibit uneven surfaces. Such surfaces can be mistaken for vegitation as is seen in \autoref{fig:trees}.
+
+In 3DReshaper \cite{Technodigit2012} a point clustering approach is used to automatically segment a point cloud. Distinct objects are isolated based on the distance between neighbouring points. This approach may be somewhat effective on point clouds with a constant density. However, raw point clouds from laser scans decrease in desity as one moves away from the origin. Applying this techique on a raw scan produces large clusters at the origin and incresingly smaller clusters one moves further away (See \autoref{fig:dist}).
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=0.45\textwidth]{pics/clustering.png}
+\caption{Distance clustering \cite{Technodigit2012}}
+\label{fig:dist}
+\end{figure}
+
+Meshlab \cite{VisualComputingLaboratory2012}, is currently the only known open source system that provides point cloud cleaning features. It is primarily aimed at processing triangulated meshes. Recently point cloud editing features were introduced in the form of point picking and plane selection. These features perform somewhat sluggish on larger point clouds. They are also not sufficient to perform a point cloud cleaning task.
+
+%For most industrial applications, once the necessary features in a point cloud have been identified, the level of detail is reduced by creating CAD models. The majority of point cloud editing packages cater for such applications. Segmentation tools from such packages may thus exhibit some inaccuracies that may lead to valid points being discarded which is unacceptable when working with heritage data.
+
+\begin{table*}[htb]
 \centering
   \begin{tabular}{| l | x{3cm} | x{3cm} | x{3cm} | c |}
   	\hline
 	 & \multicolumn{3}{|c|}{Segmentation feature} & \\
 	 \hline
-	Package name & Simple & Intelligent & Auto & Open source \\    
+	Package name & Simple & Semi automated & Fully automatic & Open source \\    
     \hline
 	Terrascan \cite{Terrasolid2012} & & & ground points, vegetation, buildings &	\tickNo \\
 	\hline
-	Pointools Edit \cite{Pointools2012} & lasso select\newline rectangle select, ball/cube brush select & fill select with distance threshold, fill with colour or intensity similarity, plane select & &	\tickNo \\
+	Pointools Edit \cite{Pointools2012} & lasso select\newline rectangle select, ball and cube brush select & floodfill with distance threshold, floodfill based on colour or intensity similarity, plane select & &	\tickNo \\
 	\hline
 	VR Mesh Studio \cite{VirtualGrid2012} & & power lines & ground, vegetation, roofs, planes &	\tickNo \\
 	\hline
@@ -113,9 +117,9 @@ For most industrial applications, once the necessary features in a point cloud h
 	\hline
 	3D Reshaper \cite{Technodigit2012} & lasso select & & clustering with distance metric, clustering colours, remove isolated points &	\tickNo \\
 	\hline
-	Cyclone \cite{Leica2012} & lasso select & fill with smoothness similarity &  &	\tickNo \\
+	Cyclone \cite{Leica2012} & lasso select & floodfill based on smoothness similarity &  &	\tickNo \\
 	\hline	
-	Meshlab \cite{VisualComputingLaboratory2012} & plane select, single point select & & isolated point removal &	\tickYes \\
+	Meshlab \cite{VisualComputingLaboratory2012} & point picking & plane select & isolated point removal &	\tickYes \\
 	\hline
   \end{tabular}
   \caption{Existing systems}
@@ -124,9 +128,7 @@ For most industrial applications, once the necessary features in a point cloud h
 
 
 
-Global segmentation or classification schemes can remove a lot of the effort associated with point cloud cleaning. In 3DReshaper \cite{Technodigit2012}, a point clustering approach is used to isolate distinct objects based on the distance between neighbouring points. However, because the point density of a laser scan usually decreases as points fall away from the scanner, this approach tends to produce large clusters close to the origin, and many small groups of clusters further away. Automated classification schemes take higher dimensional features into account in order to identify clusters corresponding to ground points, vegetation and buildings \cite{Terrasolid2012,VirtualGrid2012,Carlson2012}. While this may be of great for land surveyors or architects, such fully automated methods tend to lack the precision required for cultural heritage purposes.
 
-There is certainly room to reduce the amount of productivity one has to sacrifice for precision, especially in open source tools. Meshlab \cite{VisualComputingLaboratory2012}, is currently the only known open source system that provides point cloud cleaning features. It is primarily aimed at processing triangulated meshes and therefore lacks some raw point cloud cleaning features. The recently introduced point editing features, such as point picking and plane selection, performs somewhat sluggish on larger point clouds, and are not very efficient.
 
 %resolution of the scans are also different
 % rotation table is highre
@@ -147,7 +149,33 @@ There is certainly room to reduce the amount of productivity one has to sacrific
 % complex geopmetry cannot be discarded
 % what is the model is simplified and then mapped to the complex voints
 % multi resolution kind of
- Automated point cloud segmentation is not a new problem. There is however, very little available research related to the segmentation of cultural heritage data. Some success has been achieved in automatically segmenting sites into surfaces and edges through the use of Principle Component Analysis \cite{Spina2010}. What makes the segmentation of heritage data hard, is that scanned structures can exhibit very complex geometries that is hard to classify \cite{Spina2010}.
+
+Approaches
+	Point features
+	Classification of point features
+		Probabilistic
+		Machine learning
+		Heuristics
+
+
+Approaches:
+	genaral classification of point coulds
+		Aerial scans with markov network \cite{Shapovalov2010}
+		City classification \cite{Golovinskiy2009}
+		Sonar \cite{Arge2010}
+		FPFH \cite{Rusu2009} \cite{Rusu2008}
+	segment cultural heritage sites
+		Spinas \cite{Spina2010}
+	to segment trees
+		Canopy and 3d modeling paper \cite{Wang2008}
+		Aerial one again \cite{Shapovalov2010}
+	
+Impementations
+	PCL
+		
+	
+
+Little research has been found relating to the segmentation of cultural heritage data. Some success has been achieved in automatically segmenting sites into surfaces and edges through the use of Principle Component Analysis \cite{Spina2010}. What makes the segmentation of heritage data hard, is that scanned structures can exhibit very complex geometries that is hard to classify \cite{Spina2010}.
 
 %seperate trees for sites
 

@@ -148,16 +148,24 @@ Meshlab \cite{VisualComputingLaboratory2012}, is the only known open source syst
 % multi resolution kind of
 
 
-Little research is available relating to the cleaning or classification of cultural heritage data. Extensive research have however been conducted in point cloud classification in the context of robot navigation and other domains.
+Little research is available relating to the cleaning or classification of cultural heritage data. Extensive research have however been conducted in point cloud classification and segmentation in the context of robot navigation and other domains.
 
 In robot navigation objects need to be identified in real time in order to inform actions. The general approach taken in such a classification task is to use point features to characterize basic surface characteristics. Subsequently machine learning techniques are used to classify points into higher level features. Point features can be far more efficiently calculated than alternative approaches such as model fitting.
 
-Point features are calculated by considering the neighbourhood around a given point. A point normal is probably the most basic point feature. Fast Point Feature Histograms (FPFH) is a more complex point feature that has been shown to discriminate well between basic geometric surfaces \cite{Rusu2009}. \citeauthor{Rusu2009} used FPFHs to train both Conditional Random Fields (CRF) and Support Vector Machines (SVM) to classify basic geometric shapes. The classifiers where tested on a scan taken of a table scene with plates, cutlery and condiments. Different arrangements of the scene had between 70k and 80k points. Results showed that the CRF took 0.09 seconds to classify a point cloud with 97.36\% accuracy while SVM classified the cloud in 1.98 seconds with 89.67\% percent accuracy. FPFH in conjunction with CRFs for real time point cleaning of larger clouds seems promising. Cultural heritage data is however likely to exhibit far more noise. Using this unmodified approach to classify noise is not expected to produce acceptable results.
+Point features are calculated by considering the neighbourhood around a given point. A point normal is probably the most basic point feature. Fast Point Feature Histograms (FPFH) is a more complex point feature that has been shown to discriminate well between basic geometric surfaces \cite{Rusu2009}. \citeauthor{Rusu2009} used FPFHs to train both Conditional Random Fields (CRF) and Support Vector Machines (SVM) to classify basic geometric shapes. The classifiers where tested on a scan taken of a table scene with plates, cutlery and condiments. Different arrangements of the scene had between 70k and 80k p\citeauthor{Golovinskiy2009}oints. Results showed that the CRF took 0.09 seconds to classify a point cloud with 97.36\% accuracy while SVM classified the cloud in 1.98 seconds with 89.67\% percent accuracy. FPFH in conjunction with CRFs for real time point cleaning of larger clouds seems promising. Cultural heritage data is however likely to exhibit far more noise. Using this unmodified approach to classify noise is not expected to produce acceptable results.
 
 % only geometric features were used
-A more involved approach was taken while trying to recognize objects in urban environments. Urban datasets are more similar to the data that one is likely to find in the cultural heritage domain. \citeauthor{Golovinskiy2009} uses a four step process to recognize objects. Firstly potential locations of objects are identified by looking at point density. Object are then isolated from background noise using graph cuts. To achieve this segmentation, two cost functions are introduced. The first penalizes neighboring nodes being of a different type while the second cost function penalizes nodes that are far away from the object center. It was shown that this approach is superior to distance clustering. As in \cite{Rusu2009}, a classifier is trained and used to label isolated points. Unlike \cite{Rusu2009}, a feature vector describing the segmented shape is used. Shape features including spin images, shape volume and other features are used to classify objects such as cars and street lights. Contextual features such as the distance of an object from a known feature such as a road is also taken into account. After features have calculated the final step is classification. Random forest, k-nearest neighbors and SVM were tested. SVM was most accurate and correctly classified 65\% of objects.
+A more involved approach was taken while attemptig to recognize objects in urban environments. Urban datasets are more similar to the data that one is likely to find in the cultural heritage domain. \citeauthor{Golovinskiy2009} uses a four step process to recognize objects. Firstly potential locations of objects are identified by looking at point density. Object are then isolated from background noise using graph cuts. To achieve this segmentation, two cost functions are introduced. The first penalizes neighboring nodes being of a different type while the second cost function penalizes nodes that are far away from the object center. It was shown that this approach is superior to distance clustering. As in \cite{Rusu2009}, a classifier is trained and used to label isolated points. Unlike \cite{Rusu2009}, a feature vector describing the segmented shape is used. Shape features including spin images, shape volume and other features are used to classify objects such as cars and street lights. Contextual features such as the distance of an object from a known feature such as a road is also taken into account. After features have calculated the final step is classification. Random forest, k-nearest neighbors and SVM were tested. SVM was most accurate and correctly classified 65\% of objects.
 
-This approach my not be cleaning. But the ideas cloud be applied to point cloud cleaning. Specifically graph cuts and taking contextual information into account
+%This approach my not be cleaning. But the ideas cloud be applied to point cloud cleaning. Specifically graph cuts and taking contextual information into account
+
+Ouside of the robot navigation domain
+
+noise mertric to clear shrubery from bare earth
+
+sonar
+
+over vs under segmentation?
 
 -----------------
 
@@ -211,11 +219,23 @@ A variety of point feature schemes that are used extensively in robotics, could 
 Classification can be achieved by though either heuristic schemes \cite{Spina2010} or probabilistic models \cite{Shapovalov2010,Rusu2009}. Approaches based on machine learning have been shown to be effective.
 
 
-%\subsection{Artifacts types}
-\section{Research question}
-La la
 
-\section{Aims (expand)}
+%\subsection{Artifacts types}
+
+\section{Aims}
+From the above review of point cloud classification and segmentation iterature it seems unlikely that automated cleaning of laser scans could achieve the accuracy required by the cultural heritage comunity. It is therefore proposed that an augmented approach be taken to computationally leverage a persons ability to isolate local noise in a fast and accurate manner. In order to limit the scope of this project while maximising impact, the focus of this project will be on the removal of vegetation. This will include trees, shubs and grass.
+
+look at graph cuts
+take local information onto account
+attempt to use different point features
+use classifiers SVM, random trees
+
+\section{Research question}
+\itemize{
+\item To what extent can augmented methods allow the 
+}
+
+----------
 Why am I doing it?
 
 Inputs, outputs

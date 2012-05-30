@@ -53,3 +53,15 @@ Can use feature distace to limit clustering
 
 What if semantic labels are applied to isolated points before cleaning
 
+
+So current plan:
+    Only segment trees
+    Start easy go hard
+    CPU to GPU implementation
+    Interface
+        Get all the basics up
+        Point picking
+        Polygon
+        Layers
+        Subtract
+    Want to: click of point nd get top down view, click then to go back

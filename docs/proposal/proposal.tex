@@ -40,7 +40,7 @@
 \maketitle
 
 \section{Introduction}
-The Zamani Project is an initiative aimed towards digitally preserving cultural heritage sites in Africa. This goal is achieved by visiting culturally significant sites and documenting their spatial domain. The end result are highly accurate 3D models of documented sites \cite{Ruther2011}.
+The Zamani Project is an initiative aimed at digitally preserving cultural heritage sites in Africa. This goal is achieved by visiting culturally significant sites and capturing their 3D structure. The end result are highly accurate 3D models of documented sites \cite{Ruther2011}.
 
 \begin{figure}[htb]
 \centering
@@ -55,19 +55,19 @@ The Zamani Project is an initiative aimed towards digitally preserving cultural 
 % there are no open source offerings
 % land surveying, producing cad models, cultural heritage
 
-The 3D models that are produced is the product of a processing pipeline that starts with data acquisition (see \autoref{fig:pipeline}) \cite{Ruther2011}. Laser rage scanners and cameras are used to capture the spatial domain. Following this, the point clouds acquired need to be cleaned and registered onto one coordinate space. Cleaning can be performed before or after registration. The surface reconstruction step triangulates the point cloud and produces a geometric model. Missing data or holes can be automatically filled during this step or manually afterwards. Finally, site photography is used to texture the model.
+The 3D models that is produced is the product of a processing pipeline that starts with data acquisition (see \autoref{fig:pipeline}) \cite{Ruther2011}. Laser rage scanners and cameras are used to capture the spatial domain. Following this, the point clouds acquired need to be cleaned and registered onto one coordinate space. Cleaning can be performed before or after registration. The surface reconstruction step triangulates the point cloud and produces a geometric model. Missing data or holes can be automatically filled during this step or manually afterwards. Finally, site photography is used to texture the model.
 
-The focus of this project is on the cleaning step of this pipeline. Cleaning involves the removal of unwanted noise from point clouds. Noise can be classified into three categories. Static noise, dynamic noise and instrument noise. Static noise are unwanted objects that do not move. Examples can include vegetation, cars and equipment \cite{Held2012}. Dynamic noise are unwanted objects, such as birds or people, that move through the scan. Instrument noise occurs when part of laser beam hits a near objects and part of it hits a far object. The result is that the average distance of the two objects is recorded.
+The focus of this project is on the cleaning step of this pipeline. Cleaning involves the removal of unwanted noise from point clouds. Noise can be classified into three categories. Static noise, dynamic noise and instrument noise. Static noise refers to unwanted objects that do not move. Examples can include vegetation, cars and equipment \cite{Held2012}. Dynamic noise are unwanted objects, such as birds or people, that move through the scan. Instrument noise occurs when part of laser beam hits a near object and part of it hits a far object. The result is that the average distance of the two objects is recorded.
 
 A typical scan may take an experienced person anywhere between 30 minutes to 2 hours to clean. Given that one requires 500 - 1000 scans to cover a typical heritage site, this stage of the processing pipeline takes a considerable amount of time \cite{Ruther2011}.
 
 In the Zamani project, vegetation is considered to be the most problematic type of noise \cite{Held2012}. The objective of this project is to develop a system to accelerate the removal of vegetation from point clouds.
 
-In the next section shortcomings in existing systems and a overview of related work is presented. The subsequent section will outline the project aims and research questions. Research methods will then be discussed. Finally the project time line will be presented.
+In the next section shortcomings in existing systems and a overview of related work are presented. Subsequent sections will outline the project aims and research questions. Research methods will then be discussed. Finally the project time line will be presented.
 
 \section{Background}
 
-Point cloud cleaning implies the classification and segmentation of points corresponding to noise. This classification can be performed manually by the user or it can be automated. Various degrees of automation allows users to save time by offloading some aspects of a task to an algorithm. Automation can however compromise accuracy.
+Point cloud cleaning implies the classification and segmentation of points corresponding to noise. This classification can be performed manually by the user or it can be automated. Various degrees of automation allow users to save time by offloading some aspects of a task to software. Automation can however compromise accuracy.
 
 In the cultural heritage domain there is a strong emphasis on preserving detail. Every point is considered valuable information \cite{Held2012}. It is thus very important that noise is accurately classified.
 
@@ -112,7 +112,7 @@ A limited degree of automated cleaning can be achieved with different families o
 
 Fully automated segmentation tools are found in many industrial packages. Packages exists that automatically segment a laser range scan into ground points, vegetation and buildings \cite{Terrasolid2012,VirtualGrid2012,Carlson2012}. Vegetation detection in VR Mesh Studio \cite{Terrasolid2012} is based on a noise metric. In the heritage domain buildings often exhibit uneven surfaces. Such surfaces can be mistaken for vegetation as is seen in \autoref{fig:trees}.
 
-In 3DReshaper \cite{Technodigit2012} a point clustering approach is used to automatically segment a point cloud. Distinct objects are isolated by looking at the distance between neighbouring points. This approach may be somewhat effective on point clouds with a constant density. However, raw point clouds from laser scans decrease in density as one moves away from the origin. Applying this technique on a raw scan produces large clusters at the origin and increasingly smaller clusters one moves further away (See \autoref{fig:dist}).
+In 3DReshaper \cite{Technodigit2012} a point clustering approach is used to automatically segment a point cloud. Distinct objects are isolated by looking at the distance between neighbouring points. This approach may be somewhat effective on point clouds with a constant density. However, raw point clouds from laser scans decrease in density as one moves away from the origin. Applying this technique on a raw scan produces large clusters at the origin and increasingly smaller clusters as one moves further away (See \autoref{fig:dist}).
 
 \begin{figure}[htb]
 \centering
@@ -147,20 +147,20 @@ Meshlab \cite{VisualComputingLaboratory2012}, is the only known open source syst
 % multi resolution kind of
 
 
-Little research is available relating to the cleaning or classification of cultural heritage data. Extensive research have however been conducted in point cloud classification and segmentation in the context of robot navigation and other domains.
+Little research is available relating to the cleaning or classification of cultural heritage data. Extensive research has however been conducted in point cloud classification and segmentation in the context of robot navigation and other domains.
 
 In robot navigation objects need to be identified in real time in order to inform actions. The general approach taken in such a classification task is to use point features to characterize basic surface characteristics. Subsequently machine learning techniques are used to classify points into higher level features. Point features can be far more efficiently calculated than alternative approaches such as model fitting.
 
-Point features are calculated by considering the neighbourhood around a given point. A point normal is probably the most basic point feature. Fast Point Feature Histograms (FPFH) is a more complex point feature that has been shown to discriminate well between basic geometric surfaces \cite{Rusu2009}. \citeauthor{Rusu2009} used FPFHs to train both Conditional Random Fields (CRF) and Support Vector Machines (SVM) to classify basic geometric shapes. The classifiers where tested on a scan taken of a table scene with plates, cutlery and condiments. Different arrangements of the scene had between 70k and 80k p\citeauthor{Golovinskiy2009}oints. Results showed that the CRF took 0.09 seconds to classify a point cloud with 97.36\% accuracy while SVM classified the cloud in 1.98 seconds with 89.67\% percent accuracy. FPFH in conjunction with CRFs for real time point cleaning of larger clouds seems promising. Cultural heritage data is however likely to exhibit far more noise. Using this unmodified approach to classify noise is not expected to produce acceptable results.
+Point features are calculated by considering the neighbourhood around a given point. A point normal is probably the most basic point feature. Fast Point Feature Histograms (FPFH) is a more complex point feature that has been shown to discriminate well between basic geometric surfaces \cite{Rusu2009}. \citeauthor{Rusu2009} used FPFHs to train both Conditional Random Fields (CRF) and Support Vector Machines (SVM) to classify basic geometric shapes. The classifiers where tested on a scan taken of a table scene with plates, cutlery and condiments. Different arrangements of the scene had between 70k and 80k points. Results showed that the CRF took 0.09 seconds to classify a point cloud with 97.36\% accuracy while SVM classified the cloud in 1.98 seconds with 89.67\% percent accuracy. FPFH in conjunction with CRFs for real time point cleaning of larger clouds seems promising. Cultural heritage data is however likely to exhibit far more noise. Using this unmodified approach to classify noise is not expected to produce acceptable results.
 
 % only geometric features were used
-A more involved approach was taken while attempting to recognize objects in urban environments. Urban datasets are more similar to the data that one is likely to find in the cultural heritage domain. \citeauthor{Golovinskiy2009} uses a four step process to recognize objects. Firstly potential locations of objects are identified by looking at point density. Object are then isolated from background noise using graph cuts. To achieve this segmentation, two cost functions are introduced. The first penalizes neighbouring nodes being of a different type while the second cost function penalizes nodes that are far away from the object center. It was shown that this approach is superior to distance clustering. As in \cite{Rusu2009}, a classifier is trained and used to label isolated points. Unlike \cite{Rusu2009}, a feature vector describing the segmented shape is used. Shape features including spin images, shape volume and other features are used to classify objects such as cars and street lights. Contextual features such as the distance of an object from a known feature such as a road is also taken into account. After features have calculated the final step is classification. Random forest, k-nearest neighbours and SVM were tested. SVM was most accurate and correctly classified 65\% of objects.
+A more complex approach was taken when attempting to recognize objects in urban environments. Urban datasets are more similar to the data that one is likely to find in the cultural heritage domain. \citeauthor{Golovinskiy2009} use a four step process to recognize objects. Firstly potential locations of objects are identified by looking at point density. Object are then isolated from background noise using graph cuts. To achieve this segmentation, two cost functions are introduced. The first penalizes neighbouring nodes being of a different type while the second cost function penalizes nodes that are far away from the object center. It was shown that this approach is superior to distance clustering. As in \cite{Rusu2009}, a classifier is trained and used to label isolated points. Unlike \cite{Rusu2009}, a feature vector describing the segmented shape is used. Shape features including spin images, shape volume and other features are used to classify objects such as cars and street lights. Contextual features such as the distance of an object from a known feature such as a road are also taken into account. After features have calculated the final step is classification. Random forest, k-nearest neighbours and SVM were tested. SVM was most accurate and correctly classified 65\% of objects.
 
 %This approach my not be cleaning. But the ideas cloud be applied to point cloud cleaning. Specifically graph cuts and taking contextual information into account
 
-Automatic segmentation of cultural heritage sites into surfaces and edges was demonstrated by \citep{Spina2010}. What makes the segmentation of heritage data hard, is that scanned structures can exhibit very complex geometries that is hard to classify \cite{Spina2010}. The point feature used was the ratio of the two largest eigenvalues after a Principle Component Analysis of a point's neighbourhood. It was shown to be effective in segmenting sites into planes and edges.
+Automatic segmentation of cultural heritage sites into surfaces and edges was demonstrated by \citep{Spina2010}. What makes the segmentation of heritage data hard, is that scanned structures can exhibit very complex geometries that are hard to classify \cite{Spina2010}. The point feature used was the ratio of the two largest eigenvalues after a Principle Component Analysis of a point's neighbourhood. It was shown to be effective in segmenting sites into planes and edges.
 
-A variety of point feature schemes that are used extensively in robotics, could potentially be exploited in the cultural heritage domain. A number of popular point feature algorithms have been implemented and is freely available in the Point Cloud Library \cite{Rusu2011}.
+A variety of point feature schemes that are used extensively in robotics, could potentially be exploited in the cultural heritage domain. A number of popular point feature algorithms have been implemented and are freely available in the Point Cloud Library \cite{Rusu2011}.
 
 % Talk about wang
 
@@ -182,22 +182,24 @@ A variety of point feature schemes that are used extensively in robotics, could 
 %\subsection{Artifacts types}
 
 \section{Aims}
-From the above review of point cloud classification and segmentation literature it seems unlikely that automated cleaning of laser scans could achieve the accuracy required by the cultural heritage community. It is therefore proposed that an augmented approach be taken to enhance a persons ability to isolate local noise in a fast and accurate manner. In order to limit the scope of this project while maximising impact, the focus of this project will be on the removal of vegetation. This will include trees, shubs and grass.
+From the above review of point cloud classification and segmentation literature it seems unlikely that automated cleaning of laser scans could achieve the accuracy required by the cultural heritage community. It is therefore proposed that an augmented approach be taken to enhance a persons ability to isolate local noise in a fast and accurate manner. In order to limit the scope of this project while maximising impact, the focus of this project will be on the removal of vegetation. This will include trees, shrubs and grass.
 
 %The aim of this research is to produce a system that will allow users to clean cultural heritage data in a fast and effective manner. The focus will be on finding ways to remove the most problematic artefacts as identified by the Zamani project. In descending order of importance, the focus will thus be on removing vegetation, people, and equipment. 
 
 %Existing point feature schemes will be investigated, as well as heuristic and machine learning approaches to segmentation. In order to ensure fast response times, cleaning methods will be accelerated with OpenCL.
 
 \section{Research question}
+
+TODO: Explain more
 \begin{itemize}
-\item How much can augmented methods speed up the segmentation of vegetation?
+\item To what extent can augmented methods speed up the segmentation of vegetation?
 \item What degree of accuracy can be obtained?
 \end{itemize}
 
 \section{Method}
-The proposed method of vegetation removal will let the user limit the search space by isolate the approximate area containing the target vegetation. A lasso tool will be implemented for this purpose. In the case of a bush or a tree, the user will be asked to select the center of the object using a point picking tool. 
+The proposed method of vegetation removal will let the user limit the search space by isolating the approximate area containing the target vegetation. A lasso tool will be implemented for this purpose. In the case of a bush or a tree, the user will be asked to select the center of the object using a point picking tool. 
 
-Given the search space and a point lying on the object, heuristic together with contextual cues will be used to segment a tree. Contextual cues such as the location of the ground plane could be used in order to inform a heuristic algorithm. A tree generally has a cylindrical trunk and a leafy crown higher up. A heuristic algorithm can be created to expect point features to become more noisy as further up away from the ground as the crown of the tree is approached. Such heuristics can be encoded as an energy function and be used with a graph cut algorithm in order to segment vegetation. \footnote{Given that scans overlap to some extent in order to perform registration, an extension could be written to apply cleaning from a cleaned scan to a dirty overlapping scan. PCL contains a registration module which could be used for this purpose.}
+Given the search space and a point lying on the object, heuristic together with contextual cues will be used to segment a tree. Contextual cues such as the location of the ground plane could be used in order to inform a heuristic algorithm. A tree generally has a cylindrical trunk and a leafy crown higher up. A heuristic algorithm can be created to expect point features to become more noisy further up away from the ground as the crown of the tree is approached. Such heuristics can be encoded as an energy function and be used with a graph cut algorithm in order to segment vegetation. \footnote{Given that scans overlap to some extent in order to perform registration, an extension could be written to apply cleaning from a cleaned scan to a dirty overlapping scan. PCL contains a registration module which could be used for this purpose.}
 
 An alternative approach to investigate is the use of trained classifiers such as SVM's or CRF's to classify points that are likely to correspond to a vegetation.
 
@@ -205,15 +207,15 @@ An alternative approach to investigate is the use of trained classifiers such as
 % registration based cleaning
 \section{System}
 
-The development of the segmentation method with proceed incrementally. The first step will be to create a user interface in which segmentation methods can be tested. The goal will then be to segment free standing trees, shrubs and grass. Once this has been completed trees and shrubs that cooccur will be segmented. Once serial methods have been implemented an attempt will be made to parallelise them using GPGPU. The calculation of most point features generally only involves local data dependencies is thus an ideal candidate for a GPGPU implementation. Graph cuts have also been shown to be parallelisable on GPUs \cite{Hussein2007}.
+The development of the segmentation method with proceed incrementally. The first step will be to create a user interface in which segmentation methods can be tested. The goal will then be to segment free standing trees, shrubs and grass. Once this has been completed trees and shrubs that co-occur with buildings will be segmented. Once serial methods have been implemented an attempt will be made to improve performance using GPGPU techniques. The calculation of most point features generally only involves local data dependencies is thus an ideal candidate for a GPGPU implementation. Graph cuts have also been shown to be parallelisable on GPUs \cite{Hussein2007}.
 
-The system will be designed to only work single scans in Leica PTX format, as this is what the Zamani Project uses \cite{Held2012}. Existing point features in the PCL library \cite{Rusu2011} will be used. The interface will use QT and OpenGL, while OpenCL will be used for GPGPU algorithms.
+The system will be designed to process single scans in Leica PTX format, as this is what the Zamani Project uses \cite{Held2012}. Existing point features in the PCL library \cite{Rusu2011} will be used. The interface will use QT and OpenGL, while OpenCL will be used for GPGPU algorithms.
 
 \section{Evaluation}
 
 The system will be evaluated both quantitatively and qualitatively. In the quantitative evaluation it will be determined whether the new system outperforms the old system in terms of speed and accuracy. For the qualitative evaluation an expert opinion will be acquired.
 
-For the quantitative evaluation members of the Zamani group will be recruited as well as their interns. A counterbalanced repeated measures design will be used due to the limited number of experienced users that will be available for testing. Users will be given a number of scans to clean. The scans will have to be cleaned using both Leica Cyclone and the new system. To counteract practise effects the system used first will vary between users. The cleaning task will be timed and accuracy will be determined by comparing user cleaned scans with pre-cleaned scans. A basic point cloud diff tool with be created for this purpose.
+For the quantitative evaluation members of the Zamani group will be recruited as well as their interns. A counterbalanced repeated measures design will be used due to the limited number of experienced users that will be available for testing. Users will be given a number of scans to clean. The scans will have to be cleaned using both Leica Cyclone and the new system. To counteract practise effects the order in which the two systems will be used will vary between users. In order in which scans will be cleaned will also be shuffled. The cleaning task will be timed and accuracy will be determined by comparing user cleaned scans with pre-cleaned scans. A basic point cloud diff tool with be created for this purpose.
 
 % how big of a sample?
 % what about significance
@@ -238,14 +240,14 @@ System Design Chapter & February 2013\\
 Implementation Chapter & March 2013\\
 User testing & April 2012\\
 Evaluation Chapter & May 2013\\
-%Conference Paper & June 2013\\
-First Thesis Draft & July 2013\\
+Thesis Draft & June 2013\\
+Conference Paper & July 2013\\
 Final Draft & August 2013\\
 \hline
 \end{tabular}
 \end{table}
 
-
+TODO: Gantt chart
 
 %by comparing the time taken to clean a scan with Zamani's current system \cite{Leica2012} to the new system.
 

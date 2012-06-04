@@ -15,8 +15,21 @@
     linkcolor=black,%
     urlcolor=black
 }
-
+\usepackage{color}
 \usepackage{amsfonts}
+\usepackage{tikz}
+\usepackage{gantt}
+\usepackage{pdflscape}
+
+\newcommand{\months}[1]{#1*4}
+\newcommand{\weeks}[1]{#1*1}
+
+\newcommand{\init}[1]{\textcolor{red}{#1}}
+\newcommand{\thesis}[1]{\textcolor{blue}{#1}}
+\newcommand{\impl}[1]{\textcolor{green}{#1}}
+\newcommand{\eval}[1]{\textcolor{yellow}{#1}}
+\newcommand{\paper}[1]{\textcolor{purple}{#1}}
+
 \newcommand{\tickYes}{\checkmark}
 \usepackage{pifont}
 \newcommand{\tickNo}{\hspace{1pt}\ding{55}}
@@ -190,7 +203,8 @@ From the above review of point cloud classification and segmentation literature 
 
 \section{Research question}
 
-TODO: Explain more
+The most important research outcome of this project is an improvement in the speed and accuracy at which point clouds can be cleaned. The following two research questions are thus posed.
+
 \begin{itemize}
 \item To what extent can augmented methods speed up the segmentation of vegetation?
 \item What degree of accuracy can be obtained?
@@ -213,11 +227,11 @@ The system will be designed to process single scans in Leica PTX format, as this
 
 \section{Evaluation}
 
-TODO: Algorithm vs system accuracy
-
 The system will be evaluated both quantitatively and qualitatively. In the quantitative evaluation it will be determined whether the new system outperforms the old system in terms of speed and accuracy. For the qualitative evaluation an expert opinion will be acquired.
 
 For the quantitative evaluation members of the Zamani group will be recruited as well as their interns. A counterbalanced repeated measures design will be used due to the limited number of experienced users that will be available for testing. Users will be given a number of scans to clean. The scans will have to be cleaned using both Leica Cyclone and the new system. To counteract practise effects the order in which the two systems will be used will vary between users. In order in which scans will be cleaned will also be shuffled. The cleaning task will be timed and accuracy will be determined by comparing user cleaned scans with pre-cleaned scans. A basic point cloud diff tool with be created for this purpose.
+
+The accuracy of the vegetation segmentation algorithm will also be evaluated in isolation. The new method will be compared to existing vegetation extraction tools in VR Mesh Studio \cite{VirtualGrid2012} and Terrascan \cite{Terrasolid2012}. The diff tool will again be used to determine accuracy.
 
 % how big of a sample?
 % what about significance
@@ -226,30 +240,118 @@ The system will qualitatively be evaluated by walking an experienced member of t
 			
 %What about pairwise registration and scanning framework?
 
-\section{Milestones}
+\section{Timeline}
 \begin{table}[h]
 \begin{tabular}{llr}
 \hline
 Task & Due date \\
 \hline
-Research Proposal & June 2012\\
-Point Cloud Cleaning Framework & July 2012\\
-Basic Cleaning Tools & August 2012\\
-Clean Isolated Vegetation & September 2012\\
-Background Chapter & November 2012\\
-Clean All Vegetation & January 2013\\
-System Design Chapter & February 2013\\
-Implementation Chapter & March 2013\\
-User testing & April 2012\\
-Evaluation Chapter & May 2013\\
-Thesis Draft & June 2013\\
-Conference Paper & July 2013\\
-Final Draft & August 2013\\
+Research Proposal & 13 June 2012\\
+Point Cloud Cleaning Framework & 30 June 2012\\
+Clean Isolated Vegetation & 7 September 2012\\
+Clean Co-occurring Vegetation & 15 November 2013\\
+Background Chapter & 22 November 2012\\
+System Design Chapter & 7 January 2013\\
+GPGPU port & 15 January 2012\\
+Implementation Chapter & 22 February 2013\\
+User testing & 28 February 2012\\ % will they have interns yet?
+Evaluation Chapter & 7 March 2013\\
+Thesis Draft & 7 April 2013\\
+Conference Paper & 7 May 2013\\
+Final Draft & 7 July 2013\\
 \hline
 \end{tabular}
 \end{table}
 
-TODO: Gantt chart
+
+\begin{landscape}
+  \scalebox{0.75}{
+  \begin{gantt}[xunitlength=0.35cm,fontsize=\small,titlefontsize=\small,drawledgerline=true]{24}{72}
+    \begin{ganttitle}
+      \titleelement{2012}{40}
+      \numtitle{2013}{1}{2013}{32}
+    \end{ganttitle}
+    
+	\begin{ganttitle}
+      \titleelement{Mar}{4}
+      \titleelement{Apr}{4}
+      \titleelement{May}{4}
+      \titleelement{Jun}{4}
+      \titleelement{Jul}{4}
+      \titleelement{Aug}{4}
+      \titleelement{Sep}{4}
+      \titleelement{Oct}{4}
+      \titleelement{Nov}{4}
+      \titleelement{Dec}{4}
+      \titleelement{Jan}{4}
+      \titleelement{Feb}{4}
+      \titleelement{Mar}{4}
+      \titleelement{Apr}{4}
+      \titleelement{May}{4}
+      \titleelement{Jun}{4}
+      \titleelement{Jul}{4}
+      \titleelement{Aug}{4}
+    \end{ganttitle}    
+    
+    \begin{ganttitle}
+      \numtitle{1}{1}{4}{1}
+      \numtitle{1}{1}{4}{1}
+      \numtitle{1}{1}{4}{1}
+      \numtitle{1}{1}{4}{1}
+      \numtitle{1}{1}{4}{1}
+      \numtitle{1}{1}{4}{1}
+      \numtitle{1}{1}{4}{1}
+      \numtitle{1}{1}{4}{1}
+      \numtitle{1}{1}{4}{1}
+      \numtitle{1}{1}{4}{1}
+      \numtitle{1}{1}{4}{1}
+      \numtitle{1}{1}{4}{1}
+      \numtitle{1}{1}{4}{1}
+      \numtitle{1}{1}{4}{1}
+      \numtitle{1}{1}{4}{1}
+      \numtitle{1}{1}{4}{1}
+      \numtitle{1}{1}{4}{1}
+      \numtitle{1}{1}{4}{1}
+    \end{ganttitle}
+    \ganttgroup{Initial research}{1}{3.25\months}
+    \ganttbar[color=red]{Reading}{1}{3.25\months}
+    \ganttbar[color=red]{Proposal}{3\months}{2\weeks}
+    
+    \ganttgroup{Thesis}{7\months}{9\months}
+    \ganttbar[color=blue]{Background}{7\months}{1.75\months}
+    \ganttbarcon[color=blue]{Design}{8.75\months}{1.5\months}
+    \ganttbarcon[color=blue]{Implementation}{10.25\months}{1.5\months}
+    \ganttbarcon[color=blue]{Evaluation}{11.75\months}{2\weeks}
+    \ganttbarcon[color=blue]{First draft}{12.25\months}{1\months}
+    \ganttbarcon[color=blue]{Final draft}{14.25\months}{2\months}
+    
+    
+	\ganttgroup{Implementation}{3\months}{7.5\months}
+    \ganttbar[color=green]{Framework}{3\months}{6\weeks}
+    \ganttbarcon[color=green]{Isolated vegetation}{4.5\months}{2\months}
+    \ganttbarcon[color=green]{Co-occurring vegetation}{6.5\months}{2\months}
+    \ganttbarcon[color=green]{GPGPU port}{8.5\months}{2\months}
+    
+	\ganttgroup{Evaluation}{10.5\months}{6\weeks}
+    \ganttbar[color=yellow]{Qualitative}{10.5\months}{3\weeks}
+    \ganttbarcon[color=yellow]{Quantitative}{11.25\months}{3\weeks}   
+    
+    \ganttgroup{Paper}{13.25\months}{4\weeks}
+    \ganttbar[color=purple]{First draft}{13.25\months}{3\weeks}
+    \ganttbarcon[color=purple]{Final draft}{14\months}{1\weeks}   
+    
+%    \ganttbar[pattern=crosshatch,color=blue]{task 3}{15}{3}
+%    \ganttbar{task 4}{20}{3}
+%    \ganttcon{15}{4}{20}{6}
+%    \ganttbar{task 5}{15}{5}
+%    \ganttbarcon[color=red]{task 6}{20}{5}
+%    \ganttbarcon{task 7}{30}{5}
+  \end{gantt}
+  }
+  \end{landscape}
+
+
+
 
 %by comparing the time taken to clean a scan with Zamani's current system \cite{Leica2012} to the new system.
 

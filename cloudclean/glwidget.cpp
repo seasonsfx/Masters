@@ -138,7 +138,7 @@ void GLWidget::initializeGL()
     queue = clCreateCommandQueue(context, device, 0, NULL);
     
     p_vbocl = clCreateFromGLBuffer(context, CL_MEM_WRITE_ONLY, m_vertexBuffer.bufferId(), NULL);
-    
+
 }
 
 bool GLWidget::prepareShaderProgram( const QString& vertexShaderPath,

@@ -30,6 +30,7 @@ INCLUDEPATH +=  "/usr/include/pcl-1.5/" \
                  "/usr/include/flann/" \
                  "/usr/include/eigen3/" \
                 "/opt/AMDAPP/include" \
+                "/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc" \
 
 LIBS += -lpcl_io \
         -lpcl_common  \

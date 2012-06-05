@@ -8,6 +8,13 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#ifdef __APPLE__
+#include <OpenCL/opencl.h>
+#else
+#include <CL/cl.h>
+#endif
+#include <CL/cl_gl.h>
+
 #include <QGLWidget>
 #include <QGLBuffer>
 #include <QGLShaderProgram>
@@ -50,14 +57,26 @@ private:
     QGLShaderProgram m_shader;
     QGLBuffer m_vertexBuffer;
 
+
+    cl_platform_id          platform;         
+    cl_device_id            device;
+    cl_context              context;
+    cl_command_queue        queue;
+    cl_program              program;
+    cl_kernel               kernel;
+    size_t                  kernelsize;
+    
+    cl_mem                  cl_vbo;
+
     glm::mat4 cameraToClipMatrix;
     glm::mat4 modelview_mat;
     glm::vec4 offsetVec;
     float aspectRatio;
 
     Qt::MouseButton mouseDown;
-    bool mouseDrag;
     bool moved;
+    int start_x;
+    int start_y;
 
     //TODO: Move out of here
     bool sampling;

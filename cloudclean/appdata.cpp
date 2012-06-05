@@ -65,12 +65,12 @@ void normal_estimation(pcl::PointCloud<pcl::PointXYZI>::Ptr cloud, pcl::PointClo
 
 
             if ( // Not out of bounds
-                    !(
+                    (!(
                         (i%width == 0 && (p2x == 1 || p1x == 1) ) || // right overun
                         (i%width == 1 && (p2x == -1 || p1x == -1) ) || // left overun
-                        (i/width == 0 && (p2y == -1 || p1y == -1) ) || // top overun
-                        (i/width == (height-1) && (p2y == 1 || p1y == 1) ) // bottom overun
-                    ) &&
+                        (i <= width && (p2y == -1 || p1y == -1) ) || // top overun
+                        (i/width == (height-1) && (p2y == 1 || p1y == 1) ) // bottom overun TODO:Check if this holds
+                    )) &&
                     // No NaNs
                     (
                         (cloud->points[idx1].x == cloud->points[idx1].x) && // invalid point 1

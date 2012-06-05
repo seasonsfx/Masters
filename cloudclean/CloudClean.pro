@@ -29,6 +29,7 @@ FORMS    += cloudclean.ui
 INCLUDEPATH +=  "/usr/include/pcl-1.5/" \
                  "/usr/include/flann/" \
                  "/usr/include/eigen3/" \
+                "/opt/AMDAPP/include" \
 
 LIBS += -lpcl_io \
         -lpcl_common  \
@@ -36,7 +37,8 @@ LIBS += -lpcl_io \
         -lpcl_kdtree  \
         -lpcl_visualization \
         -lpcl_search \
-        -lGLU
+        -lGLU \
+        -lOpenCL
 
 #unix {
 #    CONFIG += link_pkgconfig

@@ -22,9 +22,11 @@ GLWidget::GLWidget(QWidget* parent )
     cameraToClipMatrix = glm::perspective(35.0f, aspectRatio, zNear, zFar);
 
     moved = false;
+    start_x = 0;
+    start_y = 0;
 
     glFormat.setVersion( 3, 3 );
-    //glFormat.setProfile( QGLFormat::CoreProfile ); // Requires >=Qt-4.8.0
+    glFormat.setProfile( QGLFormat::CoreProfile ); // Requires >=Qt-4.8.0
     glFormat.setSampleBuffers( true );
     glFormat.setDoubleBuffer( true );
     glFormat.setDepth( true );
@@ -34,10 +36,6 @@ GLWidget::GLWidget(QWidget* parent )
 
     setAutoBufferSwap ( true );
     setMouseTracking( true );
-
-
-    //glm::vec3(app_data->cloud->sensor_origin_(0), app_data->cloud->sensor_origin_(1), app_data->cloud->sensor_origin_(2)),
-    //glm::fquat( (float)app_data->cloud->sensor_orientation_.x(), app_data->cloud->sensor_orientation_.y(), app_data->cloud->sensor_orientation_.z(), app_data->cloud->sensor_orientation_.w()),
 
     // View/Object Setup
     glutil::ViewData initialViewData =
@@ -60,8 +58,6 @@ GLWidget::GLWidget(QWidget* parent )
     {
         glm::vec3(app_data->cloud->sensor_origin_(0), app_data->cloud->sensor_origin_(1), app_data->cloud->sensor_origin_(2)), ///<The world-space position of the object.
         glm::fquat(0.0f, 0.0f, 0.0f, 0.0f), ///<The world-space orientation of the object.
-        //glm::vec3(app_data->cloud->sensor_origin_(0), app_data->cloud->sensor_origin_(1), app_data->cloud->sensor_origin_(2)),
-        //glm::fquat( (float)app_data->cloud->sensor_orientation_.x(), app_data->cloud->sensor_orientation_.y(), app_data->cloud->sensor_orientation_.z(), app_data->cloud->sensor_orientation_.w()),
     };
 
     viewPole = boost::shared_ptr<glutil::ViewPole>(new glutil::ViewPole(initialViewData, viewScale, glutil::MB_RIGHT_BTN));
@@ -124,6 +120,25 @@ void GLWidget::initializeGL()
 
     glUniformMatrix4fv(m_shader.uniformLocation("cameraToClipMatrix"), 1, GL_FALSE, glm::value_ptr(cameraToClipMatrix));
     glUniformMatrix4fv(m_shader.uniformLocation("modelToCameraMatrix"), 1, GL_FALSE, glm::value_ptr(modelview_mat));
+    
+    // Setup OpenCL
+    clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 1, &device, NULL);
+    QGLContext glCtx = this->context();
+//http://www.codeproject.com/Articles/201263/Part-6-Primitive-Restart-and-OpenGL-Interoperabili
+    cl_context_properties props[] = {
+            CL_CONTEXT_PLATFORM, 
+            (cl_context_properties)platform,
+            CL_GLX_DISPLAY_KHR,
+            (intptr_t) glXGetCurrentDisplay(),
+            CL_GL_CONTEXT_KHR,
+            (intptr_t) glCtx, 0
+    };
+    
+    context = clCreateContext(props, 1, &device, NULL, NULL, NULL);
+    queue = clCreateCommandQueue(context, device, 0, NULL);
+    
+    p_vbocl = clCreateFromGLBuffer(context, CL_MEM_WRITE_ONLY, m_vertexBuffer.bufferId(), NULL);
+    
 }
 
 bool GLWidget::prepareShaderProgram( const QString& vertexShaderPath,
@@ -186,15 +201,17 @@ void GLWidget::mouseMoveEvent ( QMouseEvent * event ){
     if(mouseDown == Qt::LeftButton)
         objtPole->MouseMove(glm::ivec2(event->x(), event->y()));
 
-    if(mouseDown)
+    if(sqrt(pow(start_x-event->x(),2) + pow(start_x-event->x(),2)) > 5)
         moved = true;
 
     updateGL();
 }
 
 void GLWidget::mousePressEvent ( QMouseEvent * event ){
-    mouseDrag = false;
     mouseDown = event->button();
+    start_x = 0;
+    start_y = 0;
+    moved = false;
 
     if(event->button() == Qt::RightButton)
         viewPole->MouseClick(glutil::MB_RIGHT_BTN, true, 0, glm::ivec2(event->x(), event->y()));
@@ -273,35 +290,36 @@ void GLWidget::clickity(int x, int y){
         return;
     }
 
-    // print feature
-    printf("Point:\t (%f, %f, %f)\n",
-                app_data->cloud->points[min_index].x, app_data->cloud->points[min_index].y, app_data->cloud->points[min_index].z);
+    // BS not found
+    if(app_data->fpfhs->points[min_index].histogram[0] != 0){
+        // print feature
+        printf("Point:\t (%f, %f, %f)\n",
+                    app_data->cloud->points[min_index].x, app_data->cloud->points[min_index].y, app_data->cloud->points[min_index].z);
 
-    printf("Normal:\t (%f, %f, %f)\n", app_data->normals->points[min_index].data_n[0], app_data->normals->points[min_index].data_n[1], app_data->normals->points[min_index].data_n[2]);
+        printf("Normal:\t (%f, %f, %f)\n", app_data->normals->points[min_index].data_n[0], app_data->normals->points[min_index].data_n[1], app_data->normals->points[min_index].data_n[2]);
 
-    printf("Feature:\t");
-    for (int j = 0; j < 33; ++j)
-    {
-        printf(", %f ", app_data->fpfhs->points[min_index].histogram[j]);
+        printf("Feature:\t");
+        for (int j = 0; j < 33; ++j)
+        {
+            printf(", %f ", app_data->fpfhs->points[min_index].histogram[j]);
+        }
+        printf("\n\n");
     }
-    printf("\n\n");
+    else{
+        printf("bs found\n");
+    }
+
 
     if(sampling){
 
         if(app_data->fpfhs->points[min_index].histogram[0] == app_data->fpfhs->points[min_index].histogram[0])
                 stats.push_back(app_data->fpfhs->points[min_index]);
 
-
-
-    ///// STATS!!
-
-
         // set initial values
         for (int j = 0; j < 33; ++j){
             mean.histogram[j] = 0.0f;
             mean.histogram[j] = 0.0f;
         }
-
 
         //Feature
 
@@ -344,7 +362,10 @@ void GLWidget::clickity(int x, int y){
 
     }
 
-    if(filling && app_data->cloud->points[min_index].x == app_data->cloud->points[min_index].x){
+
+    // Quick filling
+
+    if(filling){
         printf("filling!!\n");
         std::vector<bool> filled(app_data->cloud->points.size(), false);
         std::queue<int> myqueue;
@@ -363,7 +384,6 @@ void GLWidget::clickity(int x, int y){
 
             // fill
             // Update buffer
-            //glBufferSubData(GL_ARRAY_BUFFER, 4*sizeof(float)*current, 4*sizeof(float), empty);
             int offset = 4*sizeof(float)*current;
             m_vertexBuffer.write(offset, reinterpret_cast<const void *> (empty), sizeof(empty));
 
@@ -391,35 +411,95 @@ void GLWidget::clickity(int x, int y){
                 if (filled[idx])
                     continue;
 
-                int in_range = 0;
-
-                // Check if point is within threshold
-                for (int j = 0; j < 33; ++j)
-                {
-                    if ((app_data->fpfhs->points[idx].histogram[j] - mean.histogram[j]) < stdev.histogram[j])
-                    {
-                        in_range++;
-                    }
-                }
-
-                // If histogram in range
-                if (in_range > vals_in_range)
-                {
-                    myqueue.push(idx);
-                    //printf("PUSH!!!\n");
-                }
+                myqueue.push(idx);
             }
 
         }
-
-
-        // line
-        /*glBindBuffer(GL_ARRAY_BUFFER, lineBufferObject);
-        float line[6] = {p1.x, p1.y, p1.z, p2.x, p2.y, p2.z};
-        glBufferSubData(GL_ARRAY_BUFFER, 0, 6*sizeof(float), line);
-        */
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
+
+
+
+
+//    if(filling && app_data->cloud->points[min_index].x == app_data->cloud->points[min_index].x){
+//        printf("filling!!\n");
+//        std::vector<bool> filled(app_data->cloud->points.size(), false);
+//        std::queue<int> myqueue;
+
+//        myqueue.push(min_index);
+
+//        int current;
+
+//        //glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
+//        float empty[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+
+//        int count; // Stops ape shit
+
+//        while (!myqueue.empty() && count++ < 10000){
+//            current = myqueue.front(); myqueue.pop();
+
+//            // fill
+//            // Update buffer
+//            //glBufferSubData(GL_ARRAY_BUFFER, 4*sizeof(float)*current, 4*sizeof(float), empty);
+//            int offset = 4*sizeof(float)*current;
+//            m_vertexBuffer.write(offset, reinterpret_cast<const void *> (empty), sizeof(empty));
+
+//            filled[current] = true;
+//            int idx;
+
+//            int K = 20;
+
+//            std::vector<int> pointIdxNKNSearch(K);
+//            std::vector<float> pointNKNSquaredDistance(K);
+//            app_data->kdtree->nearestKSearch (app_data->cloud->points[current], K, pointIdxNKNSearch, pointNKNSquaredDistance);
+
+
+//            // push neighbours
+//            for (int i = 0; i < pointIdxNKNSearch.size (); ++i)
+//            {
+//                idx = pointIdxNKNSearch[i];
+
+//                // Skip NaN points
+//                if (app_data->cloud->points[idx].x != app_data->cloud->points[idx].x)
+//                    continue;
+
+//                // skip already filled points
+//                if (filled[idx])
+//                    continue;
+
+//                int in_range = 0;
+
+//                // Check if point is within threshold
+//                for (int j = 0; j < 33; ++j)
+//                {
+//                    if ((app_data->fpfhs->points[idx].histogram[j] - mean.histogram[j]) < stdev.histogram[j])
+//                    {
+//                        in_range++;
+//                    }
+//                }
+
+//                // If histogram in range
+//                if (true/*in_range > vals_in_range*/)
+//                {
+//                    myqueue.push(idx);
+//                    //printf("PUSH!!!\n");
+//                }
+//            }
+
+//        }
+
+
+//        // line
+//        /*glBindBuffer(GL_ARRAY_BUFFER, lineBufferObject);
+//        float line[6] = {p1.x, p1.y, p1.z, p2.x, p2.y, p2.z};
+//        glBufferSubData(GL_ARRAY_BUFFER, 0, 6*sizeof(float), line);
+//        */
+//        glBindBuffer(GL_ARRAY_BUFFER, 0);
+//    }
+//    else{
+//        printf("filling NaN;");
+//    }
+
 }
 
 void GLWidget::wheelEvent ( QWheelEvent * event ){

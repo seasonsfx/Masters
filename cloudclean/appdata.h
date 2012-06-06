@@ -36,8 +36,8 @@ private:
     explicit AppData(QObject *parent = 0);
 
     // Disable copy and assignment
-    AppData(AppData const&): QObject(0){};
-    AppData& operator=(AppData const&) { return *this; };
+    AppData(AppData const&): QObject(0){}
+    AppData& operator=(AppData const&) { return *this; }
 
 signals:
 

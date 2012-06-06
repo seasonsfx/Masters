@@ -39,6 +39,11 @@ protected:
     virtual void initializeGL();
     virtual void resizeGL( int w, int h );
     virtual void paintGL();
+    virtual void paintEvent(QPaintEvent *event);
+
+    void drawLasso(QPainter *painter);
+    void addLassoPoint(int x, int y);
+    void moveLasso(int x, int y);
 
     void clickity(int x, int y);
 
@@ -85,6 +90,8 @@ private:
     bool                    moved;
     int                     start_x;
     int                     start_y;
+
+    std::vector<Eigen::Vector2i>   lasso;
 
     //TODO: Move out of here
     bool                                sampling;

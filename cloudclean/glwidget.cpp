@@ -67,6 +67,9 @@ GLWidget::GLWidget(QWidget* parent )
     viewPole = boost::shared_ptr<glutil::ViewPole>(new glutil::ViewPole(initialViewData, viewScale, glutil::MB_RIGHT_BTN));
     objtPole = boost::shared_ptr<glutil::ObjectPole>(new glutil::ObjectPole(initialObjectData, 90.0f/250.0f, glutil::MB_LEFT_BTN, &*viewPole));
 
+    // overlay painting related
+    setAutoFillBackground(false);
+
     // OpenCL
     clGetPlatformIDs(1, &platform, NULL);
 
@@ -74,7 +77,7 @@ GLWidget::GLWidget(QWidget* parent )
 
 void GLWidget::initializeGL()
 {
-
+    glEnable(GL_MULTISAMPLE);
     QGLFormat glFormat = QGLWidget::format();
     if ( !glFormat.sampleBuffers() )
         qWarning() << "Could not enable sample buffers";
@@ -217,9 +220,14 @@ void GLWidget::resizeGL( int w, int h )
     updateGL();
 }
 
-void GLWidget::paintGL()
+void GLWidget::paintGL(){
+    update();
+}
+
+void GLWidget::paintEvent(QPaintEvent *event)
 {
 
+    Q_UNUSED(event);
     anim+= 0.01f;
 
     // map OpenGL buffer object for writing from OpenCL
@@ -235,8 +243,6 @@ void GLWidget::paintGL()
     clEnqueueReleaseGLObjects(cmd_queue, 1, &p_vbocl, 0,0,0);
     clFinish(cmd_queue);
 
-
-
     // Clear the buffer with the current clearing color
     glClearDepth(1.0f);
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -249,12 +255,61 @@ void GLWidget::paintGL()
     // Set new modelview matrix
     glUniformMatrix4fv(m_shader.uniformLocation("modelToCameraMatrix"), 1, GL_FALSE, glm::value_ptr(modelview_mat));
 
-    // Draw stuff
-    glDrawArrays( GL_POINTS, 0, app_data->cloud->size() );
+    // Draw points
+    glDrawArrays( GL_POINTS, 0, app_data->cloud->size());
+
+    // Overlay drawing
+
+    // TODO Orthogonal modelview
+    // TODO Manual painting
+    // TODO Figure out indexed painting
+
+    /*glDisable(GL_CULL_FACE);
+    glDisable(GL_DEPTH_TEST);
+
+    QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing);
+    drawLasso(&painter);
+    painter.end();
+
+    glEnable(GL_CULL_FACE);
+    glEnable(GL_DEPTH_TEST);
+    */
 }
 
-void GLWidget::mouseDoubleClickEvent ( QMouseEvent * event ){
+void GLWidget::drawLasso(QPainter *painter)
+ {
+    if(lasso.size()<2){
+        return;
+    }
 
+    painter->setPen(Qt::green);
+    for(int i = 0; i < lasso.size()-2; i++){
+        painter-> drawLine (lasso[i].x(), lasso[i].y(), lasso[i+1].x(), lasso[i+1].y());
+    }
+
+ }
+
+void GLWidget::addLassoPoint(int x, int y){
+    if(lasso.empty()){
+        lasso.push_back(Eigen::Vector2i(x,y));
+    }
+    else{
+        Eigen::Vector2i end = lasso.back();
+        lasso.back() = Eigen::Vector2i(x, y);
+        lasso.push_back(end);
+    }
+}
+
+void GLWidget::moveLasso(int x, int y){
+    if(!lasso.empty()){
+        lasso.back() = Eigen::Vector2i(x, y);
+    }
+}
+
+
+void GLWidget::mouseDoubleClickEvent ( QMouseEvent * event ){
+    // End lasso
 }
 
 void GLWidget::mouseMoveEvent ( QMouseEvent * event ){
@@ -266,6 +321,9 @@ void GLWidget::mouseMoveEvent ( QMouseEvent * event ){
 
     if(sqrt(pow(start_x-event->x(),2) + pow(start_x-event->x(),2)) > 5)
         moved = true;
+
+    if(moved)
+        moveLasso(event->x(), event->y());
 
     updateGL();
 }
@@ -279,8 +337,10 @@ void GLWidget::mousePressEvent ( QMouseEvent * event ){
     if(event->button() == Qt::RightButton)
         viewPole->MouseClick(glutil::MB_RIGHT_BTN, true, 0, glm::ivec2(event->x(), event->y()));
 
-    else if (event->button() == Qt::LeftButton)
+    else if (event->button() == Qt::LeftButton){
         objtPole->MouseClick(glutil::MB_LEFT_BTN, true, 0, glm::ivec2(event->x(), event->y()));
+        addLassoPoint(event->x(), event->y());
+    }
 
     updateGL();
 }
@@ -510,6 +570,7 @@ void GLWidget::keyPressEvent ( QKeyEvent * event ){
 
  bool GLWidget::eventFilter(QObject *object, QEvent *event)
  {
+     Q_UNUSED(object);
      if (event->type() == QEvent::KeyPress ) {
          QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
          keyPressEvent (keyEvent);

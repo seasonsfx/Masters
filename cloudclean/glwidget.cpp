@@ -1,6 +1,9 @@
 #include "glwidget.h"
 #include "qapplication.h"
 #include <cstdio>
+#include <fstream>
+#include <iostream>
+#include <ctime>
 
 GLWidget::GLWidget(QWidget* parent )
     : QGLWidget( parent ),
@@ -24,6 +27,7 @@ GLWidget::GLWidget(QWidget* parent )
     moved = false;
     start_x = 0;
     start_y = 0;
+
 
     glFormat.setVersion( 3, 3 );
     glFormat.setProfile( QGLFormat::CoreProfile ); // Requires >=Qt-4.8.0
@@ -62,6 +66,9 @@ GLWidget::GLWidget(QWidget* parent )
 
     viewPole = boost::shared_ptr<glutil::ViewPole>(new glutil::ViewPole(initialViewData, viewScale, glutil::MB_RIGHT_BTN));
     objtPole = boost::shared_ptr<glutil::ObjectPole>(new glutil::ObjectPole(initialObjectData, 90.0f/250.0f, glutil::MB_LEFT_BTN, &*viewPole));
+
+    // OpenCL
+    clGetPlatformIDs(1, &platform, NULL);
 
 }
 
@@ -122,22 +129,60 @@ void GLWidget::initializeGL()
     glUniformMatrix4fv(m_shader.uniformLocation("modelToCameraMatrix"), 1, GL_FALSE, glm::value_ptr(modelview_mat));
     
     // Setup OpenCL
-    clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 1, &device, NULL);
-    QGLContext glCtx = this->context();
-//http://www.codeproject.com/Articles/201263/Part-6-Primitive-Restart-and-OpenGL-Interoperabili
+    cl_int result = clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 1, &device, NULL);
+
+    if(result != CL_SUCCESS)
+        exit(-1);
+
+    GLXContext glCtx = glXGetCurrentContext();
+
+    //http://www.codeproject.com/Articles/201263/Part-6-Primitive-Restart-and-OpenGL-Interoperabili
     cl_context_properties props[] = {
             CL_CONTEXT_PLATFORM, 
             (cl_context_properties)platform,
             CL_GLX_DISPLAY_KHR,
             (intptr_t) glXGetCurrentDisplay(),
             CL_GL_CONTEXT_KHR,
-            (intptr_t) glCtx, 0
+            (intptr_t) glCtx,
+            0
     };
     
     context = clCreateContext(props, 1, &device, NULL, NULL, NULL);
-    queue = clCreateCommandQueue(context, device, 0, NULL);
+    cmd_queue = clCreateCommandQueue(context, device, 0, NULL);
     
     p_vbocl = clCreateFromGLBuffer(context, CL_MEM_WRITE_ONLY, m_vertexBuffer.bufferId(), NULL);
+
+    // For convenience use C++ to load the program source into memory
+    std::ifstream file("dim.cl");
+    std::string prog(std::istreambuf_iterator<char>(file), (std::istreambuf_iterator<char>()));
+    file.close();
+    const char* source = prog.c_str();
+    const size_t kernelsize = prog.length()+1;
+    program = clCreateProgramWithSource(context, 1, (const char**) &source,
+                                 &kernelsize, NULL);
+
+    // Build the program executable
+    int err = clBuildProgram(program, 0, NULL, NULL, NULL, NULL);
+    if (err != CL_SUCCESS) {
+        size_t len;
+        char buffer[2048];
+
+        std::cerr << "Error: Failed to build program executable!" << endl;
+        clGetProgramBuildInfo(program, device, CL_PROGRAM_BUILD_LOG,
+                           sizeof(buffer), buffer, &len);
+        std::cerr << buffer << endl;
+        exit(1);
+    }
+
+    // Create the compute kernel in the program
+    kernel = clCreateKernel(program, "dim", &err);
+        if (!kernel || err != CL_SUCCESS) {
+        std::cerr << "Error: Failed to create compute kernel!" << endl;
+        exit(1);
+    }
+
+    // Set the kernel argument
+    clSetKernelArg(kernel, 0, sizeof(cl_mem), (void*)&p_vbocl);
 
 }
 
@@ -174,6 +219,24 @@ void GLWidget::resizeGL( int w, int h )
 
 void GLWidget::paintGL()
 {
+
+    anim+= 0.01f;
+
+    // map OpenGL buffer object for writing from OpenCL
+    glFinish();
+    clEnqueueAcquireGLObjects(cmd_queue, 1, &p_vbocl, 0,0,0);
+
+    // Set queue the kernel
+    clSetKernelArg(kernel, 1, sizeof(float), (void*)&anim);
+    const size_t buffsize = app_data->cloud->points.size();
+    clEnqueueNDRangeKernel(cmd_queue, kernel, 1, NULL, &buffsize, NULL, 0, 0, 0);
+
+    // queue unmap buffer object
+    clEnqueueReleaseGLObjects(cmd_queue, 1, &p_vbocl, 0,0,0);
+    clFinish(cmd_queue);
+
+
+
     // Clear the buffer with the current clearing color
     glClearDepth(1.0f);
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -309,60 +372,6 @@ void GLWidget::clickity(int x, int y){
         printf("bs found\n");
     }
 
-
-    if(sampling){
-
-        if(app_data->fpfhs->points[min_index].histogram[0] == app_data->fpfhs->points[min_index].histogram[0])
-                stats.push_back(app_data->fpfhs->points[min_index]);
-
-        // set initial values
-        for (int j = 0; j < 33; ++j){
-            mean.histogram[j] = 0.0f;
-            mean.histogram[j] = 0.0f;
-        }
-
-        //Feature
-
-        // Mean
-        for (int i = 0; i < stats.size(); ++i)
-        {
-            for (int j = 0; j < 33; ++j){
-                mean.histogram[j] += stats[i].histogram[j]/stats.size();
-
-            }
-        }
-        for (int i = 0; i < stats.size(); ++i)
-        {
-            for (int j = 0; j < 33; ++j){
-                stdev.histogram[j] += pow(stats[i].histogram[j]-mean.histogram[j], 2.0f);
-            }
-        }
-        // Final step
-        for (int j = 0; j < 33; ++j){
-                stdev.histogram[j] = sqrt(stdev.histogram[j]/stats.size());
-        }
-
-
-        printf("Feature mean:\t ");
-        // Print stdev
-        for (int j = 0; j < 33; ++j)
-        {
-            printf(", %f ", mean.histogram[j]);
-        }
-        printf("\n\n");
-
-
-        printf("Feature stdev:\t ");
-        // Print stdev
-        for (int j = 0; j < 33; ++j)
-        {
-            printf(", %f ", stdev.histogram[j]);
-        }
-        printf("\n\n");
-
-    }
-
-
     // Quick filling
 
     if(filling){
@@ -377,7 +386,7 @@ void GLWidget::clickity(int x, int y){
         //glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
         float empty[4] = {0.0f, 0.0f, 0.0f, 0.0f};
 
-        int count; // Stops ape shit
+        int count = 0; // Stops ape shit
 
         while (!myqueue.empty() && count++ < 10000){
             current = myqueue.front(); myqueue.pop();
@@ -415,90 +424,8 @@ void GLWidget::clickity(int x, int y){
             }
 
         }
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        //glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
-
-
-
-
-//    if(filling && app_data->cloud->points[min_index].x == app_data->cloud->points[min_index].x){
-//        printf("filling!!\n");
-//        std::vector<bool> filled(app_data->cloud->points.size(), false);
-//        std::queue<int> myqueue;
-
-//        myqueue.push(min_index);
-
-//        int current;
-
-//        //glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
-//        float empty[4] = {0.0f, 0.0f, 0.0f, 0.0f};
-
-//        int count; // Stops ape shit
-
-//        while (!myqueue.empty() && count++ < 10000){
-//            current = myqueue.front(); myqueue.pop();
-
-//            // fill
-//            // Update buffer
-//            //glBufferSubData(GL_ARRAY_BUFFER, 4*sizeof(float)*current, 4*sizeof(float), empty);
-//            int offset = 4*sizeof(float)*current;
-//            m_vertexBuffer.write(offset, reinterpret_cast<const void *> (empty), sizeof(empty));
-
-//            filled[current] = true;
-//            int idx;
-
-//            int K = 20;
-
-//            std::vector<int> pointIdxNKNSearch(K);
-//            std::vector<float> pointNKNSquaredDistance(K);
-//            app_data->kdtree->nearestKSearch (app_data->cloud->points[current], K, pointIdxNKNSearch, pointNKNSquaredDistance);
-
-
-//            // push neighbours
-//            for (int i = 0; i < pointIdxNKNSearch.size (); ++i)
-//            {
-//                idx = pointIdxNKNSearch[i];
-
-//                // Skip NaN points
-//                if (app_data->cloud->points[idx].x != app_data->cloud->points[idx].x)
-//                    continue;
-
-//                // skip already filled points
-//                if (filled[idx])
-//                    continue;
-
-//                int in_range = 0;
-
-//                // Check if point is within threshold
-//                for (int j = 0; j < 33; ++j)
-//                {
-//                    if ((app_data->fpfhs->points[idx].histogram[j] - mean.histogram[j]) < stdev.histogram[j])
-//                    {
-//                        in_range++;
-//                    }
-//                }
-
-//                // If histogram in range
-//                if (true/*in_range > vals_in_range*/)
-//                {
-//                    myqueue.push(idx);
-//                    //printf("PUSH!!!\n");
-//                }
-//            }
-
-//        }
-
-
-//        // line
-//        /*glBindBuffer(GL_ARRAY_BUFFER, lineBufferObject);
-//        float line[6] = {p1.x, p1.y, p1.z, p2.x, p2.y, p2.z};
-//        glBufferSubData(GL_ARRAY_BUFFER, 0, 6*sizeof(float), line);
-//        */
-//        glBindBuffer(GL_ARRAY_BUFFER, 0);
-//    }
-//    else{
-//        printf("filling NaN;");
-//    }
 
 }
 
@@ -583,7 +510,7 @@ void GLWidget::keyPressEvent ( QKeyEvent * event ){
 
  bool GLWidget::eventFilter(QObject *object, QEvent *event)
  {
-     if (event->type() == QEvent::KeyPress) {
+     if (event->type() == QEvent::KeyPress ) {
          QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
          keyPressEvent (keyEvent);
          return true;

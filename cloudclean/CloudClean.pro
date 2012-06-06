@@ -9,6 +9,9 @@ QT       += core gui opengl
 TARGET = CloudClean
 TEMPLATE = app
 
+QMAKE_CXX = clang++
+QMAKE_CC = clang
+
 QMAKE_CXXFLAGS += -g
 QMAKE_CXXFLAGS_RELEASE -= -O2
 QMAKE_CXXFLAGS_RELEASE -= -Os
@@ -45,3 +48,6 @@ LIBS += -lpcl_io \
 #    CONFIG += link_pkgconfig
 #    PKGCONFIG += pcl_io-1.5 pcl_common-1.5 pcl_features-1.5 pcl_kdtree-1.5 pcl_visualization-1.5
 #}
+
+OTHER_FILES += \
+    dim.cl

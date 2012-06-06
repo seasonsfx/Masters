@@ -1,6 +1,8 @@
 #ifndef GLWIDGET_H
 #define GLWIDGET_H
 
+#include <ctime>
+
 #define GL3_PROTOTYPES
 #include <GL3/gl3.h>
 #include <GL/glu.h>
@@ -13,6 +15,7 @@
 #else
 #include <CL/cl.h>
 #endif
+
 #include <CL/cl_gl.h>
 
 #include <QGLWidget>
@@ -22,6 +25,9 @@
 
 #include "appdata.h"
 #include "MousePoles.h"
+
+#include <GL/glx.h>
+#undef KeyPress // Defined in X11/X.h, interferes with QEvent::KeyPress
 
 class GLWidget : public QGLWidget
 {
@@ -51,43 +57,45 @@ private:
     bool prepareShaderProgram( const QString& vertexShaderPath,
                                const QString& fragmentShaderPath );
 
-    AppData * app_data;
+    AppData *               app_data;
 
-    QGLFormat glFormat;
-    QGLShaderProgram m_shader;
-    QGLBuffer m_vertexBuffer;
+    QGLFormat               glFormat;
+    QGLShaderProgram        m_shader;
+    QGLBuffer               m_vertexBuffer;
 
 
     cl_platform_id          platform;         
     cl_device_id            device;
     cl_context              context;
-    cl_command_queue        queue;
+    cl_command_queue        cmd_queue;
     cl_program              program;
     cl_kernel               kernel;
     size_t                  kernelsize;
     
-    cl_mem                  cl_vbo;
+    cl_mem                  p_vbocl;
 
-    glm::mat4 cameraToClipMatrix;
-    glm::mat4 modelview_mat;
-    glm::vec4 offsetVec;
-    float aspectRatio;
+    float   anim;
 
-    Qt::MouseButton mouseDown;
-    bool moved;
-    int start_x;
-    int start_y;
+    glm::mat4               cameraToClipMatrix;
+    glm::mat4               modelview_mat;
+    glm::vec4               offsetVec;
+    float                   aspectRatio;
+
+    Qt::MouseButton         mouseDown;
+    bool                    moved;
+    int                     start_x;
+    int                     start_y;
 
     //TODO: Move out of here
-    bool sampling;
-    bool filling;
-    int vals_in_range;
-    std::vector<pcl::FPFHSignature33> stats;
-    pcl::FPFHSignature33 mean;
-    pcl::FPFHSignature33 stdev;
+    bool                                sampling;
+    bool                                filling;
+    int                                 vals_in_range;
+    std::vector<pcl::FPFHSignature33>   stats;
+    pcl::FPFHSignature33                mean;
+    pcl::FPFHSignature33                stdev;
 
-    boost::shared_ptr<glutil::ViewPole> viewPole;
-    boost::shared_ptr<glutil::ObjectPole> objtPole;
+    boost::shared_ptr<glutil::ViewPole>     viewPole;
+    boost::shared_ptr<glutil::ObjectPole>   objtPole;
 };
 
 #endif // GLWIDGET_H

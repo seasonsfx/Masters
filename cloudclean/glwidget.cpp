@@ -7,7 +7,7 @@
 
 GLWidget::GLWidget(QWidget* parent )
     : QGLWidget( parent ),
-      m_vertexBuffer( QGLBuffer::VertexBuffer )
+      point_buffer( QGLBuffer::VertexBuffer )
 {
     qApp->installEventFilter(this);
     app_data = AppData::Instance();
@@ -28,7 +28,6 @@ GLWidget::GLWidget(QWidget* parent )
     start_x = 0;
     start_y = 0;
 
-
     glFormat.setVersion( 3, 3 );
     glFormat.setProfile( QGLFormat::CoreProfile ); // Requires >=Qt-4.8.0
     glFormat.setSampleBuffers( true );
@@ -36,10 +35,21 @@ GLWidget::GLWidget(QWidget* parent )
     glFormat.setDepth( true );
     glFormat.setStencil( true );
     glFormat.setAlpha( true );
+
+    if ( !glFormat.sampleBuffers() )
+        qWarning() << "Could not enable sample buffers";
+
     QGLWidget(glFormat, parent);
 
     setAutoBufferSwap ( true );
     setMouseTracking( true );
+
+    // overlay painting related
+    setAutoFillBackground(false);
+
+    // OpenCL
+    clGetPlatformIDs(1, &platform, NULL);
+
 
     // View/Object Setup
     glutil::ViewData initialViewData =
@@ -67,40 +77,28 @@ GLWidget::GLWidget(QWidget* parent )
     viewPole = boost::shared_ptr<glutil::ViewPole>(new glutil::ViewPole(initialViewData, viewScale, glutil::MB_RIGHT_BTN));
     objtPole = boost::shared_ptr<glutil::ObjectPole>(new glutil::ObjectPole(initialObjectData, 90.0f/250.0f, glutil::MB_LEFT_BTN, &*viewPole));
 
-    // overlay painting related
-    setAutoFillBackground(false);
-
-    // OpenCL
-    clGetPlatformIDs(1, &platform, NULL);
-
 }
 
 void GLWidget::initializeGL()
 {
-    glEnable(GL_MULTISAMPLE);
-    QGLFormat glFormat = QGLWidget::format();
-    if ( !glFormat.sampleBuffers() )
-        qWarning() << "Could not enable sample buffers";
-
     // Set the clear color to black
     glClearColor( 0.1f, 0.1f, 0.1f, 1.0f );
 
     // Prepare a complete shader program...
-    if ( !prepareShaderProgram( "shaders/simple.vert", "shaders/simple.frag" ) )
+    if ( !prepareShaderProgram(point_shader, "shaders/points.vert", "shaders/points.frag" ) )
         return;
 
-    m_vertexBuffer.create();
-    m_vertexBuffer.setUsagePattern( QGLBuffer::DynamicDraw );
-    if ( !m_vertexBuffer.bind() )
+    point_buffer.create();
+    point_buffer.setUsagePattern( QGLBuffer::DynamicDraw );
+    if ( !point_buffer.bind() )
     {
         qWarning() << "Could not bind vertex buffer to the context";
         return;
     }
-    m_vertexBuffer.allocate(app_data->cloud->points.size() * sizeof(float) * 4);
+    point_buffer.allocate(app_data->cloud->points.size() * sizeof(float) * 4);
 
-    // Bind the shader program so that we can associate variables from
-    // our application to the shaders
-    if ( !m_shader.bind() )
+    // Bind the shader program so that we can associate variables from our application to the shaders
+    if ( !point_shader.bind() )
     {
         qWarning() << "Could not bind shader program to context";
         return;
@@ -118,18 +116,18 @@ void GLWidget::initializeGL()
         //std::printf("point (%f, %f %f)\n", app_data->cloud->points[i].x, app_data->cloud->points[i].y, app_data->cloud->points[i].z);
 
         int offset = 4*sizeof(float)*i;
-        m_vertexBuffer.write(offset, reinterpret_cast<const void *> (data), sizeof(data));
+        point_buffer.write(offset, reinterpret_cast<const void *> (data), sizeof(data));
     }
 
 
     // Enable the "vertex" attribute to bind it to our currently bound
     // vertex buffer.
-    m_shader.setAttributeBuffer( "vertex", GL_FLOAT, 0, 4 );
-    m_shader.enableAttributeArray( "vertex" );
+    point_shader.setAttributeBuffer( "vertex", GL_FLOAT, 0, 4 );
+    point_shader.enableAttributeArray( "vertex" );
 
 
-    glUniformMatrix4fv(m_shader.uniformLocation("cameraToClipMatrix"), 1, GL_FALSE, glm::value_ptr(cameraToClipMatrix));
-    glUniformMatrix4fv(m_shader.uniformLocation("modelToCameraMatrix"), 1, GL_FALSE, glm::value_ptr(modelview_mat));
+    glUniformMatrix4fv(point_shader.uniformLocation("cameraToClipMatrix"), 1, GL_FALSE, glm::value_ptr(cameraToClipMatrix));
+    glUniformMatrix4fv(point_shader.uniformLocation("modelToCameraMatrix"), 1, GL_FALSE, glm::value_ptr(modelview_mat));
     
     // Setup OpenCL
     cl_int result = clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 1, &device, NULL);
@@ -153,7 +151,7 @@ void GLWidget::initializeGL()
     context = clCreateContext(props, 1, &device, NULL, NULL, NULL);
     cmd_queue = clCreateCommandQueue(context, device, 0, NULL);
     
-    p_vbocl = clCreateFromGLBuffer(context, CL_MEM_WRITE_ONLY, m_vertexBuffer.bufferId(), NULL);
+    p_vbocl = clCreateFromGLBuffer(context, CL_MEM_WRITE_ONLY, point_buffer.bufferId(), NULL);
 
     // For convenience use C++ to load the program source into memory
     std::ifstream file("dim.cl");
@@ -189,23 +187,22 @@ void GLWidget::initializeGL()
 
 }
 
-bool GLWidget::prepareShaderProgram( const QString& vertexShaderPath,
-                                     const QString& fragmentShaderPath )
+bool GLWidget::prepareShaderProgram(QGLShaderProgram & shader, const QString& vertexShaderPath, const QString& fragmentShaderPath )
 {
-    // First we load and compile the vertex shader...
-    bool result = m_shader.addShaderFromSourceFile( QGLShader::Vertex, vertexShaderPath );
+    // Load and compile the vertex shader
+    bool result = shader.addShaderFromSourceFile( QGLShader::Vertex, vertexShaderPath );
     if ( !result )
-        qWarning() << m_shader.log();
+        qWarning() << shader.log();
 
-    // ...now the fragment shader...
-    result = m_shader.addShaderFromSourceFile( QGLShader::Fragment, fragmentShaderPath );
+    // Load and compile the fragment shader
+    result = shader.addShaderFromSourceFile( QGLShader::Fragment, fragmentShaderPath );
     if ( !result )
-        qWarning() << m_shader.log();
+        qWarning() << shader.log();
 
-    // ...and finally we link them to resolve any references.
-    result = m_shader.link();
+    // Link them to resolve any references.
+    result = shader.link();
     if ( !result )
-        qWarning() << "Could not link shader program:" << m_shader.log();
+        qWarning() << "Could not link shader program:" << point_shader.log();
 
     return result;
 }
@@ -215,7 +212,7 @@ void GLWidget::resizeGL( int w, int h )
     // Set the viewport to window dimensions
     cameraToClipMatrix[0].x = aspectRatio * (h / (float)w);
     cameraToClipMatrix[1].y = aspectRatio;
-    glUniformMatrix4fv(m_shader.uniformLocation("cameraToClipMatrix"), 1, GL_FALSE, glm::value_ptr(cameraToClipMatrix));
+    glUniformMatrix4fv(point_shader.uniformLocation("cameraToClipMatrix"), 1, GL_FALSE, glm::value_ptr(cameraToClipMatrix));
     glViewport( 0, 0, w, qMax( h, 1 ) );
     updateGL();
 }
@@ -228,7 +225,7 @@ void GLWidget::paintEvent(QPaintEvent *event)
 {
 
     Q_UNUSED(event);
-    anim+= 0.01f;
+    anim+= 1.0f;
 
     // map OpenGL buffer object for writing from OpenCL
     glFinish();
@@ -243,6 +240,9 @@ void GLWidget::paintEvent(QPaintEvent *event)
     clEnqueueReleaseGLObjects(cmd_queue, 1, &p_vbocl, 0,0,0);
     clFinish(cmd_queue);
 
+
+
+
     // Clear the buffer with the current clearing color
     glClearDepth(1.0f);
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -253,16 +253,32 @@ void GLWidget::paintEvent(QPaintEvent *event)
     modelview_mat = viewPole->CalcMatrix() * translate * objtPole->CalcMatrix();
 
     // Set new modelview matrix
-    glUniformMatrix4fv(m_shader.uniformLocation("modelToCameraMatrix"), 1, GL_FALSE, glm::value_ptr(modelview_mat));
+    glUniformMatrix4fv(point_shader.uniformLocation("modelToCameraMatrix"), 1, GL_FALSE, glm::value_ptr(modelview_mat));
+
+    point_buffer.bind();
 
     // Draw points
     glDrawArrays( GL_POINTS, 0, app_data->cloud->size());
 
     // Overlay drawing
+    glDrawArrays( GL_LINES, 0, app_data->cloud->size());
 
     // TODO Orthogonal modelview
     // TODO Manual painting
     // TODO Figure out indexed painting
+
+    int * lasso_data = &(lasso[0].x());
+    unsigned int lasso_index[lasso.size()*2];
+    for(int i = 0; i < lasso.size(); i++){
+        lasso_index[i*2] = i*2;
+        lasso_index[i*2+1] = i*2+1;
+    }
+
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glVertexPointer(lasso.size(), GL_INT, 0, lasso_data);
+    glDrawElements(GL_LINE, lasso.size()+1, GL_UNSIGNED_INT, lasso_index);
+    glDisableClientState(GL_VERTEX_ARRAY);
+
 
     /*glDisable(GL_CULL_FACE);
     glDisable(GL_DEPTH_TEST);
@@ -454,7 +470,7 @@ void GLWidget::clickity(int x, int y){
             // fill
             // Update buffer
             int offset = 4*sizeof(float)*current;
-            m_vertexBuffer.write(offset, reinterpret_cast<const void *> (empty), sizeof(empty));
+            point_buffer.write(offset, reinterpret_cast<const void *> (empty), sizeof(empty));
 
             filled[current] = true;
 
@@ -509,22 +525,18 @@ void GLWidget::keyPressEvent ( QKeyEvent * event ){
             break;
     case Qt::Key_D:
     case Qt::Key_Right:
-            //offsetVec = offsetVec + inv*glm::vec4(0.5f, 0.0f, 0.0f, 0.0f);
             viewPole->CharPress('d');
             break;
     case Qt::Key_A:
     case Qt::Key_Left:
-            //offsetVec = offsetVec + inv*glm::vec4(-0.5f, 0.0f, 0.0f, 0.0f);
             viewPole->CharPress('a');
             break;
     case Qt::Key_W:
     case Qt::Key_Up:
-            //offsetVec = offsetVec + inv*glm::vec4(0.0f, 0.5f, 0.f, 0.0f);
             viewPole->CharPress('w');
             break;
     case Qt::Key_S:
     case Qt::Key_Down:
-            //offsetVec = offsetVec + inv*glm::vec4(0.0f, -0.5f, 0.0f, 0.0f);
             viewPole->CharPress('s');
             break;
     case Qt::Key_Q:
@@ -580,7 +592,7 @@ void GLWidget::keyPressEvent ( QKeyEvent * event ){
  }
 
  void GLWidget::reloadCloud(){
-    m_vertexBuffer.allocate(app_data->cloud->points.size() * sizeof(float) * 4);
+    point_buffer.allocate(app_data->cloud->points.size() * sizeof(float) * 4);
     float data[4];
     for (int i = 0; i < (int)app_data->cloud->size(); i++)
     {
@@ -591,7 +603,7 @@ void GLWidget::keyPressEvent ( QKeyEvent * event ){
 
         //std::printf("point (%f, %f %f)\n", app_data->cloud->points[i].x, app_data->cloud->points[i].y, app_data->cloud->points[i].z);
         int offset = 4*sizeof(float)*i;
-        m_vertexBuffer.write(offset, reinterpret_cast<const void *> (data), sizeof(data));
+        point_buffer.write(offset, reinterpret_cast<const void *> (data), sizeof(data));
     }
     std::printf("Reloaded\n");
  }

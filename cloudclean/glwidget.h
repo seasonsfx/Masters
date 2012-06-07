@@ -59,15 +59,26 @@ public slots:
     void reloadCloud();
 
 private:
-    bool prepareShaderProgram( const QString& vertexShaderPath,
+    bool prepareShaderProgram( QGLShaderProgram& shader,
+                               const QString& vertexShaderPath,
                                const QString& fragmentShaderPath );
 
     AppData *               app_data;
 
     QGLFormat               glFormat;
-    QGLShaderProgram        m_shader;
-    QGLBuffer               m_vertexBuffer;
+    QGLShaderProgram        point_shader;
+    QGLShaderProgram        lasso_shader;
 
+    QGLBuffer               point_buffer; // Holds point vertices
+    QGLBuffer               layer_buffer; // index buffer with layers
+
+    QGLBuffer               lasso_buffer;
+    QGLBuffer               lasso_index;
+
+    glm::mat4               cameraToClipMatrix;
+    glm::mat4               modelview_mat;
+    glm::vec4               offsetVec;
+    float                   aspectRatio;
 
     cl_platform_id          platform;         
     cl_device_id            device;
@@ -80,11 +91,6 @@ private:
     cl_mem                  p_vbocl;
 
     float   anim;
-
-    glm::mat4               cameraToClipMatrix;
-    glm::mat4               modelview_mat;
-    glm::vec4               offsetVec;
-    float                   aspectRatio;
 
     Qt::MouseButton         mouseDown;
     bool                    moved;

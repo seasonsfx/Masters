@@ -50,4 +50,8 @@ LIBS += -lpcl_io \
 #}
 
 OTHER_FILES += \
-    dim.cl
+    dim.cl \
+    shaders/points.vert \
+    shaders/points.frag \
+    shaders/lasso.vert \
+    shaders/lasso.frag

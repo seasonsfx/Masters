@@ -5,6 +5,85 @@
 #include <iostream>
 #include <ctime>
 
+// Helper function to get error string
+// *********************************************************************
+const char* oclErrorString(cl_int error)
+{
+    static const char* errorString[] = {
+        "CL_SUCCESS",
+        "CL_DEVICE_NOT_FOUND",
+        "CL_DEVICE_NOT_AVAILABLE",
+        "CL_COMPILER_NOT_AVAILABLE",
+        "CL_MEM_OBJECT_ALLOCATION_FAILURE",
+        "CL_OUT_OF_RESOURCES",
+        "CL_OUT_OF_HOST_MEMORY",
+        "CL_PROFILING_INFO_NOT_AVAILABLE",
+        "CL_MEM_COPY_OVERLAP",
+        "CL_IMAGE_FORMAT_MISMATCH",
+        "CL_IMAGE_FORMAT_NOT_SUPPORTED",
+        "CL_BUILD_PROGRAM_FAILURE",
+        "CL_MAP_FAILURE",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "CL_INVALID_VALUE",
+        "CL_INVALID_DEVICE_TYPE",
+        "CL_INVALID_PLATFORM",
+        "CL_INVALID_DEVICE",
+        "CL_INVALID_CONTEXT",
+        "CL_INVALID_QUEUE_PROPERTIES",
+        "CL_INVALID_COMMAND_QUEUE",
+        "CL_INVALID_HOST_PTR",
+        "CL_INVALID_MEM_OBJECT",
+        "CL_INVALID_IMAGE_FORMAT_DESCRIPTOR",
+        "CL_INVALID_IMAGE_SIZE",
+        "CL_INVALID_SAMPLER",
+        "CL_INVALID_BINARY",
+        "CL_INVALID_BUILD_OPTIONS",
+        "CL_INVALID_PROGRAM",
+        "CL_INVALID_PROGRAM_EXECUTABLE",
+        "CL_INVALID_KERNEL_NAME",
+        "CL_INVALID_KERNEL_DEFINITION",
+        "CL_INVALID_KERNEL",
+        "CL_INVALID_ARG_INDEX",
+        "CL_INVALID_ARG_VALUE",
+        "CL_INVALID_ARG_SIZE",
+        "CL_INVALID_KERNEL_ARGS",
+        "CL_INVALID_WORK_DIMENSION",
+        "CL_INVALID_WORK_GROUP_SIZE",
+        "CL_INVALID_WORK_ITEM_SIZE",
+        "CL_INVALID_GLOBAL_OFFSET",
+        "CL_INVALID_EVENT_WAIT_LIST",
+        "CL_INVALID_EVENT",
+        "CL_INVALID_OPERATION",
+        "CL_INVALID_GL_OBJECT",
+        "CL_INVALID_BUFFER_SIZE",
+        "CL_INVALID_MIP_LEVEL",
+        "CL_INVALID_GLOBAL_WORK_SIZE",
+    };
+
+    const int errorCount = sizeof(errorString) / sizeof(errorString[0]);
+
+    const int index = -error;
+
+    return (index >= 0 && index < errorCount) ? errorString[index] : "";
+
+}
+
 GLWidget::GLWidget(QWidget* parent )
     : QGLWidget( parent ),
       point_buffer( QGLBuffer::VertexBuffer )
@@ -147,11 +226,15 @@ void GLWidget::initializeGL()
             (intptr_t) glCtx,
             0
     };
-    
+
     context = clCreateContext(props, 1, &device, NULL, NULL, NULL);
     cmd_queue = clCreateCommandQueue(context, device, 0, NULL);
-    
-    p_vbocl = clCreateFromGLBuffer(context, CL_MEM_WRITE_ONLY, point_buffer.bufferId(), NULL);
+
+    p_vbocl = clCreateFromGLBuffer(context, CL_MEM_READ_WRITE, point_buffer.bufferId(), &result);
+
+    if(result != CL_SUCCESS){
+        qWarning() << "CL object create failed:" << oclErrorString(result);
+    }
 
     // For convenience use C++ to load the program source into memory
     std::ifstream file("dim.cl");
@@ -229,19 +312,28 @@ void GLWidget::paintEvent(QPaintEvent *event)
 
     // map OpenGL buffer object for writing from OpenCL
     glFinish();
-    clEnqueueAcquireGLObjects(cmd_queue, 1, &p_vbocl, 0,0,0);
+    int result = clEnqueueAcquireGLObjects(cmd_queue, 1, &p_vbocl, 0,0,0);
+    if(result != CL_SUCCESS){
+        qWarning() << "Aquire failed:" << oclErrorString(result);
+    }
 
     // Set queue the kernel
     clSetKernelArg(kernel, 1, sizeof(float), (void*)&anim);
     const size_t buffsize = app_data->cloud->points.size();
-    clEnqueueNDRangeKernel(cmd_queue, kernel, 1, NULL, &buffsize, NULL, 0, 0, 0);
+
+    result = clEnqueueNDRangeKernel(cmd_queue, kernel, 1, NULL, &buffsize, NULL, 0, 0, 0);
+    if(result != CL_SUCCESS)
+        qWarning() << "Kernel exectution failed.";
 
     // queue unmap buffer object
-    clEnqueueReleaseGLObjects(cmd_queue, 1, &p_vbocl, 0,0,0);
-    clFinish(cmd_queue);
+    result = clEnqueueReleaseGLObjects(cmd_queue, 1, &p_vbocl, 0,0,0);
+    if(result != CL_SUCCESS){
+        qWarning() << "Release failed:" << oclErrorString(result);
+    }
 
-
-
+    result = clFinish(cmd_queue);
+    if(result != CL_SUCCESS)
+        qWarning() << "Finish failed";
 
     // Clear the buffer with the current clearing color
     glClearDepth(1.0f);
@@ -261,7 +353,6 @@ void GLWidget::paintEvent(QPaintEvent *event)
     glDrawArrays( GL_POINTS, 0, app_data->cloud->size());
 
     // Overlay drawing
-    glDrawArrays( GL_LINES, 0, app_data->cloud->size());
 
     // TODO Orthogonal modelview
     // TODO Manual painting
@@ -368,7 +459,7 @@ void GLWidget::mouseReleaseEvent ( QMouseEvent * event ){
 
     if(!moved){
         printf("CLICK CLICK!!\n");
-        clickity(event->x(), event->x());
+        clickity(event->x(), event->y());
     }
 
     moved = false;
@@ -383,6 +474,8 @@ inline float distance(glm::vec3 x0, glm::vec3 x1, glm::vec3 x2){
 }
 
 void GLWidget::clickity(int x, int y){
+    printf("%d, %d\n", x, y);
+
     // This function will find 2 points in world space that are on the line into the screen defined by screen-space( ie. window-space ) point (x,y)
 
     double mvmatrix[16];
@@ -395,9 +488,7 @@ void GLWidget::clickity(int x, int y){
     {
         projmatrix[i] = glm::value_ptr(cameraToClipMatrix)[i];
         mvmatrix[i] = glm::value_ptr(modelview_mat)[i];
-        printf("%f ", mvmatrix[i]);
     }
-    printf("\n");
 
     glGetIntegerv(GL_VIEWPORT, viewport);
 
@@ -405,8 +496,12 @@ void GLWidget::clickity(int x, int y){
 
     gluUnProject ((double) x, dClickY, 0.0, mvmatrix, projmatrix, viewport, &dX, &dY, &dZ);
     glm::vec3 p1 = glm::vec3 ( (float) dX, (float) dY, (float) dZ );
-    gluUnProject ((double) x, dClickY, 0.9, mvmatrix, projmatrix, viewport, &dX, &dY, &dZ);
+    gluUnProject ((double) x, dClickY, 1.0f, mvmatrix, projmatrix, viewport, &dX, &dY, &dZ);
     glm::vec3 p2 = glm::vec3 ( (float) dX, (float) dY, (float) dZ );
+
+    // Points
+    printf("Point 1: (%f, %f, %f)\n", p1.x, p1.y, p1.z);
+    printf("Point 2: (%f, %f, %f)\n", p2.x, p2.y, p2.z);
 
     int min_index = -1;
     float min_val = FLT_MAX;
@@ -429,27 +524,11 @@ void GLWidget::clickity(int x, int y){
         return;
     }
 
-    // BS not found
-    if(app_data->fpfhs->points[min_index].histogram[0] != 0){
-        // print feature
-        printf("Point:\t (%f, %f, %f)\n",
-                    app_data->cloud->points[min_index].x, app_data->cloud->points[min_index].y, app_data->cloud->points[min_index].z);
+    // point filling
+    float empty2[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+    point_buffer.write(4*sizeof(float)*min_index, reinterpret_cast<const void *> (empty2), sizeof(empty2));
 
-        printf("Normal:\t (%f, %f, %f)\n", app_data->normals->points[min_index].data_n[0], app_data->normals->points[min_index].data_n[1], app_data->normals->points[min_index].data_n[2]);
-
-        printf("Feature:\t");
-        for (int j = 0; j < 33; ++j)
-        {
-            printf(", %f ", app_data->fpfhs->points[min_index].histogram[j]);
-        }
-        printf("\n\n");
-    }
-    else{
-        printf("bs found\n");
-    }
-
-    // Quick filling
-
+    // 3d brush
     if(filling){
         printf("filling!!\n");
         std::vector<bool> filled(app_data->cloud->points.size(), false);
@@ -500,7 +579,6 @@ void GLWidget::clickity(int x, int y){
             }
 
         }
-        //glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
 }

@@ -123,9 +123,7 @@ GLWidget::GLWidget(QWidget* parent )
     setMouseTracking( true );
 
     // overlay painting related
-    setAutoFillBackground(false);
-
-    // OpenCL
+    setAutoFillBackground(false);    // OpenCL
     clGetPlatformIDs(1, &platform, NULL);
 
 
@@ -162,13 +160,29 @@ void GLWidget::initializeGL()
     // Set the clear color to black
     glClearColor( 0.1f, 0.1f, 0.1f, 1.0f );
 
-    // Prepare shader programs
-    if ( !prepareShaderProgram(point_shader, "shaders/points.vert", "shaders/points.frag" ) )
-        return;
 
     if ( !prepareShaderProgram(lasso_shader, "shaders/lasso.vert", "shaders/lasso.frag" ) )
         return;
+    lasso_buffer.create();
+    lasso_buffer.setUsagePattern( QGLBuffer::DynamicDraw );
+    if ( !lasso_buffer.bind() )
+    {
+        qWarning() << "Could not bind vertex buffer to the context";
+        return;
+    }
+    lasso_buffer.allocate(sizeof(float) * 2 *16);
+    if ( !lasso_shader.bind() )
+    {
+        qWarning() << "Could not bind shader program to context";
+        return;
+    }
+    lasso_shader.setAttributeBuffer( "vertex", GL_FLOAT, 0, 2 );
+    lasso_shader.enableAttributeArray( "vertex" );
 
+
+    // Prepare shader programs
+    if ( !prepareShaderProgram(point_shader, "shaders/points.vert", "shaders/points.frag" ) )
+        return;
     point_buffer.create();
     point_buffer.setUsagePattern( QGLBuffer::DynamicDraw );
     if ( !point_buffer.bind() )
@@ -177,41 +191,25 @@ void GLWidget::initializeGL()
         return;
     }
     point_buffer.allocate(app_data->cloud->points.size() * sizeof(float) * 4);
-
-    // Bind the shader program so that we can associate variables from our application to the shaders
     if ( !point_shader.bind() )
     {
         qWarning() << "Could not bind shader program to context";
         return;
     }
-
     float data[4];
-
     for (int i = 0; i < (int)app_data->cloud->size(); i++)
     {
         data[0] = app_data->cloud->points[i].x;
         data[1] = app_data->cloud->points[i].y;
         data[2] = app_data->cloud->points[i].z;
         data[3] = app_data->cloud->points[i].intensity;
-
-        //std::printf("point (%f, %f %f)\n", app_data->cloud->points[i].x, app_data->cloud->points[i].y, app_data->cloud->points[i].z);
-
         int offset = 4*sizeof(float)*i;
         point_buffer.write(offset, reinterpret_cast<const void *> (data), sizeof(data));
     }
-
-
-    // Enable the "vertex" attribute to bind it to our currently bound
-    // vertex buffer.
     point_shader.setAttributeBuffer( "vertex", GL_FLOAT, 0, 4 );
     point_shader.enableAttributeArray( "vertex" );
-
-
     glUniformMatrix4fv(point_shader.uniformLocation("cameraToClipMatrix"), 1, GL_FALSE, glm::value_ptr(cameraToClipMatrix));
-    //glUniformMatrix4fv(point_shader.uniformLocation("modelToCameraMatrix"), 1, GL_FALSE, glm::value_ptr(modelview_mat));
-    
-    glUniformMatrix4fv(lasso_shader.uniformLocation("cameraToClipMatrix"), 1, GL_FALSE, glm::value_ptr(cameraToClipMatrix));
-    //glUniformMatrix4fv(lasso_shader.uniformLocation("modelToCameraMatrix"), 1, GL_FALSE, glm::value_ptr(modelview_mat));
+
 
     // Setup OpenCL
     cl_int result = clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 1, &device, NULL);
@@ -354,36 +352,31 @@ void GLWidget::paintEvent(QPaintEvent *event)
     point_buffer.bind();
     glDrawArrays( GL_POINTS, 0, app_data->cloud->size());
 
-    // Overlay drawing
-
-    // TODO Orthogonal modelview
     // TODO Manual painting
     // TODO Figure out indexed painting
 
-    // Set up vertices
-    /*int * lasso_data = &(lasso[0].x());
-    unsigned int lasso_index[lasso.size()*2];
-    for(int i = 0; i < lasso.size(); i++){
-        lasso_index[i*2] = i*2;
-        lasso_index[i*2+1] = i*2+1;
-    }
-*/
+    float lasso_data[16] = {30.0f, 1.0f, 1.0f, 3.0f, 0.0f, 0.0f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 1.0f};
 
-    int lasso_data[6] = {2, 2, 1, 123, 123, 1};
-    int lasso_index[2] = {1, 2};
+    // Set up shader
+    lasso_shader.bind();
+    printf("1: %s\n", gluErrorString(glGetError()));
+    glm::mat4 ortho_mat = glm::ortho(0.0f, (float)this->width(), 0.0f, (float)this->height());
+    glUniformMatrix4fv(lasso_shader.uniformLocation("ortho"), 1, GL_FALSE, glm::value_ptr(ortho_mat));
+    printf("2: %s\n", gluErrorString(glGetError()));
+    lasso_buffer.bind();
+    printf("3: %s\n", gluErrorString(glGetError()));
+    lasso_buffer.write(0, reinterpret_cast<const void *> (lasso_data), sizeof(lasso_data));
+    printf("4: %s\n", gluErrorString(glGetError()));
+    glDrawArrays( GL_LINES, 0, 8); // count is number of vertices
 
-    // Set up orho mat
-    int viewport[4];
-    glGetIntegerv(GL_VIEWPORT, viewport);
-    glm::mat4 ortho_mat = glm::ortho((float)viewport[0], (float)viewport[1], (float)viewport[2], (float)viewport[3]);
+    /*for(int i = 0; i < 1; i++){
+        lasso_buffer.write(0, reinterpret_cast<const void *> (lasso_data), sizeof(int)*16);
+        glDrawArrays( GL_LINES, 0, 4);
+    }*/
 
-    point_shader.bind();
-    glUniformMatrix4fv(lasso_shader.uniformLocation("modelToCameraMatrix"), 1, GL_FALSE, glm::value_ptr(ortho_mat));
+    printf("5: %s\n", gluErrorString(glGetError()));
 
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glVertexPointer(lasso.size(), GL_INT, 0, lasso_data);
-    glDrawElements(GL_LINE, /*lasso.size()+1*/1, GL_UNSIGNED_INT, lasso_index);
-    glDisableClientState(GL_VERTEX_ARRAY);
+    //glDrawElements(GL_LINES, 2, GL_UNSIGNED_INT, lasso_index);
 
 
     /*glDisable(GL_CULL_FACE);
@@ -549,8 +542,6 @@ void GLWidget::clickity(int x, int y){
         myqueue.push(min_index);
 
         int current;
-
-        //glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
         float empty[4] = {0.0f, 0.0f, 0.0f, 0.0f};
 
         int count = 0; // Stops ape shit
@@ -665,8 +656,6 @@ void GLWidget::keyPressEvent ( QKeyEvent * event ){
         data[1] = app_data->cloud->points[i].y;
         data[2] = app_data->cloud->points[i].z;
         data[3] = app_data->cloud->points[i].intensity;
-
-        //std::printf("point (%f, %f %f)\n", app_data->cloud->points[i].x, app_data->cloud->points[i].y, app_data->cloud->points[i].z);
         int offset = 4*sizeof(float)*i;
         point_buffer.write(offset, reinterpret_cast<const void *> (data), sizeof(data));
     }

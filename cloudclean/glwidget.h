@@ -100,7 +100,6 @@ private:
     std::vector<Eigen::Vector2i>   lasso;
 
     //TODO: Move out of here
-    bool                                sampling;
     bool                                filling;
     int                                 vals_in_range;
     std::vector<pcl::FPFHSignature33>   stats;

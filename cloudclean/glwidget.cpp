@@ -93,7 +93,6 @@ GLWidget::GLWidget(QWidget* parent )
     aspectRatio = 1.0f;
 
     //TODO: Move out of here
-    sampling = false;
     filling = false;
     vals_in_range = 15;
     
@@ -163,8 +162,11 @@ void GLWidget::initializeGL()
     // Set the clear color to black
     glClearColor( 0.1f, 0.1f, 0.1f, 1.0f );
 
-    // Prepare a complete shader program...
+    // Prepare shader programs
     if ( !prepareShaderProgram(point_shader, "shaders/points.vert", "shaders/points.frag" ) )
+        return;
+
+    if ( !prepareShaderProgram(lasso_shader, "shaders/lasso.vert", "shaders/lasso.frag" ) )
         return;
 
     point_buffer.create();
@@ -206,8 +208,11 @@ void GLWidget::initializeGL()
 
 
     glUniformMatrix4fv(point_shader.uniformLocation("cameraToClipMatrix"), 1, GL_FALSE, glm::value_ptr(cameraToClipMatrix));
-    glUniformMatrix4fv(point_shader.uniformLocation("modelToCameraMatrix"), 1, GL_FALSE, glm::value_ptr(modelview_mat));
+    //glUniformMatrix4fv(point_shader.uniformLocation("modelToCameraMatrix"), 1, GL_FALSE, glm::value_ptr(modelview_mat));
     
+    glUniformMatrix4fv(lasso_shader.uniformLocation("cameraToClipMatrix"), 1, GL_FALSE, glm::value_ptr(cameraToClipMatrix));
+    //glUniformMatrix4fv(lasso_shader.uniformLocation("modelToCameraMatrix"), 1, GL_FALSE, glm::value_ptr(modelview_mat));
+
     // Setup OpenCL
     cl_int result = clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 1, &device, NULL);
 
@@ -344,12 +349,9 @@ void GLWidget::paintEvent(QPaintEvent *event)
     translate[3]+= offsetVec;
     modelview_mat = viewPole->CalcMatrix() * translate * objtPole->CalcMatrix();
 
-    // Set new modelview matrix
+    point_shader.bind();
     glUniformMatrix4fv(point_shader.uniformLocation("modelToCameraMatrix"), 1, GL_FALSE, glm::value_ptr(modelview_mat));
-
     point_buffer.bind();
-
-    // Draw points
     glDrawArrays( GL_POINTS, 0, app_data->cloud->size());
 
     // Overlay drawing
@@ -358,16 +360,29 @@ void GLWidget::paintEvent(QPaintEvent *event)
     // TODO Manual painting
     // TODO Figure out indexed painting
 
-    int * lasso_data = &(lasso[0].x());
+    // Set up vertices
+    /*int * lasso_data = &(lasso[0].x());
     unsigned int lasso_index[lasso.size()*2];
     for(int i = 0; i < lasso.size(); i++){
         lasso_index[i*2] = i*2;
         lasso_index[i*2+1] = i*2+1;
     }
+*/
+
+    int lasso_data[6] = {2, 2, 1, 123, 123, 1};
+    int lasso_index[2] = {1, 2};
+
+    // Set up orho mat
+    int viewport[4];
+    glGetIntegerv(GL_VIEWPORT, viewport);
+    glm::mat4 ortho_mat = glm::ortho((float)viewport[0], (float)viewport[1], (float)viewport[2], (float)viewport[3]);
+
+    point_shader.bind();
+    glUniformMatrix4fv(lasso_shader.uniformLocation("modelToCameraMatrix"), 1, GL_FALSE, glm::value_ptr(ortho_mat));
 
     glEnableClientState(GL_VERTEX_ARRAY);
     glVertexPointer(lasso.size(), GL_INT, 0, lasso_data);
-    glDrawElements(GL_LINE, lasso.size()+1, GL_UNSIGNED_INT, lasso_index);
+    glDrawElements(GL_LINE, /*lasso.size()+1*/1, GL_UNSIGNED_INT, lasso_index);
     glDisableClientState(GL_VERTEX_ARRAY);
 
 
@@ -474,9 +489,6 @@ inline float distance(glm::vec3 x0, glm::vec3 x1, glm::vec3 x2){
 }
 
 void GLWidget::clickity(int x, int y){
-    printf("%d, %d\n", x, y);
-
-    // This function will find 2 points in world space that are on the line into the screen defined by screen-space( ie. window-space ) point (x,y)
 
     double mvmatrix[16];
     double projmatrix[16];
@@ -624,35 +636,10 @@ void GLWidget::keyPressEvent ( QKeyEvent * event ){
             viewPole->CharPress('e');
             break;
 
-    case Qt::Key_F: // flush stats
-            stats.clear();
-            for (int j = 0; j < 33; ++j){
-                    mean.histogram[j] = 0.0f;
-                    mean.histogram[j] = 0.0f;
-            }
-            break;
-    case Qt::Key_G: // toggle flood fill
+    case Qt::Key_F:
             filling = !filling;
             printf("filling toggle\n");
-            sampling = false;
             break;
-
-    case Qt::Key_H: // toggle sample
-            sampling = !sampling;
-            filling = false;
-            break;
-    case Qt::Key_Plus:
-            if(vals_in_range < 33)
-                    vals_in_range++;
-            printf("%d\n", vals_in_range);
-            break;
-    case Qt::Key_Minus:
-            if(vals_in_range > 0)
-                    vals_in_range--;
-            printf("%d\n", vals_in_range);
-            break;
-
-
     }
     updateGL();
 

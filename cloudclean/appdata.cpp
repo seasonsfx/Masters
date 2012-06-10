@@ -130,12 +130,12 @@ bool AppData::loadFile(const char * input_file, int subsample){
     invalid_points = 0;
 
     // Mark valid points
-    boost::shared_ptr<std::vector<int> > indicesptr (new std::vector<int> ());
+    p_valid_indices = boost::shared_ptr<std::vector<int> >(new std::vector<int> ());
     for (int i = 0; i < point_count; ++i)
     {
         if (cloud->points[i].x == cloud->points[i].x)
         {
-            indicesptr->push_back(i);
+            p_valid_indices->push_back(i);
         }
         else
             invalid_points++;
@@ -169,7 +169,7 @@ bool AppData::loadFile(const char * input_file, int subsample){
     fpfh.setSearchMethod (tree);
     fpfh.setKSearch (K);
     //fpfh.setRadiusSearch (radius);
-    fpfh.setIndices(indicesptr);
+    fpfh.setIndices(p_valid_indices);
     fpfh.compute (*fpfhs);
 
     time(&fpfh_end); // Timing

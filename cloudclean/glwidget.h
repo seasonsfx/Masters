@@ -39,12 +39,12 @@ protected:
     virtual void initializeGL();
     virtual void resizeGL( int w, int h );
     virtual void paintGL();
-    virtual void paintEvent(QPaintEvent *event);
 
+    void lassoToLayer();
     void addLassoPoint(int x, int y);
     void moveLasso(int x, int y);
 
-    void clickity(int x, int y);
+    void click(int x, int y);
 
     void mouseDoubleClickEvent ( QMouseEvent * event );
     void mouseMoveEvent ( QMouseEvent * event );
@@ -72,7 +72,7 @@ private:
     uint                    lasso_vao;
 
     QGLBuffer               point_buffer; // Holds point vertices
-    QGLBuffer               layer_buffer; // index buffer with layers
+    std::vector<QGLBuffer>  point_indices; // index buffers that represent layers
 
 
     QGLBuffer               lasso_buffer;

@@ -18,10 +18,12 @@ public:
     float radius;
     int invalid_points;
 
-    pcl::PointCloud<pcl::PointXYZI>::Ptr cloud;
-    pcl::KdTreeFLANN<pcl::PointXYZI>::Ptr kdtree;
-    pcl::PointCloud<pcl::FPFHSignature33>::Ptr fpfhs;
-    pcl::PointCloud<pcl::Normal>::Ptr normals;
+    pcl::PointCloud<pcl::PointXYZI>::Ptr            cloud;
+    pcl::KdTreeFLANN<pcl::PointXYZI>::Ptr           kdtree;
+    pcl::PointCloud<pcl::FPFHSignature33>::Ptr      fpfhs;
+    pcl::PointCloud<pcl::Normal>::Ptr               normals;
+
+    boost::shared_ptr<std::vector<int> >            p_valid_indices;
 
     std::vector<pcl::FPFHSignature33> stats;
     pcl::FPFHSignature33 mean;

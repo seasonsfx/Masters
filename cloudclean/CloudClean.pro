@@ -25,7 +25,8 @@ HEADERS  += cloudclean.h viewpane.h \
             appdata.h \
             io.h \
             glwidget.h \
-            MousePoles.h
+            MousePoles.h \
+    helpers.h
 
 FORMS    += cloudclean.ui
 
@@ -51,8 +52,8 @@ LIBS += -lpcl_io \
 #}
 
 OTHER_FILES += \
-    dim.cl \
     shaders/points.vert \
     shaders/points.frag \
     shaders/lasso.vert \
-    shaders/lasso.frag
+    shaders/lasso.frag \
+    lasso.cl

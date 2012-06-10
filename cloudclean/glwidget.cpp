@@ -5,85 +5,9 @@
 #include <iostream>
 #include <ctime>
 #include <Eigen/Dense>
-
-// Helper function to get error string
-// *********************************************************************
-const char* oclErrorString(cl_int error)
-{
-    static const char* errorString[] = {
-        "CL_SUCCESS",
-        "CL_DEVICE_NOT_FOUND",
-        "CL_DEVICE_NOT_AVAILABLE",
-        "CL_COMPILER_NOT_AVAILABLE",
-        "CL_MEM_OBJECT_ALLOCATION_FAILURE",
-        "CL_OUT_OF_RESOURCES",
-        "CL_OUT_OF_HOST_MEMORY",
-        "CL_PROFILING_INFO_NOT_AVAILABLE",
-        "CL_MEM_COPY_OVERLAP",
-        "CL_IMAGE_FORMAT_MISMATCH",
-        "CL_IMAGE_FORMAT_NOT_SUPPORTED",
-        "CL_BUILD_PROGRAM_FAILURE",
-        "CL_MAP_FAILURE",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "CL_INVALID_VALUE",
-        "CL_INVALID_DEVICE_TYPE",
-        "CL_INVALID_PLATFORM",
-        "CL_INVALID_DEVICE",
-        "CL_INVALID_CONTEXT",
-        "CL_INVALID_QUEUE_PROPERTIES",
-        "CL_INVALID_COMMAND_QUEUE",
-        "CL_INVALID_HOST_PTR",
-        "CL_INVALID_MEM_OBJECT",
-        "CL_INVALID_IMAGE_FORMAT_DESCRIPTOR",
-        "CL_INVALID_IMAGE_SIZE",
-        "CL_INVALID_SAMPLER",
-        "CL_INVALID_BINARY",
-        "CL_INVALID_BUILD_OPTIONS",
-        "CL_INVALID_PROGRAM",
-        "CL_INVALID_PROGRAM_EXECUTABLE",
-        "CL_INVALID_KERNEL_NAME",
-        "CL_INVALID_KERNEL_DEFINITION",
-        "CL_INVALID_KERNEL",
-        "CL_INVALID_ARG_INDEX",
-        "CL_INVALID_ARG_VALUE",
-        "CL_INVALID_ARG_SIZE",
-        "CL_INVALID_KERNEL_ARGS",
-        "CL_INVALID_WORK_DIMENSION",
-        "CL_INVALID_WORK_GROUP_SIZE",
-        "CL_INVALID_WORK_ITEM_SIZE",
-        "CL_INVALID_GLOBAL_OFFSET",
-        "CL_INVALID_EVENT_WAIT_LIST",
-        "CL_INVALID_EVENT",
-        "CL_INVALID_OPERATION",
-        "CL_INVALID_GL_OBJECT",
-        "CL_INVALID_BUFFER_SIZE",
-        "CL_INVALID_MIP_LEVEL",
-        "CL_INVALID_GLOBAL_WORK_SIZE",
-    };
-
-    const int errorCount = sizeof(errorString) / sizeof(errorString[0]);
-
-    const int index = -error;
-
-    return (index >= 0 && index < errorCount) ? errorString[index] : "";
-
-}
+#include "helpers.h"
+#include <time.h>
+#include <stdlib.h>
 
 GLWidget::GLWidget(QWidget* parent )
     : QGLWidget( parent ),
@@ -166,9 +90,6 @@ void GLWidget::initializeGL()
     if ( !prepareShaderProgram(point_shader, "shaders/points.vert", "shaders/points.frag" ) )
         return;
     point_shader.bind();
-
-    //glGenVertexArrays(1, &point_vao);
-    //glBindVertexArray(lasso_vao);
     point_buffer.create();
     point_buffer.setUsagePattern( QGLBuffer::DynamicDraw );
 
@@ -198,11 +119,27 @@ void GLWidget::initializeGL()
 
     glUniformMatrix4fv(point_shader.uniformLocation("cameraToClipMatrix"), 1, GL_FALSE, glm::value_ptr(cameraToClipMatrix));
 
-    point_buffer.release();
+
+    point_indices.push_back(QGLBuffer(QGLBuffer::IndexBuffer));
+    bool created = point_indices[0].create();
+
+    printf("Created : %s\n", created?"true":"false");
+    printf("1: %s\n", gluErrorString(glGetError()));
+    point_indices[0].setUsagePattern( QGLBuffer::DynamicDraw );
+    point_indices[0].bind();
+    printf("2: %s\n", gluErrorString(glGetError()));
+    point_indices[0].allocate(app_data->cloud->size() * sizeof(int) ); // needs to store indices to be rendered
+    printf("size in kb: %f\n", (app_data->cloud->size() * 4)/(1024.0f));
+    printf("3: %s\n", gluErrorString(glGetError()));
+
+    point_indices[0].write(0,reinterpret_cast<const void *>(&app_data->p_valid_indices->at(0)), app_data->p_valid_indices->size() * sizeof(int));
+
+    //point_buffer.release();
     point_shader.release();
+    printf("4: %s\n", gluErrorString(glGetError()));
 
-    // Lasso shader and buffered
 
+    // Lasso shader and buffers
     if ( !prepareShaderProgram(lasso_shader, "shaders/lasso.vert", "shaders/lasso.frag" ) )
         return;
     lasso_shader.bind();
@@ -225,7 +162,6 @@ void GLWidget::initializeGL()
 
     lasso_shader.release();
     lasso_buffer.release();
-    //glBindVertexArray(0);
 
     // Setup OpenCL
     cl_int result = clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 1, &device, NULL);
@@ -251,12 +187,11 @@ void GLWidget::initializeGL()
 
     p_vbocl = clCreateFromGLBuffer(context, CL_MEM_READ_WRITE, point_buffer.bufferId(), &result);
 
-    if(result != CL_SUCCESS){
+    if(result != CL_SUCCESS)
         qWarning() << "CL object create failed:" << oclErrorString(result);
-    }
 
     // For convenience use C++ to load the program source into memory
-    std::ifstream file("dim.cl");
+    std::ifstream file("lasso.cl");
     std::string prog(std::istreambuf_iterator<char>(file), (std::istreambuf_iterator<char>()));
     file.close();
     const char* source = prog.c_str();
@@ -320,14 +255,96 @@ void GLWidget::resizeGL( int w, int h )
 }
 
 void GLWidget::paintGL(){
-    update();
+
+    // Clear the buffer with the current clearing color
+    glClearDepth(1.0f);
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+    // Calculate modelview matrix
+    glm::mat4 translate(1.0f);
+    translate[3]+= offsetVec;
+    modelview_mat = viewPole->CalcMatrix() * translate * objtPole->CalcMatrix();
+
+    point_shader.bind();
+    glUniformMatrix4fv(point_shader.uniformLocation("modelToCameraMatrix"), 1, GL_FALSE, glm::value_ptr(modelview_mat));
+    point_buffer.bind();
+    point_shader.enableAttributeArray( "vertex" );
+    point_shader.setAttributeBuffer( "vertex", GL_FLOAT, 0, 4 );
+
+    srand (time(NULL));
+
+    for(int i = 0; i < point_indices.size(); i++){
+        Eigen::Vector3f colour(((RAND_MAX/2.0f)+(rand()/2.0f))/RAND_MAX , ((RAND_MAX/2.0f)+(rand()/2.0f))/RAND_MAX , ((RAND_MAX/2.0f)+(rand()/2.0f))/RAND_MAX);
+        //Eigen::Vector3f colour(1,1,1);
+        std::cout << colour.x() << ", " << colour.y() << ", "<< colour.z() << ", "<< std::endl;
+        glUniform3fv(point_shader.uniformLocation("layerColour"), 1, colour.data());
+        point_indices[i].bind();
+        glDrawElements(GL_POINTS, app_data->cloud->size(), GL_UNSIGNED_INT, 0);
+    }
+    //printf("5: %s\n", gluErrorString(glGetError()));
+
+    point_shader.release();
+    point_buffer.release();
+
+    // Draw lasso shader
+    lasso_shader.bind();
+    Eigen::Matrix4f ortho;
+    ortho << 2.0f/(float)this->width(), 0, 0, -1,
+             0, -2.0f/(float)this->height(), 0, 1,
+             0, 0, 1, 0,
+             0, 0, 0, 1;
+    glUniformMatrix4fv(lasso_shader.uniformLocation("ortho"), 1, GL_FALSE, ortho.data());
+    lasso_buffer.bind();
+    float lasso_data[4];
+    lasso_buffer.write(0, reinterpret_cast<const void *> (lasso_data), sizeof(lasso_data));
+
+    lasso_shader.enableAttributeArray( "point" );
+    lasso_shader.setAttributeBuffer( "point", GL_FLOAT, 0, 2 );
+
+    if(lasso.size() > 1){
+        for(int i = 0; i < lasso.size()-1; i++){
+            lasso_data[0] = lasso[i].x();
+            lasso_data[1] = lasso[i].y();
+            lasso_data[2] = lasso[i+1].x();
+            lasso_data[3] = lasso[i+1].y();
+            lasso_buffer.write(0, reinterpret_cast<const void *> (lasso_data), sizeof(lasso_data));
+            glDrawArrays( GL_LINES, 0, 4);
+        }
+
+        lasso_data[0] = lasso[0].x();
+        lasso_data[1] = lasso[0].y();
+        lasso_buffer.write(0, reinterpret_cast<const void *> (lasso_data), sizeof(lasso_data));
+        glDrawArrays( GL_LINES, 0, 4);
+    }
+
+    lasso_buffer.release();
+    lasso_shader.release();
+
+    //printf("5: %s\n", gluErrorString(glGetError()));
 }
 
-void GLWidget::paintEvent(QPaintEvent *event)
-{
+void GLWidget::lassoToLayer(){
 
-    Q_UNUSED(event);
-    anim+= 1.0f;
+    // project points to 2d
+    // ray cast test for each point
+    // write to points to new layer
+    // remove points from old layer
+
+    point_shader.bind();
+    point_indices.push_back(QGLBuffer(QGLBuffer::IndexBuffer));
+    point_indices[point_indices.size()-1].create();
+    point_indices[0].setUsagePattern( QGLBuffer::DynamicDraw );
+    point_indices[0].bind();
+    point_indices[0].allocate(app_data->cloud->size() * sizeof(int) ); // needs to store indices to be rendered
+    printf("lasso err: %s\n", gluErrorString(glGetError()));
+
+    /*
+    for(unsigned int i = 0; i < app_data->cloud->size(); i++){
+        point_indices[0].write(i*sizeof(int),reinterpret_cast<const void *>(&i), sizeof(int));
+    }
+    */
+    point_shader.release();
+
 
     // map OpenGL buffer object for writing from OpenCL
     glFinish();
@@ -354,78 +371,6 @@ void GLWidget::paintEvent(QPaintEvent *event)
     if(result != CL_SUCCESS)
         qWarning() << "Finish failed";
 
-    // Clear the buffer with the current clearing color
-    glClearDepth(1.0f);
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
-    // Calculate modelview matrix
-    glm::mat4 translate(1.0f);
-    translate[3]+= offsetVec;
-    modelview_mat = viewPole->CalcMatrix() * translate * objtPole->CalcMatrix();
-
-    point_shader.bind();
-    glUniformMatrix4fv(point_shader.uniformLocation("modelToCameraMatrix"), 1, GL_FALSE, glm::value_ptr(modelview_mat));
-    point_buffer.bind();
-    point_shader.enableAttributeArray( "vertex" );
-    point_shader.setAttributeBuffer( "vertex", GL_FLOAT, 0, 4 );
-    glDrawArrays( GL_POINTS, 0, app_data->cloud->size());
-    point_buffer.release();
-    point_shader.release();
-
-    // TODO Manual painting
-    // TODO Figure out indexed painting
-
-    //float lasso_data[12] = {0.0f, 0.0f, width(), height(), 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f}; //, 0.0f, 1.0f, 0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 1.0f};
-
-    float lasso_data[4];
-
-    // Set up shader
-    lasso_shader.bind();
-
-    //printf("1: %s\n", gluErrorString(glGetError()));
-
-    //glm::mat4 ortho_mat = glm::ortho(0.0f, (float)this->width(), 0.0f, (float)this->height());
-    //glUniformMatrix4fv(lasso_shader.uniformLocation("ortho"), 1, GL_FALSE, glm::value_ptr(ortho_mat));
-
-
-    Eigen::Matrix4f ortho;
-
-    ortho << 2.0f/(float)this->width(), 0, 0, -1,//-width()/2.0f,
-             0, -2.0f/(float)this->height(), 0, 1,//-height()/2.0f,
-             0, 0, 1, 0,
-             0, 0, 0, 1;
-
-    glUniformMatrix4fv(lasso_shader.uniformLocation("ortho"), 1, GL_FALSE, ortho.data());
-
-    lasso_buffer.bind();
-    lasso_buffer.write(0, reinterpret_cast<const void *> (lasso_data), sizeof(lasso_data));
-
-    lasso_shader.enableAttributeArray( "point" );
-    lasso_shader.setAttributeBuffer( "point", GL_FLOAT, 0, 2 );
-
-    //glDrawArrays( GL_LINES, 0, 6); // count is number of vertices
-
-
-    if(lasso.size() > 1){
-        for(int i = 0; i < lasso.size()-1; i++){
-            lasso_data[0] = lasso[i].x();
-            lasso_data[1] = lasso[i].y();
-            lasso_data[2] = lasso[i+1].x();
-            lasso_data[3] = lasso[i+1].y();
-            lasso_buffer.write(0, reinterpret_cast<const void *> (lasso_data), sizeof(lasso_data));
-            glDrawArrays( GL_LINES, 0, 4);
-        }
-
-        lasso_data[0] = lasso[0].x();
-        lasso_data[1] = lasso[0].y();
-        lasso_buffer.write(0, reinterpret_cast<const void *> (lasso_data), sizeof(lasso_data));
-        glDrawArrays( GL_LINES, 0, 4);
-    }
-
-    lasso_buffer.release();
-    lasso_shader.release();
-
-    //printf("5: %s\n", gluErrorString(glGetError()));
 }
 
 void GLWidget::addLassoPoint(int x, int y){
@@ -495,8 +440,7 @@ void GLWidget::mouseReleaseEvent ( QMouseEvent * event ){
     viewPole->MouseClick(glutil::MB_RIGHT_BTN, false, 0, glm::ivec2(event->x(), event->y()));
 
     if(!moved){
-        printf("CLICK CLICK!!\n");
-        clickity(event->x(), event->y());
+        click(event->x(), event->y());
     }
 
     if (!moved && event->button() == Qt::LeftButton){
@@ -514,7 +458,7 @@ inline float distance(glm::vec3 x0, glm::vec3 x1, glm::vec3 x2){
     return top.x*top.x + top.y*top.y + top.z*top.z / bot.x*bot.x + bot.y*bot.y + bot.z*bot.z;
 }
 
-void GLWidget::clickity(int x, int y){
+void GLWidget::click(int x, int y){
 
     double mvmatrix[16];
     double projmatrix[16];
@@ -536,10 +480,6 @@ void GLWidget::clickity(int x, int y){
     glm::vec3 p1 = glm::vec3 ( (float) dX, (float) dY, (float) dZ );
     gluUnProject ((double) x, dClickY, 1.0f, mvmatrix, projmatrix, viewport, &dX, &dY, &dZ);
     glm::vec3 p2 = glm::vec3 ( (float) dX, (float) dY, (float) dZ );
-
-    // Points
-    printf("Point 1: (%f, %f, %f)\n", p1.x, p1.y, p1.z);
-    printf("Point 2: (%f, %f, %f)\n", p2.x, p2.y, p2.z);
 
     int min_index = -1;
     float min_val = FLT_MAX;

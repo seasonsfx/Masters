@@ -4,6 +4,7 @@
 #include <fstream>
 #include <iostream>
 #include <ctime>
+#include <Eigen/Dense>
 
 // Helper function to get error string
 // *********************************************************************
@@ -94,7 +95,7 @@ GLWidget::GLWidget(QWidget* parent )
 
     //TODO: Move out of here
     filling = false;
-    vals_in_range = 15;
+    lasso_active = false;
     
     modelview_mat = glm::mat4(1.0f);
     offsetVec = glm::vec4(0.0f,0.0f,0.0f,0.0f);
@@ -107,7 +108,7 @@ GLWidget::GLWidget(QWidget* parent )
     start_y = 0;
 
     glFormat.setVersion( 3, 3 );
-    glFormat.setProfile( QGLFormat::CoreProfile ); // Requires >=Qt-4.8.0
+    glFormat.setProfile( QGLFormat::CoreProfile );
     glFormat.setSampleBuffers( true );
     glFormat.setDoubleBuffer( true );
     glFormat.setDepth( true );
@@ -161,30 +162,16 @@ void GLWidget::initializeGL()
     glClearColor( 0.1f, 0.1f, 0.1f, 1.0f );
 
 
-    if ( !prepareShaderProgram(lasso_shader, "shaders/lasso.vert", "shaders/lasso.frag" ) )
-        return;
-    lasso_buffer.create();
-    lasso_buffer.setUsagePattern( QGLBuffer::DynamicDraw );
-    if ( !lasso_buffer.bind() )
-    {
-        qWarning() << "Could not bind vertex buffer to the context";
-        return;
-    }
-    lasso_buffer.allocate(sizeof(float) * 2 *16);
-    if ( !lasso_shader.bind() )
-    {
-        qWarning() << "Could not bind shader program to context";
-        return;
-    }
-    lasso_shader.setAttributeBuffer( "vertex", GL_FLOAT, 0, 2 );
-    lasso_shader.enableAttributeArray( "vertex" );
-
-
-    // Prepare shader programs
+    // Point shader and buffers
     if ( !prepareShaderProgram(point_shader, "shaders/points.vert", "shaders/points.frag" ) )
         return;
+    point_shader.bind();
+
+    //glGenVertexArrays(1, &point_vao);
+    //glBindVertexArray(lasso_vao);
     point_buffer.create();
     point_buffer.setUsagePattern( QGLBuffer::DynamicDraw );
+
     if ( !point_buffer.bind() )
     {
         qWarning() << "Could not bind vertex buffer to the context";
@@ -206,10 +193,39 @@ void GLWidget::initializeGL()
         int offset = 4*sizeof(float)*i;
         point_buffer.write(offset, reinterpret_cast<const void *> (data), sizeof(data));
     }
-    point_shader.setAttributeBuffer( "vertex", GL_FLOAT, 0, 4 );
     point_shader.enableAttributeArray( "vertex" );
+    point_shader.setAttributeBuffer( "vertex", GL_FLOAT, 0, 4 );
+
     glUniformMatrix4fv(point_shader.uniformLocation("cameraToClipMatrix"), 1, GL_FALSE, glm::value_ptr(cameraToClipMatrix));
 
+    point_buffer.release();
+    point_shader.release();
+
+    // Lasso shader and buffered
+
+    if ( !prepareShaderProgram(lasso_shader, "shaders/lasso.vert", "shaders/lasso.frag" ) )
+        return;
+    lasso_shader.bind();
+    lasso_buffer.create();
+    lasso_buffer.setUsagePattern( QGLBuffer::DynamicDraw );
+    if ( !lasso_buffer.bind() )
+    {
+        qWarning() << "Could not bind vertex buffer to the context";
+        return;
+    }
+    lasso_buffer.allocate(sizeof(float) * 12);
+    if ( !lasso_shader.bind() )
+    {
+        qWarning() << "Could not bind shader program to context";
+        return;
+    }
+    lasso_shader.enableAttributeArray( "point" );
+    lasso_shader.setAttributeBuffer( "point", GL_FLOAT, 0, 2 );
+
+
+    lasso_shader.release();
+    lasso_buffer.release();
+    //glBindVertexArray(0);
 
     // Setup OpenCL
     cl_int result = clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 1, &device, NULL);
@@ -288,7 +304,7 @@ bool GLWidget::prepareShaderProgram(QGLShaderProgram & shader, const QString& ve
     // Link them to resolve any references.
     result = shader.link();
     if ( !result )
-        qWarning() << "Could not link shader program:" << point_shader.log();
+        qWarning() << "Could not link shader program:" << shader.log();
 
     return result;
 }
@@ -350,63 +366,74 @@ void GLWidget::paintEvent(QPaintEvent *event)
     point_shader.bind();
     glUniformMatrix4fv(point_shader.uniformLocation("modelToCameraMatrix"), 1, GL_FALSE, glm::value_ptr(modelview_mat));
     point_buffer.bind();
+    point_shader.enableAttributeArray( "vertex" );
+    point_shader.setAttributeBuffer( "vertex", GL_FLOAT, 0, 4 );
     glDrawArrays( GL_POINTS, 0, app_data->cloud->size());
+    point_buffer.release();
+    point_shader.release();
 
     // TODO Manual painting
     // TODO Figure out indexed painting
 
-    float lasso_data[16] = {30.0f, 1.0f, 1.0f, 3.0f, 0.0f, 0.0f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 1.0f};
+    //float lasso_data[12] = {0.0f, 0.0f, width(), height(), 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f}; //, 0.0f, 1.0f, 0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 1.0f};
+
+    float lasso_data[4];
 
     // Set up shader
     lasso_shader.bind();
-    printf("1: %s\n", gluErrorString(glGetError()));
-    glm::mat4 ortho_mat = glm::ortho(0.0f, (float)this->width(), 0.0f, (float)this->height());
-    glUniformMatrix4fv(lasso_shader.uniformLocation("ortho"), 1, GL_FALSE, glm::value_ptr(ortho_mat));
-    printf("2: %s\n", gluErrorString(glGetError()));
+
+    //printf("1: %s\n", gluErrorString(glGetError()));
+
+    //glm::mat4 ortho_mat = glm::ortho(0.0f, (float)this->width(), 0.0f, (float)this->height());
+    //glUniformMatrix4fv(lasso_shader.uniformLocation("ortho"), 1, GL_FALSE, glm::value_ptr(ortho_mat));
+
+
+    Eigen::Matrix4f ortho;
+
+    ortho << 2.0f/(float)this->width(), 0, 0, -1,//-width()/2.0f,
+             0, -2.0f/(float)this->height(), 0, 1,//-height()/2.0f,
+             0, 0, 1, 0,
+             0, 0, 0, 1;
+
+    glUniformMatrix4fv(lasso_shader.uniformLocation("ortho"), 1, GL_FALSE, ortho.data());
+
     lasso_buffer.bind();
-    printf("3: %s\n", gluErrorString(glGetError()));
     lasso_buffer.write(0, reinterpret_cast<const void *> (lasso_data), sizeof(lasso_data));
-    printf("4: %s\n", gluErrorString(glGetError()));
-    glDrawArrays( GL_LINES, 0, 8); // count is number of vertices
 
-    /*for(int i = 0; i < 1; i++){
-        lasso_buffer.write(0, reinterpret_cast<const void *> (lasso_data), sizeof(int)*16);
+    lasso_shader.enableAttributeArray( "point" );
+    lasso_shader.setAttributeBuffer( "point", GL_FLOAT, 0, 2 );
+
+    //glDrawArrays( GL_LINES, 0, 6); // count is number of vertices
+
+
+    if(lasso.size() > 1){
+        for(int i = 0; i < lasso.size()-1; i++){
+            lasso_data[0] = lasso[i].x();
+            lasso_data[1] = lasso[i].y();
+            lasso_data[2] = lasso[i+1].x();
+            lasso_data[3] = lasso[i+1].y();
+            lasso_buffer.write(0, reinterpret_cast<const void *> (lasso_data), sizeof(lasso_data));
+            glDrawArrays( GL_LINES, 0, 4);
+        }
+
+        lasso_data[0] = lasso[0].x();
+        lasso_data[1] = lasso[0].y();
+        lasso_buffer.write(0, reinterpret_cast<const void *> (lasso_data), sizeof(lasso_data));
         glDrawArrays( GL_LINES, 0, 4);
-    }*/
+    }
 
-    printf("5: %s\n", gluErrorString(glGetError()));
+    lasso_buffer.release();
+    lasso_shader.release();
 
-    //glDrawElements(GL_LINES, 2, GL_UNSIGNED_INT, lasso_index);
-
-
-    /*glDisable(GL_CULL_FACE);
-    glDisable(GL_DEPTH_TEST);
-
-    QPainter painter(this);
-    painter.setRenderHint(QPainter::Antialiasing);
-    drawLasso(&painter);
-    painter.end();
-
-    glEnable(GL_CULL_FACE);
-    glEnable(GL_DEPTH_TEST);
-    */
+    //printf("5: %s\n", gluErrorString(glGetError()));
 }
 
-void GLWidget::drawLasso(QPainter *painter)
- {
-    if(lasso.size()<2){
-        return;
-    }
-
-    painter->setPen(Qt::green);
-    for(int i = 0; i < lasso.size()-2; i++){
-        painter-> drawLine (lasso[i].x(), lasso[i].y(), lasso[i+1].x(), lasso[i+1].y());
-    }
-
- }
-
 void GLWidget::addLassoPoint(int x, int y){
+    if(!lasso_active)
+        return;
+
     if(lasso.empty()){
+        lasso.push_back(Eigen::Vector2i(x,y));
         lasso.push_back(Eigen::Vector2i(x,y));
     }
     else{
@@ -417,7 +444,7 @@ void GLWidget::addLassoPoint(int x, int y){
 }
 
 void GLWidget::moveLasso(int x, int y){
-    if(!lasso.empty()){
+    if(!lasso.empty() && lasso_active){
         lasso.back() = Eigen::Vector2i(x, y);
     }
 }
@@ -425,6 +452,9 @@ void GLWidget::moveLasso(int x, int y){
 
 void GLWidget::mouseDoubleClickEvent ( QMouseEvent * event ){
     // End lasso
+    lasso_active = !lasso_active;
+    if(lasso_active)
+        addLassoPoint(event->x(), event->y());
 }
 
 void GLWidget::mouseMoveEvent ( QMouseEvent * event ){
@@ -454,7 +484,6 @@ void GLWidget::mousePressEvent ( QMouseEvent * event ){
 
     else if (event->button() == Qt::LeftButton){
         objtPole->MouseClick(glutil::MB_LEFT_BTN, true, 0, glm::ivec2(event->x(), event->y()));
-        addLassoPoint(event->x(), event->y());
     }
 
     updateGL();
@@ -468,6 +497,10 @@ void GLWidget::mouseReleaseEvent ( QMouseEvent * event ){
     if(!moved){
         printf("CLICK CLICK!!\n");
         clickity(event->x(), event->y());
+    }
+
+    if (!moved && event->button() == Qt::LeftButton){
+            addLassoPoint(event->x(), event->y());
     }
 
     moved = false;

@@ -41,7 +41,6 @@ protected:
     virtual void paintGL();
     virtual void paintEvent(QPaintEvent *event);
 
-    void drawLasso(QPainter *painter);
     void addLassoPoint(int x, int y);
     void moveLasso(int x, int y);
 
@@ -69,8 +68,12 @@ private:
     QGLShaderProgram        point_shader;
     QGLShaderProgram        lasso_shader;
 
+    uint                    point_vao;
+    uint                    lasso_vao;
+
     QGLBuffer               point_buffer; // Holds point vertices
     QGLBuffer               layer_buffer; // index buffer with layers
+
 
     QGLBuffer               lasso_buffer;
     QGLBuffer               lasso_index;
@@ -94,6 +97,7 @@ private:
 
     Qt::MouseButton         mouseDown;
     bool                    moved;
+    bool                    lasso_active;
     int                     start_x;
     int                     start_y;
 
@@ -101,7 +105,6 @@ private:
 
     //TODO: Move out of here
     bool                                filling;
-    int                                 vals_in_range;
     std::vector<pcl::FPFHSignature33>   stats;
     pcl::FPFHSignature33                mean;
     pcl::FPFHSignature33                stdev;

@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'cloudclean.ui'
 **
-** Created: Wed Jun 6 14:23:36 2012
+** Created: Sat Jun 9 14:36:02 2012
 **      by: Qt User Interface Compiler version 4.8.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!

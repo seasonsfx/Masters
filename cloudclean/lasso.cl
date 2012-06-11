@@ -1,21 +1,21 @@
-inline float4 matMul(float16 mat, float4 point){
+inline float4 matMult(float16 mat, float4 point){
 
     float4 p0 = (float4)(0.0f, 0.0f, 0.0f, 0.0f);
 
-    p0.x += mat.s0 * points[idx].x;
-    p0.y += mat.s1 * points[idx].x;
-    p0.z += mat.s2 * points[idx].x;
-    p0.w += mat.s3 * points[idx].x;
+    p0.x += mat.s0 * point.x;
+    p0.y += mat.s1 * point.x;
+    p0.z += mat.s2 * point.x;
+    p0.w += mat.s3 * point.x;
 
-    p0.x += mat.s4 * points[idx].y;
-    p0.y += mat.s5 * points[idx].y;
-    p0.z += mat.s6 * points[idx].y;
-    p0.w += mat.s7 * points[idx].y;
+    p0.x += mat.s4 * point.y;
+    p0.y += mat.s5 * point.y;
+    p0.z += mat.s6 * point.y;
+    p0.w += mat.s7 * point.y;
 
-    p0.x += mat.s8 * points[idx].z;
-    p0.y += mat.s9 * points[idx].z;
-    p0.z += mat.sA * points[idx].z;
-    p0.w += mat.sB * points[idx].z;
+    p0.x += mat.s8 * point.z;
+    p0.y += mat.s9 * point.z;
+    p0.z += mat.sA * point.z;
+    p0.w += mat.sB * point.z;
 
     p0.x += mat.sC;
     p0.y += mat.sD;
@@ -30,15 +30,15 @@ inline float4 matMul(float16 mat, float4 point){
 }
 
 inline float dist(float2 a, float2 b){
-    sqrt(pow(a.x - b.x, 2) + pow(a.y - b.y, 2));
+    return sqrt(pow(a.x - b.x, 2) + pow(a.y - b.y, 2));
 }
 
-inline bool rayIntercepts(float2 origin, float slope, float2 p1, float2 p2){
+inline bool rayIntercept(float4 origin, float slope, float2 p1, float2 p2){
     float2 intercept;
 
     float ray_c = origin.y/(origin.x*slope);
-    line_slope = (p1.y-p2.y)/(p1.x-p2.x);
-    line_c = p1.y - (p1.x*line_slope);
+    float line_slope = (p1.y-p2.y)/(p1.x-p2.x);
+    float line_c = p1.y - (p1.x*line_slope);
     intercept.x =  (line_c - ray_c) / (slope - line_slope);
 
     // if x is NaN then its parallel
@@ -53,14 +53,15 @@ inline bool rayIntercepts(float2 origin, float slope, float2 p1, float2 p2){
     // is the intercept between two end points?
     if(dist(p1, intercept) + dist(p2, intercept) < dist(p1, p2))
         return true;
+    return false;
 }
 
-__kernel void lassok(__global float4* points, __global int* source_indices, __global int* dest_indices, __global float2* lasso, int lasso_line_count, float16 mat)
+__kernel void lasso (__global float4* points, __global int* source_indices, __global int* dest_indices, __global float2* lasso, int lasso_line_count, float16 mat)
 {
     unsigned int idx = get_global_id(0);
 
     // Perspecive projection
-    float4 p0 = matMul(mat, points[idx]);
+    float4 p0 = matMult(mat, points[idx]);
 
     // 2d ray casting to deterine if point is in lasso
 
@@ -84,4 +85,16 @@ __kernel void lassok(__global float4* points, __global int* source_indices, __gl
     else{
         dest_indices[idx] = 0;
     }
+}
+
+__kernel void dist_test(float2 p1, float2 p2, float out){
+    out = dist_test(p1, p2);
+}
+
+__kernel matMult_test(float16 mat, float4 point, float4 out){
+    out = matMult_test(mat, point);
+}
+
+__kernel rayIntercept_test(float4 origin, float slope, float2 p1, float2 p2, bool out){
+    out = rayIntercept_test(origin, slope, p1, p2);
 }

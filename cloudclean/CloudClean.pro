@@ -19,7 +19,8 @@ QMAKE_CXXFLAGS_RELEASE -= -Os
 SOURCES +=  main.cpp cloudclean.cpp viewpane.cpp \
             appdata.cpp \
             glwidget.cpp \
-            MousePoles.cpp
+            MousePoles.cpp \
+    unittests/lasso.cpp
 
 HEADERS  += cloudclean.h viewpane.h \
             appdata.h \
@@ -56,4 +57,5 @@ OTHER_FILES += \
     shaders/points.frag \
     shaders/lasso.vert \
     shaders/lasso.frag \
-    lasso.cl
+    lasso.cl \
+    unittests/Makefile

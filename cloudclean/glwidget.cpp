@@ -208,7 +208,7 @@ void GLWidget::initializeGL()
         clError("Build failed: ", err);
 
         size_t len;
-        char buffer[4096];
+        char buffer[8096];
 
         std::cerr << "Error: Failed to build program executable!" << endl;
         clGetProgramBuildInfo(program, device, CL_PROGRAM_BUILD_LOG,
@@ -218,7 +218,7 @@ void GLWidget::initializeGL()
     }
 
     // Create the compute kernel in the program
-    kernel = clCreateKernel(program, "lassok", &err);
+    kernel = clCreateKernel(program, "lasso", &err);
         if (!kernel || err != CL_SUCCESS) {
         std::cerr << "Error: Failed to create compute kernel!" << endl;
         exit(1);

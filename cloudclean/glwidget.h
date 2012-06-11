@@ -40,6 +40,7 @@ protected:
     virtual void resizeGL( int w, int h );
     virtual void paintGL();
 
+    Eigen::Vector2f normalized_mouse(int x, int y);
     void lassoToLayer();
     void addLassoPoint(int x, int y);
     void moveLasso(int x, int y);
@@ -68,11 +69,10 @@ private:
     QGLShaderProgram        point_shader;
     QGLShaderProgram        lasso_shader;
 
-    uint                    point_vao;
-    uint                    lasso_vao;
-
     QGLBuffer               point_buffer; // Holds point vertices
     std::vector<QGLBuffer>  point_indices; // index buffers that represent layers
+
+    std::vector<Eigen::Vector3f>    point_colours;
 
 
     QGLBuffer               lasso_buffer;
@@ -101,7 +101,7 @@ private:
     int                     start_x;
     int                     start_y;
 
-    std::vector<Eigen::Vector2i>   lasso;
+    std::vector<Eigen::Vector2f>   lasso;
 
     //TODO: Move out of here
     bool                                filling;

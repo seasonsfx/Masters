@@ -121,6 +121,7 @@ void GLWidget::initializeGL()
 
 
     point_indices.push_back(QGLBuffer(QGLBuffer::IndexBuffer));
+    point_colours.push_back(Eigen::Vector3f(1.0f, 1.0f, 1.0f));
     bool created = point_indices[0].create();
 
     printf("Created : %s\n", created?"true":"false");
@@ -134,9 +135,8 @@ void GLWidget::initializeGL()
 
     point_indices[0].write(0,reinterpret_cast<const void *>(&app_data->p_valid_indices->at(0)), app_data->p_valid_indices->size() * sizeof(int));
 
-    //point_buffer.release();
+    point_buffer.release();
     point_shader.release();
-    printf("4: %s\n", gluErrorString(glGetError()));
 
 
     // Lasso shader and buffers
@@ -163,6 +163,8 @@ void GLWidget::initializeGL()
     lasso_shader.release();
     lasso_buffer.release();
 
+    std::printf("Init error 0: %s\n", gluErrorString(glGetError()));
+
     // Setup OpenCL
     cl_int result = clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 1, &device, NULL);
 
@@ -185,12 +187,10 @@ void GLWidget::initializeGL()
     context = clCreateContext(props, 1, &device, NULL, NULL, NULL);
     cmd_queue = clCreateCommandQueue(context, device, 0, NULL);
 
-    p_vbocl = clCreateFromGLBuffer(context, CL_MEM_READ_WRITE, point_buffer.bufferId(), &result);
-
     if(result != CL_SUCCESS)
         qWarning() << "CL object create failed:" << oclErrorString(result);
 
-    // For convenience use C++ to load the program source into memory
+    // Load the program source into memory
     std::ifstream file("lasso.cl");
     std::string prog(std::istreambuf_iterator<char>(file), (std::istreambuf_iterator<char>()));
     file.close();
@@ -218,9 +218,6 @@ void GLWidget::initializeGL()
         std::cerr << "Error: Failed to create compute kernel!" << endl;
         exit(1);
     }
-
-    // Set the kernel argument
-    clSetKernelArg(kernel, 0, sizeof(cl_mem), (void*)&p_vbocl);
 
 }
 
@@ -255,7 +252,7 @@ void GLWidget::resizeGL( int w, int h )
 }
 
 void GLWidget::paintGL(){
-
+    //std::printf("Paint error 0: %s\n", gluErrorString(glGetError()));
     // Clear the buffer with the current clearing color
     glClearDepth(1.0f);
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -274,33 +271,36 @@ void GLWidget::paintGL(){
     srand (time(NULL));
 
     for(int i = 0; i < point_indices.size(); i++){
-        Eigen::Vector3f colour(((RAND_MAX/2.0f)+(rand()/2.0f))/RAND_MAX , ((RAND_MAX/2.0f)+(rand()/2.0f))/RAND_MAX , ((RAND_MAX/2.0f)+(rand()/2.0f))/RAND_MAX);
-        //Eigen::Vector3f colour(1,1,1);
-        std::cout << colour.x() << ", " << colour.y() << ", "<< colour.z() << ", "<< std::endl;
+        Eigen::Vector3f colour = point_colours[i];
         glUniform3fv(point_shader.uniformLocation("layerColour"), 1, colour.data());
         point_indices[i].bind();
-        glDrawElements(GL_POINTS, app_data->cloud->size(), GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_POINTS, app_data->p_valid_indices->size(), GL_UNSIGNED_INT, 0);
+        //std::printf("Paint error at i = %d: %s\n", i, gluErrorString(glGetError()));
     }
-    //printf("5: %s\n", gluErrorString(glGetError()));
 
-    point_shader.release();
     point_buffer.release();
+    point_shader.release();
 
     // Draw lasso shader
     lasso_shader.bind();
     Eigen::Matrix4f ortho;
-    ortho << 2.0f/(float)this->width(), 0, 0, -1,
+    ortho.setIdentity();
+    /*ortho << 2.0f/(float)this->width(), 0, 0, -1,
              0, -2.0f/(float)this->height(), 0, 1,
              0, 0, 1, 0,
              0, 0, 0, 1;
+    */
+
     glUniformMatrix4fv(lasso_shader.uniformLocation("ortho"), 1, GL_FALSE, ortho.data());
     lasso_buffer.bind();
     float lasso_data[4];
     lasso_buffer.write(0, reinterpret_cast<const void *> (lasso_data), sizeof(lasso_data));
 
+    //std::printf("Paint error 2: %s\n", gluErrorString(glGetError()));
+
     lasso_shader.enableAttributeArray( "point" );
     lasso_shader.setAttributeBuffer( "point", GL_FLOAT, 0, 2 );
-
+    //std::printf("Paint error 3: %s\n", gluErrorString(glGetError()));
     if(lasso.size() > 1){
         for(int i = 0; i < lasso.size()-1; i++){
             lasso_data[0] = lasso[i].x();
@@ -315,12 +315,13 @@ void GLWidget::paintGL(){
         lasso_data[1] = lasso[0].y();
         lasso_buffer.write(0, reinterpret_cast<const void *> (lasso_data), sizeof(lasso_data));
         glDrawArrays( GL_LINES, 0, 4);
+
     }
 
     lasso_buffer.release();
     lasso_shader.release();
 
-    //printf("5: %s\n", gluErrorString(glGetError()));
+    //std::printf("Paint error 4: %s\n", gluErrorString(glGetError()));
 }
 
 void GLWidget::lassoToLayer(){
@@ -332,65 +333,137 @@ void GLWidget::lassoToLayer(){
 
     point_shader.bind();
     point_indices.push_back(QGLBuffer(QGLBuffer::IndexBuffer));
+    Eigen::Vector3f colour(((RAND_MAX/2.0f)+(rand()/2.0f))/RAND_MAX , ((RAND_MAX/2.0f)+(rand()/2.0f))/RAND_MAX , ((RAND_MAX/2.0f)+(rand()/2.0f))/RAND_MAX); // Set random colour
+    point_colours.push_back(colour);
     point_indices[point_indices.size()-1].create();
-    point_indices[0].setUsagePattern( QGLBuffer::DynamicDraw );
-    point_indices[0].bind();
-    point_indices[0].allocate(app_data->cloud->size() * sizeof(int) ); // needs to store indices to be rendered
-    printf("lasso err: %s\n", gluErrorString(glGetError()));
+    point_indices[point_indices.size()-1].setUsagePattern( QGLBuffer::DynamicDraw );
+    point_indices[point_indices.size()-1].bind();
+    point_indices[point_indices.size()-1].allocate(app_data->p_valid_indices->size() * sizeof(int) ); // needs to store indices to be rendered
 
-    /*
-    for(unsigned int i = 0; i < app_data->cloud->size(); i++){
-        point_indices[0].write(i*sizeof(int),reinterpret_cast<const void *>(&i), sizeof(int));
+    //qWarning() << "lasso err 1: " << gluErrorString(glGetError());
+    //std::printf("lasso error 0: %s\n", gluErrorString(glGetError()));
+
+    // Initialise to invalid indices
+    for(unsigned int i = 0; i < app_data->p_valid_indices->size(); i++){
+        unsigned int val = -1; // TODO: does invalid indices render?
+        point_indices[point_indices.size()-1].write(i*sizeof(int),reinterpret_cast<const void *>(&val), sizeof(int));
     }
-    */
+
+    point_indices[point_indices.size()-1].release();
     point_shader.release();
 
-
-    // map OpenGL buffer object for writing from OpenCL
     glFinish();
-    int result = clEnqueueAcquireGLObjects(cmd_queue, 1, &p_vbocl, 0,0,0);
+    int result;
+
+    // Create buffers from OpenGL
+    cl_mem cl_points = clCreateFromGLBuffer(context, CL_MEM_READ_WRITE, point_buffer.bufferId(), &result);
+    clError("CL 1", result);
+    cl_mem cl_source_idx = clCreateFromGLBuffer(context, CL_MEM_READ_WRITE, point_indices[point_indices.size()-2].bufferId(), &result);
+    clError("CL 2", result);
+    cl_mem cl_dest_idx = clCreateFromGLBuffer(context, CL_MEM_READ_WRITE, point_indices[point_indices.size()-1].bufferId(), &result);
+    clError("CL 3", result);
+
+    const cl_mem gl_objects[3] = {cl_points, cl_source_idx, cl_dest_idx};
+
+    // Aquire OpenGL buffer objects for writing from OpenCL
+    result = clEnqueueAcquireGLObjects(cmd_queue, 3, gl_objects, 0,0,0);
     if(result != CL_SUCCESS){
         qWarning() << "Aquire failed:" << oclErrorString(result);
     }
 
-    // Set queue the kernel
-    clSetKernelArg(kernel, 1, sizeof(float), (void*)&anim);
-    const size_t buffsize = app_data->cloud->points.size();
+    // Create OpenCL buffer for lasso and matrix
+    int lasso_size = lasso.size();
+    int lasso_data[lasso_size*2];
+    for(int i = 0; i< lasso_size; i++){
+        lasso_data[i*2] = lasso[i].x();
+        lasso_data[i*2+1] = lasso[i].y();
+    }
+    cl_mem cl_lasso = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(lasso_data), &lasso_data, &result);
 
-    result = clEnqueueNDRangeKernel(cmd_queue, kernel, 1, NULL, &buffsize, NULL, 0, 0, 0);
+
+    clError("CL 5", result);
+
+    glm::mat4 gmat = cameraToClipMatrix * modelview_mat;
+    float mat[16];
+    for(int i = 0 ; i < 4; i++){
+        mat[i*4] = gmat[i].x;
+        mat[i*4+1] = gmat[i].y;
+        mat[i*4+2] = gmat[i].z;
+        mat[i*4+3] = gmat[i].w;
+    }
+
+    clError("CL 5.1", result);
+
+    // Set the kernel arguments
+    result = clSetKernelArg(kernel, 0, sizeof(cl_mem), (void*)&cl_points);
+    clError("CL 5", result);
+    result =clSetKernelArg(kernel, 1, sizeof(cl_mem), (void*)&cl_source_idx);
+    clError("CL 6", result);
+    result = clSetKernelArg(kernel, 2, sizeof(cl_mem), (void*)&cl_dest_idx);
+    clError("CL 8", result);
+    result = clSetKernelArg(kernel, 3, sizeof(cl_mem), (void*)&cl_lasso);
+    clError("CL 9", result);
+    result = clSetKernelArg(kernel, 4, sizeof(int), (void*)&lasso_size);
+    clError("CL 10", result);
+    result = clSetKernelArg(kernel, 5, sizeof(float) * 16, (void*)&mat);
+    clError("CL 11", result);
+
+    // Enqueue the kernel
+    const size_t kernel_count = app_data->p_valid_indices->size();
+    result = clEnqueueNDRangeKernel(cmd_queue, kernel, 1, NULL, &kernel_count, NULL, 0, 0, 0);
     if(result != CL_SUCCESS)
         qWarning() << "Kernel exectution failed.";
 
-    // queue unmap buffer object
-    result = clEnqueueReleaseGLObjects(cmd_queue, 1, &p_vbocl, 0,0,0);
+    // Release OpenGL buffer objects
+    result = clEnqueueReleaseGLObjects(cmd_queue, 3, gl_objects, 0,0,0);
     if(result != CL_SUCCESS){
         qWarning() << "Release failed:" << oclErrorString(result);
     }
+    else
+        qWarning() << "SUCCESS!:" << oclErrorString(result);
+
+    // Release lasso
+    clReleaseMemObject(cl_lasso);
 
     result = clFinish(cmd_queue);
     if(result != CL_SUCCESS)
-        qWarning() << "Finish failed";
+        qWarning() << "OpenCL failed";
 
 }
 
+// Puts mouse in NDC
+inline Eigen::Vector2f GLWidget::normalized_mouse(int x, int y){
+    return Eigen::Vector2f(x/(width()/2.0f) - 1.0f, -(y/(height()/2.0f) - 1.0f));
+}
+
 void GLWidget::addLassoPoint(int x, int y){
+
     if(!lasso_active)
         return;
 
     if(lasso.empty()){
-        lasso.push_back(Eigen::Vector2i(x,y));
-        lasso.push_back(Eigen::Vector2i(x,y));
+        lasso.push_back(normalized_mouse(x, y));
     }
     else{
-        Eigen::Vector2i end = lasso.back();
-        lasso.back() = Eigen::Vector2i(x, y);
+        Eigen::Vector2f end = lasso.back();
+        lasso.back() = normalized_mouse(x, y);
         lasso.push_back(end);
     }
+
+
+    qWarning() << "lasso size: " << lasso.size();
+
+    for(int i = 0; i < lasso.size(); i++){
+        char buff[100];
+        std::sprintf(buff, "(%f, %f)\n", lasso[i].x(), lasso[i].y());
+        qWarning() << buff;
+    }
+
 }
 
 void GLWidget::moveLasso(int x, int y){
     if(!lasso.empty() && lasso_active){
-        lasso.back() = Eigen::Vector2i(x, y);
+        lasso.back() = normalized_mouse(x, y);
     }
 }
 
@@ -398,8 +471,14 @@ void GLWidget::moveLasso(int x, int y){
 void GLWidget::mouseDoubleClickEvent ( QMouseEvent * event ){
     // End lasso
     lasso_active = !lasso_active;
-    if(lasso_active)
+    if(lasso_active){
         addLassoPoint(event->x(), event->y());
+    }
+    else{
+        lasso.pop_back();
+        lassoToLayer();
+        lasso.clear();
+    }
 }
 
 void GLWidget::mouseMoveEvent ( QMouseEvent * event ){

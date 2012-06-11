@@ -196,14 +196,19 @@ void GLWidget::initializeGL()
     file.close();
     const char* source = prog.c_str();
     const size_t kernelsize = prog.length()+1;
+    int err;
     program = clCreateProgramWithSource(context, 1, (const char**) &source,
-                                 &kernelsize, NULL);
+                                 &kernelsize, &err);
+    clError("Create program failed: ", err);
 
     // Build the program executable
-    int err = clBuildProgram(program, 0, NULL, NULL, NULL, NULL);
+    err = clBuildProgram(program, 0, NULL, NULL, NULL, NULL);
     if (err != CL_SUCCESS) {
+
+        clError("Build failed: ", err);
+
         size_t len;
-        char buffer[2048];
+        char buffer[4096];
 
         std::cerr << "Error: Failed to build program executable!" << endl;
         clGetProgramBuildInfo(program, device, CL_PROGRAM_BUILD_LOG,
@@ -213,7 +218,7 @@ void GLWidget::initializeGL()
     }
 
     // Create the compute kernel in the program
-    kernel = clCreateKernel(program, "dim", &err);
+    kernel = clCreateKernel(program, "lassok", &err);
         if (!kernel || err != CL_SUCCESS) {
         std::cerr << "Error: Failed to create compute kernel!" << endl;
         exit(1);

@@ -1,4 +1,4 @@
-inline float4 matMult(float16 mat, float4 point){
+inline float4 proj(float16 mat, float4 point){
 
     float4 p0 = (float4)(0.0f, 0.0f, 0.0f, 0.0f);
 
@@ -29,31 +29,100 @@ inline float4 matMult(float16 mat, float4 point){
     return p0;
 }
 
-inline float dist(float2 a, float2 b){
-    return sqrt(pow(a.x - b.x, 2) + pow(a.y - b.y, 2));
+int rand(){
+    return 699;
 }
 
-inline bool rayIntercept(float4 origin, float slope, float2 p1, float2 p2){
-    float2 intercept;
+float cross2D(float2 lineA, float2 lineB, float2 other)
+{
+    float2 dA, dB;
+    dA.x = lineA.x - other.x; dA.y = lineA.y - other.y;
+    dB.x = lineB.x - other.x; dB.y = lineB.y - other.y;
 
-    float ray_c = origin.y/(origin.x*slope);
-    float line_slope = (p1.y-p2.y)/(p1.x-p2.x);
-    float line_c = p1.y - (p1.x*line_slope);
-    intercept.x =  (line_c - ray_c) / (slope - line_slope);
+    return dA.x*dB.y - dA.y*dB.x;
+}
 
-    // if x is NaN then its parallel
-    if(intercept.x != intercept.x)
-        return false;
-    intercept.y = line_slope * intercept.x + line_c;
+int side(float a)
+{
+    if(a < -1e-6)
+        return -1;
+    if(a > 1e-6)
+        return 1;
+    return 0;
+}
 
-    // Check if point is in the right direction
-    if(intercept.x < origin.x)
-        return false;
+bool oppositeSides(float2 lineA, float2 lineB, float2 pointC, float2 pointD)
+{
+    float crossC = cross2D(lineA, lineB, pointC);
+    float crossD = cross2D(lineA, lineB, pointD);
 
-    // is the intercept between two end points?
-    if(abs(dist(p1, intercept) + dist(p2, intercept) - dist(p1, p2)) < 0.001f)
+    int sideC = side(crossC);
+    int sideD = side(crossD);
+
+    return sideC != sideD;
+}
+
+float pointDistance(float2 pointA, float2 pointB)
+{
+    float dx = pointA.x - pointB.x;
+    float dy = pointA.y - pointB.y;
+
+    return sqrt(dx*dx + dy*dy);
+}
+
+bool pointOnLineSegment(float2 lineA, float2 lineB, float2 pointC)
+{
+    float lineLength = pointDistance(lineA, lineB);
+    float viaPoint = pointDistance(lineA, pointC) + pointDistance(lineB, pointC);
+
+    return fabs(viaPoint - lineLength) < 1e-6;
+}
+
+bool intersects(float2 lineA, float2 lineB, float2 lineC, float2 lineD)
+{
+    if(oppositeSides(lineA, lineB, lineC, lineD) && oppositeSides(lineC, lineD, lineA, lineB))
+        return true; /// Lines intersect in obvious manner
+
+    /// Line segments either don't intersect or are parallel
+    if(pointOnLineSegment(lineA, lineB, lineC) || pointOnLineSegment(lineA, lineB, lineD) ||
+       pointOnLineSegment(lineC, lineD, lineA) || pointOnLineSegment(lineC, lineD, lineB))
         return true;
+
     return false;
+}
+
+float randomAngle()
+{
+    return 2.0*M_PI*(rand() % 10000)/10000.0;
+}
+
+float2 randomLineSegment(float2 origin)
+{
+    float angle = randomAngle();
+    float2 endPoint;
+    endPoint.x = 10.0*cos(angle) + origin.x;
+    endPoint.y = 10.0*sin(angle) + origin.y;
+    return endPoint;
+}
+
+bool pointInsidePolygon(__global float2* polygon, int n, float2 point)
+{
+    while(true)
+    {
+        float2 endPoint = randomLineSegment(point);
+
+        for(int i = 0; i < n; ++i)
+            if(pointOnLineSegment(point, endPoint, polygon[i]))
+                continue;
+
+        int hits = 0;
+
+        for(int i = 0; i < n; ++i)
+            if(intersects(polygon[i], polygon[(i + 1) % n], point, endPoint))
+                ++hits;
+
+        return (hits % 2 == 1);
+    }
 }
 
 __kernel void lasso (__global float4* points, __global int* source_indices, __global int* dest_indices, __global float2* lasso, int lasso_line_count, float16 mat)
@@ -61,24 +130,11 @@ __kernel void lasso (__global float4* points, __global int* source_indices, __gl
     unsigned int idx = get_global_id(0);
 
     // Perspecive projection
-    float4 p0 = matMult(mat, points[idx]);
+    float4 vertex = proj(mat, points[idx]);
 
-    // 2d ray casting to deterine if point is in lasso
+    float2 point = vertex.xy;
 
-    int hits = 0;
-
-    // generate line to cast - todo check vertices
-    float ray_slope = 0.0f;
-
-    // for every lasso line
-    for(int ii = 0; ii < lasso_line_count; ii++){
-        int i = ii%(lasso_line_count-1); // Wrap around for last line
-        if(rayIntercepts(p0, ray_slope, lasso[i], lasso[i+1]))
-            hits++;
-    }
-
-    // if hits are even then the point is inside
-    if(hits%2!=0){
+    if(pointInsidePolygon(lasso, lasso_line_count, point)){
         dest_indices[idx] = source_indices[idx];
         source_indices[idx] = 0;
     }
@@ -87,14 +143,21 @@ __kernel void lasso (__global float4* points, __global int* source_indices, __gl
     }
 }
 
-__kernel void dist_test(float2 p1, float2 p2, float out){
-    out = dist_test(p1, p2);
+
+__kernel void proj_test(float16 mat, float4 point, __global float4* out){
+    unsigned int idx = get_global_id(0);
+    out[idx] = proj(mat, point);
 }
 
-__kernel matMult_test(float16 mat, float4 point, float4 out){
-    out = matMult_test(mat, point);
+__kernel void intersects_test(float2 origin, float2 dest, float2 p1, float2 p2, __global bool* out){
+    unsigned int idx = get_global_id(0);
+    out[idx] = intersects(origin, dest, p1, p2);
 }
 
-__kernel rayIntercept_test(float4 origin, float slope, float2 p1, float2 p2, bool out){
-    out = rayIntercept_test(origin, slope, p1, p2);
+/*
+__kernel void intersects_test(float2 origin, float2 dest, float2 p1, float2 p2, __global float2* out){
+    unsigned int idx = get_global_id(0);
+    float2[idx*2] = origin;//intersects(origin, dest, p1, p2);
+    float2[idx*2+1] = dest;
 }
+*/

@@ -19,8 +19,7 @@ QMAKE_CXXFLAGS_RELEASE -= -Os
 SOURCES +=  main.cpp cloudclean.cpp viewpane.cpp \
             appdata.cpp \
             glwidget.cpp \
-            MousePoles.cpp \
-    unittests/lasso.cpp
+            MousePoles.cpp
 
 HEADERS  += cloudclean.h viewpane.h \
             appdata.h \

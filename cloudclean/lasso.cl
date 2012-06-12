@@ -51,7 +51,7 @@ inline bool rayIntercept(float4 origin, float slope, float2 p1, float2 p2){
         return false;
 
     // is the intercept between two end points?
-    if(dist(p1, intercept) + dist(p2, intercept) < dist(p1, p2))
+    if(abs(dist(p1, intercept) + dist(p2, intercept) - dist(p1, p2)) < 0.001f)
         return true;
     return false;
 }

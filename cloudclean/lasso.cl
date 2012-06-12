@@ -143,10 +143,19 @@ __kernel void lasso (__global float4* points, __global int* source_indices, __gl
     }
 }
 
+// Unit test kernels
 
-__kernel void proj_test(float16 mat, float4 point, __global float4* out){
+__kernel void proj_test(float16 mat, __global float4* point, __global float4* out){
     unsigned int idx = get_global_id(0);
-    out[idx] = proj(mat, point);
+    float4 t;
+    /*t.x = 5.0f;
+    t.y = 2.0f;
+    t.z = 4.0f;
+    t.w = 1.0f;
+    out[idx] = t;
+    out[idx] = point[idx];
+    */
+    out[idx] = proj(mat, point[idx]);
 }
 
 __kernel void intersects_test(float2 origin, float2 dest, float2 p1, float2 p2, __global bool* out){
@@ -154,10 +163,7 @@ __kernel void intersects_test(float2 origin, float2 dest, float2 p1, float2 p2, 
     out[idx] = intersects(origin, dest, p1, p2);
 }
 
-/*
-__kernel void intersects_test(float2 origin, float2 dest, float2 p1, float2 p2, __global float2* out){
+__kernel void pointInsidePolygon_test(__global float2* polygon, int n, float2 point, __global bool* out){
     unsigned int idx = get_global_id(0);
-    float2[idx*2] = origin;//intersects(origin, dest, p1, p2);
-    float2[idx*2+1] = dest;
+    out[idx] = pointInsidePolygon(polygon, n, point);
 }
-*/

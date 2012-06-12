@@ -222,7 +222,7 @@ int main() {
     //    std::cout << "CL object create failed:" << oclErrorString(result);
 
     // Load the program source into memory
-    std::ifstream file("../lasso.cl");
+    std::ifstream file("../../lasso.cl");
     std::string prog(std::istreambuf_iterator<char>(file), (std::istreambuf_iterator<char>()));
     file.close();
     const char* source = prog.c_str();
@@ -230,13 +230,10 @@ int main() {
     int err;
     cl_program program = clCreateProgramWithSource(context, 1, (const char**) &source,
                                  &kernelsize, &err);
-    //clError("Create program failed: ", err);
 
     // Build the program executable
     err = clBuildProgram(program, 0, NULL, NULL, NULL, NULL);
     if (err != CL_SUCCESS) {
-
-        //clError("Build failed: ", err);
 
         size_t len;
         char buffer[8096];
@@ -249,37 +246,39 @@ int main() {
     }
 
     // Create the compute kernel in the program
-    cl_kernel kernel = clCreateKernel(program, "pointInsidePolygon_test", &err);
+    cl_kernel kernel = clCreateKernel(program, "proj_test", &err);
         if (!kernel || err != CL_SUCCESS) {
         std::cerr << "Error: Failed to create compute kernel!" << std::endl;
         exit(1);
     }
 
-    const size_t worksize = 1;
+    const size_t worksize = 3;
     
-    float query = {1.0f};
+    float points[3*4] = {
+            1.0f, 2.0f, 3.0f, 4.0f, // in
+            5.0f, 6.0f, 7.0f, 8.0f, // out
+            9.0f, 10.4f, 11.0f, 12.0f // in
+    };
     
-    int lasso_n = 4;
-    float lasso_data[8] = {
-                -0.5f, -0.5f,
-                -0.5f, 0.5f,
-                0.5f, 0.5f,
-                0.5f, -0.5f,
-                };
+    float mat[16] = {
+        1.0f, 0.0f, 0.0f, 0.0f,
+        0.0f, 1.0f, 0.0f, 0.0f, 
+        0.0f, 0.0f, 1.0f, 0.0f,
+        0.0f, 0.0f, 0.0f, 1.0f,
+    };
     
-     cl_mem lasso = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(lasso_data), &lasso_data, &result);
+     cl_mem cl_points = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(points), &points, &result);
     
     
-    cl_mem out = clCreateBuffer(context, CL_MEM_READ_WRITE, worksize*sizeof(bool), NULL, &result);
+    cl_mem cl_out = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(float)*4*worksize, NULL, &result);
     
 
     if (result != CL_SUCCESS)
         printf("ERR 0: %s\n", oclErrorString(result));
 
-    result = clSetKernelArg(kernel, 0, sizeof(out), &lasso);
-    result = clSetKernelArg(kernel, 1, sizeof(int), &lasso_n);
-    result = clSetKernelArg(kernel, 2, sizeof(float)*2, &query);
-    result = clSetKernelArg(kernel, 3, sizeof(out), &out);
+    result = clSetKernelArg(kernel, 0, sizeof(mat), &mat);
+    result = clSetKernelArg(kernel, 1, sizeof(cl_points), &cl_points);
+    result = clSetKernelArg(kernel, 2, sizeof(cl_out), &cl_out);
     
 
     result=clEnqueueNDRangeKernel(cmd_queue, kernel, 1, NULL, &worksize, &worksize, 0, NULL, NULL);
@@ -287,8 +286,8 @@ int main() {
     if (result != CL_SUCCESS)
         printf("ERR 1: %s\n", oclErrorString(result));
 
-    bool out_val[worksize];
-    result=clEnqueueReadBuffer(cmd_queue, out, CL_FALSE, 0, worksize*sizeof(bool), out_val, 0, NULL, NULL);
+    float out[worksize*4];
+    result=clEnqueueReadBuffer(cmd_queue, cl_out, CL_FALSE, 0, sizeof(out), out, 0, NULL, NULL);
 
     if (result != CL_SUCCESS)
         printf("ERR 2: %s\n", oclErrorString(result));
@@ -298,30 +297,11 @@ int main() {
     if (result != CL_SUCCESS)
         printf("ERR 3: %s\n", oclErrorString(result));    
 
-    printf("GPU:\n");
-    for(int i = 0; i < worksize; i++)
-        printf("Result: %d \n", out_val[i]);
+
+    printf("Results:\n");
+    for(int i = 0; i < worksize; i++){
+        printf("(%f, %f, %f, %f)\n", out[i*worksize], out[i*worksize+1], out[i*worksize+2], out[i*worksize+3]);
+    }
     
 
-    /*printf("CPU:\n");
-    for(int i = 0; i < worksize; i++){
-        printf("Result: %d \n", intersects(f2(p1),f2(p2),f2(p3),f2(p4)));
-    }
-    */
-
 }
-
-
-// Allocate memory for the kernel to work with
-//cl_mem mem1, mem2;
-//mem1=clCreateBuffer(context, CL_MEM_READ_ONLY, worksize, NULL, &result);
-//mem2=clCreateBuffer(context, CL_MEM_WRITE_ONLY, worksize, NULL, &result);
-
-
-// Send input data to OpenCL (async, don't alter the buffer!)
-//result=clEnqueueWriteBuffer(cmd_queue, mem1, CL_FALSE, 0, worksize, buf, 0, NULL, NULL);
-// Perform the operation
-//result=clEnqueueNDRangeKernel(cmd_queue, k_rot13, 1, NULL, &worksize, &worksize, 0, NULL, NULL);
-// Read the result back into buf2
-//result=clEnqueueReadBuffer(cmd_queue, mem2, CL_FALSE, 0, worksize, buf2, 0, NULL, NULL);
-// Await completion of all the above

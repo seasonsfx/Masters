@@ -86,6 +86,36 @@ const char* oclErrorString(cl_int error)
 
 }
 
+inline void proj(float* mat, float* point){
+
+    float p0[4] = {0.0f, 0.0f, 0.0f, 1.0f};
+
+    p0[0] += mat[0] * point[0];
+    p0[1] += mat[1] * point[0];
+    p0[2] += mat[2] * point[0];
+    p0[3] += mat[3] * point[0];
+
+    p0[0] += mat[4] * point[1];
+    p0[1] += mat[5] * point[1];
+    p0[2] += mat[6] * point[1];
+    p0[3] += mat[7] * point[1];
+
+    p0[0] += mat[8] * point[2];
+    p0[1] += mat[9] * point[2];
+    p0[2] += mat[10] * point[2];
+    p0[3] += mat[11] * point[2];
+
+    p0[0] += mat[12];
+    p0[1] += mat[13];
+    p0[2] += mat[14];
+    p0[3] += mat[15];
+
+    point[0] = p0[0]/ p0[3];
+    point[1] = p0[1]/ p0[3];
+    point[2] = p0[2]/ p0[3];
+    point[3] = p0[3];
+}
+
 
 class float2
 {
@@ -255,32 +285,40 @@ int main() {
         exit(1);
     }
 
-    const size_t worksize = 3;
+    const size_t worksize = 16;
     
-    const int point_n = 3;
-    float points[4*point_n] = {
-            1.0f, 0.0f, 0.0f, 0.0f, 
-            0.0f, 0.0f, 0.0f, 0.0f, 
-            0.0f, 0.0f, 0.0f, 0.0f
-    };
-    
-    int sidx[3] = {0,1,2};
-    int didx[3] = {-11111,-11111,-11111};
-
-    const int lasso_n = 4;
-    float lasso[2*lasso_n] = {
-                -0.5f, -0.5f,
-                -0.5f, 0.5f,
-                0.5f, 0.5f,
-                0.5f, -0.5f,
-    };
-
-    float mat[16] = {
-        1.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 1.0f, 0.0f, 0.0f, 
-        0.0f, 0.0f, 1.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 1.0f,
-    };
+float points[64] = {
+1.000000f, 1.000000f, 1.000000f, 0.500000f, 
+-1.000000f, 1.000000f, 1.000000f, 0.500000f, 
+1.000000f, -1.000000f, 1.000000f, 0.500000f, 
+1.000000f, 1.000000f, -1.000000f, 0.500000f, 
+2.000000f, 1.000000f, 1.000000f, 0.500000f, 
+1.000000f, 2.000000f, 1.000000f, 0.500000f, 
+1.000000f, 1.000000f, 2.000000f, 0.500000f, 
+3.000000f, 1.000000f, 1.000000f, 0.500000f, 
+1.000000f, 3.000000f, 1.000000f, 0.500000f, 
+1.000000f, 1.000000f, 3.000000f, 0.500000f, 
+4.000000f, 1.000000f, 1.000000f, 0.500000f, 
+1.000000f, 4.000000f, 1.000000f, 0.500000f, 
+1.000000f, 1.000000f, 4.000000f, 0.500000f, 
+5.000000f, 1.000000f, 1.000000f, 0.500000f, 
+1.000000f, 5.000000f, 1.000000f, 0.500000f, 
+1.000000f, 1.000000f, 5.000000f, 0.500000f
+ };
+int sidx[16] = {
+0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
+int didx[16] = {
+-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
+const int lasso_n = 4;
+float lasso[8] = {
+-0.856618f, 0.670996f, 
+0.849265f, 0.675325f, 
+0.852941f, -0.861472f, 
+-0.856618f, -0.857143f
+ };
+float mat[16] = {
+-0.741204f, -0.046847f, 0.486869f, 0.485896f , 0.295306f, 0.638950f, 0.687547f, 0.686173f , 0.290965f, -0.767820f, 0.542444f, 0.541361f , 0.000000f, 0.000000f, 12.224618f, 12.399993f 
+ };
 
     cl_mem cl_points = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(points), &points, &result);
     cl_mem cl_sidx = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(sidx), &sidx, &result);
@@ -318,10 +356,19 @@ int main() {
     if (result != CL_SUCCESS)
         printf("ERR 3: %s\n", oclErrorString(result));    
 
-    printf("Results:\n");
+    printf("Lasso:\n");
+    for(int i = 0; i < lasso_n; i++){
+        printf("(%f, %f) \n", lasso[i*2], lasso[i*2+1]);
+    }
+
+    printf("Points selected:\n");
     for(int i = 0; i < worksize; i++){
-        printf("sidx: %d \n", sidx[i]);
-        printf("didx: %d \n", didx[i]);
+        if(sidx[i] == -1){
+            //printf("sidx: %d \n", sidx[i]);
+            float* p = &points[didx[i]*4];
+            proj(mat, p);
+            printf("didx: %d \t (%f, %f, %f, %f) \n", didx[i], p[0], p[1], p[2], p[3]);
+        }
     }
     
 

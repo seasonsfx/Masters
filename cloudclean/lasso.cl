@@ -1,6 +1,8 @@
+#define M_PI 3.14159f
+
 inline float4 proj(float16 mat, float4 point){
 
-    float4 p0 = (float4)(0.0f, 0.0f, 0.0f, 0.0f);
+    float4 p0 = (float4)(0.0f, 0.0f, 0.0f, 1.0f);
 
     p0.x += mat.s0 * point.x;
     p0.y += mat.s1 * point.x;
@@ -93,15 +95,15 @@ bool intersects(float2 lineA, float2 lineB, float2 lineC, float2 lineD)
 
 float randomAngle()
 {
-    return 2.0*M_PI*(rand() % 10000)/10000.0;
+    return 2.0f*M_PI*(rand() % 10000)/10000.0f;
 }
 
 float2 randomLineSegment(float2 origin)
 {
     float angle = randomAngle();
     float2 endPoint;
-    endPoint.x = 10.0*cos(angle) + origin.x;
-    endPoint.y = 10.0*sin(angle) + origin.y;
+    endPoint.x = 10.0f*cos(angle) + origin.x;
+    endPoint.y = 10.0f*sin(angle) + origin.y;
     return endPoint;
 }
 
@@ -125,7 +127,7 @@ bool pointInsidePolygon(__global float2* polygon, int n, float2 point)
     }
 }
 
-__kernel void lasso (__global float4* points, __global int* source_indices, __global int* dest_indices, __global float2* lasso, int lasso_line_count, float16 mat)
+__kernel void lasso (__global float4* points, __global int* source_indices, __global int* dest_indices, __global float2* polygon, int n, float16 mat)
 {
     unsigned int idx = get_global_id(0);
 
@@ -134,27 +136,35 @@ __kernel void lasso (__global float4* points, __global int* source_indices, __gl
 
     float2 point = vertex.xy;
 
-    if(pointInsidePolygon(lasso, lasso_line_count, point)){
+    bool in_lasso = pointInsidePolygon(polygon, n, point);
+
+    //dest_indices[idx] = point.x;
+    //source_indices[idx] = point.y;
+
+
+    if(in_lasso){
         dest_indices[idx] = source_indices[idx];
-        source_indices[idx] = 0;
+        source_indices[idx] = -1;
+        //points[source_indices[idx]] = (float4)(0.0f, 0.0f, 0.0f, 0.0f);
+        return;
     }
     else{
-        dest_indices[idx] = 0;
+        dest_indices[idx] = -1;
+        return;
     }
+
+
 }
 
 // Unit test kernels
 
 __kernel void proj_test(float16 mat, __global float4* point, __global float4* out){
     unsigned int idx = get_global_id(0);
+
     float4 t;
-    /*t.x = 5.0f;
-    t.y = 2.0f;
-    t.z = 4.0f;
-    t.w = 1.0f;
-    out[idx] = t;
-    out[idx] = point[idx];
-    */
+
+    //out[idx] = point[idx];
+
     out[idx] = proj(mat, point[idx]);
 }
 
@@ -163,7 +173,7 @@ __kernel void intersects_test(float2 origin, float2 dest, float2 p1, float2 p2, 
     out[idx] = intersects(origin, dest, p1, p2);
 }
 
-__kernel void pointInsidePolygon_test(__global float2* polygon, int n, float2 point, __global bool* out){
+__kernel void pointInsidePolygon_test(__global float2* polygon, int n, float4 point, __global bool* out){
     unsigned int idx = get_global_id(0);
-    out[idx] = pointInsidePolygon(polygon, n, point);
+    out[idx] = pointInsidePolygon(polygon, n, point.xy);
 }

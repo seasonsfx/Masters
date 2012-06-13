@@ -264,10 +264,10 @@ int main() {
         1.0f, 0.0f, 0.0f, 0.0f,
         0.0f, 1.0f, 0.0f, 0.0f, 
         0.0f, 0.0f, 1.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 1.0f,
+        1.0f, 0.0f, 0.0f, 1.0f,
     };
     
-     cl_mem cl_points = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(points), &points, &result);
+    cl_mem cl_points = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(points), &points, &result);
     
     
     cl_mem cl_out = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(float)*4*worksize, NULL, &result);
@@ -300,7 +300,7 @@ int main() {
 
     printf("Results:\n");
     for(int i = 0; i < worksize; i++){
-        printf("(%f, %f, %f, %f)\n", out[i*worksize], out[i*worksize+1], out[i*worksize+2], out[i*worksize+3]);
+        printf("(%f, %f, %f, %f)\n", out[i*4], out[i*4+1], out[i*4+2], out[i*4+3]);
     }
     
 

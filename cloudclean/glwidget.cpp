@@ -275,6 +275,7 @@ void GLWidget::paintGL(){
 
     srand (time(NULL));
 
+    glPointSize(5);
     for(int i = 0; i < point_indices.size(); i++){
         Eigen::Vector3f colour = point_colours[i];
         glUniform3fv(point_shader.uniformLocation("layerColour"), 1, colour.data());
@@ -290,11 +291,6 @@ void GLWidget::paintGL(){
     lasso_shader.bind();
     Eigen::Matrix4f ortho;
     ortho.setIdentity();
-    /*ortho << 2.0f/(float)this->width(), 0, 0, -1,
-             0, -2.0f/(float)this->height(), 0, 1,
-             0, 0, 1, 0,
-             0, 0, 0, 1;
-    */
 
     glUniformMatrix4fv(lasso_shader.uniformLocation("ortho"), 1, GL_FALSE, ortho.data());
     lasso_buffer.bind();
@@ -331,11 +327,56 @@ void GLWidget::paintGL(){
 
 void GLWidget::lassoToLayer(){
 
-    // project points to 2d
-    // ray cast test for each point
-    // write to points to new layer
-    // remove points from old layer
+    //// GENERATE TESTING CODE ///
 
+    int csize = app_data->cloud->points.size();
+
+    setlocale(LC_ALL,"C");
+    printf("float points[%d] = {\n", csize*4);
+    for(int i = 0; i < csize; i++){
+        printf("%ff, %ff, %ff, %ff", app_data->cloud->points[i].x, app_data->cloud->points[i].y, app_data->cloud->points[i].z, app_data->cloud->points[i].intensity);
+        if(i < csize-1)
+            printf(", \n");
+    }
+    printf("\n };\n");
+
+    printf("int sidx[%d] = {\n", csize);
+    for(int i = 0; i < csize; i++){
+        printf("%d", i);
+        if(i < csize-1)
+            printf(", ");
+    }
+    printf("};\n");
+
+    printf("int didx[%d] = {\n", csize);
+    for(int i = 0; i < csize; i++){
+        printf("%d", -1);
+        if(i < csize-1)
+            printf(", ");
+    }
+    printf("};\n");
+
+    printf("const int lasso_n = %d;\n", lasso.size());
+
+    printf("float lasso[%d] = {\n", lasso.size()*2);
+    for(int i = 0; i < lasso.size(); i++){
+        printf("%ff, %ff", lasso[i].x(), lasso[i].y());
+        if(i < lasso.size()-1)
+            printf(", \n");
+    }
+    printf("\n };\n");
+
+
+    printf("float mat[16] = {\n");
+    glm::mat4 gmat2 = cameraToClipMatrix * modelview_mat;
+    for(int i = 0 ; i < 4; i++){
+        printf("%ff, %ff, %ff, %ff ", gmat2[i].x, gmat2[i].y, gmat2[i].z, gmat2[i].w);
+        if(i < 3)
+            printf(", ");
+    }
+    printf("\n };\n");
+
+    ////////// END TESTING CODE //////////////
     point_shader.bind();
     point_indices.push_back(QGLBuffer(QGLBuffer::IndexBuffer));
     Eigen::Vector3f colour(((RAND_MAX/2.0f)+(rand()/2.0f))/RAND_MAX , ((RAND_MAX/2.0f)+(rand()/2.0f))/RAND_MAX , ((RAND_MAX/2.0f)+(rand()/2.0f))/RAND_MAX); // Set random colour
@@ -434,6 +475,7 @@ void GLWidget::lassoToLayer(){
     if(result != CL_SUCCESS)
         qWarning() << "OpenCL failed";
 
+    lasso.clear();
 }
 
 // Puts mouse in NDC
@@ -458,11 +500,13 @@ void GLWidget::addLassoPoint(int x, int y){
 
     qWarning() << "lasso size: " << lasso.size();
 
+    /*
     for(int i = 0; i < lasso.size(); i++){
         char buff[100];
         std::sprintf(buff, "(%f, %f)\n", lasso[i].x(), lasso[i].y());
         qWarning() << buff;
     }
+    */
 
 }
 
@@ -482,7 +526,6 @@ void GLWidget::mouseDoubleClickEvent ( QMouseEvent * event ){
     else{
         lasso.pop_back();
         lassoToLayer();
-        lasso.clear();
     }
 }
 

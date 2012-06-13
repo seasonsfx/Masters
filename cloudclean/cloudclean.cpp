@@ -34,7 +34,7 @@ bool CloudClean::loadScan(){
         return false;
 
     const char *ptr = filename.toAscii().data();
-    AppData::Instance()->loadFile(ptr, 8);
+    AppData::Instance()->loadFile(ptr, 1);
     reloadCloud();
     return true;
 }

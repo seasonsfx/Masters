@@ -85,4 +85,36 @@ void clError(char * msg, cl_int err){
         qWarning() << msg << oclErrorString(err);
 }
 
+
+
+inline void proj(float* mat, float* point){
+
+    float p0[4] = {0.0f, 0.0f, 0.0f, 1.0f};
+
+    p0[0] += mat[0] * point[0];
+    p0[1] += mat[1] * point[0];
+    p0[2] += mat[2] * point[0];
+    p0[3] += mat[3] * point[0];
+
+    p0[0] += mat[4] * point[1];
+    p0[1] += mat[5] * point[1];
+    p0[2] += mat[6] * point[1];
+    p0[3] += mat[7] * point[1];
+
+    p0[0] += mat[8] * point[2];
+    p0[1] += mat[9] * point[2];
+    p0[2] += mat[10] * point[2];
+    p0[3] += mat[11] * point[2];
+
+    p0[0] += mat[12];
+    p0[1] += mat[13];
+    p0[2] += mat[14];
+    p0[3] += mat[15];
+
+    point[0] = p0[0]/ p0[3];
+    point[1] = p0[1]/ p0[3];
+    point[2] = p0[2]/ p0[3];
+    point[3] = p0[3];
+}
+
 #endif // HELPERS_H

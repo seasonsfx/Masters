@@ -142,7 +142,7 @@ __kernel void lasso (__global float4* points, __global int* source_indices, __gl
     //source_indices[idx] = point.y;
 
 
-    if(in_lasso){
+    if(!in_lasso){
         dest_indices[idx] = source_indices[idx];
         source_indices[idx] = -1;
         //points[source_indices[idx]] = (float4)(0.0f, 0.0f, 0.0f, 0.0f);

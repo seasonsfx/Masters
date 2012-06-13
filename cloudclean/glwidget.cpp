@@ -376,11 +376,13 @@ void GLWidget::lassoToLayer(){
     }
     printf("\n };\n");
 
-    ////////// END TESTING CODE //////////////
+    ////////// END TESTING CODE GENERATION //////////////
+
     point_shader.bind();
     point_indices.push_back(QGLBuffer(QGLBuffer::IndexBuffer));
     Eigen::Vector3f colour(((RAND_MAX/2.0f)+(rand()/2.0f))/RAND_MAX , ((RAND_MAX/2.0f)+(rand()/2.0f))/RAND_MAX , ((RAND_MAX/2.0f)+(rand()/2.0f))/RAND_MAX); // Set random colour
     point_colours.push_back(colour);
+    point_shader.bind();
     point_indices[point_indices.size()-1].create();
     point_indices[point_indices.size()-1].setUsagePattern( QGLBuffer::DynamicDraw );
     point_indices[point_indices.size()-1].bind();
@@ -404,12 +406,12 @@ void GLWidget::lassoToLayer(){
     // Create buffers from OpenGL
     cl_mem cl_points = clCreateFromGLBuffer(context, CL_MEM_READ_WRITE, point_buffer.bufferId(), &result);
     clError("CL 1", result);
-    cl_mem cl_source_idx = clCreateFromGLBuffer(context, CL_MEM_READ_WRITE, point_indices[point_indices.size()-2].bufferId(), &result);
+    cl_mem cl_sidx = clCreateFromGLBuffer(context, CL_MEM_READ_WRITE, point_indices[point_indices.size()-2].bufferId(), &result);
     clError("CL 2", result);
-    cl_mem cl_dest_idx = clCreateFromGLBuffer(context, CL_MEM_READ_WRITE, point_indices[point_indices.size()-1].bufferId(), &result);
+    cl_mem cl_didx = clCreateFromGLBuffer(context, CL_MEM_READ_WRITE, point_indices[point_indices.size()-1].bufferId(), &result);
     clError("CL 3", result);
 
-    const cl_mem gl_objects[3] = {cl_points, cl_source_idx, cl_dest_idx};
+    const cl_mem gl_objects[3] = {cl_points, cl_sidx, cl_didx};
 
     // Aquire OpenGL buffer objects for writing from OpenCL
     result = clEnqueueAcquireGLObjects(cmd_queue, 3, gl_objects, 0,0,0);
@@ -443,9 +445,9 @@ void GLWidget::lassoToLayer(){
     // Set the kernel arguments
     result = clSetKernelArg(kernel, 0, sizeof(cl_mem), (void*)&cl_points);
     clError("CL 5", result);
-    result =clSetKernelArg(kernel, 1, sizeof(cl_mem), (void*)&cl_source_idx);
+    result =clSetKernelArg(kernel, 1, sizeof(cl_mem), (void*)&cl_sidx);
     clError("CL 6", result);
-    result = clSetKernelArg(kernel, 2, sizeof(cl_mem), (void*)&cl_dest_idx);
+    result = clSetKernelArg(kernel, 2, sizeof(cl_mem), (void*)&cl_didx);
     clError("CL 8", result);
     result = clSetKernelArg(kernel, 3, sizeof(cl_mem), (void*)&cl_lasso);
     clError("CL 9", result);
@@ -459,6 +461,20 @@ void GLWidget::lassoToLayer(){
     result = clEnqueueNDRangeKernel(cmd_queue, kernel, 1, NULL, &kernel_count, NULL, 0, 0, 0);
     if(result != CL_SUCCESS)
         qWarning() << "Kernel exectution failed.";
+
+
+    /////////////////
+
+    int size = csize * sizeof(int);
+    float sidx[size];
+    float didx[size];
+
+    result=clEnqueueReadBuffer(cmd_queue, cl_didx, CL_FALSE, 0, sizeof(didx), didx, 0, NULL, NULL);
+    clError("CL 6.0", result);
+    result=clEnqueueReadBuffer(cmd_queue, cl_sidx, CL_FALSE, 0, sizeof(sidx), sidx, 0, NULL, NULL);
+    clError("CL 6.1", result);
+
+    //////////////////
 
     // Release OpenGL buffer objects
     result = clEnqueueReleaseGLObjects(cmd_queue, 3, gl_objects, 0,0,0);
@@ -474,6 +490,44 @@ void GLWidget::lassoToLayer(){
     result = clFinish(cmd_queue);
     if(result != CL_SUCCESS)
         qWarning() << "OpenCL failed";
+
+    /////////////////
+
+/*
+    point_indices[point_indices.size()-1].bind();
+    point_indices[point_indices.size()-1].read(0, didx, size );
+    point_indices[point_indices.size()-2].bind();
+    point_indices[point_indices.size()-2].read(0, sidx, size);
+
+    glBindBuffer(GL_ARRAY_BUFFER, point_indices[point_indices.size()-1].bufferId());
+    glGetBufferSubData(GL_ARRAY_BUFFER, 0, size, didx);
+    glBindBuffer(GL_ARRAY_BUFFER, point_indices[point_indices.size()-2].bufferId());
+    glGetBufferSubData(GL_ARRAY_BUFFER, 0, size, sidx);
+*/
+    std::printf("WRITE BACK GL ERR: %s\n", gluErrorString(glGetError()));
+
+    for(int i = 0; i < csize; i++){
+        printf("sidx: %d \n", sidx[i]);
+        printf("didx: %d \n", didx[i]);
+    }
+
+    for(int i = 0; i < csize; i++){
+        printf("%ff, %ff, %ff, %ff", app_data->cloud->points[i].x, app_data->cloud->points[i].y, app_data->cloud->points[i].z, app_data->cloud->points[i].intensity);
+        if(i < csize-1)
+            printf(", \n");
+    }
+
+    printf("\nPoints selected:\n");
+    for(int i = 0; i < app_data->cloud->points.size() ; i++){
+        if(sidx[i] == -1){
+            int ii = didx[i];
+            float p[4] = {app_data->cloud->points[ii].x, app_data->cloud->points[ii].y, app_data->cloud->points[ii].z, app_data->cloud->points[ii].intensity};
+            proj(mat, p);
+            printf("didx: %d \t (%f, %f, %f, %f) \n", didx[i], p[0], p[1], p[2], p[3]);
+        }
+    }
+
+    ///////////////////
 
     lasso.clear();
 }

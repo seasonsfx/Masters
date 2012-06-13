@@ -86,36 +86,6 @@ const char* oclErrorString(cl_int error)
 
 }
 
-inline void proj(float* mat, float* point){
-
-    float p0[4] = {0.0f, 0.0f, 0.0f, 1.0f};
-
-    p0[0] += mat[0] * point[0];
-    p0[1] += mat[1] * point[0];
-    p0[2] += mat[2] * point[0];
-    p0[3] += mat[3] * point[0];
-
-    p0[0] += mat[4] * point[1];
-    p0[1] += mat[5] * point[1];
-    p0[2] += mat[6] * point[1];
-    p0[3] += mat[7] * point[1];
-
-    p0[0] += mat[8] * point[2];
-    p0[1] += mat[9] * point[2];
-    p0[2] += mat[10] * point[2];
-    p0[3] += mat[11] * point[2];
-
-    p0[0] += mat[12];
-    p0[1] += mat[13];
-    p0[2] += mat[14];
-    p0[3] += mat[15];
-
-    point[0] = p0[0]/ p0[3];
-    point[1] = p0[1]/ p0[3];
-    point[2] = p0[2]/ p0[3];
-    point[3] = p0[3];
-}
-
 
 class float2
 {
@@ -279,73 +249,48 @@ int main() {
     }
 
     // Create the compute kernel in the program
-    cl_kernel kernel = clCreateKernel(program, "lasso", &err);
+    cl_kernel kernel = clCreateKernel(program, "pointInsidePolygon_test", &err);
         if (!kernel || err != CL_SUCCESS) {
         std::cerr << "Error: Failed to create compute kernel!" << std::endl;
         exit(1);
     }
 
-    const size_t worksize = 16;
+    const size_t worksize = 1;
     
-float points[64] = {
-1.000000f, 1.000000f, 1.000000f, 0.500000f, 
--1.000000f, 1.000000f, 1.000000f, 0.500000f, 
-1.000000f, -1.000000f, 1.000000f, 0.500000f, 
-1.000000f, 1.000000f, -1.000000f, 0.500000f, 
-2.000000f, 1.000000f, 1.000000f, 0.500000f, 
-1.000000f, 2.000000f, 1.000000f, 0.500000f, 
-1.000000f, 1.000000f, 2.000000f, 0.500000f, 
-3.000000f, 1.000000f, 1.000000f, 0.500000f, 
-1.000000f, 3.000000f, 1.000000f, 0.500000f, 
-1.000000f, 1.000000f, 3.000000f, 0.500000f, 
-4.000000f, 1.000000f, 1.000000f, 0.500000f, 
-1.000000f, 4.000000f, 1.000000f, 0.500000f, 
-1.000000f, 1.000000f, 4.000000f, 0.500000f, 
-5.000000f, 1.000000f, 1.000000f, 0.500000f, 
-1.000000f, 5.000000f, 1.000000f, 0.500000f, 
-1.000000f, 1.000000f, 5.000000f, 0.500000f
- };
-int sidx[16] = {
-0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
-int didx[16] = {
--1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
-const int lasso_n = 4;
-float lasso[8] = {
--0.856618f, 0.670996f, 
-0.849265f, 0.675325f, 
-0.852941f, -0.861472f, 
--0.856618f, -0.857143f
- };
-float mat[16] = {
--0.741204f, -0.046847f, 0.486869f, 0.485896f , 0.295306f, 0.638950f, 0.687547f, 0.686173f , 0.290965f, -0.767820f, 0.542444f, 0.541361f , 0.000000f, 0.000000f, 12.224618f, 12.399993f 
- };
-
-    cl_mem cl_points = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(points), &points, &result);
-    cl_mem cl_sidx = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(sidx), &sidx, &result);
-    cl_mem cl_didx = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(didx), &didx, &result);
-    cl_mem cl_lasso = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(lasso), &lasso, &result);
+    float query[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+    
+    int lasso_n = 4;
+    float lasso_data[8] = {
+                -0.5f, -0.5f,
+                -0.5f, 0.5f,
+                0.5f, 0.5f,
+                0.5f, -0.5f,
+                };
+    
+     cl_mem lasso = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(lasso_data), &lasso_data, &result);
+    
+    
+    cl_mem out = clCreateBuffer(context, CL_MEM_READ_WRITE, worksize*sizeof(bool), NULL, &result);
     
 
     if (result != CL_SUCCESS)
         printf("ERR 0: %s\n", oclErrorString(result));
 
-    result = clSetKernelArg(kernel, 0, sizeof(cl_points), &cl_points);
-    result = clSetKernelArg(kernel, 1, sizeof(cl_sidx), &cl_sidx);
-    result = clSetKernelArg(kernel, 2, sizeof(cl_didx), &cl_didx);
-    result = clSetKernelArg(kernel, 3, sizeof(cl_lasso), &cl_lasso);
-    result = clSetKernelArg(kernel, 4, sizeof(lasso_n), &lasso_n);
-    result = clSetKernelArg(kernel, 5, sizeof(mat), &mat);
-
+    result = clSetKernelArg(kernel, 0, sizeof(out), &lasso);
+    result = clSetKernelArg(kernel, 1, sizeof(lasso_n), &lasso_n);
+    result = clSetKernelArg(kernel, 2, sizeof(query), &query);
+    result = clSetKernelArg(kernel, 3, sizeof(out), &out);
+    
     if (result != CL_SUCCESS)
         printf("ERR 0.1: %s\n", oclErrorString(result));
 
-    result = clEnqueueNDRangeKernel(cmd_queue, kernel, 1, NULL, &worksize, &worksize, 0, NULL, NULL);
+    result=clEnqueueNDRangeKernel(cmd_queue, kernel, 1, NULL, &worksize, &worksize, 0, NULL, NULL);
 
     if (result != CL_SUCCESS)
         printf("ERR 1: %s\n", oclErrorString(result));
 
-    result=clEnqueueReadBuffer(cmd_queue, cl_didx, CL_FALSE, 0, sizeof(didx), didx, 0, NULL, NULL);
-    result=clEnqueueReadBuffer(cmd_queue, cl_sidx, CL_FALSE, 0, sizeof(didx), sidx, 0, NULL, NULL);
+    bool out_val[worksize];
+    result=clEnqueueReadBuffer(cmd_queue, out, CL_FALSE, 0, worksize*sizeof(bool), out_val, 0, NULL, NULL);
 
     if (result != CL_SUCCESS)
         printf("ERR 2: %s\n", oclErrorString(result));
@@ -355,20 +300,30 @@ float mat[16] = {
     if (result != CL_SUCCESS)
         printf("ERR 3: %s\n", oclErrorString(result));    
 
-    printf("Lasso:\n");
-    for(int i = 0; i < lasso_n; i++){
-        printf("(%f, %f) \n", lasso[i*2], lasso[i*2+1]);
-    }
-
-    printf("Points selected:\n");
-    for(int i = 0; i < worksize; i++){
-        if(sidx[i] == -1){
-            //printf("sidx: %d \n", sidx[i]);
-            float* p = &points[didx[i]*4];
-            proj(mat, p);
-            printf("didx: %d \t (%f, %f, %f, %f) \n", didx[i], p[0], p[1], p[2], p[3]);
-        }
-    }
+    printf("GPU:\n");
+    for(int i = 0; i < worksize; i++)
+        printf("Result: %d \n", out_val[i]);
     
 
+    /*printf("CPU:\n");
+    for(int i = 0; i < worksize; i++){
+        printf("Result: %d \n", intersects(f2(p1),f2(p2),f2(p3),f2(p4)));
+    }
+    */
+
 }
+
+
+// Allocate memory for the kernel to work with
+//cl_mem mem1, mem2;
+//mem1=clCreateBuffer(context, CL_MEM_READ_ONLY, worksize, NULL, &result);
+//mem2=clCreateBuffer(context, CL_MEM_WRITE_ONLY, worksize, NULL, &result);
+
+
+// Send input data to OpenCL (async, don't alter the buffer!)
+//result=clEnqueueWriteBuffer(cmd_queue, mem1, CL_FALSE, 0, worksize, buf, 0, NULL, NULL);
+// Perform the operation
+//result=clEnqueueNDRangeKernel(cmd_queue, k_rot13, 1, NULL, &worksize, &worksize, 0, NULL, NULL);
+// Read the result back into buf2
+//result=clEnqueueReadBuffer(cmd_queue, mem2, CL_FALSE, 0, worksize, buf2, 0, NULL, NULL);
+// Await completion of all the above

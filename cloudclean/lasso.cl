@@ -2,33 +2,35 @@
 
 inline float4 proj(float16 mat, float4 point){
 
-    float4 p0 = (float4)(0.0f, 0.0f, 0.0f, 1.0f);
+    float4 out = (float4)(0.0f, 0.0f, 0.0f, 0.0f);
+    point.w = 1;
 
-    p0.x += mat.s0 * point.x;
-    p0.y += mat.s1 * point.x;
-    p0.z += mat.s2 * point.x;
-    p0.w += mat.s3 * point.x;
 
-    p0.x += mat.s4 * point.y;
-    p0.y += mat.s5 * point.y;
-    p0.z += mat.s6 * point.y;
-    p0.w += mat.s7 * point.y;
+    out.x += mat.s0 * point.x;
+    out.y += mat.s1 * point.x;
+    out.z += mat.s2 * point.x;
+    out.w += mat.s3 * point.x;
 
-    p0.x += mat.s8 * point.z;
-    p0.y += mat.s9 * point.z;
-    p0.z += mat.sA * point.z;
-    p0.w += mat.sB * point.z;
+    out.x += mat.s4 * point.y;
+    out.y += mat.s5 * point.y;
+    out.z += mat.s6 * point.y;
+    out.w += mat.s7 * point.y;
 
-    p0.x += mat.sC;
-    p0.y += mat.sD;
-    p0.z += mat.sE;
-    p0.w += mat.sF;
+    out.x += mat.s8 * point.z;
+    out.y += mat.s9 * point.z;
+    out.z += mat.sA * point.z;
+    out.w += mat.sB * point.z;
 
-    p0.x/= p0.w;
-    p0.y/= p0.w;
-    p0.z/= p0.w;
+    out.x += mat.sC;
+    out.y += mat.sD;
+    out.z += mat.sE;
+    out.w += mat.sF;
 
-    return p0;
+    out.x/= out.w;
+    out.y/= out.w;
+    out.z/= out.w;
+
+    return out;
 }
 
 int rand(){

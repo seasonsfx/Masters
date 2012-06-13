@@ -3,6 +3,7 @@
 *.dll
 *.so
 *.o
+*.log
+*.run
 CloudClean
-glsdk
 moc_*.cpp

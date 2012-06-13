@@ -26,7 +26,7 @@ HEADERS  += cloudclean.h viewpane.h \
             io.h \
             glwidget.h \
             MousePoles.h \
-    helpers.h
+            helpers.h
 
 FORMS    += cloudclean.ui
 

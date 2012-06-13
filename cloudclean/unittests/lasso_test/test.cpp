@@ -4,6 +4,7 @@
 #include <fstream>
 #include <math.h>
 #include <CL/cl.h>
+#include <Eigen/Dense>
 
 #define __global 
 
@@ -287,35 +288,40 @@ int main() {
 
     const size_t worksize = 1;
   
-float points[4] = {
-0.000000f, 0.000000f, 0.000000f, 0.000000f
- };
-int sidx[1] = {
-0};
-int didx[1] = {
--1};
-const int lasso_n = 4;
-float lasso[8] = {
-0.941176f, 0.051948f, 
-0.996324f, 0.056277f, 
-0.996324f, -0.043290f, 
-0.944853f, -0.038961f
- };
-/*
-float mat[16] = {
-1.0f, 0.0f, 0.0f, 0.0f ,
-0.0f, 1.0f, 0.0f, 0.0f ,
-0.0f, 0.0f, 1.0f, 0.0f ,
-2.0f, 2.0f, 2.0f, 5.0f 
- };
-*/
 
-float mat[16] = {
--0.849264f, -0.000187f, 0.000569f, 0.000568f ,
+    int sidx[1] = {
+    0};
+    int didx[1] = {
+    -1};
+    const int lasso_n = 4;
+    float lasso[8] = {
+    0.941176f, 0.051948f, 
+    0.996324f, 0.056277f, 
+    0.996324f, -0.043290f, 
+    0.944853f, -0.038961f
+     };
+
+
+
+
+    Eigen::Vector4f p1;
+
+    p1 << 1.0f, 2.0f, 3.0f, 1.0f;
+
+    float points[4];
+
+    for(int i = 0; i<4; i++){
+        points[i] = p1.data()[i];
+    }
+
+    Eigen::Matrix4f m1;
+
+    m1 << -0.849264f, -0.000187f, 0.000569f, 0.000568f ,
 0.000103f, 0.867339f, 0.498714f, 0.497718f ,
 0.000497f, -0.497718f, 0.869075f, 0.867339f ,
-1.528681f, 0.000006f, 5.611412f, 5.800000f 
- };
+1.528681f, 0.000006f, 5.611412f, 5.800000f;
+
+    float* mat = m1.data();
 
 
     cl_mem cl_points = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(points), &points, &result);
@@ -332,7 +338,7 @@ float mat[16] = {
     result = clSetKernelArg(kernel, 2, sizeof(cl_didx), &cl_didx);
     result = clSetKernelArg(kernel, 3, sizeof(cl_lasso), &cl_lasso);
     result = clSetKernelArg(kernel, 4, sizeof(lasso_n), &lasso_n);
-    result = clSetKernelArg(kernel, 5, sizeof(mat), &mat);
+    result = clSetKernelArg(kernel, 5, sizeof(float)*16, &mat);
 
     if (result != CL_SUCCESS)
         printf("ERR 0.1: %s\n", oclErrorString(result));
@@ -361,6 +367,14 @@ float mat[16] = {
     for(int i = 0; i < lasso_n; i++){
         printf("(%f, %f) \n", lasso[i*2], lasso[i*2+1]);
     }
+
+    p1 = m1*p1;
+
+    p1[0] /= p1[3];
+    p1[1] /= p1[3];
+    p1[2] /= p1[3];
+
+    printf("(%f, %f, %f, %f)\n", p1.x(), p1.y(), p1.z(), p1.w());
 
     printf("Points selected:\n");
     for(int i = 0; i < worksize; i++){

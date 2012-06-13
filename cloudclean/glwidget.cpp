@@ -273,7 +273,8 @@ void GLWidget::paintGL(){
     point_shader.enableAttributeArray( "vertex" );
     point_shader.setAttributeBuffer( "vertex", GL_FLOAT, 0, 4 );
 
-    srand (time(NULL));
+
+    //srand (time(NULL));
 
     glPointSize(5);
     for(int i = 0; i < point_indices.size(); i++){
@@ -406,7 +407,7 @@ void GLWidget::lassoToLayer(){
     // Create buffers from OpenGL
     cl_mem cl_points = clCreateFromGLBuffer(context, CL_MEM_READ_WRITE, point_buffer.bufferId(), &result);
     clError("CL 1", result);
-    cl_mem cl_sidx = clCreateFromGLBuffer(context, CL_MEM_READ_WRITE, point_indices[point_indices.size()-2].bufferId(), &result);
+    cl_mem cl_sidx = clCreateFromGLBuffer(context, CL_MEM_READ_WRITE, point_indices[0].bufferId(), &result);
     clError("CL 2", result);
     cl_mem cl_didx = clCreateFromGLBuffer(context, CL_MEM_READ_WRITE, point_indices[point_indices.size()-1].bufferId(), &result);
     clError("CL 3", result);
@@ -436,6 +437,7 @@ void GLWidget::lassoToLayer(){
 
     glm::mat4 gmat = cameraToClipMatrix * modelview_mat;
     float mat[16];
+
     for(int i = 0 ; i < 4; i++){
         mat[i*4] = gmat[i].x;
         mat[i*4+1] = gmat[i].y;
@@ -456,7 +458,7 @@ void GLWidget::lassoToLayer(){
     clError("CL 9", result);
     result = clSetKernelArg(kernel, 4, sizeof(int), (void*)&lasso_size);
     clError("CL 10", result);
-    result = clSetKernelArg(kernel, 5, sizeof(float) * 16, (void*)&mat);
+    result = clSetKernelArg(kernel, 5, sizeof(float) * 16, glm::value_ptr(modelview_mat));
     clError("CL 11", result);
 
     // Enqueue the kernel

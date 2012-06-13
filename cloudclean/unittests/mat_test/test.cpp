@@ -4,6 +4,7 @@
 #include <fstream>
 #include <math.h>
 #include <CL/cl.h>
+#include <Eigen/Dense>
 
 #define __global 
 
@@ -254,19 +255,65 @@ int main() {
 
     const size_t worksize = 3;
     
+    Eigen::Vector4f p1, p2, p3;
+
+    p1 << 1.0f, 2.0f, 3.0f, 1.0f;
+    p2 << 5.0f, 6.0f, 7.0f, 1.0f;
+    p3 << 9.0f, 10.4f, 11.0f, 1.0f;
+
+    float points[3*4];
+
+    for(int i = 0; i<4; i++){
+        points[i] = p1.data()[i];
+        points[4+i] = p2.data()[i];
+        points[8+i] = p3.data()[i];
+    }
+
+
+    Eigen::Matrix4f m1;
+    //m1 = Eigen::Matrix4f::Random();
+
+    /*
+    m1 << 1.0f, 0.0f, 0.0f, 0.0f,
+        0.0f, 1.0f, 0.0f, 0.0f, 
+        0.0f, 0.0f, 1.0f, 0.0f,
+        0.0f, 0.0f, 0.0f, 1.0f;
+    */
+
+    m1 << -0.849264f, -0.000187f, 0.000569f, 0.000568f ,
+0.000103f, 0.867339f, 0.498714f, 0.497718f ,
+0.000497f, -0.497718f, 0.869075f, 0.867339f ,
+1.528681f, 0.000006f, 5.611412f, 5.800000f;
+    //std::cout<< m1 << std::endl;
+
+    float* mat = m1.data();
+
+    printf("\nMat:\n");
+    for(int i = 0; i < 4; i++){
+        printf("(%f, %f, %f, %f)\n", mat[i*4], mat[i*4+1], mat[i*4+2], mat[i*4+3]);
+    }
+
+    printf("\nPoints:\n");
+    for(int i = 0; i < worksize; i++){
+        printf("(%f, %f, %f, %f)\n", points[i*4], points[i*4+1], points[i*4+2], points[i*4+3]);
+    }
+
+/*  
     float points[3*4] = {
             1.0f, 2.0f, 3.0f, 4.0f, // in
             5.0f, 6.0f, 7.0f, 8.0f, // out
             9.0f, 10.4f, 11.0f, 12.0f // in
     };
-    
+*/
+
+/*
     float mat[16] = {
         1.0f, 0.0f, 0.0f, 0.0f,
         0.0f, 1.0f, 0.0f, 0.0f, 
         0.0f, 0.0f, 1.0f, 0.0f,
         1.0f, 0.0f, 0.0f, 1.0f,
     };
-    
+  */  
     cl_mem cl_points = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(points), &points, &result);
     
     
@@ -276,7 +323,7 @@ int main() {
     if (result != CL_SUCCESS)
         printf("ERR 0: %s\n", oclErrorString(result));
 
-    result = clSetKernelArg(kernel, 0, sizeof(mat), &mat);
+    result = clSetKernelArg(kernel, 0, sizeof(float)*16, m1.data());
     result = clSetKernelArg(kernel, 1, sizeof(cl_points), &cl_points);
     result = clSetKernelArg(kernel, 2, sizeof(cl_out), &cl_out);
     
@@ -298,10 +345,36 @@ int main() {
         printf("ERR 3: %s\n", oclErrorString(result));    
 
 
-    printf("Results:\n");
+    printf("\nResults GPU:\n");
     for(int i = 0; i < worksize; i++){
         printf("(%f, %f, %f, %f)\n", out[i*4], out[i*4+1], out[i*4+2], out[i*4+3]);
     }
     
+
+    printf("\nResults CPU:\n");
+
+
+    p1 = m1*p1;
+    p2 = m1*p2;
+    p3 = m1*p3;
+
+    p1[0] /= p1[3];
+    p1[1] /= p1[3];
+    p1[2] /= p1[3];
+
+    p2[0] /= p2[3];
+    p2[1] /= p2[3];
+    p2[2] /= p2[3];
+
+    p3[0] /= p3[3];
+    p3[1] /= p3[3];
+    p3[2] /= p3[3];
+
+
+    printf("(%f, %f, %f, %f)\n", p1.x(), p1.y(), p1.z(), p1.w());
+    printf("(%f, %f, %f, %f)\n", p2.x(), p2.y(), p2.z(), p2.w());
+    printf("(%f, %f, %f, %f)\n", p3.x(), p3.y(), p3.z(), p3.w());
+
+
 
 }

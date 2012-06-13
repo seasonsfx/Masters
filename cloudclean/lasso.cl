@@ -2,7 +2,7 @@
 
 inline float4 proj(float16 mat, float4 point){
 
-    float4 p0 = (float4)(0.0f, 0.0f, 0.0f, 0.0f);
+    float4 p0 = (float4)(0.0f, 0.0f, 0.0f, 1.0f);
 
     p0.x += mat.s0 * point.x;
     p0.y += mat.s1 * point.x;

@@ -288,7 +288,7 @@ int main() {
     const size_t worksize = 1;
   
 float points[4] = {
-0.000000f, 0.000000f, 0.000000f, 1.000000f
+0.000000f, 0.000000f, 0.000000f, 0.000000f
  };
 int sidx[1] = {
 0};
@@ -296,17 +296,27 @@ int didx[1] = {
 -1};
 const int lasso_n = 4;
 float lasso[8] = {
--0.213235f, 0.255411f, 
-0.253676f, 0.259740f, 
-0.250000f, -0.367965f, 
--0.216912f, -0.363636f
+0.941176f, 0.051948f, 
+0.996324f, 0.056277f, 
+0.996324f, -0.043290f, 
+0.944853f, -0.038961f
  };
+/*
+float mat[16] = {
+1.0f, 0.0f, 0.0f, 0.0f ,
+0.0f, 1.0f, 0.0f, 0.0f ,
+0.0f, 0.0f, 1.0f, 0.0f ,
+2.0f, 2.0f, 2.0f, 5.0f 
+ };
+*/
+
 float mat[16] = {
 -0.849264f, -0.000187f, 0.000569f, 0.000568f ,
 0.000103f, 0.867339f, 0.498714f, 0.497718f ,
 0.000497f, -0.497718f, 0.869075f, 0.867339f ,
-0.000000f, 0.000000f, 4.809810f, 5.000000f 
+1.528681f, 0.000006f, 5.611412f, 5.800000f 
  };
+
 
     cl_mem cl_points = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(points), &points, &result);
     cl_mem cl_sidx = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(sidx), &sidx, &result);
@@ -354,11 +364,27 @@ float mat[16] = {
 
     printf("Points selected:\n");
     for(int i = 0; i < worksize; i++){
+        int ii;
         if(sidx[i] == -1){
-            //printf("sidx: %d \n", sidx[i]);
-            float* p = &points[didx[i]*4];
-            proj(mat, p);
-            printf("didx: %d \t (%f, %f, %f, %f) \n", didx[i], p[0], p[1], p[2], p[3]);
+            ii = didx[i];
+            printf("didx: %d \t", didx[i]);
+        }
+        else{
+            ii = sidx[i];
+            printf("sidx: %d \t", sidx[i]);
+        }
+
+
+        float* p = &points[ii*4];
+        proj(mat, p);
+        printf("(%f, %f, %f, %f)", p[0], p[1], p[2], p[3]);
+        
+
+        if(sidx[i] == -1){
+            printf(" IS inside\n");
+        }
+        else{
+            printf(" NOT inside\n");
         }
     }
     

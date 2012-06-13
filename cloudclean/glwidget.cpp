@@ -539,7 +539,7 @@ void GLWidget::lassoToLayer(){
 
         float p[4] = {app_data->cloud->points[ii].x, app_data->cloud->points[ii].y, app_data->cloud->points[ii].z, app_data->cloud->points[ii].intensity};
         proj(mat, p);
-        printf("(%f, %f, %f, %f)", didx[i], p[0], p[1], p[2], p[3]);
+        printf("(%f, %f, %f, %f)", p[0], p[1], p[2], p[3]);
 
         if(sidx[i] == -1){
             printf(" is inside");

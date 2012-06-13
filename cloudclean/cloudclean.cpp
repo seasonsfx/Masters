@@ -12,7 +12,9 @@ CloudClean::CloudClean(QWidget *parent) :
 
     connect(ui->openButton, SIGNAL(pressed()), this, SLOT(loadScan()));
 
-    if( !(AppData::Instance()->cloud->points.size() || loadScan()) ){
+    bool scan_loaded = loadScan();
+    int cloud_size_not_0 = AppData::Instance()->cloud->points.size();
+    if( !( cloud_size_not_0|| scan_loaded) ){
         exit(0);
     }
 

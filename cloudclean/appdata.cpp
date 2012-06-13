@@ -7,10 +7,10 @@ AppData* AppData::only_instance = NULL;
 AppData::AppData(QObject *parent) :
     QObject(parent)
 {
-    normals = pcl::PointCloud<pcl::Normal>::Ptr(new pcl::PointCloud<pcl::Normal>);
-    kdtree = pcl::KdTreeFLANN<pcl::PointXYZI>::Ptr(new pcl::KdTreeFLANN<pcl::PointXYZI>());
+    //normals = pcl::PointCloud<pcl::Normal>::Ptr(new pcl::PointCloud<pcl::Normal>);
+    //kdtree = pcl::KdTreeFLANN<pcl::PointXYZI>::Ptr(new pcl::KdTreeFLANN<pcl::PointXYZI>());
     cloud = pcl::PointCloud<pcl::PointXYZI>::Ptr(new pcl::PointCloud<pcl::PointXYZI>);
-    fpfhs = pcl::PointCloud<pcl::FPFHSignature33>::Ptr(new pcl::PointCloud<pcl::FPFHSignature33>);
+    //fpfhs = pcl::PointCloud<pcl::FPFHSignature33>::Ptr(new pcl::PointCloud<pcl::FPFHSignature33>);
 }
 
 AppData * AppData::Instance(){
@@ -143,7 +143,7 @@ bool AppData::loadFile(const char * input_file, int subsample){
 
     printf("Points: %d\n", point_count);
     printf("Invalid points: %d (%f %%) \n", invalid_points, invalid_points/(float)point_count);
-
+/*
     time(&n_begin); // Timing
 
 
@@ -180,6 +180,6 @@ bool AppData::loadFile(const char * input_file, int subsample){
     printf("File read: %f\n", difftime(f_end, f_begin));
     printf("Normal estimation: %f\n", difftime(n_end, n_begin));
     printf("FPFH %f\n", difftime(fpfh_end, fpfh_begin));
-
+*/
     return true;
 }

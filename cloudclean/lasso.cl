@@ -2,7 +2,7 @@
 
 inline float4 proj(float16 mat, float4 point){
 
-    float4 p0 = (float4)(0.0f, 0.0f, 0.0f, 1.0f);
+    float4 p0 = (float4)(0.0f, 0.0f, 0.0f, 0.0f);
 
     p0.x += mat.s0 * point.x;
     p0.y += mat.s1 * point.x;
@@ -134,25 +134,17 @@ __kernel void lasso (__global float4* points, __global int* source_indices, __gl
     // Perspecive projection
     float4 vertex = proj(mat, points[idx]);
 
-    float2 point = vertex.xy;
+    bool in_lasso = pointInsidePolygon(polygon, n, vertex.xy);
 
-    bool in_lasso = pointInsidePolygon(polygon, n, point);
-
-    //dest_indices[idx] = point.x;
-    //source_indices[idx] = point.y;
-
-
-    if(!in_lasso){
+    if(in_lasso){
         dest_indices[idx] = source_indices[idx];
         source_indices[idx] = -1;
-        //points[source_indices[idx]] = (float4)(0.0f, 0.0f, 0.0f, 0.0f);
         return;
     }
     else{
         dest_indices[idx] = -1;
         return;
     }
-
 
 }
 

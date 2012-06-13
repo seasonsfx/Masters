@@ -56,5 +56,4 @@ OTHER_FILES += \
     shaders/points.frag \
     shaders/lasso.vert \
     shaders/lasso.frag \
-    lasso.cl \
-    unittests/Makefile
+    lasso.cl

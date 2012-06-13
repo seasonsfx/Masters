@@ -421,11 +421,14 @@ void GLWidget::lassoToLayer(){
 
     // Create OpenCL buffer for lasso and matrix
     int lasso_size = lasso.size();
-    int lasso_data[lasso_size*2];
+    float lasso_data[lasso_size*2];
     for(int i = 0; i< lasso_size; i++){
         lasso_data[i*2] = lasso[i].x();
         lasso_data[i*2+1] = lasso[i].y();
     }
+
+    printf("Lasso size %d\n", sizeof(lasso_data));
+
     cl_mem cl_lasso = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(lasso_data), &lasso_data, &result);
 
 
@@ -465,14 +468,18 @@ void GLWidget::lassoToLayer(){
 
     /////////////////
 
-    int size = csize * sizeof(int);
-    float sidx[size];
-    float didx[size];
+    int sidx[csize];
+    int didx[csize];
+    // Initialise to -111 so i can see if stuff happened
+    for(int i = 0; i < csize; i++){
+        sidx[i] = -1111;
+        didx[i] = -1111;
+    }
 
     result=clEnqueueReadBuffer(cmd_queue, cl_didx, CL_FALSE, 0, sizeof(didx), didx, 0, NULL, NULL);
-    clError("CL 6.0", result);
+    clError("CL 12 ", result);
     result=clEnqueueReadBuffer(cmd_queue, cl_sidx, CL_FALSE, 0, sizeof(sidx), sidx, 0, NULL, NULL);
-    clError("CL 6.1", result);
+    clError("CL 13 ", result);
 
     //////////////////
 
@@ -506,30 +513,44 @@ void GLWidget::lassoToLayer(){
 */
     std::printf("WRITE BACK GL ERR: %s\n", gluErrorString(glGetError()));
 
+
+    printf("\nLasso points:\n");
+    for(int i = 0; i< lasso_size; i++){
+        printf("(%f, %f)\n" , lasso[i].x(), lasso[i].y());
+    }
+
+    printf("\nSource and destination indices:\n");
     for(int i = 0; i < csize; i++){
         printf("sidx: %d \n", sidx[i]);
         printf("didx: %d \n", didx[i]);
     }
 
-    for(int i = 0; i < csize; i++){
-        printf("%ff, %ff, %ff, %ff", app_data->cloud->points[i].x, app_data->cloud->points[i].y, app_data->cloud->points[i].z, app_data->cloud->points[i].intensity);
-        if(i < csize-1)
-            printf(", \n");
-    }
-
-    printf("\nPoints selected:\n");
+    printf("\nPoints (projected):\n");
     for(int i = 0; i < app_data->cloud->points.size() ; i++){
+        int ii;
         if(sidx[i] == -1){
-            int ii = didx[i];
-            float p[4] = {app_data->cloud->points[ii].x, app_data->cloud->points[ii].y, app_data->cloud->points[ii].z, app_data->cloud->points[ii].intensity};
-            proj(mat, p);
-            printf("didx: %d \t (%f, %f, %f, %f) \n", didx[i], p[0], p[1], p[2], p[3]);
+            ii = didx[i];
+            printf("didx: %d \t", didx[i]);
         }
+        else{
+            ii = sidx[i];
+            printf("sidx: %d \t", sidx[i]);
+        }
+
+        float p[4] = {app_data->cloud->points[ii].x, app_data->cloud->points[ii].y, app_data->cloud->points[ii].z, app_data->cloud->points[ii].intensity};
+        proj(mat, p);
+        printf("(%f, %f, %f, %f)", didx[i], p[0], p[1], p[2], p[3]);
+
+        if(sidx[i] == -1){
+            printf(" is inside");
+        }
+        printf("\n");
     }
 
     ///////////////////
 
     lasso.clear();
+    fflush(stdout);
 }
 
 // Puts mouse in NDC
@@ -688,7 +709,7 @@ void GLWidget::click(int x, int y){
     point_buffer.write(4*sizeof(float)*min_index, reinterpret_cast<const void *> (empty2), sizeof(empty2));
 
     // 3d brush
-    if(filling){
+    /*if(filling){
         printf("filling!!\n");
         std::vector<bool> filled(app_data->cloud->points.size(), false);
         std::queue<int> myqueue;
@@ -736,7 +757,7 @@ void GLWidget::click(int x, int y){
             }
 
         }
-    }
+    }*/
 
 }
 

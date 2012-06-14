@@ -118,20 +118,20 @@ void GLWidget::initializeGL()
     point_shader.setAttributeBuffer( "vertex", GL_FLOAT, 0, 4 );
 
     glUniformMatrix4fv(point_shader.uniformLocation("cameraToClipMatrix"), 1, GL_FALSE, glm::value_ptr(cameraToClipMatrix));
-
+    glError("121");
 
     point_indices.push_back(QGLBuffer(QGLBuffer::IndexBuffer));
     point_colours.push_back(Eigen::Vector3f(1.0f, 1.0f, 1.0f));
     bool created = point_indices[0].create();
 
     printf("Created : %s\n", created?"true":"false");
-    printf("1: %s\n", gluErrorString(glGetError()));
+    glError("128");
     point_indices[0].setUsagePattern( QGLBuffer::DynamicDraw );
     point_indices[0].bind();
-    printf("2: %s\n", gluErrorString(glGetError()));
+    glError("133");
     point_indices[0].allocate(app_data->cloud->size() * sizeof(int) ); // needs to store indices to be rendered
     printf("size in kb: %f\n", (app_data->cloud->size() * 4)/(1024.0f));
-    printf("3: %s\n", gluErrorString(glGetError()));
+    glError("134");
 
     point_indices[0].write(0,reinterpret_cast<const void *>(&app_data->p_valid_indices->at(0)), app_data->p_valid_indices->size() * sizeof(int));
 
@@ -163,7 +163,7 @@ void GLWidget::initializeGL()
     lasso_shader.release();
     lasso_buffer.release();
 
-    std::printf("Init error 0: %s\n", gluErrorString(glGetError()));
+    glError("166");
 
     // Setup OpenCL
     cl_int result = clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 1, &device, NULL);
@@ -251,13 +251,14 @@ void GLWidget::resizeGL( int w, int h )
     // Set the viewport to window dimensions
     cameraToClipMatrix[0].x = aspectRatio * (h / (float)w);
     cameraToClipMatrix[1].y = aspectRatio;
+    point_shader.bind();
     glUniformMatrix4fv(point_shader.uniformLocation("cameraToClipMatrix"), 1, GL_FALSE, glm::value_ptr(cameraToClipMatrix));
+    glError("256");
     glViewport( 0, 0, w, qMax( h, 1 ) );
     updateGL();
 }
 
 void GLWidget::paintGL(){
-    //std::printf("Paint error 0: %s\n", gluErrorString(glGetError()));
     // Clear the buffer with the current clearing color
     glClearDepth(1.0f);
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -269,6 +270,7 @@ void GLWidget::paintGL(){
 
     point_shader.bind();
     glUniformMatrix4fv(point_shader.uniformLocation("modelToCameraMatrix"), 1, GL_FALSE, glm::value_ptr(modelview_mat));
+    glError("274");
     point_buffer.bind();
     point_shader.enableAttributeArray( "vertex" );
     point_shader.setAttributeBuffer( "vertex", GL_FLOAT, 0, 4 );
@@ -280,9 +282,10 @@ void GLWidget::paintGL(){
     for(int i = 0; i < point_indices.size(); i++){
         Eigen::Vector3f colour = point_colours[i];
         glUniform3fv(point_shader.uniformLocation("layerColour"), 1, colour.data());
+        glError("285");
         point_indices[i].bind();
         glDrawElements(GL_POINTS, app_data->p_valid_indices->size(), GL_UNSIGNED_INT, 0);
-        //std::printf("Paint error at i = %d: %s\n", i, gluErrorString(glGetError()));
+        glError("289");
     }
 
     point_buffer.release();
@@ -294,15 +297,16 @@ void GLWidget::paintGL(){
     ortho.setIdentity();
 
     glUniformMatrix4fv(lasso_shader.uniformLocation("ortho"), 1, GL_FALSE, ortho.data());
+    glError("300");
     lasso_buffer.bind();
     float lasso_data[4];
     lasso_buffer.write(0, reinterpret_cast<const void *> (lasso_data), sizeof(lasso_data));
 
-    //std::printf("Paint error 2: %s\n", gluErrorString(glGetError()));
+    glError("305");
 
     lasso_shader.enableAttributeArray( "point" );
     lasso_shader.setAttributeBuffer( "point", GL_FLOAT, 0, 2 );
-    //std::printf("Paint error 3: %s\n", gluErrorString(glGetError()));
+    glError("309");
     if(lasso.size() > 1){
         for(int i = 0; i < lasso.size()-1; i++){
             lasso_data[0] = lasso[i].x();
@@ -322,8 +326,7 @@ void GLWidget::paintGL(){
 
     lasso_buffer.release();
     lasso_shader.release();
-
-    //std::printf("Paint error 4: %s\n", gluErrorString(glGetError()));
+    glError("329");
 }
 
 void GLWidget::lassoToLayer(){
@@ -388,9 +391,6 @@ void GLWidget::lassoToLayer(){
     point_indices[point_indices.size()-1].setUsagePattern( QGLBuffer::DynamicDraw );
     point_indices[point_indices.size()-1].bind();
     point_indices[point_indices.size()-1].allocate(app_data->p_valid_indices->size() * sizeof(int) ); // needs to store indices to be rendered
-
-    //qWarning() << "lasso err 1: " << gluErrorString(glGetError());
-    //std::printf("lasso error 0: %s\n", gluErrorString(glGetError()));
 
     // Initialise to invalid indices
     for(unsigned int i = 0; i < app_data->p_valid_indices->size(); i++){
@@ -458,7 +458,7 @@ void GLWidget::lassoToLayer(){
     clError("CL 9", result);
     result = clSetKernelArg(kernel, 4, sizeof(int), (void*)&lasso_size);
     clError("CL 10", result);
-    result = clSetKernelArg(kernel, 5, sizeof(float) * 16, glm::value_ptr(modelview_mat));
+    result = clSetKernelArg(kernel, 5, sizeof(float) * 16, glm::value_ptr(gmat));
     clError("CL 11", result);
 
     // Enqueue the kernel
@@ -502,19 +502,22 @@ void GLWidget::lassoToLayer(){
 
     /////////////////
 
-/*
-    point_indices[point_indices.size()-1].bind();
-    point_indices[point_indices.size()-1].read(0, didx, size );
-    point_indices[point_indices.size()-2].bind();
-    point_indices[point_indices.size()-2].read(0, sidx, size);
-
-    glBindBuffer(GL_ARRAY_BUFFER, point_indices[point_indices.size()-1].bufferId());
-    glGetBufferSubData(GL_ARRAY_BUFFER, 0, size, didx);
-    glBindBuffer(GL_ARRAY_BUFFER, point_indices[point_indices.size()-2].bufferId());
-    glGetBufferSubData(GL_ARRAY_BUFFER, 0, size, sidx);
-*/
     std::printf("WRITE BACK GL ERR: %s\n", gluErrorString(glGetError()));
 
+
+    printf("Model view\n");
+    for(int i = 0 ; i < 4; i++){
+        printf("%ff, %ff, %ff, %ff \n", modelview_mat[i].x, modelview_mat[i].y, modelview_mat[i].z, modelview_mat[i].w);
+        if(i < 3)
+            printf(", ");
+    }
+
+    printf("cameraToClipMatrix\n");
+    for(int i = 0 ; i < 4; i++){
+        printf("%ff, %ff, %ff, %ff \n", cameraToClipMatrix[i].x, cameraToClipMatrix[i].y, cameraToClipMatrix[i].z, cameraToClipMatrix[i].w);
+        if(i < 3)
+            printf(", ");
+    }
 
     printf("\nLasso points:\n");
     for(int i = 0; i< lasso_size; i++){
@@ -573,17 +576,6 @@ void GLWidget::addLassoPoint(int x, int y){
         lasso.back() = normalized_mouse(x, y);
         lasso.push_back(end);
     }
-
-
-    qWarning() << "lasso size: " << lasso.size();
-
-    /*
-    for(int i = 0; i < lasso.size(); i++){
-        char buff[100];
-        std::sprintf(buff, "(%f, %f)\n", lasso[i].x(), lasso[i].y());
-        qWarning() << buff;
-    }
-    */
 
 }
 
@@ -802,11 +794,6 @@ void GLWidget::keyPressEvent ( QKeyEvent * event ){
             break;
     case Qt::Key_E:
             viewPole->CharPress('e');
-            break;
-
-    case Qt::Key_F:
-            filling = !filling;
-            printf("filling toggle\n");
             break;
     }
     updateGL();

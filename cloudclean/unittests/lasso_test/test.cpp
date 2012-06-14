@@ -114,7 +114,8 @@ inline void proj(float* mat, float* point){
     point[0] = p0[0]/ p0[3];
     point[1] = p0[1]/ p0[3];
     point[2] = p0[2]/ p0[3];
-    point[3] = p0[3];
+    point[3] = p0[3]/ p0[3];
+
 }
 
 
@@ -321,6 +322,8 @@ int main() {
 0.000497f, -0.497718f, 0.869075f, 0.867339f ,
 1.528681f, 0.000006f, 5.611412f, 5.800000f;
 
+    m1.transpose();
+
     float* mat = m1.data();
 
 
@@ -373,7 +376,9 @@ int main() {
     p1[0] /= p1[3];
     p1[1] /= p1[3];
     p1[2] /= p1[3];
+    p1[3] /= p1[3];
 
+    printf("Cpu projected point: \n");
     printf("(%f, %f, %f, %f)\n", p1.x(), p1.y(), p1.z(), p1.w());
 
     printf("Points selected:\n");

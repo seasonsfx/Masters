@@ -29,6 +29,7 @@ inline float4 proj(float16 mat, float4 point){
     out.x/= out.w;
     out.y/= out.w;
     out.z/= out.w;
+    out.w/= out.w;
 
     return out;
 }

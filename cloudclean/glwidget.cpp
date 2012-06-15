@@ -10,7 +10,7 @@
 #include <stdlib.h>
 
 GLWidget::GLWidget(QWidget* parent )
-    : QGLWidget( parent ),
+    : QGLWidget(QGLFormat(QGL::HasOverlay)),
       point_buffer( QGLBuffer::VertexBuffer )
 {
     qApp->installEventFilter(this);
@@ -38,6 +38,7 @@ GLWidget::GLWidget(QWidget* parent )
     glFormat.setDepth( true );
     glFormat.setStencil( true );
     glFormat.setAlpha( true );
+    glFormat.setOverlay( true );
 
     if ( !glFormat.sampleBuffers() )
         qWarning() << "Could not enable sample buffers";
@@ -78,6 +79,8 @@ GLWidget::GLWidget(QWidget* parent )
     viewPole = boost::shared_ptr<glutil::ViewPole>(new glutil::ViewPole(initialViewData, viewScale, glutil::MB_RIGHT_BTN));
     objtPole = boost::shared_ptr<glutil::ObjectPole>(new glutil::ObjectPole(initialObjectData, 90.0f/250.0f, glutil::MB_LEFT_BTN, &*viewPole));
 
+
+    srand (time(NULL));
 }
 
 void GLWidget::initializeGL()
@@ -137,33 +140,6 @@ void GLWidget::initializeGL()
 
     point_buffer.release();
     point_shader.release();
-
-
-    // Lasso shader and buffers
-    if ( !prepareShaderProgram(lasso_shader, "shaders/lasso.vert", "shaders/lasso.frag" ) )
-        return;
-    lasso_shader.bind();
-    lasso_buffer.create();
-    lasso_buffer.setUsagePattern( QGLBuffer::DynamicDraw );
-    if ( !lasso_buffer.bind() )
-    {
-        qWarning() << "Could not bind vertex buffer to the context";
-        return;
-    }
-    lasso_buffer.allocate(sizeof(float) * 12);
-    if ( !lasso_shader.bind() )
-    {
-        qWarning() << "Could not bind shader program to context";
-        return;
-    }
-    lasso_shader.enableAttributeArray( "point" );
-    lasso_shader.setAttributeBuffer( "point", GL_FLOAT, 0, 2 );
-
-
-    lasso_shader.release();
-    lasso_buffer.release();
-
-    glError("166");
 
     // Setup OpenCL
     cl_int result = clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 1, &device, NULL);
@@ -226,6 +202,37 @@ void GLWidget::initializeGL()
 
 }
 
+
+void GLWidget::initializeOverlayGL()
+{
+    printf("Hello!!");
+    // Lasso shader and buffers
+    if ( !prepareShaderProgram(lasso_shader, "shaders/lasso.vert", "shaders/lasso.frag" ) )
+        return;
+    lasso_shader.bind();
+    lasso_buffer.create();
+    lasso_buffer.setUsagePattern( QGLBuffer::DynamicDraw );
+    if ( !lasso_buffer.bind() )
+    {
+        qWarning() << "Could not bind vertex buffer to the context";
+        return;
+    }
+    lasso_buffer.allocate(sizeof(float) * 12);
+    if ( !lasso_shader.bind() )
+    {
+        qWarning() << "Could not bind shader program to context";
+        return;
+    }
+    lasso_shader.enableAttributeArray( "point" );
+    lasso_shader.setAttributeBuffer( "point", GL_FLOAT, 0, 2 );
+
+
+    lasso_shader.release();
+    lasso_buffer.release();
+}
+
+
+
 bool GLWidget::prepareShaderProgram(QGLShaderProgram & shader, const QString& vertexShaderPath, const QString& fragmentShaderPath )
 {
     // Load and compile the vertex shader
@@ -255,7 +262,12 @@ void GLWidget::resizeGL( int w, int h )
     glUniformMatrix4fv(point_shader.uniformLocation("cameraToClipMatrix"), 1, GL_FALSE, glm::value_ptr(cameraToClipMatrix));
     glError("256");
     glViewport( 0, 0, w, qMax( h, 1 ) );
-    updateGL();
+    //updateGL();
+}
+
+void GLWidget::resizeOverlayGL(int w, int h)
+{
+
 }
 
 void GLWidget::paintGL(){
@@ -271,12 +283,11 @@ void GLWidget::paintGL(){
     point_shader.bind();
     glUniformMatrix4fv(point_shader.uniformLocation("modelToCameraMatrix"), 1, GL_FALSE, glm::value_ptr(modelview_mat));
     glError("274");
+
+
     point_buffer.bind();
     point_shader.enableAttributeArray( "vertex" );
     point_shader.setAttributeBuffer( "vertex", GL_FLOAT, 0, 4 );
-
-
-    //srand (time(NULL));
 
     glPointSize(5);
     for(int i = 0; i < point_indices.size(); i++){
@@ -291,6 +302,9 @@ void GLWidget::paintGL(){
     point_buffer.release();
     point_shader.release();
 
+}
+
+void GLWidget::paintOverlayGL(){
     // Draw lasso shader
     lasso_shader.bind();
     Eigen::Matrix4f ortho;
@@ -329,62 +343,18 @@ void GLWidget::paintGL(){
     glError("329");
 }
 
+
+volatile inline float rand_range(float from, float to){
+    return (rand()/(float)RAND_MAX) * (to-from) + from;
+}
+
 void GLWidget::lassoToLayer(){
-
-    //// GENERATE TESTING CODE ///
-
-    int csize = app_data->cloud->points.size();
-
-    setlocale(LC_ALL,"C");
-    printf("float points[%d] = {\n", csize*4);
-    for(int i = 0; i < csize; i++){
-        printf("%ff, %ff, %ff, %ff", app_data->cloud->points[i].x, app_data->cloud->points[i].y, app_data->cloud->points[i].z, app_data->cloud->points[i].intensity);
-        if(i < csize-1)
-            printf(", \n");
-    }
-    printf("\n };\n");
-
-    printf("int sidx[%d] = {\n", csize);
-    for(int i = 0; i < csize; i++){
-        printf("%d", i);
-        if(i < csize-1)
-            printf(", ");
-    }
-    printf("};\n");
-
-    printf("int didx[%d] = {\n", csize);
-    for(int i = 0; i < csize; i++){
-        printf("%d", -1);
-        if(i < csize-1)
-            printf(", ");
-    }
-    printf("};\n");
-
-    printf("const int lasso_n = %d;\n", lasso.size());
-
-    printf("float lasso[%d] = {\n", lasso.size()*2);
-    for(int i = 0; i < lasso.size(); i++){
-        printf("%ff, %ff", lasso[i].x(), lasso[i].y());
-        if(i < lasso.size()-1)
-            printf(", \n");
-    }
-    printf("\n };\n");
-
-
-    printf("float mat[16] = {\n");
-    glm::mat4 gmat2 = cameraToClipMatrix * modelview_mat;
-    for(int i = 0 ; i < 4; i++){
-        printf("%ff, %ff, %ff, %ff ", gmat2[i].x, gmat2[i].y, gmat2[i].z, gmat2[i].w);
-        if(i < 3)
-            printf(", ");
-    }
-    printf("\n };\n");
-
-    ////////// END TESTING CODE GENERATION //////////////
-
+    makeCurrent();
     point_shader.bind();
     point_indices.push_back(QGLBuffer(QGLBuffer::IndexBuffer));
-    Eigen::Vector3f colour(((RAND_MAX/2.0f)+(rand()/2.0f))/RAND_MAX , ((RAND_MAX/2.0f)+(rand()/2.0f))/RAND_MAX , ((RAND_MAX/2.0f)+(rand()/2.0f))/RAND_MAX); // Set random colour
+
+    //Eigen::Vector3f colour(((RAND_MAX/2.0f)+(rand()/2.0f))/RAND_MAX , ((RAND_MAX/2.0f)+(rand()/2.0f))/RAND_MAX , ((RAND_MAX/2.0f)+(rand()/2.0f))/RAND_MAX); // Set random lightish colour
+    Eigen::Vector3f colour(rand_range(0.2f, 1.0f), rand_range(0.2f, 1.0f), rand_range(0.2f, 1.0f));
     point_colours.push_back(colour);
     point_shader.bind();
     point_indices[point_indices.size()-1].create();
@@ -428,8 +398,6 @@ void GLWidget::lassoToLayer(){
         lasso_data[i*2+1] = lasso[i].y();
     }
 
-    printf("Lasso size %d\n", sizeof(lasso_data));
-
     cl_mem cl_lasso = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(lasso_data), &lasso_data, &result);
 
 
@@ -468,23 +436,6 @@ void GLWidget::lassoToLayer(){
         qWarning() << "Kernel exectution failed.";
 
 
-    /////////////////
-
-    int sidx[csize];
-    int didx[csize];
-    // Initialise to -111 so i can see if stuff happened
-    for(int i = 0; i < csize; i++){
-        sidx[i] = -1111;
-        didx[i] = -1111;
-    }
-
-    result=clEnqueueReadBuffer(cmd_queue, cl_didx, CL_FALSE, 0, sizeof(didx), didx, 0, NULL, NULL);
-    clError("CL 12 ", result);
-    result=clEnqueueReadBuffer(cmd_queue, cl_sidx, CL_FALSE, 0, sizeof(sidx), sidx, 0, NULL, NULL);
-    clError("CL 13 ", result);
-
-    //////////////////
-
     // Release OpenGL buffer objects
     result = clEnqueueReleaseGLObjects(cmd_queue, 3, gl_objects, 0,0,0);
     if(result != CL_SUCCESS){
@@ -499,60 +450,6 @@ void GLWidget::lassoToLayer(){
     result = clFinish(cmd_queue);
     if(result != CL_SUCCESS)
         qWarning() << "OpenCL failed";
-
-    /////////////////
-
-    std::printf("WRITE BACK GL ERR: %s\n", gluErrorString(glGetError()));
-
-
-    printf("Model view\n");
-    for(int i = 0 ; i < 4; i++){
-        printf("%ff, %ff, %ff, %ff \n", modelview_mat[i].x, modelview_mat[i].y, modelview_mat[i].z, modelview_mat[i].w);
-        if(i < 3)
-            printf(", ");
-    }
-
-    printf("cameraToClipMatrix\n");
-    for(int i = 0 ; i < 4; i++){
-        printf("%ff, %ff, %ff, %ff \n", cameraToClipMatrix[i].x, cameraToClipMatrix[i].y, cameraToClipMatrix[i].z, cameraToClipMatrix[i].w);
-        if(i < 3)
-            printf(", ");
-    }
-
-    printf("\nLasso points:\n");
-    for(int i = 0; i< lasso_size; i++){
-        printf("(%f, %f)\n" , lasso[i].x(), lasso[i].y());
-    }
-
-    printf("\nSource and destination indices:\n");
-    for(int i = 0; i < csize; i++){
-        printf("sidx: %d \n", sidx[i]);
-        printf("didx: %d \n", didx[i]);
-    }
-
-    printf("\nPoints (projected):\n");
-    for(int i = 0; i < app_data->cloud->points.size() ; i++){
-        int ii;
-        if(sidx[i] == -1){
-            ii = didx[i];
-            printf("didx: %d \t", didx[i]);
-        }
-        else{
-            ii = sidx[i];
-            printf("sidx: %d \t", sidx[i]);
-        }
-
-        float p[4] = {app_data->cloud->points[ii].x, app_data->cloud->points[ii].y, app_data->cloud->points[ii].z, app_data->cloud->points[ii].intensity};
-        proj(mat, p);
-        printf("(%f, %f, %f, %f)", p[0], p[1], p[2], p[3]);
-
-        if(sidx[i] == -1){
-            printf(" is inside");
-        }
-        printf("\n");
-    }
-
-    ///////////////////
 
     lasso.clear();
     fflush(stdout);
@@ -611,7 +508,8 @@ void GLWidget::mouseMoveEvent ( QMouseEvent * event ){
     if(moved)
         moveLasso(event->x(), event->y());
 
-    updateGL();
+    if(mouseDown || lasso.size())
+        updateGL();
 }
 
 void GLWidget::mousePressEvent ( QMouseEvent * event ){
@@ -626,6 +524,7 @@ void GLWidget::mousePressEvent ( QMouseEvent * event ){
     else if (event->button() == Qt::LeftButton){
         objtPole->MouseClick(glutil::MB_LEFT_BTN, true, 0, glm::ivec2(event->x(), event->y()));
     }
+
 
     updateGL();
 }
@@ -643,9 +542,11 @@ void GLWidget::mouseReleaseEvent ( QMouseEvent * event ){
             addLassoPoint(event->x(), event->y());
     }
 
+
+    updateGL();
+
     moved = false;
     mouseDown = Qt::NoButton;
-    updateGL();
 }
 
 inline float distance(glm::vec3 x0, glm::vec3 x1, glm::vec3 x2){

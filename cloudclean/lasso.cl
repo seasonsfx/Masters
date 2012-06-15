@@ -35,7 +35,7 @@ inline float4 proj(float16 mat, float4 point){
 }
 
 int rand(){
-    return 699;
+    return get_global_id(0);
 }
 
 float cross2D(float2 lineA, float2 lineB, float2 other)

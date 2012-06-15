@@ -37,8 +37,11 @@ public:
 
 protected:
     virtual void initializeGL();
+    virtual void initializeOverlayGL();
     virtual void resizeGL( int w, int h );
+    virtual void resizeOverlayGL( int w, int h );
     virtual void paintGL();
+    virtual void paintOverlayGL();
 
     Eigen::Vector2f normalized_mouse(int x, int y);
     void lassoToLayer();

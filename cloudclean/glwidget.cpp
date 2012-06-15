@@ -10,7 +10,8 @@
 #include <stdlib.h>
 
 GLWidget::GLWidget(QWidget* parent )
-    : QGLWidget(QGLFormat(QGL::HasOverlay)),
+    //: QGLWidget(QGLFormat(QGL::HasOverlay)),
+    : QGLWidget(parent),
       point_buffer( QGLBuffer::VertexBuffer )
 {
     qApp->installEventFilter(this);
@@ -36,9 +37,9 @@ GLWidget::GLWidget(QWidget* parent )
     glFormat.setSampleBuffers( true );
     glFormat.setDoubleBuffer( true );
     glFormat.setDepth( true );
-    glFormat.setStencil( true );
+    //glFormat.setStencil( true );
     glFormat.setAlpha( true );
-    glFormat.setOverlay( true );
+    //glFormat.setOverlay( true );
 
     if ( !glFormat.sampleBuffers() )
         qWarning() << "Could not enable sample buffers";
@@ -79,7 +80,6 @@ GLWidget::GLWidget(QWidget* parent )
     viewPole = boost::shared_ptr<glutil::ViewPole>(new glutil::ViewPole(initialViewData, viewScale, glutil::MB_RIGHT_BTN));
     objtPole = boost::shared_ptr<glutil::ObjectPole>(new glutil::ObjectPole(initialObjectData, 90.0f/250.0f, glutil::MB_LEFT_BTN, &*viewPole));
 
-
     srand (time(NULL));
 }
 
@@ -88,6 +88,7 @@ void GLWidget::initializeGL()
     // Set the clear color to black
     glClearColor( 0.1f, 0.1f, 0.1f, 1.0f );
 
+    glEnable(GL_DEPTH_TEST);
 
     // Point shader and buffers
     if ( !prepareShaderProgram(point_shader, "shaders/points.vert", "shaders/points.frag" ) )
@@ -140,6 +141,30 @@ void GLWidget::initializeGL()
 
     point_buffer.release();
     point_shader.release();
+
+    // Lasso shader and buffers
+    if ( !prepareShaderProgram(lasso_shader, "shaders/lasso.vert", "shaders/lasso.frag" ) )
+        return;
+    lasso_shader.bind();
+    lasso_buffer.create();
+    lasso_buffer.setUsagePattern( QGLBuffer::DynamicDraw );
+    if ( !lasso_buffer.bind() )
+    {
+        qWarning() << "Could not bind vertex buffer to the context";
+        return;
+    }
+    lasso_buffer.allocate(sizeof(float) * 12);
+    if ( !lasso_shader.bind() )
+    {
+        qWarning() << "Could not bind shader program to context";
+        return;
+    }
+    lasso_shader.enableAttributeArray( "point" );
+    lasso_shader.setAttributeBuffer( "point", GL_FLOAT, 0, 2 );
+
+
+    lasso_shader.release();
+    lasso_buffer.release();
 
     // Setup OpenCL
     cl_int result = clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 1, &device, NULL);
@@ -202,37 +227,6 @@ void GLWidget::initializeGL()
 
 }
 
-
-void GLWidget::initializeOverlayGL()
-{
-    printf("Hello!!");
-    // Lasso shader and buffers
-    if ( !prepareShaderProgram(lasso_shader, "shaders/lasso.vert", "shaders/lasso.frag" ) )
-        return;
-    lasso_shader.bind();
-    lasso_buffer.create();
-    lasso_buffer.setUsagePattern( QGLBuffer::DynamicDraw );
-    if ( !lasso_buffer.bind() )
-    {
-        qWarning() << "Could not bind vertex buffer to the context";
-        return;
-    }
-    lasso_buffer.allocate(sizeof(float) * 12);
-    if ( !lasso_shader.bind() )
-    {
-        qWarning() << "Could not bind shader program to context";
-        return;
-    }
-    lasso_shader.enableAttributeArray( "point" );
-    lasso_shader.setAttributeBuffer( "point", GL_FLOAT, 0, 2 );
-
-
-    lasso_shader.release();
-    lasso_buffer.release();
-}
-
-
-
 bool GLWidget::prepareShaderProgram(QGLShaderProgram & shader, const QString& vertexShaderPath, const QString& fragmentShaderPath )
 {
     // Load and compile the vertex shader
@@ -265,14 +259,9 @@ void GLWidget::resizeGL( int w, int h )
     //updateGL();
 }
 
-void GLWidget::resizeOverlayGL(int w, int h)
-{
-
-}
-
 void GLWidget::paintGL(){
     // Clear the buffer with the current clearing color
-    glClearDepth(1.0f);
+    //glClearDepth(1.0f);
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
     // Calculate modelview matrix
@@ -289,6 +278,8 @@ void GLWidget::paintGL(){
     point_shader.enableAttributeArray( "vertex" );
     point_shader.setAttributeBuffer( "vertex", GL_FLOAT, 0, 4 );
 
+    glEnable(GL_PRIMITIVE_RESTART);
+    glPrimitiveRestartIndex((unsigned int)-1);
     glPointSize(5);
     for(int i = 0; i < point_indices.size(); i++){
         Eigen::Vector3f colour = point_colours[i];
@@ -302,10 +293,8 @@ void GLWidget::paintGL(){
     point_buffer.release();
     point_shader.release();
 
-}
-
-void GLWidget::paintOverlayGL(){
     // Draw lasso shader
+    glClear(GL_DEPTH_BUFFER_BIT );
     lasso_shader.bind();
     Eigen::Matrix4f ortho;
     ortho.setIdentity();
@@ -341,8 +330,8 @@ void GLWidget::paintOverlayGL(){
     lasso_buffer.release();
     lasso_shader.release();
     glError("329");
-}
 
+}
 
 volatile inline float rand_range(float from, float to){
     return (rand()/(float)RAND_MAX) * (to-from) + from;

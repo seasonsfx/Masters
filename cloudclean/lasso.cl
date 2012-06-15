@@ -34,8 +34,12 @@ inline float4 proj(float16 mat, float4 point){
     return out;
 }
 
-int rand(){
-    return get_global_id(0);
+int rand(int value)
+{
+    const int a = 1103515245;
+    const int c = 12345;
+
+    return (a*value) + c;
 }
 
 float cross2D(float2 lineA, float2 lineB, float2 other)
@@ -96,14 +100,15 @@ bool intersects(float2 lineA, float2 lineB, float2 lineC, float2 lineD)
     return false;
 }
 
-float randomAngle()
+float randomAngle(int* lastRandom)
 {
-    return 2.0f*M_PI*(rand() % 10000)/10000.0f;
+    *lastRandom = rand(*lastRandom);
+    return 2.0f*M_PI*(*lastRandom % 10000)/10000.0f;
 }
 
-float2 randomLineSegment(float2 origin)
+float2 randomLineSegment(float2 origin, int* lastRandom)
 {
-    float angle = randomAngle();
+    float angle = randomAngle(lastRandom);
     float2 endPoint;
     endPoint.x = 10.0f*cos(angle) + origin.x;
     endPoint.y = 10.0f*sin(angle) + origin.y;
@@ -112,9 +117,11 @@ float2 randomLineSegment(float2 origin)
 
 bool pointInsidePolygon(__global float2* polygon, int n, float2 point)
 {
+    int lastRandom = rand(get_global_id(0));
+
     while(true)
     {
-        float2 endPoint = randomLineSegment(point);
+        float2 endPoint = randomLineSegment(point, &lastRandom);
 
         for(int i = 0; i < n; ++i)
             if(pointOnLineSegment(point, endPoint, polygon[i]))

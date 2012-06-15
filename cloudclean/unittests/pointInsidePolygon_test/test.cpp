@@ -198,8 +198,29 @@ float2 f2(float* a){
 
 ////////////////////////////////////////////////
 
+volatile inline float rand_range(float from, float to){
+    return (rand()/(float)RAND_MAX) * (to-from) + from;
+}
 
 int main() {
+
+// Genarate a bunch of points and lassos
+    const int tests = 1000;
+    srand (time(NULL));
+
+    float queries[4*tests];
+    float lassos[8*tests];
+
+    for(int i = 0; i < tests; i++){
+        for(int j = 0; j < 4; i++){
+            queries[i*4+j] = rand_range(0,1);
+        }
+        for(int j = 0; j < 8; i++){
+            lassos[i*8+j] = rand_range(0,1);
+        }
+    }
+
+    
 
     cl_int result;
     cl_platform_id platform;
@@ -257,7 +278,7 @@ int main() {
 
     const size_t worksize = 1;
     
-    float query[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+    /*float query[4] = {0.0f, 0.0f, 0.0f, 0.0f};
     
     int lasso_n = 4;
     float lasso_data[8] = {
@@ -266,8 +287,9 @@ int main() {
                 0.5f, 0.5f,
                 0.5f, -0.5f,
                 };
-    
-     cl_mem lasso = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(lasso_data), &lasso_data, &result);
+    */
+
+    cl_mem lasso = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(lassos), &lassos, &result);
     
     
     cl_mem out = clCreateBuffer(context, CL_MEM_READ_WRITE, worksize*sizeof(bool), NULL, &result);
@@ -312,18 +334,3 @@ int main() {
     */
 
 }
-
-
-// Allocate memory for the kernel to work with
-//cl_mem mem1, mem2;
-//mem1=clCreateBuffer(context, CL_MEM_READ_ONLY, worksize, NULL, &result);
-//mem2=clCreateBuffer(context, CL_MEM_WRITE_ONLY, worksize, NULL, &result);
-
-
-// Send input data to OpenCL (async, don't alter the buffer!)
-//result=clEnqueueWriteBuffer(cmd_queue, mem1, CL_FALSE, 0, worksize, buf, 0, NULL, NULL);
-// Perform the operation
-//result=clEnqueueNDRangeKernel(cmd_queue, k_rot13, 1, NULL, &worksize, &worksize, 0, NULL, NULL);
-// Read the result back into buf2
-//result=clEnqueueReadBuffer(cmd_queue, mem2, CL_FALSE, 0, worksize, buf2, 0, NULL, NULL);
-// Await completion of all the above

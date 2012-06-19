@@ -12,21 +12,25 @@ TEMPLATE = app
 #QMAKE_CXX = clang++
 #D_QMAKE_CC = clang
 
-QMAKE_CXXFLAGS += -g
+QMAKE_CXXFLAGS += -g -std=c++0x #-stdlib=libc++
 QMAKE_CXXFLAGS_RELEASE -= -O2
 QMAKE_CXXFLAGS_RELEASE -= -Os
 
 SOURCES +=  main.cpp cloudclean.cpp viewpane.cpp \
             appdata.cpp \
             glwidget.cpp \
-            MousePoles.cpp
+            MousePoles.cpp \
+    layerlist.cpp \
+    layer.cpp
 
 HEADERS  += cloudclean.h viewpane.h \
             appdata.h \
             io.h \
             glwidget.h \
             MousePoles.h \
-            helpers.h
+            helpers.h \
+    layerlist.h \
+    layer.h
 
 FORMS    += cloudclean.ui
 

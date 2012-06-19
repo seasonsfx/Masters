@@ -110,8 +110,8 @@ float2 randomLineSegment(float2 origin, int* lastRandom)
 {
     float angle = randomAngle(lastRandom);
     float2 endPoint;
-    endPoint.x = 10.0f*cos(angle) + origin.x;
-    endPoint.y = 10.0f*sin(angle) + origin.y;
+    endPoint.x = 10000.0f*cos(angle) + origin.x;
+    endPoint.y = 10000.0f*sin(angle) + origin.y;
     return endPoint;
 }
 
@@ -142,7 +142,7 @@ __kernel void lasso (__global float4* points, __global int* source_indices, __gl
     unsigned int idx = get_global_id(0);
 
     // Perspecive projection
-    float4 vertex = proj(mat, points[idx]);
+    float4 vertex = proj(mat, points[source_indices[idx]]);
 
     bool in_lasso = pointInsidePolygon(polygon, n, vertex.xy);
 

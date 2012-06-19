@@ -7,6 +7,7 @@
 #include <pcl/features/integral_image_normal.h>
 #include <pcl/features/normal_3d.h>
 #include <pcl/point_types.h>
+#include "layerlist.h";
 
 class AppData : public QObject
 {
@@ -19,6 +20,8 @@ public:
     int invalid_points;
 
     pcl::PointCloud<pcl::PointXYZI>::Ptr            cloud;
+    LayerList layerList;
+
     //pcl::KdTreeFLANN<pcl::PointXYZI>::Ptr           kdtree;
     //pcl::PointCloud<pcl::FPFHSignature33>::Ptr      fpfhs;
     //pcl::PointCloud<pcl::Normal>::Ptr               normals;

@@ -22,6 +22,9 @@ CloudClean::CloudClean(QWidget *parent) :
     GLWidget * glwidget = new GLWidget;
     ui->gl->addWidget(glwidget);
     connect(this, SIGNAL(reloadCloud()), glwidget, SLOT(reloadCloud()) );
+
+
+    ui->layerList->setModel(&AppData::Instance()->layerList);
 }
 
 CloudClean::~CloudClean()
@@ -36,7 +39,7 @@ bool CloudClean::loadScan(){
         return false;
 
     const char *ptr = filename.toAscii().data();
-    AppData::Instance()->loadFile(ptr, 1);
+    AppData::Instance()->loadFile(ptr, 2);
     reloadCloud();
     return true;
 }

@@ -42,6 +42,7 @@ protected:
 
     Eigen::Vector2f normalized_mouse(int x, int y);
     void lassoToLayer();
+    void lassoToLayerCPU();
     void addLassoPoint(int x, int y);
     void moveLasso(int x, int y);
 

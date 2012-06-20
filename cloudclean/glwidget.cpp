@@ -454,7 +454,6 @@ volatile inline float rand_range(float from, float to){
 
 
 void GLWidget::lassoToLayerCPU(){
-    makeCurrent();
     point_shader.bind();
     point_indices.push_back(QGLBuffer(QGLBuffer::IndexBuffer));
 
@@ -473,8 +472,8 @@ void GLWidget::lassoToLayerCPU(){
     int * dest_indices = new int(point_indices[0].size()/sizeof(int));
     int * source_indices = new int(point_indices[0].size()/sizeof(int));
 
-    point_indices[point_indices.size()-2].bind();
-    point_indices[point_indices.size()-2].read(0, source_indices, point_indices[point_indices.size()-2].size());
+    point_indices[0].bind();
+    point_indices[0].read(0, source_indices, point_indices[0].size());
 
 
     // Create lasso
@@ -492,8 +491,8 @@ void GLWidget::lassoToLayerCPU(){
     for(int i = 0; i < app_data->p_valid_indices->size(); i++){
         // get point
         int idx = app_data->p_valid_indices->at(i);
-        pcl::PointXYZI & p = app_data->cloud->points[idx];
-        float point[4] = {p.x, p.y, p.z. p.intensity};
+        pcl::PointXYZI p = app_data->cloud->points[idx];
+        float point[4] = {p.x, p.y, p.z, p.intensity};
 
         // project point
         proj(glm::value_ptr(gmat), point);
@@ -507,11 +506,9 @@ void GLWidget::lassoToLayerCPU(){
         if(in_lasso){
             dest_indices[idx] = source_indices[idx];
             source_indices[idx] = -1;
-            return;
         }
         else{
             dest_indices[idx] = -1;
-            return;
         }
 
     }
@@ -519,19 +516,18 @@ void GLWidget::lassoToLayerCPU(){
     // Write indices to gpu
     point_indices[point_indices.size()-1].bind();
     point_indices[point_indices.size()-1].write(0, dest_indices, point_indices[point_indices.size()-1].size());
-    point_indices[point_indices.size()-2].bind();
-    point_indices[point_indices.size()-2].write(0, source_indices, point_indices[point_indices.size()-2].size());
+    point_indices[0].bind();
+    point_indices[0].write(0, source_indices, point_indices[0].size());
 
 
-    delete * source_indices;
-    delete * dest_indices;
+    delete [] source_indices;
+    delete [] dest_indices;
 
     lasso.clear();
     fflush(stdout);
 }
 
 void GLWidget::lassoToLayer(){
-    makeCurrent();
     point_shader.bind();
     point_indices.push_back(QGLBuffer(QGLBuffer::IndexBuffer));
 

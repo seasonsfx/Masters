@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'cloudclean.ui'
 **
-** Created: Tue Jun 19 16:06:46 2012
+** Created: Thu Jun 21 01:22:31 2012
 **      by: Qt User Interface Compiler version 4.8.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -48,7 +48,7 @@ public:
     QListView *layerList;
     QHBoxLayout *buttons;
     QPushButton *openButton;
-    QPushButton *pushButton_2;
+    QPushButton *saveButton;
     QTextBrowser *console;
 
     void setupUi(QWidget *CloudClean)
@@ -153,10 +153,10 @@ public:
 
         buttons->addWidget(openButton);
 
-        pushButton_2 = new QPushButton(CloudClean);
-        pushButton_2->setObjectName(QString::fromUtf8("pushButton_2"));
+        saveButton = new QPushButton(CloudClean);
+        saveButton->setObjectName(QString::fromUtf8("saveButton"));
 
-        buttons->addWidget(pushButton_2);
+        buttons->addWidget(saveButton);
 
 
         verticalLayout_3->addLayout(buttons);
@@ -193,7 +193,7 @@ public:
         toolBox->setItemText(toolBox->indexOf(page_2), QApplication::translate("CloudClean", "Plane select", 0, QApplication::UnicodeUTF8));
         label->setText(QApplication::translate("CloudClean", "Layers", 0, QApplication::UnicodeUTF8));
         openButton->setText(QApplication::translate("CloudClean", "Open Scan", 0, QApplication::UnicodeUTF8));
-        pushButton_2->setText(QApplication::translate("CloudClean", "Save as", 0, QApplication::UnicodeUTF8));
+        saveButton->setText(QApplication::translate("CloudClean", "Save as", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 
 };

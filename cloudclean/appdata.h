@@ -7,30 +7,31 @@
 #include <pcl/features/integral_image_normal.h>
 #include <pcl/features/normal_3d.h>
 #include <pcl/point_types.h>
-#include "layerlist.h";
+#include "layerlist.h"
 
 class AppData : public QObject
 {
     Q_OBJECT
 public:
 
-    int vals_in_range;
     int K;
     float radius;
-    int invalid_points;
+
+    std::vector< int >                              cloud_to_grid_map;
+    int     x_dim;
+    int     y_dim;
 
     pcl::PointCloud<pcl::PointXYZI>::Ptr            cloud;
-    LayerList layerList;
+    LayerList                                       layerList;
 
     //pcl::KdTreeFLANN<pcl::PointXYZI>::Ptr           kdtree;
     //pcl::PointCloud<pcl::FPFHSignature33>::Ptr      fpfhs;
     //pcl::PointCloud<pcl::Normal>::Ptr               normals;
 
-    boost::shared_ptr<std::vector<int> >            p_valid_indices;
-
     // Fetch singleton
     static AppData* Instance();
     bool loadFile(const char * input_file, int subsample);
+    bool saveFile(const char * output_file);
 
 private:
     static AppData* only_instance;

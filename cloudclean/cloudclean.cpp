@@ -11,6 +11,7 @@ CloudClean::CloudClean(QWidget *parent) :
     ui->setupUi(this);
 
     connect(ui->openButton, SIGNAL(pressed()), this, SLOT(loadScan()));
+    connect(ui->saveButton, SIGNAL(pressed()), this, SLOT(saveScan()));
 
     bool scan_loaded = loadScan();
     int cloud_size_not_0 = AppData::Instance()->cloud->points.size();
@@ -21,15 +22,44 @@ CloudClean::CloudClean(QWidget *parent) :
     // Add GL widget to window
     GLWidget * glwidget = new GLWidget;
     ui->gl->addWidget(glwidget);
-    connect(this, SIGNAL(reloadCloud()), glwidget, SLOT(reloadCloud()) );
-
-
     ui->layerList->setModel(&AppData::Instance()->layerList);
+    ui->layerList->setSelectionMode(QAbstractItemView::MultiSelection);
+
+    connect(ui->layerList, SIGNAL(clicked(const QModelIndex &)), this, SLOT(clickedLayer(const QModelIndex &)));
+
+    connect(this, SIGNAL(reloadCloud()), glwidget, SLOT(reloadCloud()));
 }
 
 CloudClean::~CloudClean()
 {
     delete ui;
+}
+
+void CloudClean::clickedLayer(const QModelIndex & index){
+    //QModelIndexList selected = ui->layerList->selectedIndexes();
+    AppData * app_data = AppData::Instance();
+
+    int idx = index.row();
+    app_data->layerList.layers[idx].toggleActive();
+
+    //emit glwidget.updateGL();
+
+    /*QModelIndex item;
+    foreach (item, selected) {
+    }*/
+
+    /*
+    // Deactivate all
+    for(int i = 0; i < app_data->layerList.layers.size(); i++){
+        app_data->layerList.layers[i].active = false;
+    }
+
+    // Activate selected
+    for(int i = 0; i < sRows.size(); i++){
+        int idx = sRows[i].row();
+        app_data->layerList.layers[idx].active = true;
+    }
+*/
 }
 
 bool CloudClean::loadScan(){
@@ -39,7 +69,18 @@ bool CloudClean::loadScan(){
         return false;
 
     const char *ptr = filename.toAscii().data();
-    AppData::Instance()->loadFile(ptr, 2);
+    AppData::Instance()->loadFile(ptr, 1);
     reloadCloud();
+    return true;
+}
+
+bool CloudClean::saveScan(){
+    QString filename = QFileDialog::getSaveFileName(this, tr("Save Scan"), "~", tr("PTX Files (*.ptx)"));
+
+    if(filename.length() == 0)
+        return false;
+
+    const char *ptr = filename.toAscii().data();
+    AppData::Instance()->saveFile(ptr);
     return true;
 }

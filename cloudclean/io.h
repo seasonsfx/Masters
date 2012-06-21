@@ -16,6 +16,55 @@
 
 typedef pcl::PointXYZI PointType;
 
+bool save_ptx(const char* filename, pcl::PointCloud<pcl::PointXYZI>::Ptr cloud){
+    std::ofstream ptx_file(filename);
+    ptx_file << cloud->width << std::endl;
+    ptx_file << cloud->height << std::endl;
+    ptx_file << cloud->sensor_origin_[0] << " " << cloud->sensor_origin_[1] << " "<< cloud->sensor_origin_[2] << std::endl;
+
+    // File is column major
+    Eigen::Matrix3f rmat(cloud->sensor_orientation_);
+    Eigen::Matrix4f tmat;
+    tmat << rmat(0, 0) , rmat(0, 1) , rmat(0, 2) , cloud->sensor_origin_[0] ,
+            rmat(1, 0) , rmat(1, 1) , rmat(1, 2) , cloud->sensor_origin_[1] ,
+            rmat(2, 0) , rmat(2, 1) , rmat(2, 2) , cloud->sensor_origin_[2] ,
+            0 , 0 , 0 , 1;
+
+
+    for(int c = 0; c < 3; c++){
+        for(int r = 0; r < 3; r++){
+            ptx_file << rmat(r, c);
+            if(r < 2)
+                ptx_file << " ";
+            else
+                ptx_file << std::endl;
+        }
+    }
+
+    for(int c = 0; c < 4; c++){
+        for(int r = 0; r < 4; r++){
+            ptx_file << tmat(r, c);
+            if(r < 3)
+                ptx_file << " ";
+            else
+                ptx_file << std::endl;
+        }
+    }
+
+    // Print points
+    for(unsigned int i = 0; i < cloud->points.size(); i++){
+        if(cloud->points[i].x != cloud->points[i].x){
+            ptx_file << "0 0 0 0.5" << std::endl;
+        }
+        else{
+            ptx_file << cloud->points[i].x << " " << cloud->points[i].y << " " << cloud->points[i].z << " " << cloud->points[i].intensity << std::endl;
+        }
+    }
+
+    ptx_file.close();
+    return true;
+}
+
 pcl::PointCloud<pcl::PointXYZI>::Ptr read_ptx(const char* filename, int subsample){
 	assert(subsample%2 == 0 || subsample == 1);
 
@@ -47,18 +96,18 @@ pcl::PointCloud<pcl::PointXYZI>::Ptr read_ptx(const char* filename, int subsampl
 	// Registration matrix
 	Eigen::Matrix3f reg_mat;
 
-	for(int row = 0; row < 3; row++ )
-		for(int col = 0; col < 3; col++ )
-			ptx_file >> reg_mat(row,col);
+
+    for(int col = 0; col < 3; col++ )
+        for(int row = 0; row < 3; row++ )
+            ptx_file >> reg_mat(row,col);
 
 	// Registration quaternion
 	cloud->sensor_orientation_ = Eigen::Quaternionf(reg_mat);
 
-	// Registration mat4
+    // Discard registration mat4
 	Eigen::Matrix4f reg_mat4;
-
-	for(int row = 0; row < 4; row++ )
-		for(int col = 0; col < 4; col++ )
+    for(int col = 0; col < 4; col++ )
+        for(int row = 0; row < 4; row++ )
 			ptx_file >> reg_mat4(row,col);
 
 	ptx_file >> std::ws;

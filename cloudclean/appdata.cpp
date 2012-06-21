@@ -1,6 +1,7 @@
 #include "appdata.h"
 #include <ctime>
 #include "io.h"
+#include <pcl/filters/filter.h>
 
 AppData* AppData::only_instance = NULL;
 
@@ -11,6 +12,9 @@ AppData::AppData(QObject *parent) :
     //kdtree = pcl::KdTreeFLANN<pcl::PointXYZI>::Ptr(new pcl::KdTreeFLANN<pcl::PointXYZI>());
     cloud = pcl::PointCloud<pcl::PointXYZI>::Ptr(new pcl::PointCloud<pcl::PointXYZI>);
     //fpfhs = pcl::PointCloud<pcl::FPFHSignature33>::Ptr(new pcl::PointCloud<pcl::FPFHSignature33>);
+
+    x_dim = 0;
+    y_dim = 0;
 }
 
 AppData * AppData::Instance(){
@@ -112,6 +116,50 @@ void normal_estimation(pcl::PointCloud<pcl::PointXYZI>::Ptr cloud, pcl::PointClo
     }
 }
 
+bool AppData::saveFile(const char * output_file){
+
+    // Reconstruct original cloud
+    pcl::PointCloud<pcl::PointXYZI>::Ptr original_cloud = pcl::PointCloud<pcl::PointXYZI>::Ptr(new pcl::PointCloud<pcl::PointXYZI>);
+    original_cloud->is_dense = false;
+    original_cloud->width = x_dim;
+    original_cloud->height = y_dim;
+    original_cloud->resize(x_dim*y_dim);
+    original_cloud->sensor_origin_[0] = cloud->sensor_origin_[0];
+    original_cloud->sensor_origin_[1] = cloud->sensor_origin_[1];
+    original_cloud->sensor_origin_[2] = cloud->sensor_origin_[2];
+    original_cloud->sensor_origin_[3] = cloud->sensor_origin_[3];
+    original_cloud->sensor_orientation_ = cloud->sensor_orientation_;
+
+    pcl::PointXYZI p;
+    p.x = p.y = p.z = p.intensity = NAN;
+
+    /// Init with nans
+    for(unsigned int i = 0; i < cloud_to_grid_map.size(); i++){
+        original_cloud->points[i] = p;
+    }
+
+
+    // Copy in all visible layers
+    std::vector<Layer> & layers = layerList.layers;
+    for(unsigned int l = 0; l < layers.size(); l++){
+        printf("l: %d\n", l);
+        if(!layers[l].visible)
+            continue;
+        layers[l].copyFromGPU();
+        for(unsigned int i = 0; i < layers[l].index.size(); i++){
+            printf("i: %d\n", i);
+            int idx = layers[l].index[i];
+            if(idx == -1)
+                continue;
+            original_cloud->points[cloud_to_grid_map[idx]] = cloud->points[idx];
+        }
+    }
+
+
+    save_ptx(output_file, original_cloud);
+    return true;
+}
+
 bool AppData::loadFile(const char * input_file, int subsample){
 
     printf("File: %s\n", input_file);
@@ -119,15 +167,24 @@ bool AppData::loadFile(const char * input_file, int subsample){
 
     // Time code
     time_t f_begin, f_end;
-    time_t n_begin, n_end;
-    time_t fpfh_begin, fpfh_end;
+    //time_t n_begin, n_end;
+    //time_t fpfh_begin, fpfh_end;
 
     time(&f_begin); // Timing
     cloud = read_ptx(input_file, subsample);
     time(&f_end); // Timing
 
+    x_dim = cloud->width;
+    y_dim = cloud->height;
+
+    /// Filter and flatten point cloud
+    pcl::removeNaNFromPointCloud(*cloud, *cloud, cloud_to_grid_map);
+
+    /*
+
     int point_count = cloud->points.size();
-    invalid_points = 0;
+    boost::shared_ptr<std::vector<int> > p_valid_indices;
+    int invalid_points = 0;
 
     // Mark valid points
     p_valid_indices = boost::shared_ptr<std::vector<int> >(new std::vector<int> ());
@@ -143,7 +200,7 @@ bool AppData::loadFile(const char * input_file, int subsample){
 
     printf("Points: %d\n", point_count);
     printf("Invalid points: %d (%f %%) \n", invalid_points, invalid_points/(float)point_count);
-/*
+
     time(&n_begin); // Timing
 
 

@@ -9,13 +9,16 @@ class Layer
 {
 public:
     Layer();
-    //void updateCPU();
-    //void updateGPU();
-private:
+    void copyToGPU();
+    void copyFromGPU();
+    void toggleActive();
+
     QGLBuffer gl_index_buffer;
     std::vector<int> index;
     Eigen::Vector3f colour;
     bool visible;
+    bool active;
+private:
 };
 
 #endif // LAYER_H

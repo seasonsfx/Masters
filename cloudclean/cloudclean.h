@@ -2,6 +2,8 @@
 #define CLOUDCLEAN_H
 
 #include <QWidget>
+#include <QModelIndex>
+//#include "glwidget.h"
 
 namespace Ui {
     class CloudClean;
@@ -17,9 +19,12 @@ public:
 
 private:
     Ui::CloudClean *ui;
+    //GLWidget * glwidget;
 
 public slots:
+    void clickedLayer(const QModelIndex & index);
 	bool loadScan();
+    bool saveScan();
 
 signals:
 	void reloadCloud();

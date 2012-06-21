@@ -152,9 +152,7 @@ GLWidget::GLWidget(QWidget* parent )
     glFormat.setSampleBuffers( true );
     glFormat.setDoubleBuffer( true );
     glFormat.setDepth( true );
-    //glFormat.setStencil( true );
     glFormat.setAlpha( true );
-    //glFormat.setOverlay( true );
 
     if ( !glFormat.sampleBuffers() )
         qWarning() << "Could not enable sample buffers";
@@ -239,20 +237,23 @@ void GLWidget::initializeGL()
     glUniformMatrix4fv(point_shader.uniformLocation("cameraToClipMatrix"), 1, GL_FALSE, glm::value_ptr(cameraToClipMatrix));
     glError("121");
 
-    point_indices.push_back(QGLBuffer(QGLBuffer::IndexBuffer));
-    point_colours.push_back(Eigen::Vector3f(1.0f, 1.0f, 1.0f));
-    bool created = point_indices[0].create();
+    /// Create first layer
+    app_data->layerList.newLayer();
+    Layer & layer = app_data->layerList.layers[0];
 
-    printf("Created : %s\n", created?"true":"false");
-    glError("128");
-    point_indices[0].setUsagePattern( QGLBuffer::DynamicDraw );
-    point_indices[0].bind();
-    glError("133");
-    point_indices[0].allocate(app_data->cloud->size() * sizeof(int) ); // needs to store indices to be rendered
+    layer.colour = Eigen::Vector3f(1.0f, 1.0f, 1.0f);
+    layer.gl_index_buffer.create();
+    layer.gl_index_buffer.setUsagePattern( QGLBuffer::DynamicDraw );
+    layer.gl_index_buffer.bind();
+    layer.gl_index_buffer.allocate(app_data->cloud->size() * sizeof(int) );
+
+    /// Initialise the first layer to all points
+    for(unsigned int i = 0; i < app_data->cloud->size(); i++){
+        layer.gl_index_buffer.write(i*sizeof(int), reinterpret_cast<const void *>(&i), sizeof(int));
+    }
+
     printf("size in kb: %f\n", (app_data->cloud->size() * 4)/(1024.0f));
     glError("134");
-
-    point_indices[0].write(0,reinterpret_cast<const void *>(&app_data->p_valid_indices->at(0)), app_data->p_valid_indices->size() * sizeof(int));
 
     point_buffer.release();
     point_shader.release();
@@ -326,17 +327,17 @@ void GLWidget::initializeGL()
         size_t len;
         char buffer[8096];
 
-        std::cerr << "Error: Failed to build program executable!" << endl;
+        std::cerr << "Error: Failed to build program executable!" << std::endl;
         clGetProgramBuildInfo(program, device, CL_PROGRAM_BUILD_LOG,
                            sizeof(buffer), buffer, &len);
-        std::cerr << buffer << endl;
+        std::cerr << buffer << std::endl;
         exit(1);
     }
 
     // Create the compute kernel in the program
     kernel = clCreateKernel(program, "lasso", &err);
         if (!kernel || err != CL_SUCCESS) {
-        std::cerr << "Error: Failed to create compute kernel!" << endl;
+        std::cerr << "Error: Failed to create compute kernel!" << std::endl;
         exit(1);
     }
 
@@ -371,10 +372,10 @@ void GLWidget::resizeGL( int w, int h )
     glUniformMatrix4fv(point_shader.uniformLocation("cameraToClipMatrix"), 1, GL_FALSE, glm::value_ptr(cameraToClipMatrix));
     glError("256");
     glViewport( 0, 0, w, qMax( h, 1 ) );
-    //updateGL();
 }
 
 void GLWidget::paintGL(){
+    //mutex.lock();
     // Clear the buffer with the current clearing color
     //glClearDepth(1.0f);
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -396,12 +397,18 @@ void GLWidget::paintGL(){
     glEnable(GL_PRIMITIVE_RESTART);
     glPrimitiveRestartIndex((unsigned int)-1);
     glPointSize(5);
-    for(int i = 0; i < point_indices.size(); i++){
-        Eigen::Vector3f colour = point_colours[i];
+
+    std::vector<Layer> & layers = app_data->layerList.layers;
+
+    for(unsigned int i = 0; i < layers.size(); i++){
+        Eigen::Vector3f colour(1,1,1);
+        if(layers[i].active)
+            colour = layers[i].colour;
+
         glUniform3fv(point_shader.uniformLocation("layerColour"), 1, colour.data());
         glError("285");
-        point_indices[i].bind();
-        glDrawElements(GL_POINTS, app_data->p_valid_indices->size(), GL_UNSIGNED_INT, 0);
+        layers[i].gl_index_buffer.bind();
+        glDrawElements(GL_POINTS, app_data->cloud->size(), GL_UNSIGNED_INT, 0);
         glError("289");
     }
 
@@ -426,7 +433,7 @@ void GLWidget::paintGL(){
     lasso_shader.setAttributeBuffer( "point", GL_FLOAT, 0, 2 );
     glError("309");
     if(lasso.size() > 1){
-        for(int i = 0; i < lasso.size()-1; i++){
+        for(unsigned int i = 0; i < lasso.size()-1; i++){
             lasso_data[0] = lasso[i].x();
             lasso_data[1] = lasso[i].y();
             lasso_data[2] = lasso[i+1].x();
@@ -445,36 +452,34 @@ void GLWidget::paintGL(){
     lasso_buffer.release();
     lasso_shader.release();
     glError("329");
-
+    //mutex.unlock();
 }
 
-volatile inline float rand_range(float from, float to){
+inline float rand_range(float from, float to){
     return (rand()/(float)RAND_MAX) * (to-from) + from;
 }
 
 
 void GLWidget::lassoToLayerCPU(){
-    point_shader.bind();
-    point_indices.push_back(QGLBuffer(QGLBuffer::IndexBuffer));
 
-    Eigen::Vector3f colour(rand_range(0.2f, 1.0f), rand_range(0.2f, 1.0f), rand_range(0.2f, 1.0f));
-    point_colours.push_back(colour);
-    point_indices[point_indices.size()-1].create();
-    point_indices[point_indices.size()-1].setUsagePattern( QGLBuffer::DynamicDraw );
-    point_indices[point_indices.size()-1].bind();
-    point_indices[point_indices.size()-1].allocate(app_data->p_valid_indices->size() * sizeof(int) ); // needs to store indices to be rendered
+    app_data->layerList.newLayer();
 
-    point_indices[point_indices.size()-1].release();
-    point_shader.release();
+    std::vector<Layer> & layers = app_data->layerList.layers;
 
+    QGLBuffer & dest = layers[layers.size()-1].gl_index_buffer;
+    dest.create();
+    dest.setUsagePattern( QGLBuffer::DynamicDraw );
+    dest.bind();
+    dest.allocate(app_data->cloud->size() * sizeof(int) );
+    dest.release();
 
-    // Create and read source index from gpu
-    int * dest_indices = new int(point_indices[0].size()/sizeof(int));
-    int * source_indices = new int(point_indices[0].size()/sizeof(int));
+    /// Create and read source index from gpu
+    int * dest_indices = new int[app_data->cloud->size()/sizeof(int)];
+    int * source_indices = new int[app_data->cloud->size()/sizeof(int)];
 
-    point_indices[0].bind();
-    point_indices[0].read(0, source_indices, point_indices[0].size());
-
+    QGLBuffer & source = layers[0].gl_index_buffer;
+    source.bind(); /// Bind source
+    source.read(0, source_indices, source.size());
 
     // Create lasso
     int lasso_size = lasso.size();
@@ -484,23 +489,23 @@ void GLWidget::lassoToLayerCPU(){
         lasso_data[i].y = lasso[i].y();
     }
 
-    // Perform the lasso selection
+    /// Perform the lasso selection
     glm::mat4 gmat = cameraToClipMatrix * modelview_mat;
 
-    // for each point
-    for(int i = 0; i < app_data->p_valid_indices->size(); i++){
-        // get point
-        int idx = app_data->p_valid_indices->at(i);
+    /// for each point
+    for(unsigned int i = 0; i < app_data->cloud->size(); i++){
+        /// get point
+        int idx = i;
         pcl::PointXYZI p = app_data->cloud->points[idx];
         float point[4] = {p.x, p.y, p.z, p.intensity};
 
-        // project point
+        /// project point
         proj(glm::value_ptr(gmat), point);
 
-        // make 2d
+        /// make 2d
         float2 vertex = {point[0], point[1]};
 
-        // do lasso test
+        /// do lasso test
         bool in_lasso = pointInsidePolygon(lasso_data, lasso_size, vertex);
 
         if(in_lasso){
@@ -513,12 +518,11 @@ void GLWidget::lassoToLayerCPU(){
 
     }
 
-    // Write indices to gpu
-    point_indices[point_indices.size()-1].bind();
-    point_indices[point_indices.size()-1].write(0, dest_indices, point_indices[point_indices.size()-1].size());
-    point_indices[0].bind();
-    point_indices[0].write(0, source_indices, point_indices[0].size());
-
+    /// Write results gpu
+    dest.bind();
+    dest.write(0, dest_indices, dest.size());
+    source.bind();
+    source.write(0, source_indices, source.size());
 
     delete [] source_indices;
     delete [] dest_indices;
@@ -528,26 +532,25 @@ void GLWidget::lassoToLayerCPU(){
 }
 
 void GLWidget::lassoToLayer(){
-    point_shader.bind();
-    point_indices.push_back(QGLBuffer(QGLBuffer::IndexBuffer));
 
-    //Eigen::Vector3f colour(((RAND_MAX/2.0f)+(rand()/2.0f))/RAND_MAX , ((RAND_MAX/2.0f)+(rand()/2.0f))/RAND_MAX , ((RAND_MAX/2.0f)+(rand()/2.0f))/RAND_MAX); // Set random lightish colour
-    Eigen::Vector3f colour(rand_range(0.2f, 1.0f), rand_range(0.2f, 1.0f), rand_range(0.2f, 1.0f));
-    point_colours.push_back(colour);
-    point_shader.bind();
-    point_indices[point_indices.size()-1].create();
-    point_indices[point_indices.size()-1].setUsagePattern( QGLBuffer::DynamicDraw );
-    point_indices[point_indices.size()-1].bind();
-    point_indices[point_indices.size()-1].allocate(app_data->p_valid_indices->size() * sizeof(int) ); // needs to store indices to be rendered
+    app_data->layerList.newLayer();
 
-    // Initialise to invalid indices
-    for(unsigned int i = 0; i < app_data->p_valid_indices->size(); i++){
+    std::vector<Layer> & layers = app_data->layerList.layers;
+
+    QGLBuffer & dest = layers[layers.size()-1].gl_index_buffer;
+    dest.create();
+    dest.setUsagePattern( QGLBuffer::DynamicDraw );
+    dest.bind();
+    dest.allocate(app_data->cloud->size() * sizeof(int) );
+
+    /// Initialise dest to invalid indices
+    for(unsigned int i = 0; i < app_data->cloud->size(); i++){
         unsigned int val = -1; // TODO: does invalid indices render?
-        point_indices[point_indices.size()-1].write(i*sizeof(int),reinterpret_cast<const void *>(&val), sizeof(int));
+        dest.write(i*sizeof(int),reinterpret_cast<const void *>(&val), sizeof(int));
     }
+    dest.release();
 
-    point_indices[point_indices.size()-1].release();
-    point_shader.release();
+    QGLBuffer & source = layers[0].gl_index_buffer;
 
     glFinish();
     int result;
@@ -555,9 +558,9 @@ void GLWidget::lassoToLayer(){
     // Create buffers from OpenGL
     cl_mem cl_points = clCreateFromGLBuffer(context, CL_MEM_READ_WRITE, point_buffer.bufferId(), &result);
     clError("CL 1", result);
-    cl_mem cl_sidx = clCreateFromGLBuffer(context, CL_MEM_READ_WRITE, point_indices[0].bufferId(), &result);
+    cl_mem cl_sidx = clCreateFromGLBuffer(context, CL_MEM_READ_WRITE, source.bufferId(), &result);
     clError("CL 2", result);
-    cl_mem cl_didx = clCreateFromGLBuffer(context, CL_MEM_READ_WRITE, point_indices[point_indices.size()-1].bufferId(), &result);
+    cl_mem cl_didx = clCreateFromGLBuffer(context, CL_MEM_READ_WRITE, dest.bufferId(), &result);
     clError("CL 3", result);
 
     const cl_mem gl_objects[3] = {cl_points, cl_sidx, cl_didx};
@@ -582,14 +585,6 @@ void GLWidget::lassoToLayer(){
     clError("CL 5", result);
 
     glm::mat4 gmat = cameraToClipMatrix * modelview_mat;
-    float mat[16];
-
-    for(int i = 0 ; i < 4; i++){
-        mat[i*4] = gmat[i].x;
-        mat[i*4+1] = gmat[i].y;
-        mat[i*4+2] = gmat[i].z;
-        mat[i*4+3] = gmat[i].w;
-    }
 
     clError("CL 5.1", result);
 
@@ -608,7 +603,7 @@ void GLWidget::lassoToLayer(){
     clError("CL 11", result);
 
     // Enqueue the kernel
-    const size_t kernel_count = app_data->p_valid_indices->size();
+    const size_t kernel_count = app_data->cloud->size();
     result = clEnqueueNDRangeKernel(cmd_queue, kernel, 1, NULL, &kernel_count, NULL, 0, 0, 0);
     if(result != CL_SUCCESS)
         qWarning() << "Kernel exectution failed.";
@@ -669,7 +664,7 @@ void GLWidget::mouseDoubleClickEvent ( QMouseEvent * event ){
     }
     else{
         lasso.pop_back();
-        lassoToLayerCPU();
+        lassoToLayer();
     }
 }
 
@@ -760,7 +755,7 @@ void GLWidget::click(int x, int y){
     float min_val = FLT_MAX;
 
     // Can be gpu accelerated!!
-    for (int i = 0; i < app_data->cloud->points.size(); i++) {
+    for (unsigned int i = 0; i < app_data->cloud->points.size(); i++) {
         if(app_data->cloud->points[i].intensity < 0.0001f)
             continue;
         glm::vec3 point = glm::vec3(app_data->cloud->points[i].x, app_data->cloud->points[i].y, app_data->cloud->points[i].z);

@@ -12,9 +12,13 @@ public:
     int rowCount ( const QModelIndex & parent = QModelIndex() ) const;
     QVariant data ( const QModelIndex & index, int role = Qt::DisplayRole ) const;
     //QVariant headerData ( int section, Qt::Orientation orientation, int role = Qt::DisplayRole ) const;
+    void newLayer ();
+    void reset();
+
+    std::vector<Layer> layers;
 
 private:
-    std::vector<Layer> layers;
+
 
 signals:
     

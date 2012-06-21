@@ -22,6 +22,7 @@
 #include <QGLBuffer>
 #include <QGLShaderProgram>
 #include <QMouseEvent>
+#include <QMutex>
 
 #include "appdata.h"
 #include "MousePoles.h"
@@ -60,6 +61,8 @@ public slots:
     void reloadCloud();
 
 private:
+    mutable QMutex mutex;
+
     bool prepareShaderProgram( QGLShaderProgram& shader,
                                const QString& vertexShaderPath,
                                const QString& fragmentShaderPath );
@@ -71,9 +74,9 @@ private:
     QGLShaderProgram        lasso_shader;
 
     QGLBuffer               point_buffer; // Holds point vertices
-    std::vector<QGLBuffer>  point_indices; // index buffers that represent layers
+    //std::vector<QGLBuffer>  point_indices; // index buffers that represent layers
 
-    std::vector<Eigen::Vector3f>    point_colours;
+    //std::vector<Eigen::Vector3f>    point_colours;
 
 
     QGLBuffer               lasso_buffer;
@@ -93,8 +96,6 @@ private:
     size_t                  kernelsize;
     
     cl_mem                  p_vbocl;
-
-    float   anim;
 
     Qt::MouseButton         mouseDown;
     bool                    moved;

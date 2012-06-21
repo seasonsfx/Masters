@@ -1,8 +1,7 @@
 #include <QFileDialog>
-#include "cloudclean.h"
 #include "ui_cloudclean.h"
-#include "glwidget.h"
 #include "appdata.h"
+#include "cloudclean.h"
 
 CloudClean::CloudClean(QWidget *parent) :
     QWidget(parent),
@@ -20,7 +19,7 @@ CloudClean::CloudClean(QWidget *parent) :
     }
 
     // Add GL widget to window
-    GLWidget * glwidget = new GLWidget;
+    glwidget = new GLWidget;
     ui->gl->addWidget(glwidget);
     ui->layerList->setModel(&AppData::Instance()->layerList);
     ui->layerList->setSelectionMode(QAbstractItemView::MultiSelection);
@@ -42,7 +41,7 @@ void CloudClean::clickedLayer(const QModelIndex & index){
     int idx = index.row();
     app_data->layerList.layers[idx].toggleActive();
 
-    //emit glwidget.updateGL();
+    emit glwidget->updateGL();
 
     /*QModelIndex item;
     foreach (item, selected) {
@@ -60,6 +59,12 @@ void CloudClean::clickedLayer(const QModelIndex & index){
         app_data->layerList.layers[idx].active = true;
     }
 */
+}
+
+void CloudClean::selectLayer(int i){
+    AppData * app_data = AppData::Instance();
+    //app_data->layerList.layers[i].active = true;
+    //ui->layerList->setSelection ( QRect(i, i, 0, 1), QItemSelectionModel::Select);
 }
 
 bool CloudClean::loadScan(){

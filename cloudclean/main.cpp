@@ -1,5 +1,5 @@
 #include <QtGui/QApplication>
-#include "glwidget.h"
+//#include "glwidget.h"
 #include "cloudclean.h"
 #include <iostream>
 #include "appdata.h"

@@ -16,11 +16,16 @@ Layer::Layer(): gl_index_buffer(QGLBuffer::IndexBuffer)
 }
 
 void Layer::copyToGPU(){
+    if(!gl_index_buffer.isCreated())
+        return;
     gl_index_buffer.bind();
     gl_index_buffer.write(0, &index[0], gl_index_buffer.size());
 }
 
 void Layer::copyFromGPU(){
+    if(!gl_index_buffer.isCreated())
+        return;
+
     if(index.size() == 0){
        index.resize(gl_index_buffer.size());
     }

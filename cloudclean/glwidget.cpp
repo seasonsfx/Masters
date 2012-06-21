@@ -241,7 +241,7 @@ void GLWidget::initializeGL()
     app_data->layerList.newLayer();
     Layer & layer = app_data->layerList.layers[0];
 
-    layer.colour = Eigen::Vector3f(1.0f, 1.0f, 1.0f);
+    layer.colour = Eigen::Vector3f(1.0f, 0.5f, 0.5f);
     layer.gl_index_buffer.create();
     layer.gl_index_buffer.setUsagePattern( QGLBuffer::DynamicDraw );
     layer.gl_index_buffer.bind();
@@ -538,6 +538,7 @@ void GLWidget::lassoToLayer(){
     std::vector<Layer> & layers = app_data->layerList.layers;
 
     QGLBuffer & dest = layers[layers.size()-1].gl_index_buffer;
+    layers[layers.size()-1].active = true;
     dest.create();
     dest.setUsagePattern( QGLBuffer::DynamicDraw );
     dest.bind();

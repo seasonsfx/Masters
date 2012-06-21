@@ -1,5 +1,6 @@
 #include "layerlist.h"
 #include <QTextStream>
+#include "appdata.h"
 
 LayerList::LayerList(QObject *parent) :
     QAbstractListModel(parent)
@@ -24,16 +25,24 @@ QVariant LayerList::data ( const QModelIndex & index, int role ) const {
 }
 
 void LayerList::newLayer (){
-    beginInsertRows( QModelIndex(), 0, 0 );
+    int pos = layers.size();
+    beginInsertRows( QModelIndex(), pos, pos );
     layers.push_back(Layer());
     endInsertRows();
 }
 
 /// Watch out, has OpenGL context been initialized
 void LayerList::reset (){
+    if(layers.size() < 2)
+        return;
     layers.erase(layers.begin()+1, layers.end());
     Layer & layer = layers[0];
-    for(int i = 1; i < layer.gl_index_buffer.size(); i++){
+
+    AppData * app_data = AppData::Instance();
+
+    layer.gl_index_buffer.allocate(app_data->cloud->size()*sizeof(int));
+
+    for(int i = 1; i < app_data->cloud->size(); i++){
         layer.index[i] = i;
     }
     layer.copyToGPU();

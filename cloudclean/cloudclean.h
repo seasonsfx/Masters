@@ -3,7 +3,8 @@
 
 #include <QWidget>
 #include <QModelIndex>
-//#include "glwidget.h"
+#include "glwidget.h"
+
 
 namespace Ui {
     class CloudClean;
@@ -19,10 +20,11 @@ public:
 
 private:
     Ui::CloudClean *ui;
-    //GLWidget * glwidget;
+    GLWidget * glwidget;
 
 public slots:
     void clickedLayer(const QModelIndex & index);
+    void selectLayer(int i);
 	bool loadScan();
     bool saveScan();
 

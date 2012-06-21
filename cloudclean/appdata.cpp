@@ -143,7 +143,7 @@ bool AppData::saveFile(const char * output_file){
     std::vector<Layer> & layers = layerList.layers;
     for(unsigned int l = 0; l < layers.size(); l++){
         printf("l: %d\n", l);
-        if(!layers[l].visible)
+        if(!layers[l].active)
             continue;
         layers[l].copyFromGPU();
         for(unsigned int i = 0; i < layers[l].index.size(); i++){
@@ -179,6 +179,9 @@ bool AppData::loadFile(const char * input_file, int subsample){
 
     /// Filter and flatten point cloud
     pcl::removeNaNFromPointCloud(*cloud, *cloud, cloud_to_grid_map);
+
+
+    layerList.reset();
 
     /*
 

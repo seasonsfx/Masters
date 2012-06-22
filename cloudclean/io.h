@@ -68,8 +68,8 @@ bool save_ptx(const char* filename, pcl::PointCloud<pcl::PointXYZI>::Ptr cloud){
 pcl::PointCloud<pcl::PointXYZI>::Ptr read_ptx(const char* filename, int subsample){
 	assert(subsample%2 == 0 || subsample == 1);
 
-    // Makes things faster
-    //std::cin.sync_with_stdio(false);
+    // Makes things faster apparently
+    std::cin.sync_with_stdio(false);
 
 	std::ifstream ptx_file(filename);
 	pcl::PointCloud<pcl::PointXYZI>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZI>);

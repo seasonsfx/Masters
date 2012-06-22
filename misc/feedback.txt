@@ -1,0 +1,14 @@
+Add vegitation to title
+Add risk section
+Explain what is a feature: characterises a surface feature
+Explain less feature details
+Milestones and gantt chart
+Explain why should I use GPU
+Explain that fpfh in pcl and sandro takes long
+Explain how some stuff is embresingly parallel
+Explain how some approaches might work with regular density
+Add sandro's pictures
+Remove general classification and merge subsequent 2 slides
+Explain what is meant by accuracy: Remove unwanted tools
+Explain how diff is done 
+Tensor voting (Bruce)

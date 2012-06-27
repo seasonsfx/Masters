@@ -1,6 +1,6 @@
 #include "layerlist.h"
 #include <QTextStream>
-#include "appdata.h"
+#include "cloudmodel.h"
 
 LayerList::LayerList(QObject *parent) :
     QAbstractListModel(parent)
@@ -38,7 +38,7 @@ void LayerList::reset (){
     layers.erase(layers.begin()+1, layers.end());
     Layer & layer = layers[0];
 
-    AppData * app_data = AppData::Instance();
+    CloudModel * app_data = CloudModel::Instance();
 
     layer.gl_index_buffer.allocate(app_data->cloud->size()*sizeof(int));
 

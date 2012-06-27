@@ -9,7 +9,7 @@
 #include <pcl/point_types.h>
 #include "layerlist.h"
 
-class AppData : public QObject
+class CloudModel : public QObject
 {
     Q_OBJECT
 public:
@@ -20,8 +20,10 @@ public:
     std::vector< int >                              cloud_to_grid_map;
     int     x_dim;
     int     y_dim;
+    bool    loaded;
 
     pcl::PointCloud<pcl::PointXYZI>::Ptr            cloud;
+    QGLBuffer                                       point_buffer;
     LayerList                                       layerList;
 
     //pcl::KdTreeFLANN<pcl::PointXYZI>::Ptr           kdtree;
@@ -29,17 +31,18 @@ public:
     //pcl::PointCloud<pcl::Normal>::Ptr               normals;
 
     // Fetch singleton
-    static AppData* Instance();
+    static CloudModel* Instance();
+    bool createBuffers();
     bool loadFile(const char * input_file, int subsample);
     bool saveFile(const char * output_file);
-
+    bool isLoaded();
 private:
-    static AppData* only_instance;
-    explicit AppData(QObject *parent = 0);
+    static CloudModel* only_instance;
+    explicit CloudModel(QObject *parent = 0);
 
     // Disable copy and assignment
-    AppData(AppData const&): QObject(0){}
-    AppData& operator=(AppData const&) { return *this; }
+    CloudModel(CloudModel const&) = delete;
+    CloudModel& operator=(CloudModel const&) { return *this; }
 
 signals:
 

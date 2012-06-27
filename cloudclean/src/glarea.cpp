@@ -1,4 +1,4 @@
-#include "glwidget.h"
+#include "glarea.h"
 #include "qapplication.h"
 #include <cstdio>
 #include <fstream>
@@ -124,13 +124,12 @@ bool pointInsidePolygon(float2* polygon, int n, float2 point)
 
 
 
-GLWidget::GLWidget(QWidget* parent )
+GLArea::GLArea(QWidget* parent )
     //: QGLWidget(QGLFormat(QGL::HasOverlay)),
-    : QGLWidget(parent),
-      point_buffer( QGLBuffer::VertexBuffer )
+    : QGLWidget(parent)
 {
     qApp->installEventFilter(this);
-    app_data = AppData::Instance();
+    app_data = CloudModel::Instance();
     aspectRatio = 1.0f;
 
     //TODO: Move out of here
@@ -196,7 +195,7 @@ GLWidget::GLWidget(QWidget* parent )
     srand (time(NULL));
 }
 
-void GLWidget::initializeGL()
+void GLArea::initializeGL()
 {
     // Set the clear color to black
     glClearColor( 0.1f, 0.1f, 0.1f, 1.0f );
@@ -206,30 +205,11 @@ void GLWidget::initializeGL()
     // Point shader and buffers
     if ( !prepareShaderProgram(point_shader, "shaders/points.vert", "shaders/points.frag" ) )
         return;
-    point_shader.bind();
-    point_buffer.create();
-    point_buffer.setUsagePattern( QGLBuffer::DynamicDraw );
 
-    if ( !point_buffer.bind() )
-    {
-        qWarning() << "Could not bind vertex buffer to the context";
-        return;
-    }
-    point_buffer.allocate(app_data->cloud->points.size() * sizeof(float) * 4);
     if ( !point_shader.bind() )
     {
         qWarning() << "Could not bind shader program to context";
         return;
-    }
-    float data[4];
-    for (int i = 0; i < (int)app_data->cloud->size(); i++)
-    {
-        data[0] = app_data->cloud->points[i].x;
-        data[1] = app_data->cloud->points[i].y;
-        data[2] = app_data->cloud->points[i].z;
-        data[3] = app_data->cloud->points[i].intensity;
-        int offset = 4*sizeof(float)*i;
-        point_buffer.write(offset, reinterpret_cast<const void *> (data), sizeof(data));
     }
     point_shader.enableAttributeArray( "vertex" );
     point_shader.setAttributeBuffer( "vertex", GL_FLOAT, 0, 4 );
@@ -237,25 +217,13 @@ void GLWidget::initializeGL()
     glUniformMatrix4fv(point_shader.uniformLocation("cameraToClipMatrix"), 1, GL_FALSE, glm::value_ptr(cameraToClipMatrix));
     glError("121");
 
-    /// Create first layer
-    app_data->layerList.newLayer();
-    Layer & layer = app_data->layerList.layers[0];
 
-    layer.colour = Eigen::Vector3f(1.0f, 0.5f, 0.5f);
-    layer.gl_index_buffer.create();
-    layer.gl_index_buffer.setUsagePattern( QGLBuffer::DynamicDraw );
-    layer.gl_index_buffer.bind();
-    layer.gl_index_buffer.allocate(app_data->cloud->size() * sizeof(int) );
-
-    /// Initialise the first layer to all points
-    for(unsigned int i = 0; i < app_data->cloud->size(); i++){
-        layer.gl_index_buffer.write(i*sizeof(int), reinterpret_cast<const void *>(&i), sizeof(int));
-    }
+    // Create all buffers here
+    //app_data->createBuffers();
 
     printf("size in kb: %f\n", (app_data->cloud->size() * 4)/(1024.0f));
     glError("134");
 
-    point_buffer.release();
     point_shader.release();
 
     // Lasso shader and buffers
@@ -308,10 +276,11 @@ void GLWidget::initializeGL()
         qWarning() << "CL object create failed:" << oclErrorString(result);
 
     // Load the program source into memory
-    std::ifstream file("lasso.cl");
+    std::ifstream file("plugins/lasso.cl");
     std::string prog(std::istreambuf_iterator<char>(file), (std::istreambuf_iterator<char>()));
     file.close();
     const char* source = prog.c_str();
+
     const size_t kernelsize = prog.length()+1;
     int err;
     program = clCreateProgramWithSource(context, 1, (const char**) &source,
@@ -343,7 +312,7 @@ void GLWidget::initializeGL()
 
 }
 
-bool GLWidget::prepareShaderProgram(QGLShaderProgram & shader, const QString& vertexShaderPath, const QString& fragmentShaderPath )
+bool GLArea::prepareShaderProgram(QGLShaderProgram & shader, const QString& vertexShaderPath, const QString& fragmentShaderPath )
 {
     // Load and compile the vertex shader
     bool result = shader.addShaderFromSourceFile( QGLShader::Vertex, vertexShaderPath );
@@ -363,7 +332,7 @@ bool GLWidget::prepareShaderProgram(QGLShaderProgram & shader, const QString& ve
     return result;
 }
 
-void GLWidget::resizeGL( int w, int h )
+void GLArea::resizeGL( int w, int h )
 {
     // Set the viewport to window dimensions
     cameraToClipMatrix[0].x = aspectRatio * (h / (float)w);
@@ -374,10 +343,7 @@ void GLWidget::resizeGL( int w, int h )
     glViewport( 0, 0, w, qMax( h, 1 ) );
 }
 
-void GLWidget::paintGL(){
-    //mutex.lock();
-    // Clear the buffer with the current clearing color
-    //glClearDepth(1.0f);
+void GLArea::paintGL(){
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
     // Calculate modelview matrix
@@ -390,7 +356,7 @@ void GLWidget::paintGL(){
     glError("274");
 
 
-    point_buffer.bind();
+    app_data->point_buffer.bind();
     point_shader.enableAttributeArray( "vertex" );
     point_shader.setAttributeBuffer( "vertex", GL_FLOAT, 0, 4 );
 
@@ -401,6 +367,7 @@ void GLWidget::paintGL(){
     std::vector<Layer> & layers = app_data->layerList.layers;
 
     for(unsigned int i = 0; i < layers.size(); i++){
+        printf("paint %d\n", i);
         Eigen::Vector3f colour(1,1,1);
         if(layers[i].active)
             colour = layers[i].colour;
@@ -412,7 +379,7 @@ void GLWidget::paintGL(){
         glError("289");
     }
 
-    point_buffer.release();
+    app_data->point_buffer.release();
     point_shader.release();
 
     // Draw lasso shader
@@ -452,7 +419,6 @@ void GLWidget::paintGL(){
     lasso_buffer.release();
     lasso_shader.release();
     glError("329");
-    //mutex.unlock();
 }
 
 inline float rand_range(float from, float to){
@@ -460,7 +426,7 @@ inline float rand_range(float from, float to){
 }
 
 
-void GLWidget::lassoToLayerCPU(){
+void GLArea::lassoToLayerCPU(){
 
     app_data->layerList.newLayer();
 
@@ -531,7 +497,11 @@ void GLWidget::lassoToLayerCPU(){
     fflush(stdout);
 }
 
-void GLWidget::lassoToLayer(){
+void GLArea::lassoToLayer(){
+    if(!app_data->isLoaded()){
+        lasso.clear();
+        return;
+    }
 
     app_data->layerList.newLayer();
 
@@ -557,7 +527,7 @@ void GLWidget::lassoToLayer(){
     int result;
 
     // Create buffers from OpenGL
-    cl_mem cl_points = clCreateFromGLBuffer(context, CL_MEM_READ_WRITE, point_buffer.bufferId(), &result);
+    cl_mem cl_points = clCreateFromGLBuffer(context, CL_MEM_READ_WRITE, app_data->point_buffer.bufferId(), &result);
     clError("CL 1", result);
     cl_mem cl_sidx = clCreateFromGLBuffer(context, CL_MEM_READ_WRITE, source.bufferId(), &result);
     clError("CL 2", result);
@@ -630,11 +600,11 @@ void GLWidget::lassoToLayer(){
 }
 
 // Puts mouse in NDC
-inline Eigen::Vector2f GLWidget::normalized_mouse(int x, int y){
+inline Eigen::Vector2f GLArea::normalized_mouse(int x, int y){
     return Eigen::Vector2f(x/(width()/2.0f) - 1.0f, -(y/(height()/2.0f) - 1.0f));
 }
 
-void GLWidget::addLassoPoint(int x, int y){
+void GLArea::addLassoPoint(int x, int y){
 
     if(!lasso_active)
         return;
@@ -650,14 +620,14 @@ void GLWidget::addLassoPoint(int x, int y){
 
 }
 
-void GLWidget::moveLasso(int x, int y){
+void GLArea::moveLasso(int x, int y){
     if(!lasso.empty() && lasso_active){
         lasso.back() = normalized_mouse(x, y);
     }
 }
 
 
-void GLWidget::mouseDoubleClickEvent ( QMouseEvent * event ){
+void GLArea::mouseDoubleClickEvent ( QMouseEvent * event ){
     // End lasso
     lasso_active = !lasso_active;
     if(lasso_active){
@@ -669,7 +639,7 @@ void GLWidget::mouseDoubleClickEvent ( QMouseEvent * event ){
     }
 }
 
-void GLWidget::mouseMoveEvent ( QMouseEvent * event ){
+void GLArea::mouseMoveEvent ( QMouseEvent * event ){
 
     if(mouseDown == Qt::RightButton)
         viewPole->MouseMove(glm::ivec2(event->x(), event->y()));
@@ -686,7 +656,7 @@ void GLWidget::mouseMoveEvent ( QMouseEvent * event ){
         updateGL();
 }
 
-void GLWidget::mousePressEvent ( QMouseEvent * event ){
+void GLArea::mousePressEvent ( QMouseEvent * event ){
     mouseDown = event->button();
     start_x = 0;
     start_y = 0;
@@ -703,7 +673,7 @@ void GLWidget::mousePressEvent ( QMouseEvent * event ){
     updateGL();
 }
 
-void GLWidget::mouseReleaseEvent ( QMouseEvent * event ){
+void GLArea::mouseReleaseEvent ( QMouseEvent * event ){
 
     objtPole->MouseClick(glutil::MB_LEFT_BTN, false, 0, glm::ivec2(event->x(), event->y()));
     viewPole->MouseClick(glutil::MB_RIGHT_BTN, false, 0, glm::ivec2(event->x(), event->y()));
@@ -729,7 +699,7 @@ inline float distance(glm::vec3 x0, glm::vec3 x1, glm::vec3 x2){
     return top.x*top.x + top.y*top.y + top.z*top.z / bot.x*bot.x + bot.y*bot.y + bot.z*bot.z;
 }
 
-void GLWidget::click(int x, int y){
+void GLArea::click(int x, int y){
 
     double mvmatrix[16];
     double projmatrix[16];
@@ -775,7 +745,7 @@ void GLWidget::click(int x, int y){
 
     // point filling
     float empty2[4] = {0.0f, 0.0f, 0.0f, 0.0f};
-    point_buffer.write(4*sizeof(float)*min_index, reinterpret_cast<const void *> (empty2), sizeof(empty2));
+    app_data->point_buffer.write(4*sizeof(float)*min_index, reinterpret_cast<const void *> (empty2), sizeof(empty2));
 
     // 3d brush
     /*if(filling){
@@ -796,7 +766,7 @@ void GLWidget::click(int x, int y){
             // fill
             // Update buffer
             int offset = 4*sizeof(float)*current;
-            point_buffer.write(offset, reinterpret_cast<const void *> (empty), sizeof(empty));
+            app_data->point_buffer.write(offset, reinterpret_cast<const void *> (empty), sizeof(empty));
 
             filled[current] = true;
 
@@ -830,12 +800,12 @@ void GLWidget::click(int x, int y){
 
 }
 
-void GLWidget::wheelEvent ( QWheelEvent * event ){
+void GLArea::wheelEvent ( QWheelEvent * event ){
     viewPole->MouseWheel(event->delta(), 0, glm::ivec2(event->x(), event->y()));
     updateGL();
 }
 
-void GLWidget::keyPressEvent ( QKeyEvent * event ){
+void GLArea::keyPressEvent ( QKeyEvent * event ){
     // Set up inverse rotation
     glm::mat4 inv = glm::transpose(viewPole->CalcMatrix());
     inv[3] = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
@@ -875,7 +845,7 @@ void GLWidget::keyPressEvent ( QKeyEvent * event ){
 
 }
 
- bool GLWidget::eventFilter(QObject *object, QEvent *event)
+ bool GLArea::eventFilter(QObject *object, QEvent *event)
  {
      Q_UNUSED(object);
      if (event->type() == QEvent::KeyPress ) {
@@ -886,8 +856,9 @@ void GLWidget::keyPressEvent ( QKeyEvent * event ){
      return false;
  }
 
- void GLWidget::reloadCloud(){
-    point_buffer.allocate(app_data->cloud->points.size() * sizeof(float) * 4);
+ /*
+ void GLArea::reloadCloud(){
+    app_data->point_buffer.allocate(app_data->cloud->points.size() * sizeof(float) * 4);
     float data[4];
     for (int i = 0; i < (int)app_data->cloud->size(); i++)
     {
@@ -896,7 +867,8 @@ void GLWidget::keyPressEvent ( QKeyEvent * event ){
         data[2] = app_data->cloud->points[i].z;
         data[3] = app_data->cloud->points[i].intensity;
         int offset = 4*sizeof(float)*i;
-        point_buffer.write(offset, reinterpret_cast<const void *> (data), sizeof(data));
+        app_data->point_buffer.write(offset, reinterpret_cast<const void *> (data), sizeof(data));
     }
     std::printf("Reloaded\n");
  }
+*/

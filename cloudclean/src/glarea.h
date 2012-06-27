@@ -4,7 +4,7 @@
 #include <ctime>
 
 #define GL3_PROTOTYPES
-#include <GL3/gl3.h>
+#include <external/gl3.h>
 #include <GL/glu.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -24,17 +24,17 @@
 #include <QMouseEvent>
 #include <QMutex>
 
-#include "appdata.h"
+#include "cloudmodel.h"
 #include "MousePoles.h"
 
 #include <GL/glx.h>
 #undef KeyPress // Defined in X11/X.h, interferes with QEvent::KeyPress
 
-class GLWidget : public QGLWidget
+class GLArea : public QGLWidget
 {
     Q_OBJECT
 public:
-    GLWidget( QWidget* parent = 0 );
+    GLArea( QWidget* parent = 0 );
 
 protected:
     virtual void initializeGL();
@@ -58,7 +58,7 @@ protected:
     bool eventFilter(QObject *object, QEvent *event);
 
 public slots:
-    void reloadCloud();
+    //void reloadCloud();
 
 private:
     mutable QMutex mutex;
@@ -67,17 +67,13 @@ private:
                                const QString& vertexShaderPath,
                                const QString& fragmentShaderPath );
 
-    AppData *               app_data;
+    CloudModel *            app_data;
 
     QGLFormat               glFormat;
     QGLShaderProgram        point_shader;
     QGLShaderProgram        lasso_shader;
 
-    QGLBuffer               point_buffer; // Holds point vertices
-    //std::vector<QGLBuffer>  point_indices; // index buffers that represent layers
-
-    //std::vector<Eigen::Vector3f>    point_colours;
-
+    //QGLBuffer               point_buffer; // Holds point vertices
 
     QGLBuffer               lasso_buffer;
     QGLBuffer               lasso_index;

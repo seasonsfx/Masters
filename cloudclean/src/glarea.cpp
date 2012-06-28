@@ -129,7 +129,7 @@ GLArea::GLArea(QWidget* parent )
     : QGLWidget(parent)
 {
     qApp->installEventFilter(this);
-    app_data = CloudModel::Instance();
+    cm = CloudModel::Instance();
     aspectRatio = 1.0f;
 
     //TODO: Move out of here
@@ -169,8 +169,8 @@ GLArea::GLArea(QWidget* parent )
     // View/Object Setup
     glutil::ViewData initialViewData =
     {           
-        glm::vec3(app_data->cloud->sensor_origin_(0), app_data->cloud->sensor_origin_(1), app_data->cloud->sensor_origin_(2)), ///<The starting target position position.
-        glm::fquat( (float)app_data->cloud->sensor_orientation_.x(), app_data->cloud->sensor_orientation_.y(), app_data->cloud->sensor_orientation_.z(), app_data->cloud->sensor_orientation_.w()), ///<The initial orientation aroudn the target position.
+        glm::vec3(cm->cloud->sensor_origin_(0), cm->cloud->sensor_origin_(1), cm->cloud->sensor_origin_(2)), ///<The starting target position position.
+        glm::fquat( (float)cm->cloud->sensor_orientation_.x(), cm->cloud->sensor_orientation_.y(), cm->cloud->sensor_orientation_.z(), cm->cloud->sensor_orientation_.w()), ///<The initial orientation aroudn the target position.
         5.0f,   ////<The initial radius of the camera from the target point.
         0.0f    ///<The initial spin rotation of the "up" axis, relative to \a orient
     };
@@ -185,7 +185,7 @@ GLArea::GLArea(QWidget* parent )
 
     glutil::ObjectData initialObjectData =
     {
-        glm::vec3(app_data->cloud->sensor_origin_(0), app_data->cloud->sensor_origin_(1), app_data->cloud->sensor_origin_(2)), ///<The world-space position of the object.
+        glm::vec3(cm->cloud->sensor_origin_(0), cm->cloud->sensor_origin_(1), cm->cloud->sensor_origin_(2)), ///<The world-space position of the object.
         glm::fquat(0.0f, 0.0f, 0.0f, 0.0f), ///<The world-space orientation of the object.
     };
 
@@ -221,7 +221,7 @@ void GLArea::initializeGL()
     // Create all buffers here
     //app_data->createBuffers();
 
-    printf("size in kb: %f\n", (app_data->cloud->size() * 4)/(1024.0f));
+    printf("size in kb: %f\n", (cm->cloud->size() * 4)/(1024.0f));
     glError("134");
 
     point_shader.release();
@@ -356,7 +356,7 @@ void GLArea::paintGL(){
     glError("274");
 
 
-    app_data->point_buffer.bind();
+    cm->point_buffer.bind();
     point_shader.enableAttributeArray( "vertex" );
     point_shader.setAttributeBuffer( "vertex", GL_FLOAT, 0, 4 );
 
@@ -364,10 +364,9 @@ void GLArea::paintGL(){
     glPrimitiveRestartIndex((unsigned int)-1);
     glPointSize(5);
 
-    std::vector<Layer> & layers = app_data->layerList.layers;
+    std::vector<Layer> & layers = cm->layerList.layers;
 
     for(unsigned int i = 0; i < layers.size(); i++){
-        printf("paint %d\n", i);
         Eigen::Vector3f colour(1,1,1);
         if(layers[i].active)
             colour = layers[i].colour;
@@ -375,11 +374,11 @@ void GLArea::paintGL(){
         glUniform3fv(point_shader.uniformLocation("layerColour"), 1, colour.data());
         glError("285");
         layers[i].gl_index_buffer.bind();
-        glDrawElements(GL_POINTS, app_data->cloud->size(), GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_POINTS, cm->cloud->size(), GL_UNSIGNED_INT, 0);
         glError("289");
     }
 
-    app_data->point_buffer.release();
+    cm->point_buffer.release();
     point_shader.release();
 
     // Draw lasso shader
@@ -428,20 +427,20 @@ inline float rand_range(float from, float to){
 
 void GLArea::lassoToLayerCPU(){
 
-    app_data->layerList.newLayer();
+    cm->layerList.newLayer();
 
-    std::vector<Layer> & layers = app_data->layerList.layers;
+    std::vector<Layer> & layers = cm->layerList.layers;
 
     QGLBuffer & dest = layers[layers.size()-1].gl_index_buffer;
     dest.create();
     dest.setUsagePattern( QGLBuffer::DynamicDraw );
     dest.bind();
-    dest.allocate(app_data->cloud->size() * sizeof(int) );
+    dest.allocate(cm->cloud->size() * sizeof(int) );
     dest.release();
 
     /// Create and read source index from gpu
-    int * dest_indices = new int[app_data->cloud->size()/sizeof(int)];
-    int * source_indices = new int[app_data->cloud->size()/sizeof(int)];
+    int * dest_indices = new int[cm->cloud->size()/sizeof(int)];
+    int * source_indices = new int[cm->cloud->size()/sizeof(int)];
 
     QGLBuffer & source = layers[0].gl_index_buffer;
     source.bind(); /// Bind source
@@ -459,10 +458,10 @@ void GLArea::lassoToLayerCPU(){
     glm::mat4 gmat = cameraToClipMatrix * modelview_mat;
 
     /// for each point
-    for(unsigned int i = 0; i < app_data->cloud->size(); i++){
+    for(unsigned int i = 0; i < cm->cloud->size(); i++){
         /// get point
         int idx = i;
-        pcl::PointXYZI p = app_data->cloud->points[idx];
+        pcl::PointXYZI p = cm->cloud->points[idx];
         float point[4] = {p.x, p.y, p.z, p.intensity};
 
         /// project point
@@ -498,24 +497,26 @@ void GLArea::lassoToLayerCPU(){
 }
 
 void GLArea::lassoToLayer(){
-    if(!app_data->isLoaded()){
+    if(!cm->isLoaded()){
         lasso.clear();
         return;
     }
 
-    app_data->layerList.newLayer();
+    cm->layerList.newLayer();
 
-    std::vector<Layer> & layers = app_data->layerList.layers;
+    std::vector<Layer> & layers = cm->layerList.layers;
 
     QGLBuffer & dest = layers[layers.size()-1].gl_index_buffer;
-    layers[layers.size()-1].active = true;
+
+    cm->layerList.activateLayer(layers.size()-1);
+
     dest.create();
     dest.setUsagePattern( QGLBuffer::DynamicDraw );
     dest.bind();
-    dest.allocate(app_data->cloud->size() * sizeof(int) );
+    dest.allocate(cm->cloud->size() * sizeof(int) );
 
     /// Initialise dest to invalid indices
-    for(unsigned int i = 0; i < app_data->cloud->size(); i++){
+    for(unsigned int i = 0; i < cm->cloud->size(); i++){
         unsigned int val = -1; // TODO: does invalid indices render?
         dest.write(i*sizeof(int),reinterpret_cast<const void *>(&val), sizeof(int));
     }
@@ -527,7 +528,7 @@ void GLArea::lassoToLayer(){
     int result;
 
     // Create buffers from OpenGL
-    cl_mem cl_points = clCreateFromGLBuffer(context, CL_MEM_READ_WRITE, app_data->point_buffer.bufferId(), &result);
+    cl_mem cl_points = clCreateFromGLBuffer(context, CL_MEM_READ_WRITE, cm->point_buffer.bufferId(), &result);
     clError("CL 1", result);
     cl_mem cl_sidx = clCreateFromGLBuffer(context, CL_MEM_READ_WRITE, source.bufferId(), &result);
     clError("CL 2", result);
@@ -574,7 +575,7 @@ void GLArea::lassoToLayer(){
     clError("CL 11", result);
 
     // Enqueue the kernel
-    const size_t kernel_count = app_data->cloud->size();
+    const size_t kernel_count = cm->cloud->size();
     result = clEnqueueNDRangeKernel(cmd_queue, kernel, 1, NULL, &kernel_count, NULL, 0, 0, 0);
     if(result != CL_SUCCESS)
         qWarning() << "Kernel exectution failed.";
@@ -726,10 +727,10 @@ void GLArea::click(int x, int y){
     float min_val = FLT_MAX;
 
     // Can be gpu accelerated!!
-    for (unsigned int i = 0; i < app_data->cloud->points.size(); i++) {
-        if(app_data->cloud->points[i].intensity < 0.0001f)
+    for (unsigned int i = 0; i < cm->cloud->points.size(); i++) {
+        if(cm->cloud->points[i].intensity < 0.0001f)
             continue;
-        glm::vec3 point = glm::vec3(app_data->cloud->points[i].x, app_data->cloud->points[i].y, app_data->cloud->points[i].z);
+        glm::vec3 point = glm::vec3(cm->cloud->points[i].x, cm->cloud->points[i].y, cm->cloud->points[i].z);
         float dist = distance(point, p1, p2);
 
         if(dist < min_val){
@@ -745,7 +746,7 @@ void GLArea::click(int x, int y){
 
     // point filling
     float empty2[4] = {0.0f, 0.0f, 0.0f, 0.0f};
-    app_data->point_buffer.write(4*sizeof(float)*min_index, reinterpret_cast<const void *> (empty2), sizeof(empty2));
+    cm->point_buffer.write(4*sizeof(float)*min_index, reinterpret_cast<const void *> (empty2), sizeof(empty2));
 
     // 3d brush
     /*if(filling){

@@ -14,6 +14,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
    // Settings
    layers->setAllowedAreas (Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+   glarea->setMinimumSize(400, 255);
 
    // Layout
    fileMenu->addAction(openFile);
@@ -25,8 +26,8 @@ MainWindow::MainWindow(QWidget *parent) :
    // Wire signals and slots
    connect(openFile, SIGNAL(triggered()), this, SLOT(loadScan()));
    connect(saveFile, SIGNAL(triggered()), this, SLOT(saveScan()));
-   connect(layers->layers, SIGNAL(clicked(const QModelIndex &)), this, SLOT(clickedLayer(const QModelIndex &)));
-   //connect(this, SIGNAL(reloadCloud()), glarea, SLOT(reloadCloud()));
+   connect(&CloudModel::Instance()->layerList, SIGNAL(selectLayer(int)), layers, SLOT(selectLayer(int)));
+   connect(layers, SIGNAL(updateView()), glarea, SLOT(updateGL()));
 }
 
 bool MainWindow::loadScan(){
@@ -50,17 +51,4 @@ bool MainWindow::saveScan(){
     const char *ptr = filename.toAscii().data();
     CloudModel::Instance()->saveFile(ptr);
     return true;
-}
-
-void MainWindow::clickedLayer(const QModelIndex & index){
-    CloudModel * cm = CloudModel::Instance();
-    int idx = index.row();
-    cm->layerList.layers[idx].toggleActive();
-    emit glarea->updateGL();
-}
-
-void MainWindow::selectLayer(int i){
-    //CloudModel * cm = CloudModel::Instance();
-    //cm->layerList.layers[i].active = true;
-    //ui->layerList->setSelection ( QRect(i, i, 0, 1), QItemSelectionModel::Select);
 }

@@ -1,6 +1,7 @@
 #include "layerlist.h"
 #include <QTextStream>
 #include "cloudmodel.h"
+ #include <QColor>
 
 LayerList::LayerList(QObject *parent) :
     QAbstractListModel(parent)
@@ -12,14 +13,26 @@ int LayerList::rowCount ( const QModelIndex & parent) const {
     return layers.size();
 }
 
-QVariant LayerList::data ( const QModelIndex & index, int role ) const {
+int LayerList::columnCount ( const QModelIndex & parent) const {
+    Q_UNUSED(parent);
+    return 1;
+}
 
-    if( role == Qt::DisplayRole ) {
+QVariant LayerList::data ( const QModelIndex & index, int role ) const {
+    int row = index.row();
+
+    switch(role){
+    case Qt::DisplayRole:
+    {
         QString re;
-        QTextStream(&re) << "Layer " << index.row();
+        QTextStream(&re) << "Layer " << row;
         return re;
     }
-
+    case Qt::DecorationRole:
+        return QColor(layers[row].colour[0]*255, layers[row].colour[1]*255, layers[row].colour[2]*255);
+    //case Qt::CheckStateRole:
+    //        break;//return layers[row].visible? Qt::Checked:Qt::Unchecked;
+    }
     return QVariant();
 
 }
@@ -29,6 +42,33 @@ void LayerList::newLayer (){
     beginInsertRows( QModelIndex(), pos, pos );
     layers.push_back(Layer());
     endInsertRows();
+}
+
+void LayerList::deleteLayers(std::vector<int> indices){
+    int count = 0;
+    foreach(int i, indices){
+        int idx = i - count;
+        beginRemoveRows(QModelIndex(), idx, idx);
+        layers.erase(layers.begin()+(idx));
+        endRemoveRows();
+        count++;
+    }
+}
+
+void LayerList::mergeLayers(std::vector<int> indices){
+    std::vector<int> & dest = layers[indices[0]].index;
+    for(int i = 1; i < indices.size(); i++){
+        int idx = indices[i];
+        layers[idx].copyFromGPU();
+        for(int j = 0; j < dest.size(); j++){
+            if(dest[j] != -1)
+                continue;
+            dest[j] = layers[idx].index[j];
+        }
+    }
+    layers[indices[0]].copyToGPU();
+    indices.erase(indices.begin());
+    deleteLayers(indices);
 }
 
 /// Watch out, has OpenGL context been initialized
@@ -48,10 +88,7 @@ void LayerList::reset (){
     layer.copyToGPU();
 }
 
-/*QVariant LayerList::headerData ( int section, Qt::Orientation orientation, int role ) const {
-    QString re;
-    QTextStream(&re) << "Layer " << index.row();
-    printf("Called 2\n");
-    return re;
+void LayerList::activateLayer(int i){
+    emit selectLayer(i);
+    layers[i].active = true;
 }
-*/

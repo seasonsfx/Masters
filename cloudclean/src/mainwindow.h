@@ -22,16 +22,15 @@ signals:
 public slots:
     bool loadScan();
     bool saveScan();
-    void clickedLayer(const QModelIndex & index);
-    void selectLayer(int i);
 
 private:
-    QMdiArea * mdiarea;
     QMenu *fileMenu;
     QAction *openFile;
     QAction *saveFile;
-    GLArea * glarea;
     LayerView * layers;
+
+public:
+    GLArea * glarea;
 };
 
 #endif // MAINWINDOW_H

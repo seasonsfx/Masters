@@ -2,15 +2,33 @@
 #define LAYERVIEW_H
 
 #include <QDockWidget>
-#include <QListView>
+#include <QModelIndex>
+#include <vector>
+
+namespace Ui {
+class LayerView;
+}
 
 class LayerView : public QDockWidget
 {
+    Q_OBJECT
+    
 public:
-    LayerView(QWidget *parent = 0, Qt::WindowFlags flags = 0);
-    QListView * layers;
+    explicit LayerView(QWidget *parent = 0);
+    ~LayerView();
+    
 private:
+    Ui::LayerView *ui;
+    std::vector<int> getSelection();
 
+public slots:
+    void clickedLayer(const QModelIndex & index);
+    void selectLayer(int i);
+    void deleteLayers();
+    void mergeLayers();
+
+signals:
+    void updateView();
 };
 
 #endif // LAYERVIEW_H

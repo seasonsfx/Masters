@@ -23,8 +23,6 @@ CloudModel * CloudModel::Instance(){
     if(!only_instance)
         only_instance = new CloudModel();
     return only_instance;
-    
-    
 }
 
 bool CloudModel::saveFile(const char * output_file){
@@ -138,6 +136,9 @@ bool CloudModel::loadFile(const char * input_file, int subsample){
 
     /// Filter and flatten point cloud
     pcl::removeNaNFromPointCloud(*cloud, *cloud, cloud_to_grid_map);
+
+    if(loaded)
+        layerList.reset();
 
     loaded = true;
     createBuffers();

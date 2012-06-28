@@ -12,6 +12,8 @@ public:
     void copyToGPU();
     void copyFromGPU();
     void toggleActive();
+    void toggleVisible();
+    void setActive(bool isActive);
 
     QGLBuffer gl_index_buffer;
     std::vector<int> index;

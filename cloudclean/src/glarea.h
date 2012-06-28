@@ -67,7 +67,7 @@ private:
                                const QString& vertexShaderPath,
                                const QString& fragmentShaderPath );
 
-    CloudModel *            app_data;
+    CloudModel *            cm;
 
     QGLFormat               glFormat;
     QGLShaderProgram        point_shader;

@@ -36,3 +36,11 @@ void Layer::copyFromGPU(){
 void Layer::toggleActive(){
     active = !active;
 }
+
+void Layer::toggleVisible(){
+    visible = !visible;
+}
+
+void Layer::setActive(bool isActive){
+    active = isActive;
+}

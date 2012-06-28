@@ -36,8 +36,8 @@ SOURCES += \
     mainwindow.cpp \
     cloudmodel.cpp \
     glarea.cpp \
-    layerview.cpp \
-    lassoselectplugin.cpp
+    lassoselectplugin.cpp \
+    layerview.cpp
 
 HEADERS  += \
     io.h \
@@ -48,9 +48,9 @@ HEADERS  += \
     mainwindow.h \
     cloudmodel.h \
     glarea.h \
-    layerview.h \
     interfaces/editplugininterface.h \
-    plugins/lassoselectplugin.h
+    plugins/lassoselectplugin.h \
+    layerview.h
 
 INCLUDEPATH += \
         "interfaces" \
@@ -79,3 +79,6 @@ OTHER_FILES += \
     cl_kernels/lasso.cl \
     CMakeLists.txt \
     plugins/lasso.cl
+
+FORMS += \
+    layerview.ui

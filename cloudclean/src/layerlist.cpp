@@ -42,6 +42,7 @@ void LayerList::newLayer (){
     beginInsertRows( QModelIndex(), pos, pos );
     layers.push_back(Layer());
     endInsertRows();
+    activateLayer(pos);
 }
 
 void LayerList::deleteLayers(std::vector<int> indices){

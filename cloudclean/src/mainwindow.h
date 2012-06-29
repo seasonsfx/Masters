@@ -9,6 +9,7 @@
 #include <QFileDialog>
 #include "glarea.h"
 #include "layerview.h"
+#include "pluginmanager.h"
 
 class MainWindow : public QMainWindow
 {
@@ -28,6 +29,7 @@ private:
     QAction *openFile;
     QAction *saveFile;
     LayerView * layers;
+    PluginManager pluginManager;
 
 public:
     GLArea * glarea;

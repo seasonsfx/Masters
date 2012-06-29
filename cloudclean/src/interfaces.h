@@ -1,5 +1,5 @@
-#ifndef EDITPLUGININTERFACE_H
-#define EDITPLUGININTERFACE_H
+#ifndef INTERFACES_H
+#define INTERFACES_H
 
 #include <QtPlugin>
 #include "glarea.h"
@@ -21,4 +21,14 @@ public:
 
 Q_DECLARE_INTERFACE(EditPluginInterface, "za.co.circlingthesun.cloudclean.editplugininterface/1.0")
 
-#endif // EDITPLUGININTERFACE_H
+
+class TestPluginInterface
+{
+public:
+    virtual ~TestPluginInterface(){}
+};
+
+Q_DECLARE_INTERFACE(TestPluginInterface, "za.co.circlingthesun.cloudclean.editplugininterface/1.0")
+
+
+#endif // INTERFACES_H

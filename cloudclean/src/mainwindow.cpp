@@ -4,6 +4,9 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
 {
+
+   pluginManager.loadPlugins();
+
    // Create objects
    glarea = new GLArea(this);
    layers = new LayerView(this);
@@ -28,6 +31,7 @@ MainWindow::MainWindow(QWidget *parent) :
    connect(saveFile, SIGNAL(triggered()), this, SLOT(saveScan()));
    connect(&CloudModel::Instance()->layerList, SIGNAL(selectLayer(int)), layers, SLOT(selectLayer(int)));
    connect(layers, SIGNAL(updateView()), glarea, SLOT(updateGL()));
+
 }
 
 bool MainWindow::loadScan(){

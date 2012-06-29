@@ -4,29 +4,12 @@
 #
 #-------------------------------------------------
 
+include(general.pri)
+
 QT       += core gui opengl
 
 TARGET = CloudClean
 TEMPLATE = app
-
-#QMAKE_CXX = clang++
-#D_QMAKE_CC = clang
-
-QMAKE_CXXFLAGS += -g -std=c++0x -Wall #-stdlib=libc++
-QMAKE_CXXFLAGS_RELEASE -= -O2
-QMAKE_CXXFLAGS_RELEASE -= -Os
-
-Release:DESTDIR = release
-Release:OBJECTS_DIR = release/.obj
-Release:MOC_DIR = release/.moc
-Release:RCC_DIR = release/.rcc
-Release:UI_DIR = release/.ui
-
-Debug:DESTDIR = debug
-Debug:OBJECTS_DIR = debug/.obj
-Debug:MOC_DIR = debug/.moc
-Debug:RCC_DIR = debug/.rcc
-Debug:UI_DIR = debug/.ui
 
 SOURCES += \
     main.cpp \
@@ -36,8 +19,8 @@ SOURCES += \
     mainwindow.cpp \
     cloudmodel.cpp \
     glarea.cpp \
-    lassoselectplugin.cpp \
-    layerview.cpp
+    layerview.cpp \
+    pluginmanager.cpp
 
 HEADERS  += \
     io.h \
@@ -48,12 +31,15 @@ HEADERS  += \
     mainwindow.h \
     cloudmodel.h \
     glarea.h \
-    interfaces/editplugininterface.h \
-    plugins/lassoselectplugin.h \
-    layerview.h
+    layerview.h \
+    pluginmanager.h \
+    interfaces.h
+
+
+#QT_DEBUG_PLUGINS=1
+#DESTDIR = ../distrib
 
 INCLUDEPATH += \
-        "interfaces" \
         "/usr/include/pcl-1.5/" \
         "/usr/include/flann/" \
         "/usr/include/eigen3/" \

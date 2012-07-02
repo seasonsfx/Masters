@@ -2,12 +2,14 @@
 #define INTERFACES_H
 
 #include <QtPlugin>
-#include "glarea.h"
 #include "cloudmodel.h"
+
+class GLArea;
 
 class EditPluginInterface
 {
 public:
+    EditPluginInterface();
     virtual ~EditPluginInterface(){}
     virtual bool StartEdit(CloudModel &, GLArea *){return true;}
     virtual bool EndEdit(CloudModel &, GLArea *){return true;}
@@ -20,15 +22,5 @@ public:
 };
 
 Q_DECLARE_INTERFACE(EditPluginInterface, "za.co.circlingthesun.cloudclean.editplugininterface/1.0")
-
-
-class TestPluginInterface
-{
-public:
-    virtual ~TestPluginInterface(){}
-};
-
-Q_DECLARE_INTERFACE(TestPluginInterface, "za.co.circlingthesun.cloudclean.editplugininterface/1.0")
-
 
 #endif // INTERFACES_H

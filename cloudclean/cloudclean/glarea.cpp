@@ -276,7 +276,7 @@ void GLArea::initializeGL()
         qWarning() << "CL object create failed:" << oclErrorString(result);
 
     // Load the program source into memory
-    std::ifstream file("plugins/lasso.cl");
+    std::ifstream file("lasso.cl");
     std::string prog(std::istreambuf_iterator<char>(file), (std::istreambuf_iterator<char>()));
     file.close();
     const char* source = prog.c_str();

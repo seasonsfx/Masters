@@ -1,9 +1,8 @@
 #ifndef TEST_H
 #define TEST_H
 
-#include <QtPlugin>
 #include <QObject>
-#include "interfaces/interfaces.h"
+#include "testinterface.h"
 
 class Test : public QObject, public TestPluginInterface
 {
@@ -11,6 +10,7 @@ class Test : public QObject, public TestPluginInterface
     Q_INTERFACES(TestPluginInterface)
 public:
     Test();
+    ~Test();
 };
 
 #endif // TEST_H

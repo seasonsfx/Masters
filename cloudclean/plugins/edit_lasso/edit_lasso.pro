@@ -1,14 +1,11 @@
-include(../../general.pri)
+include(../../shared.pri)
 
-TEMPLATE      = lib
-CONFIG       += plugin
-TARGET = ../edit_lasso
+TARGET = edit_lasso
 HEADERS += edit_lasso.h
 SOURCES += edit_lasso.cpp
-QT       += opengl core gui
 
 INCLUDEPATH += \
-        "../.." \
+        ../../cloudclean \
         "/usr/include/pcl-1.5/" \
         "/usr/include/flann/" \
         "/usr/include/eigen3/" \

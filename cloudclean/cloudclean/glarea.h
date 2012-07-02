@@ -4,7 +4,7 @@
 #include <ctime>
 
 #define GL3_PROTOTYPES
-#include <external/gl3.h>
+#include <../external/gl3.h>
 #include <GL/glu.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>

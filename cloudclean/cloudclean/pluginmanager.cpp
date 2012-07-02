@@ -30,7 +30,7 @@ PluginManager::~PluginManager(){
 void PluginManager::loadPlugins(){
     qApp->addLibraryPath(qApp->applicationDirPath());
     QDir pluginsDir(qApp->applicationDirPath());
-    pluginsDir.cd("plugins");
+    pluginsDir.cd("../plugins");
     qApp->addLibraryPath(qApp->applicationDirPath());
 
     QStringList pluginfilters("*." + DLLExtension());

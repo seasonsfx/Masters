@@ -1,5 +1,4 @@
 #include <QtGui/QApplication>
-//#include "cloudclean.h"
 #include <iostream>
 #include "cloudmodel.h"
 #include "assert.h"

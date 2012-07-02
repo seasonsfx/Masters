@@ -1,7 +1,8 @@
 #ifndef PLUGINMANAGER_H
 #define PLUGINMANAGER_H
 #include <QDir>
-#include "interfaces.h"
+#include "../common/interfaces.h"
+#include "../common/testinterface.h"
 #include <vector>
 
 class PluginManager

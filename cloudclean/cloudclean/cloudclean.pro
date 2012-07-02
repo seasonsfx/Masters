@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-include(general.pri)
+include(../general.pri)
 
 QT       += core gui opengl
 
@@ -33,13 +33,12 @@ HEADERS  += \
     glarea.h \
     layerview.h \
     pluginmanager.h \
-    interfaces.h
 
 
-#QT_DEBUG_PLUGINS=1
 #DESTDIR = ../distrib
 
 INCLUDEPATH += \
+        ../common/ \
         "/usr/include/pcl-1.5/" \
         "/usr/include/flann/" \
         "/usr/include/eigen3/" \
@@ -55,7 +54,8 @@ LIBS += -lpcl_io \
         -lpcl_filters \
         -lGL \
         -lGLU \
-        -lOpenCL
+        -lOpenCL \
+        #-lcommon
 
 OTHER_FILES += \
     shaders/points.vert \
@@ -64,7 +64,7 @@ OTHER_FILES += \
     shaders/lasso.frag \
     cl_kernels/lasso.cl \
     CMakeLists.txt \
-    plugins/lasso.cl
+    plugins/lasso.cl \
 
 FORMS += \
     layerview.ui

@@ -1,9 +1,8 @@
 #ifndef EDITLASSO_H
 #define EDITLASSO_H
 
-#include <QtPlugin>
 #include <QObject>
-#include "interfaces.h"
+#include "../../common/interfaces.h"
 
 class EditLasso : public QObject, public EditPluginInterface
 {
@@ -11,6 +10,7 @@ class EditLasso : public QObject, public EditPluginInterface
     Q_INTERFACES(EditPluginInterface)
 public:
     EditLasso();
+    ~EditLasso();
     //bool StartEdit(CloudModel &, GLArea *){return true;}
     //bool EndEdit(CloudModel &, GLArea *){return true;}
     void mousePressEvent  (QMouseEvent *event, CloudModel &, GLArea * );

@@ -9,6 +9,7 @@
 #include <QFileDialog>
 #include "glarea.h"
 #include "layerview.h"
+#include "toolbox.h"
 #include "pluginmanager.h"
 
 class MainWindow : public QMainWindow
@@ -23,12 +24,15 @@ signals:
 public slots:
     bool loadScan();
     bool saveScan();
+    void applyEditMode();
 
 private:
     QMenu *fileMenu;
+    QMenu *toolsMenu;
     QAction *openFile;
     QAction *saveFile;
     LayerView * layers;
+    Toolbox * toolbox;
     PluginManager pluginManager;
 
 public:

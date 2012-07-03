@@ -26,6 +26,7 @@
 
 #include "cloudmodel.h"
 #include "MousePoles.h"
+#include "interfaces.h"
 
 #include <GL/glx.h>
 #undef KeyPress // Defined in X11/X.h, interferes with QEvent::KeyPress
@@ -109,6 +110,10 @@ private:
 
     boost::shared_ptr<glutil::ViewPole>     viewPole;
     boost::shared_ptr<glutil::ObjectPole>   objtPole;
+
+public:
+    EditPluginInterface * activeEditPlugin;
+
 };
 
 #endif // GLWIDGET_H

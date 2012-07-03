@@ -48,9 +48,13 @@ void PluginManager::loadPlugins(){
 
         EditPluginInterface * editPlugin = qobject_cast<EditPluginInterface *>(plugin);
         if(editPlugin){
-            printf("Plugin loaded!\n");
+            qDebug("Plugin loaded!\n");
             fflush(stdout);
             editPlugins.push_back(editPlugin);
+
+            foreach(QAction* editAction, editPlugin->actions())
+                editActionList.push_back(editAction);
+
         }
     }
 }

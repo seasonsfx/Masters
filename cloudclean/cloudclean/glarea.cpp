@@ -130,6 +130,9 @@ GLArea::GLArea(QWidget* parent )
 {
     qApp->installEventFilter(this);
     cm = CloudModel::Instance();
+
+    activeEditPlugin = NULL;
+
     aspectRatio = 1.0f;
 
     //TODO: Move out of here
@@ -219,7 +222,6 @@ void GLArea::initializeGL()
 
 
     // Create all buffers here
-    //app_data->createBuffers();
 
     printf("size in kb: %f\n", (cm->cloud->size() * 4)/(1024.0f));
     glError("134");
@@ -629,6 +631,9 @@ void GLArea::moveLasso(int x, int y){
 
 
 void GLArea::mouseDoubleClickEvent ( QMouseEvent * event ){
+    if(activeEditPlugin && !activeEditPlugin->mouseDoubleClickEvent(event, cm, this))
+        return;
+
     // End lasso
     lasso_active = !lasso_active;
     if(lasso_active){
@@ -641,6 +646,9 @@ void GLArea::mouseDoubleClickEvent ( QMouseEvent * event ){
 }
 
 void GLArea::mouseMoveEvent ( QMouseEvent * event ){
+
+    if(activeEditPlugin && !activeEditPlugin->mouseMoveEvent(event, cm, this))
+        return;
 
     if(mouseDown == Qt::RightButton)
         viewPole->MouseMove(glm::ivec2(event->x(), event->y()));
@@ -658,6 +666,9 @@ void GLArea::mouseMoveEvent ( QMouseEvent * event ){
 }
 
 void GLArea::mousePressEvent ( QMouseEvent * event ){
+    if(activeEditPlugin && !activeEditPlugin->mousePressEvent(event, cm, this))
+        return;
+
     mouseDown = event->button();
     start_x = 0;
     start_y = 0;
@@ -675,6 +686,9 @@ void GLArea::mousePressEvent ( QMouseEvent * event ){
 }
 
 void GLArea::mouseReleaseEvent ( QMouseEvent * event ){
+
+    if(activeEditPlugin && !activeEditPlugin->mouseReleaseEvent(event, cm, this))
+        return;
 
     objtPole->MouseClick(glutil::MB_LEFT_BTN, false, 0, glm::ivec2(event->x(), event->y()));
     viewPole->MouseClick(glutil::MB_RIGHT_BTN, false, 0, glm::ivec2(event->x(), event->y()));
@@ -751,7 +765,7 @@ void GLArea::click(int x, int y){
     // 3d brush
     /*if(filling){
         printf("filling!!\n");
-        std::vector<bool> filled(app_data->cloud->points.size(), false);
+        std::vector<bool> filled(cm->cloud->points.size(), false);
         std::queue<int> myqueue;
 
         myqueue.push(min_index);
@@ -767,7 +781,7 @@ void GLArea::click(int x, int y){
             // fill
             // Update buffer
             int offset = 4*sizeof(float)*current;
-            app_data->point_buffer.write(offset, reinterpret_cast<const void *> (empty), sizeof(empty));
+            cm->point_buffer.write(offset, reinterpret_cast<const void *> (empty), sizeof(empty));
 
             filled[current] = true;
 
@@ -777,7 +791,7 @@ void GLArea::click(int x, int y){
 
             std::vector<int> pointIdxNKNSearch(K);
             std::vector<float> pointNKNSquaredDistance(K);
-            app_data->kdtree->nearestKSearch (app_data->cloud->points[current], K, pointIdxNKNSearch, pointNKNSquaredDistance);
+            cm->kdtree->nearestKSearch (cm->cloud->points[current], K, pointIdxNKNSearch, pointNKNSquaredDistance);
 
 
             // push neighbours
@@ -786,7 +800,7 @@ void GLArea::click(int x, int y){
                 idx = pointIdxNKNSearch[i];
 
                 // Skip NaN points
-                if (app_data->cloud->points[idx].x != app_data->cloud->points[idx].x)
+                if (cm->cloud->points[idx].x != cm->cloud->points[idx].x)
                     continue;
 
                 // skip already filled points
@@ -802,11 +816,19 @@ void GLArea::click(int x, int y){
 }
 
 void GLArea::wheelEvent ( QWheelEvent * event ){
+
+    if(activeEditPlugin && !activeEditPlugin->wheelEvent(event, cm, this))
+        return;
+
     viewPole->MouseWheel(event->delta(), 0, glm::ivec2(event->x(), event->y()));
     updateGL();
 }
 
 void GLArea::keyPressEvent ( QKeyEvent * event ){
+
+    if(activeEditPlugin && !activeEditPlugin->keyPressEvent(event, cm, this))
+        return;
+
     // Set up inverse rotation
     glm::mat4 inv = glm::transpose(viewPole->CalcMatrix());
     inv[3] = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
@@ -856,20 +878,3 @@ void GLArea::keyPressEvent ( QKeyEvent * event ){
      }
      return false;
  }
-
- /*
- void GLArea::reloadCloud(){
-    app_data->point_buffer.allocate(app_data->cloud->points.size() * sizeof(float) * 4);
-    float data[4];
-    for (int i = 0; i < (int)app_data->cloud->size(); i++)
-    {
-        data[0] = app_data->cloud->points[i].x;
-        data[1] = app_data->cloud->points[i].y;
-        data[2] = app_data->cloud->points[i].z;
-        data[3] = app_data->cloud->points[i].intensity;
-        int offset = 4*sizeof(float)*i;
-        app_data->point_buffer.write(offset, reinterpret_cast<const void *> (data), sizeof(data));
-    }
-    std::printf("Reloaded\n");
- }
-*/

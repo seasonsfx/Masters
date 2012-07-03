@@ -2,7 +2,6 @@
 #define PLUGINMANAGER_H
 #include <QDir>
 #include "../common/interfaces.h"
-#include "../common/testinterface.h"
 #include <vector>
 
 class PluginManager
@@ -12,6 +11,7 @@ public:
     void loadPlugins();
     ~PluginManager();
 
+    QVector<QAction *> editActionList;
     std::vector<EditPluginInterface *> editPlugins;
 };
 

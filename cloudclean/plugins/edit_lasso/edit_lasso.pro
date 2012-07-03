@@ -22,3 +22,6 @@ LIBS += -lpcl_io \
         -lGL \
         -lGLU \
         -lOpenCL
+
+RESOURCES += \
+    edit_lasso.qrc

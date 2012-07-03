@@ -20,7 +20,8 @@ SOURCES += \
     cloudmodel.cpp \
     glarea.cpp \
     layerview.cpp \
-    pluginmanager.cpp
+    pluginmanager.cpp \
+    toolbox.cpp
 
 HEADERS  += \
     io.h \
@@ -33,6 +34,7 @@ HEADERS  += \
     glarea.h \
     layerview.h \
     pluginmanager.h \
+    toolbox.h
 
 
 #DESTDIR = ../distrib
@@ -67,4 +69,5 @@ OTHER_FILES += \
     plugins/lasso.cl \
 
 FORMS += \
-    layerview.ui
+    layerview.ui \
+    toolbox.ui

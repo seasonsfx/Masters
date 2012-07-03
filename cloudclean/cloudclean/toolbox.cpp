@@ -1,0 +1,14 @@
+#include "toolbox.h"
+#include "ui_toolbox.h"
+
+Toolbox::Toolbox(QWidget *parent) :
+    QDockWidget(parent),
+    ui(new Ui::Toolbox)
+{
+    ui->setupUi(this);
+}
+
+Toolbox::~Toolbox()
+{
+    delete ui;
+}

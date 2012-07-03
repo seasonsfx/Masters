@@ -3,6 +3,4 @@ TEMPLATE = lib
 QT += opengl
 
 HEADERS += \
-    interfaces.h \
-    testinterface.h
-
+    interfaces.h

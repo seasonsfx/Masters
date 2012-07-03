@@ -9,7 +9,7 @@ class GLArea;
 class EditPluginInterface
 {
 public:
-    EditPluginInterface();
+    EditPluginInterface(){}
     virtual ~EditPluginInterface(){}
     virtual bool StartEdit(CloudModel &, GLArea *){return true;}
     virtual bool EndEdit(CloudModel &, GLArea *){return true;}

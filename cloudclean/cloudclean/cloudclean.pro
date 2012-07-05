@@ -35,6 +35,7 @@ HEADERS  += \
     pluginmanager.h \
     toolbox.h
 
+QMAKE_LFLAGS += -rdynamic
 
 #DESTDIR = ../distrib
 

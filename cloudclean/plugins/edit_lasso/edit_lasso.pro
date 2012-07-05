@@ -7,8 +7,8 @@ HEADERS += edit_lasso.h \
 
 
 SOURCES += edit_lasso.cpp \
-    ../../cloudclean/cloudmodel.cpp \
-    ../../cloudclean/glarea.cpp
+    #../../cloudclean/cloudmodel.cpp \
+    #../../cloudclean/glarea.cpp
 
 
 INCLUDEPATH += \
@@ -33,3 +33,6 @@ LIBS += -lpcl_io \
 
 RESOURCES += \
     edit_lasso.qrc
+
+OTHER_FILES += \
+    kernels/lasso.cl

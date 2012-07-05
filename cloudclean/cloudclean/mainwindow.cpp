@@ -80,12 +80,14 @@ void MainWindow::applyEditMode(){
         return;
     }
 
+    EditPluginInterface * plugin = qobject_cast<EditPluginInterface *>(action->parent());
+
     if(glarea->activeEditPlugin){
         glarea->activeEditPlugin->EndEdit(CloudModel::Instance(), glarea);
         glarea->activeEditPlugin = NULL;
+        if(glarea->activeEditPlugin == plugin) // TODO Doesnt work!
+            return;
     }
-
-    EditPluginInterface * plugin = qobject_cast<EditPluginInterface *>(action->parent());
 
     glarea->activeEditPlugin = plugin;
 

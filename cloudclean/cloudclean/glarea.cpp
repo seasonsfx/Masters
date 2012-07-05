@@ -146,7 +146,7 @@ void GLArea::initializeGL()
 }
 
 // Puts mouse in NDC
-inline Eigen::Vector2f GLArea::normalized_mouse(int x, int y){
+Eigen::Vector2f GLArea::normalized_mouse(int x, int y){
     return Eigen::Vector2f(x/(width()/2.0f) - 1.0f, -(y/(height()/2.0f) - 1.0f));
 }
 

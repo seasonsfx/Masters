@@ -44,7 +44,7 @@ public:
 
     int test();
 
-    inline Eigen::Vector2f normalized_mouse(int x, int y);
+    Eigen::Vector2f normalized_mouse(int x, int y);
     glm::mat4               cameraToClipMatrix;
     glm::mat4               modelview_mat;
 

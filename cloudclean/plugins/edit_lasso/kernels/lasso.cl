@@ -1,5 +1,3 @@
-#define M_PI 3.14159f
-
 inline float4 proj(float16 mat, float4 point){
 
     float4 out = (float4)(0.0f, 0.0f, 0.0f, 0.0f);
@@ -103,7 +101,7 @@ bool intersects(float2 lineA, float2 lineB, float2 lineC, float2 lineD)
 float randomAngle(int* lastRandom)
 {
     *lastRandom = rand(*lastRandom);
-    return 2.0f*M_PI*(*lastRandom % 10000)/10000.0f;
+    return 2.0f*GPU_PI*(*lastRandom % 10000)/10000.0f;
 }
 
 float2 randomLineSegment(float2 origin, int* lastRandom)

@@ -3,5 +3,6 @@
         <file>images/lasso.png</file>
         <file>shaders/lasso.frag</file>
         <file>shaders/lasso.vert</file>
+        <file>kernels/lasso.cl</file>
     </qresource>
 </RCC>

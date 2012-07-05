@@ -4,6 +4,10 @@
 #include <pcl/filters/filter.h>
 #include <QDebug>
 
+int CloudModel::test(){
+    return 3;
+}
+
 CloudModel* CloudModel::only_instance = NULL;
 
 CloudModel::CloudModel(QObject *parent) :
@@ -115,6 +119,7 @@ bool CloudModel::createBuffers(){
     }
 
     printf("Buffers created!\n");
+    return true;
 }
 
 bool CloudModel::loadFile(const char * input_file, int subsample){

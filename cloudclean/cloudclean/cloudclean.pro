@@ -26,7 +26,6 @@ SOURCES += \
 HEADERS  += \
     io.h \
     MousePoles.h \
-    helpers.h \
     layerlist.h \
     layer.h \
     mainwindow.h \
@@ -71,3 +70,6 @@ OTHER_FILES += \
 FORMS += \
     layerview.ui \
     toolbox.ui
+
+RESOURCES += \
+    cloudclean.qrc

@@ -14,6 +14,8 @@ class CloudModel : public QObject
     Q_OBJECT
 public:
 
+    int test();
+
     int K;
     float radius;
 

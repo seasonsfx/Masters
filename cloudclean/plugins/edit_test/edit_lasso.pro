@@ -1,15 +1,8 @@
 include(../../shared.pri)
 
 TARGET = edit_lasso
-HEADERS += edit_lasso.h \
-    #../../cloudclean/cloudmodel.h \
-    #../../cloudclean/glarea.h
-
-
-SOURCES += edit_lasso.cpp \
-    ../../cloudclean/cloudmodel.cpp \
-    ../../cloudclean/glarea.cpp
-
+HEADERS += edit_lasso.h
+SOURCES += edit_lasso.cpp
 
 INCLUDEPATH += \
         ../../cloudclean \

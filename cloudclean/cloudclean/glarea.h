@@ -26,10 +26,11 @@
 
 #include "cloudmodel.h"
 #include "MousePoles.h"
-#include "interfaces.h"
 
 #include <GL/glx.h>
 #undef KeyPress // Defined in X11/X.h, interferes with QEvent::KeyPress
+
+class EditPluginInterface;
 
 class GLArea : public QGLWidget
 {
@@ -37,16 +38,20 @@ class GLArea : public QGLWidget
 public:
     GLArea( QWidget* parent = 0 );
 
+    bool prepareShaderProgram( QGLShaderProgram& shader,
+                               const QString& vertexShaderPath,
+                               const QString& fragmentShaderPath );
+
+    int test();
+
+    inline Eigen::Vector2f normalized_mouse(int x, int y);
+    glm::mat4               cameraToClipMatrix;
+    glm::mat4               modelview_mat;
+
 protected:
     virtual void initializeGL();
     virtual void resizeGL( int w, int h );
     virtual void paintGL();
-
-    Eigen::Vector2f normalized_mouse(int x, int y);
-    void lassoToLayer();
-    void lassoToLayerCPU();
-    void addLassoPoint(int x, int y);
-    void moveLasso(int x, int y);
 
     void click(int x, int y);
 
@@ -59,48 +64,23 @@ protected:
     bool eventFilter(QObject *object, QEvent *event);
 
 public slots:
-    //void reloadCloud();
 
 private:
-    mutable QMutex mutex;
-
-    bool prepareShaderProgram( QGLShaderProgram& shader,
-                               const QString& vertexShaderPath,
-                               const QString& fragmentShaderPath );
 
     CloudModel *            cm;
 
     QGLFormat               glFormat;
     QGLShaderProgram        point_shader;
-    QGLShaderProgram        lasso_shader;
 
-    //QGLBuffer               point_buffer; // Holds point vertices
-
-    QGLBuffer               lasso_buffer;
-    QGLBuffer               lasso_index;
-
-    glm::mat4               cameraToClipMatrix;
-    glm::mat4               modelview_mat;
     glm::vec4               offsetVec;
     float                   aspectRatio;
 
-    cl_platform_id          platform;         
-    cl_device_id            device;
-    cl_context              context;
-    cl_command_queue        cmd_queue;
-    cl_program              program;
-    cl_kernel               kernel;
-    size_t                  kernelsize;
     
-    cl_mem                  p_vbocl;
+    //cl_mem                  p_vbocl;
 
-    Qt::MouseButton         mouseDown;
-    bool                    moved;
-    bool                    lasso_active;
     int                     start_x;
     int                     start_y;
 
-    std::vector<Eigen::Vector2f>   lasso;
 
     //TODO: Move out of here
     bool                                filling;
@@ -112,6 +92,14 @@ private:
     boost::shared_ptr<glutil::ObjectPole>   objtPole;
 
 public:
+    cl_platform_id          platform;
+    cl_device_id            device;
+    cl_context              context;
+    cl_command_queue        cmd_queue;
+
+    Qt::MouseButton         mouseDown;
+    bool                    moved;
+
     EditPluginInterface * activeEditPlugin;
 
 };

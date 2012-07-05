@@ -24,6 +24,11 @@ public:
     EditLasso();
     ~EditLasso();
 
+    void lassoToLayer(CloudModel *cm, GLArea *glarea);
+    void lassoToLayerCPU(CloudModel *cm);
+    void addLassoPoint(Eigen::Vector2f point);
+    void moveLasso(Eigen::Vector2f point);
+
     bool StartEdit(CloudModel * cm, GLArea * glarea);
     bool EndEdit(CloudModel *, GLArea * glarea);
     void paintGL(CloudModel *, GLArea *glarea);
@@ -38,12 +43,6 @@ public:
     QString getEditToolDescription(QAction *);
 
 private:
-
-    void lassoToLayer(CloudModel *cm, GLArea *glarea);
-    void lassoToLayerCPU(CloudModel *cm);
-    void addLassoPoint(Eigen::Vector2f point);
-    void moveLasso(Eigen::Vector2f point);
-
     QList <QAction *> actionList;
     QAction *editLasso;
     QGLShaderProgram        lasso_shader;

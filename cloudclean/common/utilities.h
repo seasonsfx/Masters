@@ -80,13 +80,13 @@ const char* oclErrorString(cl_int error)
 
 }
 
-void clError(const char * msg, cl_int err){
+void inline clError(const char * msg, cl_int err){
     if(err)
         qWarning() << msg << oclErrorString(err);
 }
 
 
-void glError(const char * msg){
+void inline  glError(const char * msg){
     int err = glGetError();
     if(err){
         printf("%s : %s\n", msg , gluErrorString(err));

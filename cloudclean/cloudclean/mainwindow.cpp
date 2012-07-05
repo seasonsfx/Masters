@@ -20,7 +20,8 @@ MainWindow::MainWindow(QWidget *parent) :
    // Config
    layers->setAllowedAreas (Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
    toolbox->setAllowedAreas (Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-   glarea->setMinimumSize(400, 255);
+   toolbox->hide();
+   glarea->setMinimumSize(700, 500);
 
    // Layout
    fileMenu->addAction(openFile);
@@ -70,6 +71,8 @@ bool MainWindow::saveScan(){
 
 void MainWindow::applyEditMode(){
 
+    qDebug("Apply edit mode\n");
+
     QAction *action = qobject_cast<QAction *>(sender());
 
     if(!CloudModel::Instance()->isLoaded()) { //prevents crash without cloud
@@ -77,10 +80,10 @@ void MainWindow::applyEditMode(){
         return;
     }
 
-    if(glarea->activeEditPlugin)
+    if(glarea->activeEditPlugin){
         glarea->activeEditPlugin->EndEdit(CloudModel::Instance(), glarea);
-
-    glarea->activeEditPlugin = NULL;
+        glarea->activeEditPlugin = NULL;
+    }
 
     EditPluginInterface * plugin = qobject_cast<EditPluginInterface *>(action->parent());
 

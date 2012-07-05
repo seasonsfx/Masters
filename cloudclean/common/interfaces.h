@@ -5,7 +5,7 @@
 #include "cloudmodel.h"
 #include "glarea.h"
 
-class GLArea;
+//class GLArea;
 class QString;
 class QAction;
 
@@ -16,11 +16,11 @@ public:
     virtual ~EditPluginInterface(){}
     virtual bool StartEdit(CloudModel *, GLArea *){return true;}
     virtual bool EndEdit(CloudModel *, GLArea *){return true;}
-    virtual void paintGL(){}
-    virtual bool mouseDoubleClickEvent  (QMouseEvent *event, CloudModel *, GLArea * ){return false;}
-    virtual bool mousePressEvent  (QMouseEvent *event, CloudModel *, GLArea * ){return false;}
-    virtual bool mouseMoveEvent   (QMouseEvent *event, CloudModel *, GLArea * ){return false;}
-    virtual bool mouseReleaseEvent(QMouseEvent *event, CloudModel *, GLArea * ){return false;}
+    virtual void paintGL(CloudModel *, GLArea *){}
+    virtual bool mouseDoubleClickEvent  (QMouseEvent *, CloudModel *, GLArea * ){return false;}
+    virtual bool mousePressEvent  (QMouseEvent *, CloudModel *, GLArea * ){return false;}
+    virtual bool mouseMoveEvent   (QMouseEvent *, CloudModel *, GLArea * ){return false;}
+    virtual bool mouseReleaseEvent(QMouseEvent *, CloudModel *, GLArea * ){return false;}
     virtual bool keyReleaseEvent  (QKeyEvent *, CloudModel *, GLArea *){return false;}
     virtual bool keyPressEvent    (QKeyEvent *, CloudModel *, GLArea *){return false;}
     virtual bool wheelEvent(QWheelEvent*, CloudModel *, GLArea * ){return false;}

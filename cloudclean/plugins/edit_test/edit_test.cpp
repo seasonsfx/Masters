@@ -2,12 +2,13 @@
 #include <../../external/gl3.h>
 #include "edit_lasso.h"
 #include <QIcon>
+#include "glarea.h"
 #include <QDebug>
 #include <QResource>
+#include "utilities.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
-
-//#include "utilities.h"
+//#include <glm/gtc/matrix_transform.hpp>
 
 EditLasso::EditLasso()
 {
@@ -152,18 +153,18 @@ void EditLasso::lassoToLayer(CloudModel * cm, GLArea * glarea){
 
     // Create buffers from OpenGL
     cl_mem cl_points = clCreateFromGLBuffer(glarea->context, CL_MEM_READ_WRITE, cm->point_buffer.bufferId(), &result);
-    //clError("CL 1", result);
+    clError("CL 1", result);
     cl_mem cl_sidx = clCreateFromGLBuffer(glarea->context, CL_MEM_READ_WRITE, source.bufferId(), &result);
-    //clError("CL 2", result);
+    clError("CL 2", result);
     cl_mem cl_didx = clCreateFromGLBuffer(glarea->context, CL_MEM_READ_WRITE, dest.bufferId(), &result);
-    //clError("CL 3", result);
+    clError("CL 3", result);
 
     const cl_mem gl_objects[3] = {cl_points, cl_sidx, cl_didx};
 
     // Aquire OpenGL buffer objects for writing from OpenCL
     result = clEnqueueAcquireGLObjects(glarea->cmd_queue, 3, gl_objects, 0,0,0);
     if(result != CL_SUCCESS){
-        //qWarning() << "Aquire failed:" << oclErrorString(result);
+        qWarning() << "Aquire failed:" << oclErrorString(result);
     }
 
     // Create OpenCL buffer for lasso and matrix
@@ -177,25 +178,25 @@ void EditLasso::lassoToLayer(CloudModel * cm, GLArea * glarea){
     cl_mem cl_lasso = clCreateBuffer(glarea->context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(lasso_data), &lasso_data, &result);
 
 
-    //clError("CL 5", result);
+    clError("CL 5", result);
 
     glm::mat4 gmat = glarea->cameraToClipMatrix * glarea->modelview_mat;
 
-    //clError("CL 5.1", result);
+    clError("CL 5.1", result);
 
     // Set the kernel arguments
     result = clSetKernelArg(kernel, 0, sizeof(cl_mem), (void*)&cl_points);
-    //clError("CL 5", result);
+    clError("CL 5", result);
     result =clSetKernelArg(kernel, 1, sizeof(cl_mem), (void*)&cl_sidx);
-    //clError("CL 6", result);
+    clError("CL 6", result);
     result = clSetKernelArg(kernel, 2, sizeof(cl_mem), (void*)&cl_didx);
-    //clError("CL 8", result);
+    clError("CL 8", result);
     result = clSetKernelArg(kernel, 3, sizeof(cl_mem), (void*)&cl_lasso);
-    //clError("CL 9", result);
+    clError("CL 9", result);
     result = clSetKernelArg(kernel, 4, sizeof(int), (void*)&lasso_size);
-    //clError("CL 10", result);
+    clError("CL 10", result);
     result = clSetKernelArg(kernel, 5, sizeof(float) * 16, glm::value_ptr(gmat));
-    //clError("CL 11", result);
+    clError("CL 11", result);
 
     // Enqueue the kernel
     const size_t kernel_count = cm->cloud->size();
@@ -207,10 +208,10 @@ void EditLasso::lassoToLayer(CloudModel * cm, GLArea * glarea){
     // Release OpenGL buffer objects
     result = clEnqueueReleaseGLObjects(glarea->cmd_queue, 3, gl_objects, 0,0,0);
     if(result != CL_SUCCESS){
-        //qWarning() << "Release failed:" << oclErrorString(result);
+        qWarning() << "Release failed:" << oclErrorString(result);
     }
     else
-        //qWarning() << "SUCCESS!:" << oclErrorString(result);
+        qWarning() << "SUCCESS!:" << oclErrorString(result);
 
     // Release lasso
     clReleaseMemObject(cl_lasso);
@@ -232,16 +233,16 @@ void EditLasso::paintGL(CloudModel *, GLArea * glarea){
     ortho.setIdentity();
 
     glUniformMatrix4fv(lasso_shader.uniformLocation("ortho"), 1, GL_FALSE, ortho.data());
-    //glError("300");
+    glError("300");
     lasso_buffer.bind();
     float lasso_data[4];
     lasso_buffer.write(0, reinterpret_cast<const void *> (lasso_data), sizeof(lasso_data));
 
-    //glError("305");
+    glError("305");
 
     lasso_shader.enableAttributeArray( "point" );
     lasso_shader.setAttributeBuffer( "point", GL_FLOAT, 0, 2 );
-    //glError("309");
+    glError("309");
     if(lasso.size() > 1){
         for(unsigned int i = 0; i < lasso.size()-1; i++){
             lasso_data[0] = lasso[i].x();
@@ -261,7 +262,7 @@ void EditLasso::paintGL(CloudModel *, GLArea * glarea){
 
     lasso_buffer.release();
     lasso_shader.release();
-    //glError("329");
+    glError("329");
 }
 
 bool EditLasso::mouseDoubleClickEvent  (QMouseEvent *event, CloudModel * cm, GLArea * glarea){
@@ -280,9 +281,6 @@ bool EditLasso::mouseDoubleClickEvent  (QMouseEvent *event, CloudModel * cm, GLA
 }
 
 bool EditLasso::StartEdit(CloudModel * cm, GLArea * glarea){
-
-    qDebug("Call: %d", cm->test());
-    qDebug("Call: %d", glarea->test());
 
     // OpenGL
     if (!glarea->prepareShaderProgram(lasso_shader, ":/shaders/lasso.vert", ":/shaders/lasso.frag" ))
@@ -317,18 +315,18 @@ bool EditLasso::StartEdit(CloudModel * cm, GLArea * glarea){
     int err;
     program = clCreateProgramWithSource(glarea->context, 1, (const char**) &source,
                                  &kernelsize, &err);
-    //clError("Create program failed: ", err);
+    clError("Create program failed: ", err);
 
     // Build the program executable
     err = clBuildProgram(program, 0, NULL, NULL, NULL, NULL);
     if (err != CL_SUCCESS) {
 
-        //clError("Build failed: ", err);
+        clError("Build failed: ", err);
 
         size_t len;
         char buffer[8096];
 
-        //std::cerr << "Error: Failed to build program executable!" << std::endl;
+        std::cerr << "Error: Failed to build program executable!" << std::endl;
         clGetProgramBuildInfo(program, glarea->device, CL_PROGRAM_BUILD_LOG,
                            sizeof(buffer), buffer, &len);
         std::cerr << buffer << std::endl;
@@ -338,7 +336,7 @@ bool EditLasso::StartEdit(CloudModel * cm, GLArea * glarea){
     // Create the compute kernel in the program
     kernel = clCreateKernel(program, "lasso", &err);
         if (!kernel || err != CL_SUCCESS) {
-        //std::cerr << "Error: Failed to create compute kernel!" << std::endl;
+        std::cerr << "Error: Failed to create compute kernel!" << std::endl;
         exit(1);
     }
 

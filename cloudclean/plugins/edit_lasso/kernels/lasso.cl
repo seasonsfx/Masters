@@ -1,3 +1,7 @@
+#ifndef GPU_PI
+#define GPU_PI 1.14159f
+#endif
+
 inline float4 proj(float16 mat, float4 point){
 
     float4 out = (float4)(0.0f, 0.0f, 0.0f, 0.0f);

@@ -281,8 +281,10 @@ bool EditLasso::mouseDoubleClickEvent  (QMouseEvent *event, CloudModel * cm, GLA
 
 bool EditLasso::StartEdit(CloudModel * cm, GLArea * glarea){
 
-    qDebug("Call: %d", cm->test());
-    qDebug("Call: %d", glarea->test());
+    if(lasso_buffer.isCreated()){
+        qDebug("Already initiated\n");
+        return false;
+    }
 
     // OpenGL
     if (!glarea->prepareShaderProgram(lasso_shader, ":/shaders/lasso.vert", ":/shaders/lasso.frag" ))
@@ -317,8 +319,6 @@ bool EditLasso::StartEdit(CloudModel * cm, GLArea * glarea){
     QByteArray qsource = qUncompress(kernel_resource.data(),kernel_resource.size());
 
     const char* source = qsource.constData();
-
-    //qDebug("PROGRAM: %s", source);
 
     const size_t kernelsize = qsource.size();
     int err;

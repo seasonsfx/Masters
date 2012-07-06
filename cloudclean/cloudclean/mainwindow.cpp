@@ -84,9 +84,12 @@ void MainWindow::applyEditMode(){
 
     if(glarea->activeEditPlugin){
         glarea->activeEditPlugin->EndEdit(CloudModel::Instance(), glarea);
-        glarea->activeEditPlugin = NULL;
-        if(glarea->activeEditPlugin == plugin) // TODO Doesnt work!
+
+        if(glarea->activeEditPlugin == plugin){
+            glarea->activeEditPlugin = NULL;
             return;
+        }
+        glarea->activeEditPlugin = NULL;
     }
 
     glarea->activeEditPlugin = plugin;

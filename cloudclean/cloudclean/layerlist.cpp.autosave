@@ -75,6 +75,7 @@ void LayerList::mergeLayers(std::vector<int> indices){
                 continue;
             }
             dest[j] = layers[i].index[j];
+            qDebug("Index: %d", );
         }
 
     }

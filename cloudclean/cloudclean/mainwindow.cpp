@@ -71,8 +71,6 @@ bool MainWindow::saveScan(){
 
 void MainWindow::applyEditMode(){
 
-    qDebug("Apply edit mode\n");
-
     QAction *action = qobject_cast<QAction *>(sender());
 
     if(!CloudModel::Instance()->isLoaded()) { //prevents crash without cloud

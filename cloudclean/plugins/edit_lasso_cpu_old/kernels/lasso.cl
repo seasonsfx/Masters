@@ -95,10 +95,10 @@ bool intersects(float2 lineA, float2 lineB, float2 lineC, float2 lineD)
         return true; /// Lines intersect in obvious manner
 
     /// Line segments either don't intersect or are parallel
-    /*if(pointOnLineSegment(lineA, lineB, lineC) || pointOnLineSegment(lineA, lineB, lineD) ||
+    if(pointOnLineSegment(lineA, lineB, lineC) || pointOnLineSegment(lineA, lineB, lineD) ||
        pointOnLineSegment(lineC, lineD, lineA) || pointOnLineSegment(lineC, lineD, lineB))
         return true;
-    */
+
     return false;
 }
 

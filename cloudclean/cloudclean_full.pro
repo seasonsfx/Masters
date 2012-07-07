@@ -3,4 +3,4 @@ CONFIG += ordered
 SUBDIRS = common \
     cloudclean \
     plugins/edit_lasso \
-    #common
+    plugins/edit_lasso_cpu

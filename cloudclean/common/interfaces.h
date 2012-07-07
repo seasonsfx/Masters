@@ -17,13 +17,13 @@ public:
     virtual bool StartEdit(CloudModel *, GLArea *){return true;}
     virtual bool EndEdit(CloudModel *, GLArea *){return true;}
     virtual void paintGL(CloudModel *, GLArea *){}
-    virtual bool mouseDoubleClickEvent  (QMouseEvent *, CloudModel *, GLArea * ){return false;}
-    virtual bool mousePressEvent  (QMouseEvent *, CloudModel *, GLArea * ){return false;}
-    virtual bool mouseMoveEvent   (QMouseEvent *, CloudModel *, GLArea * ){return false;}
-    virtual bool mouseReleaseEvent(QMouseEvent *, CloudModel *, GLArea * ){return false;}
-    virtual bool keyReleaseEvent  (QKeyEvent *, CloudModel *, GLArea *){return false;}
-    virtual bool keyPressEvent    (QKeyEvent *, CloudModel *, GLArea *){return false;}
-    virtual bool wheelEvent(QWheelEvent*, CloudModel *, GLArea * ){return false;}
+    virtual bool mouseDoubleClickEvent  (QMouseEvent *, CloudModel *, GLArea * ){return true;}
+    virtual bool mousePressEvent  (QMouseEvent *, CloudModel *, GLArea * ){return true;}
+    virtual bool mouseMoveEvent   (QMouseEvent *, CloudModel *, GLArea * ){return true;}
+    virtual bool mouseReleaseEvent(QMouseEvent *, CloudModel *, GLArea * ){return true;}
+    virtual bool keyReleaseEvent  (QKeyEvent *, CloudModel *, GLArea *){return true;}
+    virtual bool keyPressEvent    (QKeyEvent *, CloudModel *, GLArea *){return true;}
+    virtual bool wheelEvent(QWheelEvent*, CloudModel *, GLArea * ){return true;}
     virtual QList<QAction *> actions() const = 0;
     virtual QString getEditToolDescription(QAction *)=0;
 

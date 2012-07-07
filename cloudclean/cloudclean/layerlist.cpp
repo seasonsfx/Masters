@@ -60,18 +60,17 @@ void LayerList::deleteLayers(std::vector<int> indices){
 void LayerList::mergeLayers(std::vector<int> indices){
     int dest_idx = indices[0];
     std::vector<int> & dest = layers[dest_idx].index;
-
+    layers[dest_idx].copyFromGPU();
     indices.erase(indices.begin());
 
     // Copy every layer to the first layer
     foreach(int i, indices){
-
         layers[i].copyFromGPU();
 
         // Copy each individual index
         for(int j = 0; j < dest.size(); j++){
-            if(dest[j] != -1){
-                qDebug("Skip!");
+            // Dest must be -1 and source must not be -1
+            if(dest[j] != -1 || layers[i].index[j] == -1){
                 continue;
             }
             dest[j] = layers[i].index[j];

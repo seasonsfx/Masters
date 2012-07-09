@@ -5,7 +5,7 @@
 *.so
 *~
 .fuse_*
-
+*.pro.user
 # Docs
 /docs/*/*.pdf
 *.snm

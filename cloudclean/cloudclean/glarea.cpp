@@ -272,7 +272,8 @@ void GLArea::paintGL(){
     if(cm->isLoaded())
     {
 
-        col1Text += QString("FPS: %1\n").arg(cfps);
+        if ((cfps>0) && (cfps<999))
+            col1Text += QString("FPS: %1\n").arg(cfps,7,'f',1);
         col1Text += QString("Vertices: %1\n").arg(cm->cloud->size());
         //col1Text += QString("Faces: %1\n").arg(mm()->cm.fn);
 
@@ -301,18 +302,25 @@ void GLArea::paintGL(){
 
 }
 
-void GLArea::updateFps(float deltaTime)
+void GLArea::updateFps(float frameTime)
 {
+    /*float time = 0.5f*frameTime + 0.5*lastTime;
+    lastTime = frameTime;
+
+    cfps = 1.0f/(time/1000.0f);
+    */
+
     static float fpsVector[10];
     static int j=0;
     float averageFps=0;
-    if (deltaTime>0) {
-        fpsVector[j]=deltaTime;
+    if (frameTime>0) {
+        fpsVector[j]=frameTime;
         j=(j+1) % 10;
     }
     for (int i=0;i<10;i++) averageFps+=fpsVector[i];
     cfps=1000.0f/(averageFps/10);
-    lastTime=deltaTime;
+    lastTime=frameTime;
+
 }
 
 inline float rand_range(float from, float to){

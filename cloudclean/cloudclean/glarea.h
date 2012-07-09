@@ -52,7 +52,7 @@ protected:
     virtual void initializeGL();
     virtual void resizeGL( int w, int h );
     virtual void paintGL();
-    void updateFps(float deltaTime);
+    void updateFps(float frameTime);
 
     void click(int x, int y);
 
@@ -81,8 +81,8 @@ private:
     int                     start_move_x;
     int                     start_move_y;
 
-    int                     cfps;
-    int                     lastTime;
+    float                     cfps;
+    float                     lastTime;
 
     //TODO: Move out of here
     bool                                filling;

@@ -343,45 +343,6 @@ bool EditLasso::StartEdit(CloudModel * cm, GLArea * glarea){
     lasso_shader.release();
     lasso_buffer.release();
 
-    // OpenCL
-    QResource kernel_resource(":/kernels/lasso.cl");
-    //qDebug("Valid resource: %d", kernel_resource.size());
-    //qDebug("Valid compressed: %d", kernel_resource.isCompressed());
-
-    QByteArray qsource = qUncompress(kernel_resource.data(),kernel_resource.size());
-
-    const char* source = qsource.constData();
-
-    const size_t kernelsize = qsource.size();
-    int err;
-    program = clCreateProgramWithSource(glarea->context, 1, (const char**) &source,
-                                 &kernelsize, &err);
-    clError("Create program failed: ", err);
-
-    // Build the program executable
-    err = clBuildProgram(program, 0, NULL, NULL, NULL, NULL);
-    if (err != CL_SUCCESS) {
-
-        clError("Build failed: ", err);
-
-        size_t len;
-        char buffer[8096];
-
-        std::cerr << "Error: Failed to build program executable!" << std::endl;
-        clGetProgramBuildInfo(program, glarea->device, CL_PROGRAM_BUILD_LOG,
-                           sizeof(buffer), buffer, &len);
-        std::cerr << buffer << std::endl;
-        exit(1);
-    }
-
-    // Create the compute kernel in the program
-    kernel = clCreateKernel(program, "lasso", &err);
-        if (!kernel || err != CL_SUCCESS) {
-        std::cerr << "Error: Failed to create compute kernel!" << std::endl;
-        exit(1);
-    }
-
-
     return true;
 }
 bool EditLasso::EndEdit(CloudModel *, GLArea *){

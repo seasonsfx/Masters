@@ -29,5 +29,4 @@ LIBS += -lpcl_io \
 RESOURCES += \
     edit_lasso.qrc
 
-OTHER_FILES += \
-    kernels/lasso.cl
+OTHER_FILES +=

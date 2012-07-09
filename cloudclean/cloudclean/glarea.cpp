@@ -9,6 +9,8 @@
 #include <time.h>
 #include <stdlib.h>
 #include "interfaces.h"
+#include <QTime>
+#include <QFont>
 
 GLArea::GLArea(QWidget* parent )
     //: QGLWidget(QGLFormat(QGL::HasOverlay)),
@@ -18,8 +20,9 @@ GLArea::GLArea(QWidget* parent )
     cm = CloudModel::Instance();
 
     activeEditPlugin = NULL;
-
     aspectRatio = 1.0f;
+    cfps=0;
+    lastTime=0;
 
     //TODO: Move out of here
     filling = false;
@@ -31,8 +34,8 @@ GLArea::GLArea(QWidget* parent )
     cameraToClipMatrix = glm::perspective(35.0f, aspectRatio, zNear, zFar);
 
     moved = false;
-    start_x = 0;
-    start_y = 0;
+    start_move_x = 0;
+    start_move_y = 0;
 
     glFormat.setVersion( 3, 3 );
     glFormat.setProfile( QGLFormat::CoreProfile );
@@ -183,6 +186,13 @@ void GLArea::resizeGL( int w, int h )
 }
 
 void GLArea::paintGL(){
+
+    // This is reet by qpainter
+    glEnable(GL_DEPTH_TEST);
+
+    QTime time;
+    time.start();
+
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
     // Calculate modelview matrix
@@ -191,6 +201,9 @@ void GLArea::paintGL(){
     modelview_mat = viewPole->CalcMatrix() * translate * objtPole->CalcMatrix();
 
     point_shader.bind();
+
+    //glUniformMatrix4fv(point_shader.uniformLocation("cameraToClipMatrix"), 1, GL_FALSE, glm::value_ptr(cameraToClipMatrix));
+
     glUniformMatrix4fv(point_shader.uniformLocation("modelToCameraMatrix"), 1, GL_FALSE, glm::value_ptr(modelview_mat));
     glError("274");
 
@@ -215,6 +228,8 @@ void GLArea::paintGL(){
         layers[i].gl_index_buffer.bind();
         glDrawElements(GL_POINTS, cm->cloud->size(), GL_UNSIGNED_INT, 0);
         glError("289");
+        layers[i].gl_index_buffer.release();
+        glError("289");
     }
 
     cm->point_buffer.release();
@@ -223,6 +238,81 @@ void GLArea::paintGL(){
     if(activeEditPlugin)
         activeEditPlugin->paintGL(cm, this);
 
+
+    //////////////////////////////////////
+
+    QPainter painter(this);
+    painter.beginNativePainting();
+
+    painter.setRenderHint(QPainter::TextAntialiasing);
+    painter.setPen(Qt::white);
+    //qFont.setStyleStrategy(QFont::NoAntialias);
+    qFont.setFamily("Helvetica");
+    qFont.setPixelSize(12);
+    painter.setFont(qFont);
+    float barHeight = qFont.pixelSize()*5;
+    QFontMetrics metrics = QFontMetrics(font());
+    int border = qMax(4, metrics.leading());
+
+    QRect Column_0(width()/10, this->height()-barHeight+border, width()/2, this->height()-border);
+    QRect Column_1(width()/2 , this->height()-barHeight+border, width()*3/4,   this->height()-border);
+    QRect Column_2(width()*3/4 , this->height()-barHeight+border, width(),   this->height()-border);
+
+    QColor logAreaColor(20, 20, 20, 128);
+
+    painter.fillRect(QRect(0, this->height()-barHeight, width(), this->height()), logAreaColor);
+
+    QString col1Text,col0Text;
+
+    updateFps(time.elapsed());
+
+    painter.endNativePainting();
+    painter.save();
+
+    if(cm->isLoaded())
+    {
+
+        col1Text += QString("FPS: %1\n").arg(cfps);
+        col1Text += QString("Vertices: %1\n").arg(cm->cloud->size());
+        //col1Text += QString("Faces: %1\n").arg(mm()->cm.fn);
+
+        /*
+        if(fov>5) col0Text += QString("FOV: %1\n").arg(fov);
+        else col0Text += QString("FOV: Ortho\n");
+        if ((cfps>0) && (cfps<999))
+            col0Text += QString("FPS: %1\n").arg(cfps,7,'f',1);
+        if ((clipRatioNear!=1) || (clipRatioFar!=1))
+            col0Text += QString("Clipping: N:%1 F:%2\n").arg(clipRatioNear,7,'f',1).arg(clipRatioFar,7,'f',1);
+
+        */
+        //painter.drawLine ( 0, 0, 50, 50 );
+        //painter.drawText(50, 50, "LALALALALALALALALALAL");
+        painter.drawText(Column_0, Qt::AlignLeft | Qt::TextWordWrap, col1Text);
+        painter.drawText(Column_1, Qt::AlignLeft | Qt::TextWordWrap, col0Text);
+        //if(mm()->cm.Tr != Matrix44f::Identity() ) displayMatrix(painter, Column_2);
+
+    }
+
+    //////////////////////////////////////////
+
+    painter.restore();
+    painter.beginNativePainting();
+    painter.endNativePainting();
+
+}
+
+void GLArea::updateFps(float deltaTime)
+{
+    static float fpsVector[10];
+    static int j=0;
+    float averageFps=0;
+    if (deltaTime>0) {
+        fpsVector[j]=deltaTime;
+        j=(j+1) % 10;
+    }
+    for (int i=0;i<10;i++) averageFps+=fpsVector[i];
+    cfps=1000.0f/(averageFps/10);
+    lastTime=deltaTime;
 }
 
 inline float rand_range(float from, float to){
@@ -246,7 +336,7 @@ void GLArea::mouseMoveEvent ( QMouseEvent * event ){
     if(mouseDown == Qt::LeftButton)
         objtPole->MouseMove(glm::ivec2(event->x(), event->y()));
 
-    if(sqrt(pow(start_x-event->x(),2) + pow(start_x-event->x(),2)) > 5)
+    if(sqrt(pow(start_move_x-event->x(),2) + pow(start_move_y-event->y(),2)) > 5)
         moved = true;
 
     if(mouseDown)
@@ -260,8 +350,8 @@ void GLArea::mousePressEvent ( QMouseEvent * event ){
         return;
 
     mouseDown = event->button();
-    start_x = 0;
-    start_y = 0;
+    start_move_x = 0;
+    start_move_y = 0;
     moved = false;
 
     if(event->button() == Qt::RightButton)

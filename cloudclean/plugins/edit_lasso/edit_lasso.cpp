@@ -11,7 +11,7 @@
 EditLasso::EditLasso()
 {
     lasso_active = false;
-    editLasso = new QAction(QIcon(":/images/lasso.png"), "Lasso select", this);
+    editLasso = new QAction(QIcon(":/images/lasso.png"), "Lasso select (OPENCL)", this);
     actionList << editLasso;
     foreach(QAction *editAction, actionList)
         editAction->setCheckable(true);
@@ -44,79 +44,6 @@ void EditLasso::addLassoPoint(Eigen::Vector2f point){
     }
 
 }
-
-/*
-void EditLasso::lassoToLayerCPU(CloudModel * cm){
-
-    cm->layerList.newLayer();
-
-    std::vector<Layer> & layers = cm->layerList.layers;
-
-    QGLBuffer & dest = layers[layers.size()-1].gl_index_buffer;
-    dest.create();
-    dest.setUsagePattern( QGLBuffer::DynamicDraw );
-    dest.bind();
-    dest.allocate(cm->cloud->size() * sizeof(int) );
-    dest.release();
-
-    /// Create and read source index from gpu
-    int * dest_indices = new int[cm->cloud->size()/sizeof(int)];
-    int * source_indices = new int[cm->cloud->size()/sizeof(int)];
-
-    QGLBuffer & source = layers[0].gl_index_buffer;
-    source.bind(); /// Bind source
-    source.read(0, source_indices, source.size());
-
-    // Create lasso
-    int lasso_size = lasso.size();
-    float2 lasso_data[lasso_size];
-    for(int i = 0; i< lasso_size; i++){
-        lasso_data[i].x = lasso[i].x();
-        lasso_data[i].y = lasso[i].y();
-    }
-
-    /// Perform the lasso selection
-    glm::mat4 gmat = cameraToClipMatrix * modelview_mat;
-
-    /// for each point
-    for(unsigned int i = 0; i < cm->cloud->size(); i++){
-        /// get point
-        int idx = i;
-        pcl::PointXYZI p = cm->cloud->points[idx];
-        float point[4] = {p.x, p.y, p.z, p.intensity};
-
-        /// project point
-        proj(glm::value_ptr(gmat), point);
-
-        /// make 2d
-        float2 vertex = {point[0], point[1]};
-
-        /// do lasso test
-        bool in_lasso = pointInsidePolygon(lasso_data, lasso_size, vertex);
-
-        if(in_lasso){
-            dest_indices[idx] = source_indices[idx];
-            source_indices[idx] = -1;
-        }
-        else{
-            dest_indices[idx] = -1;
-        }
-
-    }
-
-    /// Write results gpu
-    dest.bind();
-    dest.write(0, dest_indices, dest.size());
-    source.bind();
-    source.write(0, source_indices, source.size());
-
-    delete [] source_indices;
-    delete [] dest_indices;
-
-    lasso.clear();
-    fflush(stdout);
-}
-*/
 
 void EditLasso::lassoToLayer(CloudModel * cm, GLArea * glarea){
     if(!cm->isLoaded()){
@@ -329,8 +256,11 @@ bool EditLasso::StartEdit(CloudModel * cm, GLArea * glarea){
     const char* source = qsource.constData();
 
     const size_t kernelsize = qsource.size();
+
+    //qDebug("Source (size %ld): %s", kernelsize, source);
+
     int err;
-    program = clCreateProgramWithSource(glarea->context, 1, (const char**) &source,
+    program = clCreateProgramWithSource(glarea->context, 1, &source,
                                  &kernelsize, &err);
     clError("Create program failed: ", err);
 

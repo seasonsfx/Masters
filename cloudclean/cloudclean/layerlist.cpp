@@ -58,6 +58,9 @@ void LayerList::deleteLayers(std::vector<int> indices){
 
 /// Merge the layers listed
 void LayerList::mergeLayers(std::vector<int> indices){
+    if(indices.size() < 2)
+        return;
+
     int dest_idx = indices[0];
     std::vector<int> & dest = layers[dest_idx].index;
     layers[dest_idx].copyFromGPU();

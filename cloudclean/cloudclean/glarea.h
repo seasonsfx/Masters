@@ -52,6 +52,7 @@ protected:
     virtual void initializeGL();
     virtual void resizeGL( int w, int h );
     virtual void paintGL();
+    void updateFps(float deltaTime);
 
     void click(int x, int y);
 
@@ -67,6 +68,8 @@ public slots:
 
 private:
 
+    QFont qFont;
+
     CloudModel *            cm;
 
     QGLFormat               glFormat;
@@ -75,12 +78,11 @@ private:
     glm::vec4               offsetVec;
     float                   aspectRatio;
 
-    
-    //cl_mem                  p_vbocl;
+    int                     start_move_x;
+    int                     start_move_y;
 
-    int                     start_x;
-    int                     start_y;
-
+    int                     cfps;
+    int                     lastTime;
 
     //TODO: Move out of here
     bool                                filling;

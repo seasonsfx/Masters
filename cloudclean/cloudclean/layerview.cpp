@@ -7,12 +7,17 @@ LayerView::LayerView(QWidget *parent) :
     QDockWidget(parent),
     ui(new Ui::LayerView)
 {
+    cm = CloudModel::Instance();
+
     ui->setupUi(this);
     ui->listView->setModel(&CloudModel::Instance()->layerList);
     ui->listView->setSelectionMode(QAbstractItemView::MultiSelection);
+    ui->selection_mode_combo->insertItem(0, "Create new layer");
+    ui->selection_mode_combo->insertItem(1, "Add to active layer");
     connect(ui->listView, SIGNAL(clicked(const QModelIndex &)), this, SLOT(clickedLayer(const QModelIndex &)));
     connect(ui->delete_button, SIGNAL(pressed()), this, SLOT(deleteLayers()));
     connect(ui->merge_button, SIGNAL(pressed()), this, SLOT(mergeLayers()));
+    connect(ui->selection_mode_combo, SIGNAL(currentIndexChanged (int)), &cm->layerList, SLOT(selectModeChanged(int)));
 }
 
 LayerView::~LayerView()
@@ -23,21 +28,19 @@ LayerView::~LayerView()
 void LayerView::clickedLayer(const QModelIndex & index){
     int col = index.column();
     int row = index.row();
-    CloudModel * cm = CloudModel::Instance();
 
     if(col == 0){
         cm->layerList.layers[row].toggleActive();
         emit updateView();
     }
-    /*else if(col == 1){
+    else if(col == 1){
         cm->layerList.layers[row].toggleVisible();
         emit glarea->updateGL();
     }
-    */
+
 }
 
 void LayerView::selectLayer(int i){
-    CloudModel * cm = CloudModel::Instance();
     cm->layerList.layers[i].active = true;
     QItemSelectionModel * sm = ui->listView->selectionModel();
     QModelIndex mi = sm->model()->index(i, 0, QModelIndex());
@@ -56,13 +59,11 @@ std::vector<int> LayerView::getSelection(){
 }
 
 void LayerView::deleteLayers(){
-    CloudModel * cm = CloudModel::Instance();
     cm->layerList.deleteLayers(getSelection());
     emit updateView();
 }
 
 void LayerView::mergeLayers(){
-    CloudModel * cm = CloudModel::Instance();
     cm->layerList.mergeLayers(getSelection());
     emit updateView();
 }

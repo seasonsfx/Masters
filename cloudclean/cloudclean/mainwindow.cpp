@@ -8,7 +8,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
    // Create objects
    glarea = new GLArea(this);
-   layers = new LayerView(this);
+   layerView = new LayerView(this);
    toolbox = new Toolbox(this);
 
    fileMenu = menuBar()->addMenu(tr("&File"));
@@ -18,7 +18,7 @@ MainWindow::MainWindow(QWidget *parent) :
    toolsMenu = menuBar()->addMenu(tr("&Tools"));
 
    // Config
-   layers->setAllowedAreas (Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+   layerView->setAllowedAreas (Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
    toolbox->setAllowedAreas (Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
    toolbox->hide();
    glarea->setMinimumSize(700, 500);
@@ -27,7 +27,7 @@ MainWindow::MainWindow(QWidget *parent) :
    fileMenu->addAction(openFile);
    fileMenu->addAction(saveFile);
 
-   addDockWidget(Qt::RightDockWidgetArea,layers);
+   addDockWidget(Qt::RightDockWidgetArea,layerView);
    addDockWidget(Qt::LeftDockWidgetArea,toolbox);
    setCentralWidget(glarea);
 
@@ -41,8 +41,8 @@ MainWindow::MainWindow(QWidget *parent) :
    // Wire signals and slots
    connect(openFile, SIGNAL(triggered()), this, SLOT(loadScan()));
    connect(saveFile, SIGNAL(triggered()), this, SLOT(saveScan()));
-   connect(&CloudModel::Instance()->layerList, SIGNAL(selectLayer(int)), layers, SLOT(selectLayer(int)));
-   connect(layers, SIGNAL(updateView()), glarea, SLOT(updateGL()));
+   connect(&CloudModel::Instance()->layerList, SIGNAL(selectLayer(int)), layerView, SLOT(selectLayer(int)));
+   connect(layerView, SIGNAL(updateView()), glarea, SLOT(updateGL()));
 
 }
 
@@ -92,6 +92,6 @@ void MainWindow::applyEditMode(){
 
     glarea->activeEditPlugin = plugin;
 
-    plugin->StartEdit(CloudModel::Instance(), glarea);
+    plugin->StartEdit(action, CloudModel::Instance(), glarea);
 
 }

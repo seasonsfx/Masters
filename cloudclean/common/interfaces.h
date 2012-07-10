@@ -14,7 +14,7 @@ class EditPluginInterface
 public:
     EditPluginInterface(){}
     virtual ~EditPluginInterface(){}
-    virtual bool StartEdit(CloudModel *, GLArea *){return true;}
+    virtual bool StartEdit(QAction *, CloudModel *, GLArea *){return true;}
     virtual bool EndEdit(CloudModel *, GLArea *){return true;}
     virtual void paintGL(CloudModel *, GLArea *){}
     virtual bool mouseDoubleClickEvent  (QMouseEvent *, CloudModel *, GLArea * ){return true;}

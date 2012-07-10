@@ -31,7 +31,7 @@ private:
     QMenu *toolsMenu;
     QAction *openFile;
     QAction *saveFile;
-    LayerView * layers;
+    LayerView * layerView;
     Toolbox * toolbox;
     PluginManager pluginManager;
 

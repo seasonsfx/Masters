@@ -8,6 +8,12 @@
 #include <vector>
 #include <QGLShaderProgram>
 
+#ifdef __APPLE__
+#include <OpenCL/opencl.h>
+#else
+#include <CL/cl.h>
+#endif
+
 class GLArea;
 
 class EditLasso : public QObject, public EditPluginInterface
@@ -18,7 +24,7 @@ public:
     EditLasso();
     ~EditLasso();
 
-    bool StartEdit(CloudModel * cm, GLArea * glarea);
+    bool StartEdit(QAction *action, CloudModel * cm, GLArea * glarea);
     bool EndEdit(CloudModel *, GLArea * glarea);
     void paintGL(CloudModel *, GLArea *glarea);
     bool mouseDoubleClickEvent  (QMouseEvent *event, CloudModel * cm, GLArea * glarea);
@@ -33,18 +39,28 @@ public:
 
 private:
 
+    static const int USE_CPU = 0;
+    static const int USE_GPU = 1;
+
+    int lassoMethod;
+
     void lassoToLayer(CloudModel *cm, GLArea *glarea);
-    void lassoToLayerCPU(CloudModel *cm);
+    void lassoToLayerGPU(CloudModel *cm, GLArea *glarea);
+    void lassoToLayerCPU(CloudModel *cm, GLArea *glarea);
     void addLassoPoint(Eigen::Vector2f point);
     void moveLasso(Eigen::Vector2f point);
 
     QList <QAction *> actionList;
-    QAction *editLasso;
+    QAction *editLassoCPU;
+    QAction *editLassoGPU;
     QGLShaderProgram        lasso_shader;
     QGLBuffer               lasso_buffer;
     QGLBuffer               lasso_index;
     bool                    lasso_active;
     std::vector<Eigen::Vector2f>   lasso;
+    cl_program              program;
+    cl_kernel               kernel;
+    size_t                  kernelsize;
 };
 
 #endif // EDITLASSO_H

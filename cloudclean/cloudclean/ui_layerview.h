@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'layerview.ui'
 **
-** Created: Thu Jul 5 12:55:21 2012
+** Created: Tue Jul 10 12:38:00 2012
 **      by: Qt User Interface Compiler version 4.8.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -14,9 +14,11 @@
 #include <QtGui/QAction>
 #include <QtGui/QApplication>
 #include <QtGui/QButtonGroup>
+#include <QtGui/QComboBox>
 #include <QtGui/QDockWidget>
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QHeaderView>
+#include <QtGui/QLabel>
 #include <QtGui/QListView>
 #include <QtGui/QPushButton>
 #include <QtGui/QVBoxLayout>
@@ -33,18 +35,26 @@ public:
     QHBoxLayout *horizontalLayout;
     QPushButton *delete_button;
     QPushButton *merge_button;
+    QVBoxLayout *verticalLayout;
+    QLabel *selection_mode_label;
+    QComboBox *selection_mode_combo;
 
     void setupUi(QDockWidget *LayerView)
     {
         if (LayerView->objectName().isEmpty())
             LayerView->setObjectName(QString::fromUtf8("LayerView"));
-        LayerView->resize(251, 469);
+        LayerView->resize(251, 514);
         dockWidgetContents = new QWidget();
         dockWidgetContents->setObjectName(QString::fromUtf8("dockWidgetContents"));
         verticalLayout_2 = new QVBoxLayout(dockWidgetContents);
         verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
         listView = new QListView(dockWidgetContents);
         listView->setObjectName(QString::fromUtf8("listView"));
+        QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(listView->sizePolicy().hasHeightForWidth());
+        listView->setSizePolicy(sizePolicy);
 
         verticalLayout_2->addWidget(listView);
 
@@ -63,6 +73,21 @@ public:
 
         verticalLayout_2->addLayout(horizontalLayout);
 
+        verticalLayout = new QVBoxLayout();
+        verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
+        selection_mode_label = new QLabel(dockWidgetContents);
+        selection_mode_label->setObjectName(QString::fromUtf8("selection_mode_label"));
+
+        verticalLayout->addWidget(selection_mode_label);
+
+        selection_mode_combo = new QComboBox(dockWidgetContents);
+        selection_mode_combo->setObjectName(QString::fromUtf8("selection_mode_combo"));
+
+        verticalLayout->addWidget(selection_mode_combo);
+
+
+        verticalLayout_2->addLayout(verticalLayout);
+
         LayerView->setWidget(dockWidgetContents);
 
         retranslateUi(LayerView);
@@ -75,6 +100,7 @@ public:
         LayerView->setWindowTitle(QApplication::translate("LayerView", "Layers", 0, QApplication::UnicodeUTF8));
         delete_button->setText(QApplication::translate("LayerView", "Delete", 0, QApplication::UnicodeUTF8));
         merge_button->setText(QApplication::translate("LayerView", "Merge", 0, QApplication::UnicodeUTF8));
+        selection_mode_label->setText(QApplication::translate("LayerView", "Selection mode:", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 
 };

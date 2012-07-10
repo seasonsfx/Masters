@@ -1,7 +1,8 @@
 include(../../shared.pri)
 
 TARGET = edit_lasso_cpu
-HEADERS += edit_lasso.h
+HEADERS += edit_lasso.h \
+    cpu_lasso.h
 
 
 SOURCES += edit_lasso.cpp
@@ -29,4 +30,5 @@ LIBS += -lpcl_io \
 RESOURCES += \
     edit_lasso.qrc
 
-OTHER_FILES +=
+OTHER_FILES += \
+    kernels/lasso.cl

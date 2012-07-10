@@ -6,6 +6,7 @@
 LayerList::LayerList(QObject *parent) :
     QAbstractListModel(parent)
 {
+    newLayerMode = 0;
 }
 
 int LayerList::rowCount ( const QModelIndex & parent) const {
@@ -58,16 +59,20 @@ void LayerList::deleteLayers(std::vector<int> indices){
 
 /// Merge the layers listed
 void LayerList::mergeLayers(std::vector<int> indices){
+
     if(indices.size() < 2)
         return;
 
     int dest_idx = indices[0];
     std::vector<int> & dest = layers[dest_idx].index;
+
     layers[dest_idx].copyFromGPU();
+
     indices.erase(indices.begin());
 
     // Copy every layer to the first layer
     foreach(int i, indices){
+
         layers[i].copyFromGPU();
 
         // Copy each individual index
@@ -78,14 +83,21 @@ void LayerList::mergeLayers(std::vector<int> indices){
             }
             dest[j] = layers[i].index[j];
         }
-
     }
+
+
+
 
     deleteLayers(indices);
     layers[dest_idx].copyToGPU();
 }
 
-/// Watch out, has OpenGL context been initialized
+void LayerList::selectModeChanged(int index){
+    newLayerMode = index;
+    qDebug("Index: %d", index);
+}
+
+/// Watch out, has OpenGL context been initialized?
 void LayerList::reset (){
     if(layers.size() < 2)
         return;

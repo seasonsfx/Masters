@@ -5,6 +5,8 @@
 #include <QModelIndex>
 #include <vector>
 
+class CloudModel;
+
 namespace Ui {
 class LayerView;
 }
@@ -18,6 +20,7 @@ public:
     ~LayerView();
     
 private:
+    CloudModel * cm;
     Ui::LayerView *ui;
     std::vector<int> getSelection();
 

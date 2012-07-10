@@ -9,6 +9,12 @@ class LayerList : public QAbstractListModel
 {
     Q_OBJECT
 public:
+
+    static const int CREATE_NEW_LAYER = 0;
+    static const int ADD_TO_ACTIVE_LAYER = 1;
+    int newLayerMode;
+
+
     explicit LayerList(QObject *parent = 0);
     int rowCount ( const QModelIndex & parent = QModelIndex() ) const;
     int columnCount ( const QModelIndex & parent) const;
@@ -26,6 +32,8 @@ signals:
 public slots:
     void deleteLayers(std::vector<int> indices);
     void mergeLayers(std::vector<int> indices);
+    void selectModeChanged(int index);
+
 };
 
 #endif // LAYERLIST_H

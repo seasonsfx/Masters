@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'layerview.ui'
 **
-** Created: Tue Jul 10 12:38:00 2012
+** Created: Tue Jul 10 17:27:41 2012
 **      by: Qt User Interface Compiler version 4.8.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -19,8 +19,8 @@
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QHeaderView>
 #include <QtGui/QLabel>
-#include <QtGui/QListView>
 #include <QtGui/QPushButton>
+#include <QtGui/QTableView>
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QWidget>
 
@@ -31,7 +31,7 @@ class Ui_LayerView
 public:
     QWidget *dockWidgetContents;
     QVBoxLayout *verticalLayout_2;
-    QListView *listView;
+    QTableView *listView;
     QHBoxLayout *horizontalLayout;
     QPushButton *delete_button;
     QPushButton *merge_button;
@@ -48,7 +48,7 @@ public:
         dockWidgetContents->setObjectName(QString::fromUtf8("dockWidgetContents"));
         verticalLayout_2 = new QVBoxLayout(dockWidgetContents);
         verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
-        listView = new QListView(dockWidgetContents);
+        listView = new QTableView(dockWidgetContents);
         listView->setObjectName(QString::fromUtf8("listView"));
         QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         sizePolicy.setHorizontalStretch(0);

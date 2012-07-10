@@ -9,34 +9,73 @@ LayerList::LayerList(QObject *parent) :
     newLayerMode = 0;
 }
 
-int LayerList::rowCount ( const QModelIndex & parent) const {
-    Q_UNUSED(parent);
+int LayerList::rowCount ( const QModelIndex &) const {
     return layers.size();
 }
 
-int LayerList::columnCount ( const QModelIndex & parent) const {
-    Q_UNUSED(parent);
-    return 1;
+int LayerList::columnCount ( const QModelIndex &) const {
+    return 2;
+}
+
+Qt::ItemFlags LayerList::flags ( const QModelIndex & index ) const{
+
+    int col = index.column();
+
+    if(col == 0){
+        return Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+    }
+
+    return Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled;
 }
 
 QVariant LayerList::data ( const QModelIndex & index, int role ) const {
     int row = index.row();
+    int col = index.column();
 
-    switch(role){
-    case Qt::DisplayRole:
-    {
-        QString re;
-        QTextStream(&re) << "Layer " << row;
-        return re;
+    if(col == 1){
+        switch(role){
+        case Qt::DisplayRole:
+        {
+            QString re;
+            QTextStream(&re) << "Layer " << row;
+            return re;
+        }
+        case Qt::DecorationRole:
+            return QColor(layers[row].colour[0]*255, layers[row].colour[1]*255, layers[row].colour[2]*255);
+        }
     }
-    case Qt::DecorationRole:
-        return QColor(layers[row].colour[0]*255, layers[row].colour[1]*255, layers[row].colour[2]*255);
-    //case Qt::CheckStateRole:
-    //        break;//return layers[row].visible? Qt::Checked:Qt::Unchecked;
+    else{
+        switch(role){
+        /*case Qt::DisplayRole:
+        {
+            QString re;
+            QTextStream(&re) << "Layer " << row;
+            return re;
+        }
+        case Qt::DecorationRole:
+            return QColor(layers[row].colour[0]*255, layers[row].colour[1]*255, layers[row].colour[2]*255);
+        */
+        case Qt::CheckStateRole:
+                return layers[row].visible? Qt::Checked : Qt::Unchecked;
+        }
     }
     return QVariant();
 
 }
+
+
+bool LayerList::setData(const QModelIndex & index, const QVariant & value, int role)
+{
+    int row = index.row();
+    int col = index.column();
+
+    if (role == Qt::CheckStateRole && col == 0)
+    {
+        toggleVisible(row);
+    }
+    return true;
+}
+
 
 void LayerList::newLayer (){
     int pos = layers.size();
@@ -85,9 +124,6 @@ void LayerList::mergeLayers(std::vector<int> indices){
         }
     }
 
-
-
-
     deleteLayers(indices);
     layers[dest_idx].copyToGPU();
 }
@@ -117,4 +153,11 @@ void LayerList::reset (){
 void LayerList::activateLayer(int i){
     emit selectLayer(i);
     layers[i].active = true;
+}
+
+void LayerList::toggleVisible(int i){
+    layers[i].toggleVisible();
+    QModelIndex mi = index(i, 0, QModelIndex());
+    emit dataChanged(mi, mi);
+    emit updateView();
 }

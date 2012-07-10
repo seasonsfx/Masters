@@ -219,6 +219,9 @@ void GLArea::paintGL(){
     std::vector<Layer> & layers = cm->layerList.layers;
 
     for(unsigned int i = 0; i < layers.size(); i++){
+        if(!layers[i].visible)
+            continue;
+
         Eigen::Vector3f colour(1,1,1);
         if(layers[i].active)
             colour = layers[i].colour;

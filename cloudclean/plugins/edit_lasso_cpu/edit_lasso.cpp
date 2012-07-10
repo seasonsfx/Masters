@@ -169,7 +169,6 @@ void EditLasso::lassoToLayerCPU(CloudModel *cm, GLArea *glarea){
     int * dest_indices = new int[cm->cloud->size()];
     int * source_indices = new int[cm->cloud->size()];
 
-
     source.bind(); /// Bind source
     source.read(0, source_indices, source.size());
     source.release();

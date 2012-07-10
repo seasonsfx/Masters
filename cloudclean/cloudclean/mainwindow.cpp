@@ -43,6 +43,7 @@ MainWindow::MainWindow(QWidget *parent) :
    connect(saveFile, SIGNAL(triggered()), this, SLOT(saveScan()));
    connect(&CloudModel::Instance()->layerList, SIGNAL(selectLayer(int)), layerView, SLOT(selectLayer(int)));
    connect(layerView, SIGNAL(updateView()), glarea, SLOT(updateGL()));
+   connect(&CloudModel::Instance()->layerList, SIGNAL(updateView()), glarea, SLOT(updateGL()));
 
 }
 

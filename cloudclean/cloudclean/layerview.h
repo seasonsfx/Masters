@@ -25,7 +25,7 @@ private:
     std::vector<int> getSelection();
 
 public slots:
-    void clickedLayer(const QModelIndex & index);
+    void pressed(const QModelIndex & index);
     void selectLayer(int i);
     void deleteLayers();
     void mergeLayers();

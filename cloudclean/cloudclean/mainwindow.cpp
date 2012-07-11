@@ -28,7 +28,7 @@ MainWindow::MainWindow(QWidget *parent) :
    fileMenu->addAction(saveFile);
 
    addDockWidget(Qt::RightDockWidgetArea,layerView);
-   addDockWidget(Qt::LeftDockWidgetArea,toolbox);
+   addDockWidget(Qt::RightDockWidgetArea,toolbox);
    setCentralWidget(glarea);
 
    // Load plugins
@@ -39,6 +39,7 @@ MainWindow::MainWindow(QWidget *parent) :
    }
 
    // Wire signals and slots
+   connect(this, SIGNAL(setSettingsWidget(QWidget *)), toolbox, SLOT(setSettingsWidget(QWidget *)));
    connect(openFile, SIGNAL(triggered()), this, SLOT(loadScan()));
    connect(saveFile, SIGNAL(triggered()), this, SLOT(saveScan()));
    connect(&CloudModel::Instance()->layerList, SIGNAL(selectLayer(int)), layerView, SLOT(selectLayer(int)));
@@ -55,7 +56,6 @@ bool MainWindow::loadScan(){
 
     const char *ptr = filename.toAscii().data();
     CloudModel::Instance()->loadFile(ptr, 1);
-    //reloadCloud();
     return true;
 }
 
@@ -84,14 +84,20 @@ void MainWindow::applyEditMode(){
     if(glarea->activeEditPlugin){
         glarea->activeEditPlugin->EndEdit(CloudModel::Instance(), glarea);
 
+        // Deactivate current plugin if clicked again
         if(glarea->activeEditPlugin == plugin){
+            plugin->EndEdit(CloudModel::Instance(), glarea);
             glarea->activeEditPlugin = NULL;
+            emit setSettingsWidget(new QWidget(this));
             return;
         }
         glarea->activeEditPlugin = NULL;
     }
 
     glarea->activeEditPlugin = plugin;
+
+    QWidget * settings = glarea->activeEditPlugin->getSettingsWidget(this);
+    emit setSettingsWidget(settings);
 
     plugin->StartEdit(action, CloudModel::Instance(), glarea);
 

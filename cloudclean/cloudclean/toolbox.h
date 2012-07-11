@@ -14,6 +14,9 @@ class Toolbox : public QDockWidget
 public:
     explicit Toolbox(QWidget *parent = 0);
     ~Toolbox();
+
+public slots:
+    void setSettingsWidget(QWidget * widget);
     
 private:
     Ui::Toolbox *ui;

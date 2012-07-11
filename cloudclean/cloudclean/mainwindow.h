@@ -20,7 +20,7 @@ public:
     
 signals:
     void reloadCloud();
-
+    void setSettingsWidget(QWidget *);
 public slots:
     bool loadScan();
     bool saveScan();

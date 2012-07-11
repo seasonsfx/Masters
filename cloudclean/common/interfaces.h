@@ -26,6 +26,7 @@ public:
     virtual bool wheelEvent(QWheelEvent*, CloudModel *, GLArea * ){return true;}
     virtual QList<QAction *> actions() const = 0;
     virtual QString getEditToolDescription(QAction *)=0;
+    virtual QWidget * getSettingsWidget(QWidget * glarea){return NULL;}
 
     // Get palletr button
     // Get settings widget

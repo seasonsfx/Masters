@@ -39,7 +39,6 @@ void PluginManager::loadPlugins(){
     foreach (QString fileName, pluginsDir.entryList(QDir::Files)){
         QString absfilepath = pluginsDir.absoluteFilePath(fileName);
         QPluginLoader loader;
-        //loader.setLoadHints(QLibrary::ExportExternalSymbolsHint);
         loader.setFileName(absfilepath);
         loader.load();
         qDebug() << loader.fileName();

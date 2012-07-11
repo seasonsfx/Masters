@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'toolbox.ui'
 **
-** Created: Thu Jul 5 12:55:21 2012
+** Created: Wed Jul 11 17:54:40 2012
 **      by: Qt User Interface Compiler version 4.8.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -45,6 +45,11 @@ public:
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QString::fromUtf8("scrollAreaWidgetContents"));
         scrollAreaWidgetContents->setGeometry(QRect(0, 0, 236, 448));
+        QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(scrollAreaWidgetContents->sizePolicy().hasHeightForWidth());
+        scrollAreaWidgetContents->setSizePolicy(sizePolicy);
         settingsArea->setWidget(scrollAreaWidgetContents);
 
         verticalLayout->addWidget(settingsArea);

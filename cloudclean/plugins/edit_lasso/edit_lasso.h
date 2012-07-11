@@ -14,6 +14,8 @@
 #include <CL/cl.h>
 #endif
 
+#include "settings.h"
+
 class GLArea;
 
 class EditLasso : public QObject, public EditPluginInterface
@@ -36,6 +38,7 @@ public:
     //bool wheelEvent(QWheelEvent*, CloudModel *, GLArea * ){}
     QList<QAction *> actions() const;
     QString getEditToolDescription(QAction *);
+    QWidget * getSettingsWidget(QWidget *glarea);
 
 private:
 
@@ -61,6 +64,8 @@ private:
     cl_program              program;
     cl_kernel               kernel;
     size_t                  kernelsize;
+
+    Settings *              settings;
 };
 
 #endif // EDITLASSO_H

@@ -12,3 +12,8 @@ Toolbox::~Toolbox()
 {
     delete ui;
 }
+
+void Toolbox::setSettingsWidget(QWidget * widget){
+    ui->settingsArea->setWidget(widget );
+    this->show();
+}

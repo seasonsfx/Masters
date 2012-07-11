@@ -2,10 +2,12 @@ include(../../shared.pri)
 
 TARGET = edit_lasso_cpu
 HEADERS += edit_lasso.h \
-    cpu_lasso.h
+    cpu_lasso.h \
+    settings.h
 
 
-SOURCES += edit_lasso.cpp
+SOURCES += edit_lasso.cpp \
+    settings.cpp
 
 INCLUDEPATH += \
         ../../cloudclean \
@@ -32,3 +34,6 @@ RESOURCES += \
 
 OTHER_FILES += \
     kernels/lasso.cl
+
+FORMS += \
+    settings.ui

@@ -20,10 +20,13 @@ EditLasso::EditLasso()
     foreach(QAction *editAction, actionList)
         editAction->setCheckable(true);
 
+    settings = new Settings();
+
 }
 
 EditLasso::~EditLasso()
 {
+    delete settings;
 }
 
 
@@ -184,8 +187,11 @@ void EditLasso::lassoToLayerCPU(CloudModel *cm, GLArea *glarea){
     /// Perform the lasso selection
     glm::mat4 gmat = glarea->cameraToClipMatrix * glarea->modelview_mat;
 
+    float depth = settings->getDepth();
+
     /// for each point
     for(unsigned int i = 0; i < cm->cloud->size(); i++){
+
         /// get point
         int idx = i;
         pcl::PointXYZI p = cm->cloud->points[idx];
@@ -193,6 +199,9 @@ void EditLasso::lassoToLayerCPU(CloudModel *cm, GLArea *glarea){
 
         /// project point
         proj(glm::value_ptr(gmat), point);
+
+        if(point[2] > depth || point[2] < 0.0f)
+            continue;
 
         /// make 2d
         float2 vertex = {point[0], point[1]};
@@ -414,6 +423,10 @@ QList<QAction *> EditLasso::actions() const{
 }
 QString EditLasso::getEditToolDescription(QAction *){
     return "Info";
+}
+
+QWidget * EditLasso::getSettingsWidget(QWidget *){
+    return settings;
 }
 
 Q_EXPORT_PLUGIN2(pnp_editlasso, EditLasso)

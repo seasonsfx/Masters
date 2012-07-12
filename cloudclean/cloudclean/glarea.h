@@ -27,6 +27,8 @@
 #include "cloudmodel.h"
 #include "MousePoles.h"
 
+#include "camera.h"
+
 #include <GL/glx.h>
 #undef KeyPress // Defined in X11/X.h, interferes with QEvent::KeyPress
 
@@ -104,6 +106,7 @@ public:
 
     EditPluginInterface * activeEditPlugin;
 
+    Camera camera;
 };
 
 #endif // GLWIDGET_H

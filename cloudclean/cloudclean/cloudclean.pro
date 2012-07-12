@@ -21,7 +21,8 @@ SOURCES += \
     glarea.cpp \
     layerview.cpp \
     pluginmanager.cpp \
-    toolbox.cpp
+    toolbox.cpp \
+    camera.cpp
 
 HEADERS  += \
     io.h \
@@ -33,7 +34,8 @@ HEADERS  += \
     glarea.h \
     layerview.h \
     pluginmanager.h \
-    toolbox.h
+    toolbox.h \
+    camera.h
 
 QMAKE_LFLAGS += -rdynamic
 

@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'toolbox.ui'
 **
-** Created: Wed Jul 11 17:54:40 2012
+** Created: Thu Jul 12 18:11:45 2012
 **      by: Qt User Interface Compiler version 4.8.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!

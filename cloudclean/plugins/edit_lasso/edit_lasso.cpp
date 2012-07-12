@@ -115,7 +115,7 @@ void EditLasso::lassoToLayerGPU(CloudModel * cm, GLArea * glarea){
 
     clError("CL 4", result);
 
-    glm::mat4 gmat = glarea->cameraToClipMatrix * glarea->modelview_mat;
+    Eigen::Affine3f gmat = glarea->camera.projectionMatrix() * glarea->camera.modelviewMatrix();
 
     clError("CL 4.1", result);
 
@@ -130,7 +130,7 @@ void EditLasso::lassoToLayerGPU(CloudModel * cm, GLArea * glarea){
     clError("CL 9", result);
     result = clSetKernelArg(kernel, 4, sizeof(int), (void*)&lasso_size);
     clError("CL 10", result);
-    result = clSetKernelArg(kernel, 5, sizeof(float) * 16, glm::value_ptr(gmat));
+    result = clSetKernelArg(kernel, 5, sizeof(float) * 16, gmat.data());
     clError("CL 11", result);
 
     // Enqueue the kernel
@@ -185,7 +185,7 @@ void EditLasso::lassoToLayerCPU(CloudModel *cm, GLArea *glarea){
     }
 
     /// Perform the lasso selection
-    glm::mat4 gmat = glarea->cameraToClipMatrix * glarea->modelview_mat;
+    Eigen::Affine3f gmat = glarea->camera.projectionMatrix() * glarea->camera.modelviewMatrix();
 
     float depth = settings->getDepth();
 
@@ -198,7 +198,7 @@ void EditLasso::lassoToLayerCPU(CloudModel *cm, GLArea *glarea){
         float point[4] = {p.x, p.y, p.z, p.intensity};
 
         /// project point
-        proj(glm::value_ptr(gmat), point);
+        proj(gmat.data(), point);
 
         if(point[2] > depth || point[2] < 0.0f)
             continue;

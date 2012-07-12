@@ -1,6 +1,7 @@
 #include "camera.h"
 #include <math.h>
 #include <Eigen/LU>
+#include <QDebug>
 
 using namespace Eigen;
 
@@ -46,6 +47,12 @@ void Camera::setPosition(const Eigen::Vector3f& pos)
     mModelviewMatrixDirty = true;
 }
 
+void Camera::adjustPosition(const Eigen::Vector3f& pos)
+{
+    mPosition += pos;
+    mModelviewMatrixDirty = true;
+}
+
 void Camera::setLookAt(const Eigen::Vector3f& lookat)
 {
     mLookAt = lookat;
@@ -78,6 +85,7 @@ void Camera::recalculateModelviewMatrix()
     mModelviewMatrix.setIdentity();
     mModelviewMatrix.linear() << side.transpose(), up.transpose(), -forward.transpose();
     mModelviewMatrix.translate(-mPosition);
+    qDebug("mPosition (%f, %f, %f)", mPosition.x(), mPosition.y(), mPosition.z());
 }
 
 void Camera::recalculateProjectionMatrix()
@@ -128,4 +136,18 @@ Eigen::Affine3f Camera::projectionMatrix() const
         const_cast<Camera*>(this)->recalculateProjectionMatrix();
     }
     return mProjectionMatrix;
+}
+
+void Camera::mouseClick(int x, int y){
+
+}
+void Camera::mouseRelease(int x, int y){
+
+}
+void Camera::mouseMove(int x, int y){
+
+}
+
+void Camera::mouseWheel(int val){
+    adjustPosition(0,0, val);
 }

@@ -6,9 +6,6 @@
 #define GL3_PROTOTYPES
 #include <../external/gl3.h>
 #include <GL/glu.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 
 #ifdef __APPLE__
 #include <OpenCL/opencl.h>
@@ -25,8 +22,6 @@
 #include <QMutex>
 
 #include "cloudmodel.h"
-#include "MousePoles.h"
-
 #include "camera.h"
 
 #include <GL/glx.h>
@@ -44,11 +39,7 @@ public:
                                const QString& vertexShaderPath,
                                const QString& fragmentShaderPath );
 
-    int test();
-
     Eigen::Vector2f normalized_mouse(int x, int y);
-    glm::mat4               cameraToClipMatrix;
-    glm::mat4               modelview_mat;
 
 protected:
     virtual void initializeGL();
@@ -72,28 +63,22 @@ private:
 
     QFont qFont;
 
-    CloudModel *            cm;
+    CloudModel *                            cm;
 
-    QGLFormat               glFormat;
-    QGLShaderProgram        point_shader;
+    QGLFormat                               glFormat;
+    QGLShaderProgram                        point_shader;
 
-    glm::vec4               offsetVec;
-    float                   aspectRatio;
+    int                                     start_move_x;
+    int                                     start_move_y;
 
-    int                     start_move_x;
-    int                     start_move_y;
-
-    float                     cfps;
-    float                     lastTime;
+    float                                   cfps;
+    float                                   lastTime;
 
     //TODO: Move out of here
-    bool                                filling;
-    std::vector<pcl::FPFHSignature33>   stats;
-    pcl::FPFHSignature33                mean;
-    pcl::FPFHSignature33                stdev;
-
-    boost::shared_ptr<glutil::ViewPole>     viewPole;
-    boost::shared_ptr<glutil::ObjectPole>   objtPole;
+    bool                                    filling;
+    std::vector<pcl::FPFHSignature33>       stats;
+    pcl::FPFHSignature33                    mean;
+    pcl::FPFHSignature33                    stdev;
 
 public:
     cl_platform_id          platform;

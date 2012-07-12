@@ -23,6 +23,9 @@ public:
     void setPosition(const Eigen::Vector3f& pos);
     void setPosition(float x, float y, float z)  { setPosition(Eigen::Vector3f(x, y, z)); }
 
+    void adjustPosition(const Eigen::Vector3f& pos);
+    void adjustPosition(float x, float y, float z)  { adjustPosition(Eigen::Vector3f(x, y, z)); }
+
     void setLookAt(const Eigen::Vector3f& lookat);
     void setLookAt(float x, float y, float z)  { setLookAt(Eigen::Vector3f(x, y, z)); }
 
@@ -48,6 +51,10 @@ public:
 
     Eigen::Affine3f projectionMatrix() const;
 
+    void mouseClick(int x, int y);
+    void mouseRelease(int x, int y);
+    void mouseMove(int x, int y);
+    void mouseWheel(int val);
 
 private:
     void recalculateModelviewMatrix();

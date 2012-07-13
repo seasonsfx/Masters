@@ -325,11 +325,8 @@ void GLArea::mousePressEvent ( QMouseEvent * event ){
     start_move_y = 0;
     moved = false;
 
-    if(event->button() == Qt::RightButton)
-        camera.mouseDown(event->x(), event->y());
-    else if (event->button() == Qt::LeftButton)
-        camera.mouseDown(event->x(), event->y());
 
+    camera.mouseDown(event->x(), event->y(), event->button());
 
     updateGL();
 }

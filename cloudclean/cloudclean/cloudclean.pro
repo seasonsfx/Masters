@@ -13,7 +13,6 @@ TEMPLATE = app
 
 SOURCES += \
     main.cpp \
-    MousePoles.cpp \
     layerlist.cpp \
     layer.cpp \
     mainwindow.cpp \
@@ -26,7 +25,6 @@ SOURCES += \
 
 HEADERS  += \
     io.h \
-    MousePoles.h \
     layerlist.h \
     layer.h \
     mainwindow.h \

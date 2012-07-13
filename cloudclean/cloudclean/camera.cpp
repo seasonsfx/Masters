@@ -19,6 +19,7 @@ Camera::Camera()
     mMouseDown = false;
     moveSensitivity = 0.05;
     mObjectOrientationMatrix.setIdentity();
+    mouseButtonPressed = 0;
 }
 
 Camera::~Camera()
@@ -97,7 +98,7 @@ void Camera::recalculateModelviewMatrix()
     mModelviewMatrix.linear() << side.transpose(), up.transpose(), -forward.transpose();
     mModelviewMatrix.translate(-mPosition);
     mModelviewMatrix *=mObjectOrientationMatrix.matrix();
-    qDebug("mPosition (%f, %f, %f)", mPosition.x(), mPosition.y(), mPosition.z());
+    //qDebug("mPosition (%f, %f, %f)", mPosition.x(), mPosition.y(), mPosition.z());
 }
 
 void Camera::recalculateProjectionMatrix()
@@ -123,8 +124,8 @@ void Camera::recalculateProjectionMatrix()
 }
 
 void Camera::setObjectOrientationMatrix(const Eigen::Affine3f& objectorient){
-    mObjectOrientationMatrix = objectorient;
-    mModelviewMatrixDirty = true;
+    //mObjectOrientationMatrix = objectorient;
+    //mModelviewMatrixDirty = true;
 }
 
 void Camera::setModelviewMatrix(const Eigen::Affine3f& modelview)
@@ -155,13 +156,16 @@ Eigen::Affine3f Camera::projectionMatrix() const
     return mProjectionMatrix;
 }
 
-void Camera::mouseDown(int x, int y){
+void Camera::mouseDown(int x, int y, int button){
+    mouseButtonPressed = button;
     mouseStart << x*moveSensitivity, y*moveSensitivity;
-    qDebug("Mouse start: (%f, %f)", mouseStart.x(), mouseStart.y());
+    //qDebug("Mouse start: (%f, %f)", mouseStart.x(), mouseStart.y());
     savedLookAt = mLookAt;
+    savedObjectOrientationMatrix = mObjectOrientationMatrix;
     mMouseDown = true;
 }
 void Camera::mouseRelease(int x, int y){
+    mouseButtonPressed = 0;
     mMouseDown = false;
 }
 void Camera::mouseMove(int x, int y){
@@ -174,22 +178,29 @@ void Camera::mouseMove(int x, int y){
     Vector3f up = side.cross(forward);
 
 
-    up = Vector3f(0,1,0); // Keep left right look level
-
-    AngleAxis<float> rotX(-rot.x()*moveSensitivity, up);
-    AngleAxis<float> rotY(-rot.y()*moveSensitivity, side);
-
-    mLookAt = (rotX * rotY * (savedLookAt-mPosition)) + mPosition;
+    if(mouseButtonPressed == LEFT_BTN){
+        up = Vector3f(0,1,0); // Keep side look level
+        AngleAxis<float> rotX(-rot.x()*moveSensitivity, up);
+        AngleAxis<float> rotY(-rot.y()*moveSensitivity, side);
+        mLookAt = (rotX * rotY * (savedLookAt-mPosition)) + mPosition;
+    }
+    else if(mouseButtonPressed == RIGHT_BTN){
+        //Vector3f up(0, 1, 0);
+        //Vector3f side(1, 0, 0);
+        AngleAxis<float> rotX(-rot.x()*moveSensitivity, up);
+        AngleAxis<float> rotY(-rot.y()*moveSensitivity, side);
+        mObjectOrientationMatrix = rotX * rotY * savedObjectOrientationMatrix;
+    }
 
     //qDebug("Offset: (%f, %f)", offset.x(), offset.y());
-    qDebug("Look at: (%f, %f, %f)", mLookAt.x(), mLookAt.y(), mLookAt.z());
+    //qDebug("Look at: (%f, %f, %f)", mLookAt.x(), mLookAt.y(), mLookAt.z());
 
     mModelviewMatrixDirty = true;
 }
 
 void Camera::mouseWheel(int val){
     // Mouse seems to move in 120 increments
-    qDebug("Wheel: %d", val);
+    //qDebug("Wheel: %d", val);
     val = val/120.0f;
     adjustPosition(0,0, val*0.2);
 }

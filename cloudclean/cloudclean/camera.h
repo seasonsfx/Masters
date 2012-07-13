@@ -51,7 +51,7 @@ public:
 
     Eigen::Affine3f projectionMatrix() const;
 
-    void mouseDown(int x, int y);
+    void mouseDown(int x, int y, int button);
     void mouseRelease(int x, int y);
     void mouseMove(int x, int y);
     void mouseWheel(int val);
@@ -60,9 +60,15 @@ private:
     void recalculateModelviewMatrix();
     void recalculateProjectionMatrix();
 
+public:
+    static const int LEFT_BTN = 1;
+    static const int RIGHT_BTN = 2;
+
 private:
+    int mouseButtonPressed;
     Eigen::Vector2f mouseStart;
     Eigen::Vector3f savedLookAt;
+    Eigen::Affine3f savedObjectOrientationMatrix;
     bool mMouseDown;
     float moveSensitivity;
 

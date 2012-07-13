@@ -318,9 +318,9 @@ void GLArea::mousePressEvent ( QMouseEvent * event ){
     moved = false;
 
     if(event->button() == Qt::RightButton)
-        camera.mouseClick(event->x(), event->y());
+        camera.mouseDown(event->x(), event->y());
     else if (event->button() == Qt::LeftButton)
-        camera.mouseClick(event->x(), event->y());
+        camera.mouseDown(event->x(), event->y());
 
 
     updateGL();
@@ -486,11 +486,11 @@ void GLArea::keyPressEvent ( QKeyEvent * event ){
             break;
     case Qt::Key_W:
     case Qt::Key_Up:
-            camera.adjustPosition(0,offset,0);
+            camera.adjustPosition(0,-offset,0);
             break;
     case Qt::Key_S:
     case Qt::Key_Down:
-            camera.adjustPosition(0,-offset,0);
+            camera.adjustPosition(0,offset,0);
             break;
     case Qt::Key_Q:
             camera.adjustPosition(0,0, offset);

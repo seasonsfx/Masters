@@ -56,6 +56,7 @@ bool MainWindow::loadScan(){
 
     const char *ptr = filename.toAscii().data();
     CloudModel::Instance()->loadFile(ptr, 1);
+    glarea->modelReloaded();
     return true;
 }
 

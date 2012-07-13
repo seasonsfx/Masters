@@ -43,8 +43,8 @@ public:
     Eigen::Vector3f lookAt() const  { return mLookAt; }
     Eigen::Vector3f up() const  { return mUp; }
 
+    void setObjectOrientationMatrix(const Eigen::Affine3f& objectorient);
     void setModelviewMatrix(const Eigen::Affine3f& modelview);
-
     void setProjectionMatrix(const Eigen::Affine3f& projection);
 
     Eigen::Affine3f modelviewMatrix() const;
@@ -71,6 +71,8 @@ private:
     Eigen::Vector3f mUp;
     float mFoV, mAspect, mDepthNear, mDepthFar;
 
+    Eigen::Affine3f mObjectOrientationMatrix;
+    bool mObjectOrientationMatrixDirty;
     Eigen::Affine3f mModelviewMatrix;
     bool mModelviewMatrixDirty;
     Eigen::Affine3f mProjectionMatrix;

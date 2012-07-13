@@ -259,6 +259,14 @@ void GLArea::paintGL(){
 
 }
 
+void GLArea::modelReloaded(){
+    Eigen::Affine3f orientation;
+    Eigen::Matrix3f rot; rot = cm->cloud->sensor_orientation_;
+    orientation.linear() = rot;
+    orientation.translation() = cm->cloud->sensor_origin_.head(3);
+    camera.setObjectOrientationMatrix(orientation);
+}
+
 void GLArea::updateFps(float frameTime)
 {
     /*float time = 0.5f*frameTime + 0.5*lastTime;

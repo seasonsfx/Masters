@@ -7,7 +7,7 @@ using namespace Eigen;
 
 Camera::Camera()
 {
-    mFoV = 90.0f;
+    mFoV = 45.0f;
     mAspect = 1.0f;
     mDepthNear = 1.0f;
     mDepthFar = 100.0f;
@@ -18,6 +18,7 @@ Camera::Camera()
     mProjectionMatrixDirty = true;
     mMouseDown = false;
     moveSensitivity = 0.05;
+    mObjectOrientationMatrix.setIdentity();
 }
 
 Camera::~Camera()
@@ -95,6 +96,7 @@ void Camera::recalculateModelviewMatrix()
     mModelviewMatrix.setIdentity();
     mModelviewMatrix.linear() << side.transpose(), up.transpose(), -forward.transpose();
     mModelviewMatrix.translate(-mPosition);
+    mModelviewMatrix *=mObjectOrientationMatrix.matrix();
     qDebug("mPosition (%f, %f, %f)", mPosition.x(), mPosition.y(), mPosition.z());
 }
 
@@ -118,6 +120,11 @@ void Camera::recalculateProjectionMatrix()
     mProjectionMatrix(3, 2) = -1;
     mProjectionMatrix(2, 3) = -2 * mDepthNear * mDepthFar / deltaZ;
     mProjectionMatrix(3, 3) = 0;
+}
+
+void Camera::setObjectOrientationMatrix(const Eigen::Affine3f& objectorient){
+    mObjectOrientationMatrix = objectorient;
+    mModelviewMatrixDirty = true;
 }
 
 void Camera::setModelviewMatrix(const Eigen::Affine3f& modelview)
@@ -166,6 +173,8 @@ void Camera::mouseMove(int x, int y){
     Vector3f side = forward.cross(mUp).normalized();
     Vector3f up = side.cross(forward);
 
+
+    up = Vector3f(0,1,0); // Keep left right look level
 
     AngleAxis<float> rotX(-rot.x()*moveSensitivity, up);
     AngleAxis<float> rotY(-rot.y()*moveSensitivity, side);

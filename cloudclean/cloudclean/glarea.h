@@ -41,11 +41,14 @@ public:
 
     Eigen::Vector2f normalized_mouse(int x, int y);
 
+    void modelReloaded();
+
 protected:
     virtual void initializeGL();
     virtual void resizeGL( int w, int h );
     virtual void paintGL();
     void updateFps(float frameTime);
+
 
     void click(int x, int y);
 

@@ -67,10 +67,23 @@ public:
 private:
     int mouseButtonPressed;
     Eigen::Vector2f mouseStart;
-    Eigen::Vector3f savedLookAt;
-    Eigen::Affine3f savedObjectOrientationMatrix;
     bool mMouseDown;
     float moveSensitivity;
+
+    Eigen::Vector3f startAxisX;
+    Eigen::Vector3f startAxisY;
+    Eigen::Vector3f startAxisZ;
+
+    Eigen::Vector3f axisX;
+    Eigen::Vector3f axisY;
+    Eigen::Vector3f axisZ;
+
+    Eigen::Vector3f forward;
+    Eigen::Vector3f savedForward;
+
+
+    Eigen::Affine3f savedObjectOrientationMatrix;
+
 
     Eigen::Vector3f mPosition;
     Eigen::Vector3f mLookAt;

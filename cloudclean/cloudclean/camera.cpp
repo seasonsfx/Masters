@@ -2,17 +2,28 @@
 #include <math.h>
 #include <Eigen/LU>
 #include <QDebug>
+#include <iostream>
 
 using namespace Eigen;
 
 Camera::Camera()
 {
-    mFoV = 120.0f;
+    mFoV = 60.0f;
     mAspect = 1.0f;
     mDepthNear = 1.0f;
     mDepthFar = 100.0f;
     mPosition = Vector3f(0, 0, -20);
     mLookAt = Vector3f(0, 0, 1);
+    forward = Vector3f(0, 0, 1);
+
+    startAxisX = Vector3f(1, 0, 0);
+    startAxisY = Vector3f(0, 1, 0);
+    startAxisZ = Vector3f(0, 0, 1);
+
+    axisX = Vector3f(1, 0, 1);
+    axisY = Vector3f(0, 1, 0);
+    axisZ = Vector3f(0, 0, 1);
+
     mUp = Vector3f(0, 1, 0);
     mModelviewMatrixDirty = true;
     mProjectionMatrixDirty = true;
@@ -54,20 +65,21 @@ void Camera::setPosition(const Eigen::Vector3f& pos)
 void Camera::adjustPosition(const Eigen::Vector3f& pos)
 {
     // Our looking direction
-    Vector3f forward = (mLookAt - mPosition).normalized();
+    //Vector3f forward = (mLookAt - mPosition).normalized();
     Vector3f side = forward.cross(mUp).normalized();
     Vector3f up = side.cross(forward);
 
     Vector3f offset  = pos.x() * side + pos.y() * up + pos.z() * forward;
 
     mPosition += offset;
-    mLookAt += offset;
+    //mLookAt += offset;
     mModelviewMatrixDirty = true;
 }
 
 void Camera::setLookAt(const Eigen::Vector3f& lookat)
 {
     mLookAt = lookat;
+    forward = (mLookAt - mPosition).normalized();
     mModelviewMatrixDirty = true;
 }
 
@@ -87,7 +99,7 @@ void Camera::recalculateModelviewMatrix()
     // Code from Mesa project, src/glu/sgi/libutil/project.c
     mModelviewMatrixDirty = false;
     // Our looking direction
-    Vector3f forward = (mLookAt - mPosition).normalized();
+    //Vector3f forward = (mLookAt - mPosition).normalized();
 
     Vector3f side = forward.cross(mUp).normalized();
 
@@ -97,7 +109,8 @@ void Camera::recalculateModelviewMatrix()
     mModelviewMatrix.setIdentity();
     mModelviewMatrix.linear() << side.transpose(), up.transpose(), -forward.transpose();
     mModelviewMatrix.translate(-mPosition);
-    mModelviewMatrix *=mObjectOrientationMatrix.matrix();
+    mModelviewMatrix *=mObjectOrientationMatrix.matrix();\
+
     //qDebug("mPosition (%f, %f, %f)", mPosition.x(), mPosition.y(), mPosition.z());
 }
 
@@ -124,8 +137,8 @@ void Camera::recalculateProjectionMatrix()
 }
 
 void Camera::setObjectOrientationMatrix(const Eigen::Affine3f& objectorient){
-    //mObjectOrientationMatrix = objectorient;
-    //mModelviewMatrixDirty = true;
+    mObjectOrientationMatrix = objectorient;
+    mModelviewMatrixDirty = true;
 }
 
 void Camera::setModelviewMatrix(const Eigen::Affine3f& modelview)
@@ -160,7 +173,8 @@ void Camera::mouseDown(int x, int y, int button){
     mouseButtonPressed = button;
     mouseStart << x*moveSensitivity, y*moveSensitivity;
     //qDebug("Mouse start: (%f, %f)", mouseStart.x(), mouseStart.y());
-    savedLookAt = mLookAt;
+    //savedLookAt = mLookAt;
+    savedForward = forward;
     savedObjectOrientationMatrix = mObjectOrientationMatrix;
     mMouseDown = true;
 }
@@ -175,20 +189,24 @@ void Camera::mouseMove(int x, int y){
         return;
     Vector2f rot = Vector2f(x*moveSensitivity,y*moveSensitivity) - mouseStart;
 
-    Vector3f forward = (mLookAt - mPosition).normalized();
-    Vector3f side = forward.cross(mUp).normalized();
-    Vector3f up = side.cross(forward);
-
-
     if(mouseButtonPressed == LEFT_BTN){
         //up = Vector3f(0,1,0); // Keep side look level
-        AngleAxis<float> rotX(-rot.x()*moveSensitivity, up);
-        AngleAxis<float> rotY(-rot.y()*moveSensitivity, side);
-        mLookAt = (rotX * rotY * (savedLookAt-mPosition)) + mPosition;
+
+        AngleAxis<float> rotX(-rot.x()*moveSensitivity, startAxisY);
+        AngleAxis<float> rotY(rot.y()*moveSensitivity, startAxisX);
+
+        //Vector3f tmp(savedLookAt-mPosition);
+
+
+        forward = (rotX * rotY) * savedForward;
+        forward.normalize();
+
+        //qDebug("Forward: (%f, %f, %f)", forward.x(), forward.y(), forward.z());
     }
     else if(mouseButtonPressed == RIGHT_BTN){
-        //Vector3f up(0, 1, 0);
-        //Vector3f side(1, 0, 0);
+        Vector3f side = forward.cross(mUp).normalized();
+        Vector3f up = side.cross(forward);
+
         AngleAxis<float> rotX(-rot.x()*moveSensitivity, up);
         AngleAxis<float> rotY(-rot.y()*moveSensitivity, side);
         mObjectOrientationMatrix = rotX * rotY * savedObjectOrientationMatrix;

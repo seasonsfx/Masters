@@ -96,13 +96,12 @@ pcl::PointCloud<pcl::PointXYZI>::Ptr read_ptx(const char* filename, int subsampl
 	// Registration matrix
 	Eigen::Matrix3f reg_mat;
 
-
-    for(int col = 0; col < 3; col++ )
-        for(int row = 0; row < 3; row++ )
+    for(int row = 0; row < 3; row++ )
+        for(int col = 0; col < 3; col++ )
             ptx_file >> reg_mat(row,col);
 
 	// Registration quaternion
-	cloud->sensor_orientation_ = Eigen::Quaternionf(reg_mat);
+    cloud->sensor_orientation_ = Eigen::Quaternionf(reg_mat.transpose());
 
     // Discard registration mat4
 	Eigen::Matrix4f reg_mat4;

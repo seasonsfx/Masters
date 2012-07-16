@@ -84,17 +84,17 @@ private:
     pcl::FPFHSignature33                    stdev;
 
 public:
-    cl_platform_id          platform;
-    cl_device_id            device;
-    cl_context              context;
-    cl_command_queue        cmd_queue;
+    cl_platform_id                          platform;
+    cl_device_id                            device;
+    cl_context                              context;
+    cl_command_queue                        cmd_queue;
 
-    Qt::MouseButton         mouseDown;
-    bool                    moved;
+    Qt::MouseButton                         mouseDown;
+    bool                                    moved;
 
-    EditPluginInterface * activeEditPlugin;
+    EditPluginInterface *                   activeEditPlugin;
 
-    Camera camera;
+    Camera                                  camera;
 };
 
 #endif // GLWIDGET_H

@@ -53,19 +53,20 @@ private:
     void addLassoPoint(Eigen::Vector2f point);
     void moveLasso(Eigen::Vector2f point);
 
-    QList <QAction *> actionList;
-    QAction *editLassoCPU;
-    QAction *editLassoGPU;
-    QGLShaderProgram        lasso_shader;
-    QGLBuffer               lasso_buffer;
-    QGLBuffer               lasso_index;
-    bool                    lasso_active;
-    std::vector<Eigen::Vector2f>   lasso;
-    cl_program              program;
-    cl_kernel               kernel;
-    size_t                  kernelsize;
+    QList <QAction *>               actionList;
+    QAction *                       editLassoCPU;
+    QAction *                       editLassoGPU;
 
-    Settings *              settings;
+    QGLShaderProgram                lasso_shader;
+    QGLBuffer                       lasso_buffer;
+    QGLBuffer                       lasso_index;
+    bool                            lasso_active;
+    std::vector<Eigen::Vector2f>    lasso;
+    cl_program                      program;
+    cl_kernel                       kernel;
+    size_t                          kernelsize;
+
+    Settings *                      settings;
 };
 
 #endif // EDITLASSO_H

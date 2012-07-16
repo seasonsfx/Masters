@@ -7,6 +7,10 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include "utilities.h"
+#include <iostream>
+#include <QPolygon>
+#include <QPainter>
+#include <QTime>
 
 EditLasso::EditLasso()
 {
@@ -49,7 +53,6 @@ void EditLasso::addLassoPoint(Eigen::Vector2f point){
         lasso.back() = point;
         lasso.push_back(end);
     }
-
 }
 
 void EditLasso::lassoToLayer(CloudModel * cm, GLArea * glarea){
@@ -115,7 +118,7 @@ void EditLasso::lassoToLayerGPU(CloudModel * cm, GLArea * glarea){
 
     clError("CL 4", result);
 
-    Eigen::Affine3f gmat = glarea->camera.projectionMatrix() * glarea->camera.modelviewMatrix();
+    Eigen::Matrix4f gmat = glarea->camera.projectionMatrix().matrix() * glarea->camera.modelviewMatrix().matrix();
 
     clError("CL 4.1", result);
 
@@ -185,7 +188,8 @@ void EditLasso::lassoToLayerCPU(CloudModel *cm, GLArea *glarea){
     }
 
     /// Perform the lasso selection
-    Eigen::Affine3f gmat = glarea->camera.projectionMatrix() * glarea->camera.modelviewMatrix();
+    Eigen::Matrix4f gmat = glarea->camera.projectionMatrix().matrix() * glarea->camera.modelviewMatrix().matrix();
+    float * matdata = gmat.data();
 
     float depth = settings->getDepth();
 
@@ -198,7 +202,7 @@ void EditLasso::lassoToLayerCPU(CloudModel *cm, GLArea *glarea){
         float point[4] = {p.x, p.y, p.z, p.intensity};
 
         /// project point
-        proj(gmat.data(), point);
+        proj(matdata, point);
 
         if(point[2] > depth || point[2] < 0.0f)
             continue;
@@ -238,43 +242,57 @@ void EditLasso::lassoToLayerCPU(CloudModel *cm, GLArea *glarea){
 
 
 void EditLasso::paintGL(CloudModel *, GLArea * glarea){
-    // Draw lasso shader
-    glClear(GL_DEPTH_BUFFER_BIT );
-    lasso_shader.bind();
-    Eigen::Matrix4f ortho;
-    ortho.setIdentity();
 
-    glUniformMatrix4fv(lasso_shader.uniformLocation("ortho"), 1, GL_FALSE, ortho.data());
+
+    lasso_shader.bind();
+
+    float colour[4] = {0.0f, 0.0f, 1.0f, 0.5f};
+    glUniform4fv(lasso_shader.uniformLocation("planeColour"), 1, colour);
+    float depth = (settings->getDepth()*2)-1;
+    glUniform1f(lasso_shader.uniformLocation("depth"), depth);
+
     glError("300");
     lasso_buffer.bind();
-    float lasso_data[4];
-    lasso_buffer.write(0, reinterpret_cast<const void *> (lasso_data), sizeof(lasso_data));
 
     glError("305");
 
     lasso_shader.enableAttributeArray( "point" );
     lasso_shader.setAttributeBuffer( "point", GL_FLOAT, 0, 2 );
     glError("309");
-    if(lasso.size() > 1){
-        for(unsigned int i = 0; i < lasso.size()-1; i++){
-            lasso_data[0] = lasso[i].x();
-            lasso_data[1] = lasso[i].y();
-            lasso_data[2] = lasso[i+1].x();
-            lasso_data[3] = lasso[i+1].y();
-            lasso_buffer.write(0, reinterpret_cast<const void *> (lasso_data), sizeof(lasso_data));
-            glDrawArrays( GL_LINES, 0, 4);
-        }
 
-        lasso_data[0] = lasso[0].x();
-        lasso_data[1] = lasso[0].y();
-        lasso_buffer.write(0, reinterpret_cast<const void *> (lasso_data), sizeof(lasso_data));
-        glDrawArrays( GL_LINES, 0, 4);
+    float square[8] = {
+        -1.0f, -1.0f,
+        1.0f, -1.0f,
+        1.0f, 1.0f,
+        -1.0f, 1.0
+        };
 
-    }
+    lasso_buffer.write(0, reinterpret_cast<const void *> (square), sizeof(square));
+    glPointSize(5);
+    glDrawArrays( GL_TRIANGLE_FAN, 0, 4);
 
     lasso_buffer.release();
     lasso_shader.release();
     glError("329");
+
+
+    QPainter painter(glarea);
+    painter.beginNativePainting();
+    painter.setPen(Qt::green);
+
+    QPolygonF polygon;
+
+    // Conversion is a bit of a hack
+    for(auto p: lasso){
+        float x = (p.x()+1)*(glarea->width()/2.0f);
+        float y = (-p.y()+1)*(glarea->height()/2.0f);
+        polygon << QPointF(x, y);
+    }
+
+    painter.drawPolygon(polygon);
+
+    painter.endNativePainting();
+
 }
 
 bool EditLasso::mouseDoubleClickEvent  (QMouseEvent *event, CloudModel * cm, GLArea * glarea){
@@ -288,10 +306,6 @@ bool EditLasso::mouseDoubleClickEvent  (QMouseEvent *event, CloudModel * cm, GLA
     }
     else if(lasso.size() > 2){
         lasso.pop_back();
-        qDebug("LASSO final size: %d", lasso.size());
-        for(auto i: lasso){
-            qDebug("(%f, %f)", i.x(), i.y());
-        }
         lassoToLayer(cm, glarea);
     }
 
@@ -316,7 +330,8 @@ bool EditLasso::StartEdit(QAction *action, CloudModel *cm, GLArea *glarea){
     }
 
     // OpenGL
-    if (!glarea->prepareShaderProgram(lasso_shader, ":/shaders/lasso.vert", ":/shaders/lasso.frag" ))
+    //if (!glarea->prepareShaderProgram(lasso_shader, ":/shaders/lasso.vert", ":/shaders/lasso.frag" ))
+    if (!glarea->prepareShaderProgram(lasso_shader, "/home/rickert/Masters/cloudclean/plugins/edit_lasso/shaders/lasso.vert", "/home/rickert/Masters/cloudclean/plugins/edit_lasso/shaders/lasso.frag" ))
         return false;
 
     lasso_shader.bind();
@@ -327,7 +342,7 @@ bool EditLasso::StartEdit(QAction *action, CloudModel *cm, GLArea *glarea){
         qWarning() << "Could not bind vertex buffer to the context";
         return false;
     }
-    lasso_buffer.allocate(sizeof(float) * 12);
+    lasso_buffer.allocate(sizeof(float) * 2 * 4);
     if ( !lasso_shader.bind() )
     {
         qWarning() << "Could not bind shader program to context";
@@ -384,6 +399,8 @@ bool EditLasso::StartEdit(QAction *action, CloudModel *cm, GLArea *glarea){
         }
 
     }
+
+    connect(settings, SIGNAL(depthChanged(int)), glarea, SLOT(updateGL()), Qt::UniqueConnection);
 
     return true;
 }

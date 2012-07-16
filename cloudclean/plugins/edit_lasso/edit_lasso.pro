@@ -33,7 +33,9 @@ RESOURCES += \
     edit_lasso.qrc
 
 OTHER_FILES += \
-    kernels/lasso.cl
+    kernels/lasso.cl \
+    shaders/lasso.vert \
+    shaders/lasso.frag
 
 FORMS += \
     settings.ui

@@ -7,7 +7,7 @@ using namespace Eigen;
 
 Camera::Camera()
 {
-    mFoV = 45.0f;
+    mFoV = 120.0f;
     mAspect = 1.0f;
     mDepthNear = 1.0f;
     mDepthFar = 100.0f;
@@ -168,6 +168,8 @@ void Camera::mouseRelease(int x, int y){
     mouseButtonPressed = 0;
     mMouseDown = false;
 }
+
+// TODO: object roation should be more inteligent
 void Camera::mouseMove(int x, int y){
     if(!mMouseDown)
         return;
@@ -179,7 +181,7 @@ void Camera::mouseMove(int x, int y){
 
 
     if(mouseButtonPressed == LEFT_BTN){
-        up = Vector3f(0,1,0); // Keep side look level
+        //up = Vector3f(0,1,0); // Keep side look level
         AngleAxis<float> rotX(-rot.x()*moveSensitivity, up);
         AngleAxis<float> rotY(-rot.y()*moveSensitivity, side);
         mLookAt = (rotX * rotY * (savedLookAt-mPosition)) + mPosition;

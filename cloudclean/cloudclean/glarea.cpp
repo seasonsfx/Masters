@@ -149,12 +149,14 @@ void GLArea::resizeGL( int w, int h )
 
 void GLArea::paintGL(){
 
-    // This is reet by qpainter
-    glEnable(GL_DEPTH_TEST);
-
     QTime time;
     time.start();
 
+    // This is reet by qpainter
+    glEnable(GL_DEPTH_TEST);
+    glEnable (GL_BLEND);
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glDepthFunc(GL_LEQUAL);
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
     point_shader.bind();
@@ -195,7 +197,6 @@ void GLArea::paintGL(){
     if(activeEditPlugin)
         activeEditPlugin->paintGL(cm, this);
 
-
     //////////////////////////////////////
 
     QPainter painter(this);
@@ -221,11 +222,6 @@ void GLArea::paintGL(){
 
     QString col1Text,col0Text;
 
-    updateFps(time.elapsed());
-
-    painter.endNativePainting();
-    painter.save();
-
     if(cm->isLoaded())
     {
 
@@ -237,14 +233,10 @@ void GLArea::paintGL(){
         /*
         if(fov>5) col0Text += QString("FOV: %1\n").arg(fov);
         else col0Text += QString("FOV: Ortho\n");
-        if ((cfps>0) && (cfps<999))
-            col0Text += QString("FPS: %1\n").arg(cfps,7,'f',1);
         if ((clipRatioNear!=1) || (clipRatioFar!=1))
             col0Text += QString("Clipping: N:%1 F:%2\n").arg(clipRatioNear,7,'f',1).arg(clipRatioFar,7,'f',1);
 
         */
-        //painter.drawLine ( 0, 0, 50, 50 );
-        //painter.drawText(50, 50, "LALALALALALALALALALAL");
         painter.drawText(Column_0, Qt::AlignLeft | Qt::TextWordWrap, col1Text);
         painter.drawText(Column_1, Qt::AlignLeft | Qt::TextWordWrap, col0Text);
         //if(mm()->cm.Tr != Matrix44f::Identity() ) displayMatrix(painter, Column_2);
@@ -253,9 +245,9 @@ void GLArea::paintGL(){
 
     //////////////////////////////////////////
 
-    painter.restore();
-    painter.beginNativePainting();
     painter.endNativePainting();
+
+    updateFps(time.elapsed());
 
 }
 
@@ -328,7 +320,7 @@ void GLArea::mousePressEvent ( QMouseEvent * event ){
 
     camera.mouseDown(event->x(), event->y(), event->button());
 
-    updateGL();
+    //updateGL();
 }
 
 void GLArea::mouseReleaseEvent ( QMouseEvent * event ){
@@ -342,7 +334,7 @@ void GLArea::mouseReleaseEvent ( QMouseEvent * event ){
         camera.mouseRelease(event->x(), event->y());
 
     if(!moved){
-        click(event->x(), event->y());
+        //click(event->x(), event->y());
     }
 
     updateGL();

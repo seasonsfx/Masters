@@ -17,6 +17,12 @@ public:
     
     float getDepth();
 
+public slots:
+    void depthChange(int);
+
+signals:
+    void depthChanged(int);
+
 private:
     Ui::Settings *ui;
 };

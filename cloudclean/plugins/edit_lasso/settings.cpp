@@ -26,7 +26,6 @@ float Settings::getDepth(){
     float val = ui->horizontalSlider->value()/(float)ui->horizontalSlider->maximum();
     float steepness = 100;
     float normval = (std::log(val)+steepness)/steepness;
-    qDebug("Normval: %f", normval);
     return normval;
 }
 

@@ -251,6 +251,9 @@ void EditLasso::paintGL(CloudModel *, GLArea * glarea){
     float depth = (settings->getDepth()*2)-1;
     glUniform1f(lasso_shader.uniformLocation("depth"), depth);
 
+    glUniformMatrix4fv(lasso_shader.uniformLocation("modelview"), 1, false, glarea->camera.modelviewMatrix().matrix().data());
+    glUniformMatrix4fv(lasso_shader.uniformLocation("projection"), 1, false, glarea->camera.projectionMatrix().matrix().data());
+
     glError("300");
     lasso_buffer.bind();
 

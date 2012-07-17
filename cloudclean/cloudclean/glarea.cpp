@@ -27,6 +27,7 @@ GLArea::GLArea(QWidget* parent )
     filling = false;
     
     camera.setDepthRange(0.1f, 100.0f);
+    camera.setAspect(this->width() / float(this->height()));
 
     moved = false;
     start_move_x = 0;
@@ -50,6 +51,8 @@ GLArea::GLArea(QWidget* parent )
     // overlay painting related
     setAutoFillBackground(false);    // OpenCL
     clGetPlatformIDs(1, &platform, NULL);
+
+
 
     srand (time(NULL));
 }
@@ -140,7 +143,7 @@ bool GLArea::prepareShaderProgram(QGLShaderProgram & shader, const QString& vert
 
 void GLArea::resizeGL( int w, int h )
 {
-    camera.setAspect(h / (float)w);
+    camera.setAspect(w / (float)h);
     point_shader.bind();
     glUniformMatrix4fv(point_shader.uniformLocation("cameraToClipMatrix"), 1, GL_FALSE, camera.projectionMatrix().data());
     glError("256");

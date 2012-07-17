@@ -7,7 +7,8 @@
 #include <exception>
 #include <stdexcept>
 #include <sstream>
-#include <stdlib.h>
+#include <cstdlib>
+#include <cstdio>
 #include <assert.h>
 #include <pcl/io/io.h>
 #include <pcl/point_types.h>
@@ -69,74 +70,116 @@ pcl::PointCloud<pcl::PointXYZI>::Ptr read_ptx(const char* filename, int subsampl
 	assert(subsample%2 == 0 || subsample == 1);
 
     // Makes things faster apparently
-    std::cin.sync_with_stdio(false);
+    //std::cin.sync_with_stdio(false);
 
-	std::ifstream ptx_file(filename);
+    //std::ifstream ptx_file(filename);
+
 	pcl::PointCloud<pcl::PointXYZI>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZI>);
 	
+    FILE * fp;
+    fp = fopen (filename,"r");
+    if (fp==NULL)
+    {
+        assert(false);
+    }
+
 	// Contains nans
 	cloud->is_dense = false;
 
-	// Matrix dimentions
-	ptx_file >> cloud->width;
-	ptx_file >> cloud->height;
+    // Scan dimentions
+    int width, height;
+    assert(std::fscanf(fp,"%i\n",&width) != 0);
+    assert(std::fscanf(fp,"%i\n",&height) != 0);
 
 	// Subsample
-	cloud->width/=subsample;
-	cloud->height/=subsample;
+    cloud->width=width/subsample;
+    cloud->height=height/subsample;
 
 	cloud->points.resize (cloud->width * cloud->height);
 
+    float x, y, z, intensity;
+
 	// Camera offset
-	ptx_file >> cloud->sensor_origin_[0];
-	ptx_file >> cloud->sensor_origin_[1];
-	ptx_file >> cloud->sensor_origin_[2];
+
+    assert(std::fscanf(fp,"%f %f %f\n", &x, &y, &z) != 0);
+    cloud->sensor_origin_[0] = x;
+    cloud->sensor_origin_[1] = y;
+    cloud->sensor_origin_[2] = z;
 	cloud->sensor_origin_[3] = 0.0f;
 	
 	// Registration matrix
 	Eigen::Matrix3f reg_mat;
 
-    for(int row = 0; row < 3; row++ )
-        for(int col = 0; col < 3; col++ )
-            ptx_file >> reg_mat(row,col);
+    for(int row = 0; row < 3; row++ ){
+        int result = std::fscanf(fp,"%f %f %f\n", &x, &y, &z);
+        printf("Result %i\n", result);
+        fflush(stdout);
+        assert(result != 0);
+        reg_mat(row,0) = x;
+        reg_mat(row,1) = y;
+        reg_mat(row,2) = z;
+    }
 
 	// Registration quaternion
     cloud->sensor_orientation_ = Eigen::Quaternionf(reg_mat.transpose());
 
     // Discard registration mat4
-	Eigen::Matrix4f reg_mat4;
-    for(int col = 0; col < 4; col++ )
-        for(int row = 0; row < 4; row++ )
-			ptx_file >> reg_mat4(row,col);
+    float t1, t2, t3, t4;
+    assert(std::fscanf(fp,"%f %f %f %f\n", &t1, &t2, &t3, &t4) != 0);
+    assert(std::fscanf(fp,"%f %f %f %f\n", &t1, &t2, &t3, &t4) != 0);
+    assert(std::fscanf(fp,"%f %f %f %f\n", &t1, &t2, &t3, &t4) != 0);
+    assert(std::fscanf(fp,"%f %f %f %f\n", &t1, &t2, &t3, &t4) != 0);
 
-	ptx_file >> std::ws;
+    // Detect file format
+    char linebuf[256];
+    int ii=0;
+    fread(&(linebuf[ii++]),1,1,fp);
+    while(linebuf[ii-1] != '\n')
+        if ( fread(&(linebuf[ii++]),1,1,fp)==0 ) assert(false);;
+    linebuf[ii-1] = '\0'; // terminate the string
+    int numtokens = 1;
+    bool hascolor = false;
+    for(ii=0; ii<(int)strlen(linebuf); ii++)
+        if(linebuf[ii] == ' ') numtokens++;
+    if(numtokens == 4)
+        hascolor = false;
+    else if(numtokens == 7){
+        hascolor = true;
+        assert(false);
+    }
+    else
+        assert(false);
 
-	// Read points
-	std::string line;
-	float x, y, z, intensity;
-        unsigned int i = 0;
-        int sample = 0;
+    // Read first line
+    ///float x, y, z, intensity;
+    sscanf(linebuf,"%f %f %f %f", &x, &y, &z, &intensity);
 
-	while(getline( ptx_file, line) && i < cloud->width*cloud->height){
-		if( (sample++%subsample) !=0){
+    cloud->points[0].x = x;
+    cloud->points[0].y = y;
+    cloud->points[0].z = z;
+    cloud->points[0].intensity = intensity;
+
+    int s = 1;
+
+    for(int i = 1; i < width*height; i++){
+        if( (i%subsample) !=0){
 			continue;
-		}
+        }
 
-		std::stringstream ss(std::stringstream::in | std::stringstream::out);
-		ss << line;
-		ss >> x >> y >> z >> intensity;
+        std::fscanf(fp,"%f %f %f %f", &x, &y, &z, &intensity);
 
 		if((x == 0) && (y == 0) & (z == 0) & ( intensity == 0.5f)) {
                         x = y = z = intensity = NAN;
 		}
 
-		cloud->points[i].x = x;
-		cloud->points[i].y = y;
-		cloud->points[i].z = z;
-		cloud->points[i].intensity = intensity;
-
-		i++;
+        cloud->points[s].x = x;
+        cloud->points[s].y = y;
+        cloud->points[s].z = z;
+        cloud->points[s].intensity = intensity;
+        s++;
 	}
+
+    fclose (fp);
 	return cloud;
 }
 

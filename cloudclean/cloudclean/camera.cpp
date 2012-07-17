@@ -6,6 +6,10 @@
 
 using namespace Eigen;
 
+template <typename T> int sgn(T val) {
+    return (T(0) < val) - (val < T(0));
+}
+
 Camera::Camera()
 {
     mFoV = 60.0f;
@@ -194,10 +198,27 @@ void Camera::mouseMove(int x, int y){
         // project that so its level
 
 
-        AngleAxis<float> rotX(-rot.x()*moveSensitivity, startUpAxis);
-        AngleAxis<float> rotY(-rot.y()*moveSensitivity, side);
+        // angle bewteen up axis and forward
+        float angle = acos(startUpAxis.dot(forward)/(startUpAxis.squaredNorm()*forward.squaredNorm()));
 
-        //Vector3f tmp(savedLookAt-mPosition);
+        float roty = -rot.y();
+
+        float troty = angle + roty;
+
+        if( abs(troty) > M_PI)
+            roty = ;
+        else if(abs(troty) > 0 )
+            roty = angle;
+
+
+        AngleAxis<float> rotX(-rot.x()*moveSensitivity, startUpAxis);
+        AngleAxis<float> rotY(roty*moveSensitivity, side);
+
+
+        // cap the up and down rotations
+
+
+
 
 
         forward = (rotX * rotY) * savedForward;

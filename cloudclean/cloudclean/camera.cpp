@@ -12,19 +12,16 @@ Camera::Camera()
     mAspect = 1.0f;
     mDepthNear = 1.0f;
     mDepthFar = 100.0f;
-    mPosition = Vector3f(0, 0, -20);
+    mPosition = Vector3f(0, 0, 0);
     mLookAt = Vector3f(0, 0, 1);
-    forward = Vector3f(0, 0, 1);
 
-    startAxisX = Vector3f(1, 0, 0);
-    startAxisY = Vector3f(0, 1, 0);
-    startAxisZ = Vector3f(0, 0, 1);
+    startSideAxis =     Vector3f(1, 0, 0);
+    startUpAxis =       Vector3f(0, 0, 1);
+    startForwardAxis =  Vector3f(0, 1, 0);
 
-    axisX = Vector3f(1, 0, 1);
-    axisY = Vector3f(0, 1, 0);
-    axisZ = Vector3f(0, 0, 1);
+    forward = startForwardAxis;
+    mUp =     startUpAxis;
 
-    mUp = Vector3f(0, 1, 0);
     mModelviewMatrixDirty = true;
     mProjectionMatrixDirty = true;
     mMouseDown = false;
@@ -190,10 +187,15 @@ void Camera::mouseMove(int x, int y){
     Vector2f rot = Vector2f(x*moveSensitivity,y*moveSensitivity) - mouseStart;
 
     if(mouseButtonPressed == LEFT_BTN){
-        //up = Vector3f(0,1,0); // Keep side look level
+        Vector3f side = forward.cross(startUpAxis).normalized();
+        Vector3f up = side.cross(forward);
 
-        AngleAxis<float> rotX(-rot.x()*moveSensitivity, startAxisY);
-        AngleAxis<float> rotY(rot.y()*moveSensitivity, startAxisX);
+        // look at point
+        // project that so its level
+
+
+        AngleAxis<float> rotX(-rot.x()*moveSensitivity, startUpAxis);
+        AngleAxis<float> rotY(-rot.y()*moveSensitivity, side);
 
         //Vector3f tmp(savedLookAt-mPosition);
 

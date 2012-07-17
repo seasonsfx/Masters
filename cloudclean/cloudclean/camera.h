@@ -70,13 +70,9 @@ private:
     bool mMouseDown;
     float moveSensitivity;
 
-    Eigen::Vector3f startAxisX;
-    Eigen::Vector3f startAxisY;
-    Eigen::Vector3f startAxisZ;
-
-    Eigen::Vector3f axisX;
-    Eigen::Vector3f axisY;
-    Eigen::Vector3f axisZ;
+    Eigen::Vector3f startSideAxis;
+    Eigen::Vector3f startUpAxis;
+    Eigen::Vector3f startForwardAxis;
 
     Eigen::Vector3f forward;
     Eigen::Vector3f savedForward;

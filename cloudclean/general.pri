@@ -1,5 +1,5 @@
-QMAKE_CXX = clang++
-D_QMAKE_CC = clang++
+#QMAKE_CXX = clang++
+#D_QMAKE_CC = clang++
 
 #QMAKE_CXX = g++-4.5
 #D_QMAKE_CC = g++-4.5

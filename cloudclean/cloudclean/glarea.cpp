@@ -469,7 +469,7 @@ void GLArea::keyPressEvent ( QKeyEvent * event ){
 
     // Set up inverse rotation
 
-    float offset = 0.2;
+    float offset = 0.4;
 
     switch (event->key())
     {
@@ -486,17 +486,17 @@ void GLArea::keyPressEvent ( QKeyEvent * event ){
             break;
     case Qt::Key_W:
     case Qt::Key_Up:
-            camera.adjustPosition(0,-offset,0);
+            camera.adjustPosition(0,0, offset); // forward
             break;
     case Qt::Key_S:
     case Qt::Key_Down:
-            camera.adjustPosition(0,offset,0);
+            camera.adjustPosition(0,0,-offset); // backward
             break;
     case Qt::Key_Q:
-            camera.adjustPosition(0,0, offset);
+            camera.adjustPosition(0,-offset,0); // up
             break;
     case Qt::Key_E:
-            camera.adjustPosition(0,0,-offset);
+            camera.adjustPosition(0,offset,0); // down
             break;
     }
     updateGL();

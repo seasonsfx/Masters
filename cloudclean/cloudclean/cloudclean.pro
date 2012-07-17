@@ -41,7 +41,7 @@ QMAKE_LFLAGS += -rdynamic
 
 INCLUDEPATH += \
         ../common/ \
-        "/usr/include/pcl-1.5/" \
+        "/usr/include/pcl-1.6/" \
         "/usr/include/flann/" \
         "/usr/include/eigen3/" \
         "/opt/AMDAPP/include" \

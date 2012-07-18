@@ -205,24 +205,15 @@ void Camera::mouseMove(int x, int y){
 
         float troty = angle + roty;
 
-        if( abs(troty) > M_PI)
-            roty = ;
-        else if(abs(troty) > 0 )
-            roty = angle;
+        qDebug("Angle between up and forward: %f", angle);
 
 
         AngleAxis<float> rotX(-rot.x()*moveSensitivity, startUpAxis);
-        AngleAxis<float> rotY(roty*moveSensitivity, side);
-
-
-        // cap the up and down rotations
-
-
-
-
+        AngleAxis<float> rotY(-rot.y()*moveSensitivity, side);
 
         forward = (rotX * rotY) * savedForward;
         forward.normalize();
+
 
         //qDebug("Forward: (%f, %f, %f)", forward.x(), forward.y(), forward.z());
     }

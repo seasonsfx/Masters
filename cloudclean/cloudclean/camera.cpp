@@ -205,7 +205,7 @@ void Camera::mouseMove(int x, int y){
 
         float troty = angle + roty;
 
-        qDebug("Angle between up and forward: %f", angle);
+        //qDebug("Angle between up and forward: %f", angle);
 
 
         AngleAxis<float> rotX(-rot.x()*moveSensitivity, startUpAxis);

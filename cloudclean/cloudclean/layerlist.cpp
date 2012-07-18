@@ -161,3 +161,7 @@ void LayerList::toggleVisible(int i){
     emit dataChanged(mi, mi);
     emit updateView();
 }
+
+void LayerList::setSelectMode(QAbstractItemView::SelectionMode mode){
+    emit selectModeChanged(mode);
+}

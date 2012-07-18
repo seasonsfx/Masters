@@ -2,6 +2,7 @@
 #define LAYERLIST_H
 
 #include <QAbstractListModel>
+#include <QAbstractItemView>
 #include "layer.h"
 #include <vector>
 
@@ -29,9 +30,12 @@ public:
     std::vector<Layer> layers;
     void activateLayer(int i);
     void toggleVisible(int i);
+    void setSelectMode(QAbstractItemView::SelectionMode mode);
+
 private:
 
 signals:
+    void selectModeChanged(QAbstractItemView::SelectionMode mode);
     void selectLayer(int i);
     void updateView();
 

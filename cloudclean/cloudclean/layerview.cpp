@@ -23,10 +23,15 @@ LayerView::LayerView(QWidget *parent) :
     ui->selection_mode_combo->insertItem(1, "Add to active layer");
     ui->selection_mode_combo->insertItem(2, "Remove points");
 
-    connect(ui->listView, SIGNAL(pressed(const QModelIndex &)), this, SLOT(pressed(const QModelIndex &)));
+    connect(ui->listView->selectionModel(), SIGNAL( selectionChanged( const QItemSelection &, const QItemSelection & )),
+          this, SLOT( selectionChanged( const QItemSelection &, const QItemSelection & ) ));
     connect(ui->delete_button, SIGNAL(pressed()), this, SLOT(deleteLayers()));
     connect(ui->merge_button, SIGNAL(pressed()), this, SLOT(mergeLayers()));
     connect(ui->selection_mode_combo, SIGNAL(currentIndexChanged (int)), &cm->layerList, SLOT(selectModeChanged(int)));
+
+    connect(&cm->layerList, SIGNAL(selectModeChanged(QAbstractItemView::SelectionMode)),
+            this, SLOT(setSelectionMode(QAbstractItemView::SelectionMode)));
+
 }
 
 LayerView::~LayerView()
@@ -34,14 +39,20 @@ LayerView::~LayerView()
     delete ui;
 }
 
-void LayerView::pressed(const QModelIndex & index){
-    int col = index.column();
-    int row = index.row();
+void LayerView::setSelectionMode(QAbstractItemView::SelectionMode mode){
+    ui->listView->setSelectionMode(mode);
+}
 
-    if(col == 1 || col == 0){
-        cm->layerList.layers[row].toggleActive();
-        emit updateView();
+void LayerView::selectionChanged(const QItemSelection & sel, const QItemSelection &des){
+    for(QModelIndex s : sel.indexes() ){
+        int row = s.row();
+        cm->layerList.layers[row].active = true;
     }
+    for(QModelIndex s : des.indexes() ){
+        int row = s.row();
+        cm->layerList.layers[row].active = false;
+    }
+    emit updateView();
 }
 
 void LayerView::selectLayer(int i){

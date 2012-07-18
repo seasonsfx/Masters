@@ -4,6 +4,8 @@
 #include <QDockWidget>
 #include <QModelIndex>
 #include <vector>
+#include <QItemSelection>
+#include <QAbstractItemView>
 
 class CloudModel;
 
@@ -25,7 +27,8 @@ private:
     std::vector<int> getSelection();
 
 public slots:
-    void pressed(const QModelIndex & index);
+    void setSelectionMode(QAbstractItemView::SelectionMode mode);
+    void selectionChanged(const QItemSelection & sel, const QItemSelection & des);
     void selectLayer(int i);
     void deleteLayers();
     void mergeLayers();

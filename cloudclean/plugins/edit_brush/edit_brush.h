@@ -25,12 +25,12 @@ public:
     ~EditBrush();
 
     bool StartEdit(QAction *action, CloudModel * cm, GLArea * glarea);
-    bool EndEdit(CloudModel *, GLArea * glarea);
+    bool EndEdit(CloudModel * cm, GLArea * glarea);
     void paintGL(CloudModel *, GLArea *glarea);
     bool mouseDoubleClickEvent  (QMouseEvent *event, CloudModel * cm, GLArea * glarea);
     bool mousePressEvent  (QMouseEvent *event, CloudModel *, GLArea * glarea);
     bool mouseMoveEvent   (QMouseEvent *event, CloudModel *, GLArea * glarea);
-    bool mouseReleaseEvent(QMouseEvent *event, CloudModel *, GLArea * glarea);
+    bool mouseReleaseEvent(QMouseEvent *event, CloudModel * cm, GLArea * glarea);
     //bool keyReleaseEvent  (QKeyEvent *, CloudModel *, GLArea *){}
     //bool keyPressEvent    (QKeyEvent *, CloudModel *, GLArea *){}
     //bool wheelEvent(QWheelEvent*, CloudModel *, GLArea * ){}
@@ -38,9 +38,14 @@ public:
     QString getEditToolDescription(QAction *);
 
 private:
+    void fill(int x, int y, float radius, int source_idx, int dest_idx, CloudModel *cm, GLArea * glarea);
 
-    QList <QAction *> actionList;
-    QAction *editSample;
+private:
+    QList <QAction *>                       actionList;
+    QAction *                               editSample;
+
+    pcl::KdTreeFLANN<pcl::PointXYZI>::Ptr   kdtree;
+    int dest_layer;
 
 };
 

@@ -3,6 +3,7 @@
 #include "io.h"
 #include <pcl/filters/filter.h>
 #include <QDebug>
+#include <QTime>
 
 int CloudModel::test(){
     return 3;
@@ -75,8 +76,6 @@ bool CloudModel::saveFile(const char * output_file){
 
 bool CloudModel::createBuffers(){
 
-    //printf("Cloud size: %d\n", cloud->size());
-
     if(!loaded)
         return false;
 
@@ -118,42 +117,60 @@ bool CloudModel::createBuffers(){
         layer.gl_index_buffer.write(i*sizeof(int), reinterpret_cast<const void *>(&i), sizeof(int));
     }
 
-    printf("Buffers created!\n");
+    qDebug("Buffers created!");
     return true;
 }
 
+void normal_estimation(pcl::PointCloud<pcl::PointXYZI>::Ptr cloud, pcl::PointCloud<pcl::Normal>::Ptr normals);
+
 bool CloudModel::loadFile(const char * input_file, int subsample){
 
-    printf("File: %s\n", input_file);
-    printf("Subsample: %d\n", subsample);
+    qDebug("File: %s", input_file);
+    qDebug("Subsample: %d\n", subsample);
 
-    // Time code
-    time_t f_begin, f_end;
-    //time_t n_begin, n_end;
-    //time_t fpfh_begin, fpfh_end;
+    QTime t;
+    t.start();
 
-    time(&f_begin); // Timing
     cloud = read_ptx(input_file, subsample);
-    time(&f_end); // Timing
+
+    qDebug("File loaded in %d ms", t.elapsed());
 
     x_dim = cloud->width;
     y_dim = cloud->height;
 
+    t.start();
+    /// Calculate normals
+    pcl::PointCloud<pcl::Normal>::Ptr normals_tmp(new pcl::PointCloud<pcl::Normal> ());
+
+    normal_estimation(cloud, normals_tmp);
+    qDebug("Normals calculated in %d ms", t.elapsed());
+
+    t.start();
     /// Filter and flatten point cloud
     pcl::removeNaNFromPointCloud(*cloud, *cloud, cloud_to_grid_map);
+    qDebug("Cloud filtered in %d ms", t.elapsed());
+
+    t.start();
+    /// Move normals to unstructured cloud
+    normals = pcl::PointCloud<pcl::Normal>::Ptr(new pcl::PointCloud<pcl::Normal> ());
+    normals->resize(cloud->size());
+    for(int i = 0; i < cloud_to_grid_map.size(); i++){
+        normals->points[i] = normals_tmp->points[cloud_to_grid_map[i]];
+    }
+
+    qDebug("Normals moved in  %d ms", t.elapsed());
 
     if(loaded)
         layerList.reset();
 
     loaded = true;
-    createBuffers();
 
-    //layerList.reset();
+    t.start();
+    createBuffers();
+    qDebug("Points loaded to GPU in %d ms", t.elapsed());
+
 
     /*
-
-    time(&n_begin); // Timing
-
 
     // Estimate normals
     normal_estimation(cloud, normals);

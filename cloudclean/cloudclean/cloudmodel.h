@@ -30,7 +30,7 @@ public:
 
     //pcl::KdTreeFLANN<pcl::PointXYZI>::Ptr           kdtree;
     //pcl::PointCloud<pcl::FPFHSignature33>::Ptr      fpfhs;
-    //pcl::PointCloud<pcl::Normal>::Ptr               normals;
+    pcl::PointCloud<pcl::Normal>::Ptr               normals;
 
     // Fetch singleton
     static CloudModel* Instance();

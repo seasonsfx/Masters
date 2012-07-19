@@ -69,9 +69,12 @@ pcl::PointCloud<pcl::PointXYZI>::Ptr read_ptx(const char* filename, int subsampl
 	assert(subsample%2 == 0 || subsample == 1);
 
     // Makes things faster apparently
-    std::cin.sync_with_stdio(false);
+    //std::cin.sync_with_stdio(false);
 
 	std::ifstream ptx_file(filename);
+
+    assert(ptx_file.is_open());
+
 	pcl::PointCloud<pcl::PointXYZI>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZI>);
 	
 	// Contains nans

@@ -7,6 +7,7 @@
 #include <Eigen/Dense>
 #include <vector>
 #include <QGLShaderProgram>
+#include <pcl/octree/octree.h>
 
 #ifdef __APPLE__
 #include <OpenCL/opencl.h>
@@ -39,12 +40,15 @@ public:
 
 private:
     void fill(int x, int y, float radius, int source_idx, int dest_idx, CloudModel *cm, GLArea * glarea);
+    int pointPick(int x, int y, float radius, int source_idx, Eigen::Vector3f& p1, Eigen::Vector3f& p2, CloudModel *cm, GLArea * glarea);
 
 private:
     QList <QAction *>                       actionList;
     QAction *                               editSample;
 
-    pcl::KdTreeFLANN<pcl::PointXYZI>::Ptr   kdtree;
+    //pcl::KdTreeFLANN<pcl::PointXYZI>::Ptr   kdtree;
+    pcl::octree::OctreePointCloudSearch<pcl::PointXYZI>::Ptr  octree;
+
     int dest_layer;
 
 };

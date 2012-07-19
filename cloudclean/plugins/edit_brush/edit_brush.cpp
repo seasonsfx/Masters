@@ -10,7 +10,7 @@
 #include "utilities.h"
 #include "layer.h"
 #include "QAbstractItemView"
-#include <pcl/kdtree/kdtree.h>
+//#include <pcl/kdtree/kdtree.h>
 #include <QTime>
 
 EditBrush::EditBrush()
@@ -37,14 +37,27 @@ bool EditBrush::mouseDoubleClickEvent  (QMouseEvent *event, CloudModel * cm, GLA
 }
 
 bool EditBrush::StartEdit(QAction *action, CloudModel *cm, GLArea *glarea){
-    // Set up kdtree if not set up yet
+    // Set up kdtree and octre if not set up yet
 
-    if(kdtree.get() == NULL){
+    if(octree.get() == NULL){
         QTime t;
-        t.start();
+        /*t.start();
+
         kdtree = pcl::KdTreeFLANN<pcl::PointXYZI>::Ptr(new pcl::KdTreeFLANN<pcl::PointXYZI>());
         kdtree->setInputCloud(cm->cloud);
         qDebug("Time to create kdtree: %d ms", t.elapsed());
+
+        t.start();
+        */
+
+        double resolution = 0.2;
+
+        octree = pcl::octree::OctreePointCloudSearch<pcl::PointXYZI>::Ptr(new pcl::octree::OctreePointCloudSearch<pcl::PointXYZI>(resolution));
+        octree->setInputCloud(cm->cloud);
+        octree->defineBoundingBox();
+        octree->addPointsFromInputCloud();
+
+        qDebug("Time to create octtree: %d ms", t.elapsed());
     }
 
     cm->layerList.setSelectMode(QAbstractItemView::SingleSelection);
@@ -91,7 +104,7 @@ inline float pointToLineDist(Eigen::Vector3f point, Eigen::Vector3f x1, Eigen::V
     return (x2-x1).cross(x1-point).squaredNorm()/(x2-x1).squaredNorm();
 }
 
-int pointPick(int x, int y, float radius, int source_idx, Eigen::Vector3f& p1, Eigen::Vector3f& p2, CloudModel *cm, GLArea * glarea){
+int EditBrush::pointPick(int x, int y, float radius, int source_idx, Eigen::Vector3f& p1, Eigen::Vector3f& p2, CloudModel *cm, GLArea * glarea){
 
     Layer & layer = cm->layerList.layers[source_idx];
 
@@ -101,11 +114,20 @@ int pointPick(int x, int y, float radius, int source_idx, Eigen::Vector3f& p1, E
     int min_index = -1;
     float min_val = FLT_MAX;
 
-    // Find point
-    for (int i: layer.index) {
+    // Need to narrow down candidates
 
-        // skip invalid indices
-        if(i == -1)
+    Eigen::Vector3f& origin = p1;
+    Eigen::Vector3f direction = p2-p1;
+    std::vector<int> intercept_indices;
+
+    octree->getIntersectedVoxelIndices(origin, direction, intercept_indices);
+
+
+    // Find point
+    for (int i: intercept_indices) {
+
+        //skip indices not in layer
+        if(layer.index[i] == -1)
             continue;
 
         // Save some memory by using map
@@ -121,9 +143,12 @@ int pointPick(int x, int y, float radius, int source_idx, Eigen::Vector3f& p1, E
             continue;
 
         // Skip points to far from the ray
+        // Uncomment this to restore functionality
+        /*
         float projDist = (projPoint-point).squaredNorm();
         if(projDist > radius)
             continue;
+        */
 
         float dist = pointToLineDist(point, p1, p2);
 
@@ -142,8 +167,16 @@ int pointPick(int x, int y, float radius, int source_idx, Eigen::Vector3f& p1, E
 void EditBrush::fill(int x, int y, float radius, int source_idx, int dest_idx, CloudModel *cm, GLArea * glarea){
 
     Eigen::Vector3f p1, p2;
+
+    QTime t;
+    t.start();
+
     int min_index = pointPick(x, y, radius, source_idx, p1, p2, cm, glarea);
 
+    qDebug("Time to pick point: %d ms", t.elapsed());
+
+
+    t.start();
     if(min_index == -1)
         return;
 
@@ -166,15 +199,17 @@ void EditBrush::fill(int x, int y, float radius, int source_idx, int dest_idx, C
         dest[current] = source[current];
         source[current] = -1;
 
+        //break; // Remove this to restore functionality
+
         // push neighbours..
 
         int idx;
 
-        int K = 20;
+        int K = 5;
 
         std::vector<int> pointIdxNKNSearch(K);
         std::vector<float> pointNKNSquaredDistance(K);
-        kdtree->nearestKSearch (cm->cloud->points[current], K, pointIdxNKNSearch, pointNKNSquaredDistance);
+        octree->nearestKSearch (cm->cloud->points[current], K, pointIdxNKNSearch, pointNKNSquaredDistance);
 
         for (int i = 0; i < pointIdxNKNSearch.size (); ++i)
         {
@@ -188,8 +223,12 @@ void EditBrush::fill(int x, int y, float radius, int source_idx, int dest_idx, C
         }
     }
 
+    qDebug("Time to fill : %d ms", t.elapsed());
+    t.start();
     cm->layerList.layers[source_idx].copyToGPU();
     cm->layerList.layers[dest_idx].copyToGPU();
+
+   qDebug("Time to copy to GPU: %d ms", t.elapsed());
 
 }
 
@@ -209,30 +248,31 @@ bool EditBrush::mouseMoveEvent   (QMouseEvent *event, CloudModel *, GLArea * gla
 
 bool EditBrush::mouseReleaseEvent(QMouseEvent *event, CloudModel * cm, GLArea * glarea){
 
-    // Single selection switched on, on edit start
+    if (!glarea->moved && event->button() == Qt::LeftButton){
+        // Single selection switched on, on edit start
 
-    int source_layer = -1;
+        int source_layer = -1;
 
-    for(int i = 0; i < cm->layerList.layers.size(); i++){
-        Layer & l = cm->layerList.layers[i];
-        if(l.active && l.visible){
-            source_layer = i;
-            l.copyFromGPU();
-            break;
+        for(int i = 0; i < cm->layerList.layers.size(); i++){
+            Layer & l = cm->layerList.layers[i];
+            if(l.active && l.visible){
+                source_layer = i;
+                l.copyFromGPU();
+                break;
+            }
         }
+
+
+        if(dest_layer == -1){
+            cm->layerList.newLayer();
+            dest_layer = cm->layerList.layers.size()-1;
+        }
+
+        float radius = 1.0f;
+
+        fill(event->x(), event->y(), radius, source_layer, dest_layer, cm, glarea);
+
     }
-
-
-    if(dest_layer == -1){
-        cm->layerList.newLayer();
-        dest_layer = cm->layerList.layers.size()-1;
-    }
-
-    float radius = 1.0f;
-
-    fill(event->x(), event->y(), radius, source_layer, dest_layer, cm, glarea);
-
-    //if (!glarea->moved && event->button() == Qt::LeftButton){}
 
     return true;
 }

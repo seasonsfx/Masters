@@ -125,7 +125,7 @@ void normal_estimation(pcl::PointCloud<pcl::PointXYZI>::Ptr cloud, pcl::PointClo
 
 bool CloudModel::loadFile(const char * input_file, int subsample){
 
-    qDebug("File: %s", input_file);
+    //qDebug("File: %s", input_file);
     qDebug("Subsample: %d\n", subsample);
 
     QTime t;

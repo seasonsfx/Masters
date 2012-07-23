@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'layerview.ui'
 **
-** Created: Wed Jul 18 02:13:31 2012
+** Created: Mon Jul 23 17:01:20 2012
 **      by: Qt User Interface Compiler version 4.8.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!

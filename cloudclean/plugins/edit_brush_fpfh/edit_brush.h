@@ -48,7 +48,7 @@ private:
     QList <QAction *>                       actionList;
     QAction *                               editSample;
 
-    pcl::PointCloud<pcl::Normal>::Ptr normals;
+    //pcl::PointCloud<pcl::Normal>::Ptr normals;
     pcl::octree::OctreePointCloudSearch<pcl::PointXYZI>::Ptr  octree;
     pcl::PointCloud<pcl::FPFHSignature33>::Ptr fpfhs;
 

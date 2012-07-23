@@ -86,8 +86,8 @@ pcl::PointCloud<pcl::PointXYZI>::Ptr read_ptx(const char* filename, int subsampl
     ptx_file >> height;
 
 	// Subsample
-    cloud->width =  width/subsample;
-    cloud->height = height/subsample;
+    cloud->width =  width/(subsample/2);
+    cloud->height = height/(subsample/2);
 
 	cloud->points.resize (cloud->width * cloud->height);
 
@@ -140,8 +140,8 @@ pcl::PointCloud<pcl::PointXYZI>::Ptr read_ptx(const char* filename, int subsampl
     unsigned int i = 1;
     int sample = 0;
 
-    while(i < width*height){
-		if( (sample++%subsample) !=0){
+    while(sample < width*height){
+        if( (sample++%(subsample*subsample)) != 0){
             getline( ptx_file, line);
 			continue;
 		}
@@ -157,7 +157,10 @@ pcl::PointCloud<pcl::PointXYZI>::Ptr read_ptx(const char* filename, int subsampl
 		cloud->points[i].z = z;
 		cloud->points[i].intensity = intensity;
 
-		i++;
+        i++;
+
+        if(i > cloud->width*cloud->height)
+            break;
 	}
 	return cloud;
 }

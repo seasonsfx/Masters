@@ -11,6 +11,8 @@
 #include "layer.h"
 #include "QAbstractItemView"
 #include <QTime>
+#include <pcl/features/fpfh_omp.h>
+#include <omp.h>
 
 EditBrush::EditBrush()
 {
@@ -51,32 +53,25 @@ bool EditBrush::StartEdit(QAction *action, CloudModel *cm, GLArea *glarea){
 
         qDebug("Time to create octree: %d ms", t.elapsed());
 
-
-        t.start();
-        normals = pcl::PointCloud<pcl::Normal>::Ptr(new pcl::PointCloud<pcl::Normal> ());
-
-        pcl::NormalEstimation<pcl::PointXYZI, pcl::Normal> ne;
-        ne.setInputCloud (cm->cloud);
         pcl::search::KdTree<pcl::PointXYZI>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZI>);
-        ne.setSearchMethod(tree);
-        // Use all neighbors in a sphere of radius 3cm
-        ne.setRadiusSearch (0.03);
-        ne.compute (*normals);
 
-        qDebug("Time to estimate normals: %d ms", t.elapsed());
+        qDebug("Num of CPU: %d", omp_get_num_procs());
 
         t.start();
 
-        pcl::FPFHEstimation<pcl::PointXYZI, pcl::Normal, pcl::FPFHSignature33> fpfh;
+        pcl::FPFHEstimationOMP<pcl::PointXYZI, pcl::Normal, pcl::FPFHSignature33> fpfh;
         fpfh.setInputCloud (cm->cloud);
-        fpfh.setInputNormals (normals);
+        fpfh.setInputNormals (cm->normals);
         fpfh.setSearchMethod(tree);
+        int procs = omp_get_num_procs()/2; // Hyperthreading is bad
+        fpfh.setNumberOfThreads(procs);
 
         fpfhs = pcl::PointCloud<pcl::FPFHSignature33>::Ptr(new pcl::PointCloud<pcl::FPFHSignature33> ());
 
         // Use all neighbors in a sphere of radius 5cm
         // IMPORTANT: the radius used here has to be larger than the radius used to estimate the surface normals!!!
-        fpfh.setRadiusSearch (0.05);
+        //fpfh.setRadiusSearch (0.05);
+        fpfh.setKSearch(5);
 
         fpfh.compute (*fpfhs);
 
@@ -235,12 +230,28 @@ void EditBrush::fill(int x, int y, float radius, int source_idx, int dest_idx, C
         std::vector<float> pointNKNSquaredDistance(K);
         octree->nearestKSearch (cm->cloud->points[current], K, pointIdxNKNSearch, pointNKNSquaredDistance);
 
+        pcl::FPFHSignature33 & current_sig = fpfhs->at(current);
+
         for (int i = 0; i < pointIdxNKNSearch.size (); ++i)
         {
             idx = pointIdxNKNSearch[i];
 
             // Skip invalid indices, visited indices are invalid
             if(source[idx] == -1)
+                continue;
+
+            // Skip if to far in feature space
+            pcl::FPFHSignature33 & neigbour_sig = fpfhs->at(idx);
+
+            float sum = 0;
+            for(int i = 0; i < 33; i++){
+                sum += pow(current_sig.histogram[i] - neigbour_sig.histogram[i], 2);
+            }
+            float dist = sqrt(dist);
+
+            qDebug("Dist %f", dist);
+
+            if(dist > 4)
                 continue;
 
             myqueue.push(idx);

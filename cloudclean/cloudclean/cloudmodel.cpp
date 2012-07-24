@@ -4,6 +4,7 @@
 #include <pcl/filters/filter.h>
 #include <QDebug>
 #include <QTime>
+//#include <pcl/visualization/cloud_viewer.h>
 
 int CloudModel::test(){
     return 3;
@@ -14,11 +15,7 @@ CloudModel* CloudModel::only_instance = NULL;
 CloudModel::CloudModel(QObject *parent) :
     QObject(parent), point_buffer( QGLBuffer::VertexBuffer )
 {
-    //normals = pcl::PointCloud<pcl::Normal>::Ptr(new pcl::PointCloud<pcl::Normal>);
-    //kdtree = pcl::KdTreeFLANN<pcl::PointXYZI>::Ptr(new pcl::KdTreeFLANN<pcl::PointXYZI>());
     cloud = pcl::PointCloud<pcl::PointXYZI>::Ptr(new pcl::PointCloud<pcl::PointXYZI>);
-    //fpfhs = pcl::PointCloud<pcl::FPFHSignature33>::Ptr(new pcl::PointCloud<pcl::FPFHSignature33>);
-
     x_dim = 0;
     y_dim = 0;
     loaded = false;
@@ -117,7 +114,39 @@ bool CloudModel::createBuffers(){
         layer.gl_index_buffer.write(i*sizeof(int), reinterpret_cast<const void *>(&i), sizeof(int));
     }
 
-    qDebug("Buffers created!");
+    layer.gl_index_buffer.release();
+
+    // Comment this out if all works
+    // Load normals to gpu
+
+    normal_buffer.create();
+    normal_buffer.setUsagePattern( QGLBuffer::DynamicDraw );
+    assert(normal_buffer.bind());
+    normal_buffer.allocate(cloud->points.size() * sizeof(float) * 6);
+    float data2[6];
+    for (int i = 0; i < (int)cloud->size(); i++)
+    {
+        data2[0] = cloud->points[i].x;
+        data2[1] = cloud->points[i].y;
+        data2[2] = cloud->points[i].z;
+        data2[3] = data2[0]+(normals->at(i).data_n[0]*0.5);
+        data2[4] = data2[1]+(normals->at(i).data_n[1]*0.5);
+        data2[5] = data2[2]+(normals->at(i).data_n[2]*0.5);
+
+        qDebug("In: (%f, %f, %f), (%f, %f, %f)", data2[0], data2[1], data2[2], data2[3], data2[4], data2[5]);
+
+        int offset = 6*sizeof(float)*i;
+        normal_buffer.write(offset, reinterpret_cast<const void *> (data), sizeof(data));
+
+        float p[6] = {-1,-1,-1,-1,-1,-1};
+        normal_buffer.read(offset, reinterpret_cast<void *>(p), sizeof(p));
+        qDebug("Out: (%f, %f, %f), (%f, %f, %f)", p[0], p[1], p[2], p[3], p[4], p[5]);
+
+    }
+
+    normal_buffer.release();
+
+    qDebug("Buffers created & loaded.");
     return true;
 }
 
@@ -160,6 +189,36 @@ bool CloudModel::loadFile(const char * input_file, int subsample){
 
     qDebug("Normals moved in  %d ms", t.elapsed());
 
+    /*
+    for(int i = 0; i < normals_tmp->size(); i++){
+        printf("normal: (%f, %f, %f)\n",
+                normals_tmp->points.at(i).data_n[0],
+                normals_tmp->points.at(i).data_n[1],
+                normals_tmp->points.at(i).data_n[2]);
+    }
+    */
+
+    /*for(int i = 0; i < normals->size(); i++){
+        printf("normal: (%f, %f, %f)\n",
+                normals->points.at(i).data_n[0],
+                normals->points.at(i).data_n[1],
+                normals->points.at(i).data_n[2]);
+    }
+    */
+
+    /*
+    pcl::visualization::PCLVisualizer viewer("PCL Viewer");
+    viewer.setBackgroundColor (0.05, 0.05, 0.05);
+    viewer.addPointCloudNormals<pcl::PointXYZI,pcl::Normal>(cloud, normals);
+
+    viewer.setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_COLOR, 1.0, 0.0, 0.0);
+    viewer.setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_LINE_WIDTH, 1);
+
+    while (!viewer.wasStopped ()){
+        viewer.spinOnce ();
+    }
+    */
+
     if(loaded)
         layerList.reset();
 
@@ -169,49 +228,28 @@ bool CloudModel::loadFile(const char * input_file, int subsample){
     createBuffers();
     qDebug("Points loaded to GPU in %d ms", t.elapsed());
 
-
-    /*
-
-    // Estimate normals
-    normal_estimation(cloud, normals);
-
-    time(&n_end); // Timing
-
-    vals_in_range = 15;
-    K = 20;
-    radius = 0.05f;
-
-    time(&fpfh_begin); // Timing
-
-    // Calulate the FPFH:
-
-    fpfhs = pcl::PointCloud<pcl::FPFHSignature33>::Ptr(new pcl::PointCloud<pcl::FPFHSignature33> ());
-    pcl::FPFHEstimation<pcl::PointXYZI, pcl::Normal, pcl::FPFHSignature33> fpfh;
-    pcl::search::KdTree<pcl::PointXYZI>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZI>);
-
-    fpfh.setInputCloud (cloud);
-    fpfh.setInputNormals (normals);
-    fpfh.setSearchMethod (tree);
-    fpfh.setKSearch (K);
-    //fpfh.setRadiusSearch (radius);
-    fpfh.setIndices(p_valid_indices);
-    fpfh.compute (*fpfhs);
-
-    time(&fpfh_end); // Timing
-
-    kdtree->setInputCloud (cloud);
-
-
-    printf("File read: %f\n", difftime(f_end, f_begin));
-    printf("Normal estimation: %f\n", difftime(n_end, n_begin));
-    printf("FPFH %f\n", difftime(fpfh_end, fpfh_begin));
-*/
     return true;
 }
 
 bool CloudModel::isLoaded(){
     return loaded;
 }
+
+class PointIdx{
+public:
+    int x;
+    int y;
+    PointIdx(int x, int y): x(x), y(y){}
+    PointIdx(): x(0), y(0){}
+};
+
+class PointIdxPair{
+public:
+    PointIdx p1;
+    PointIdx p2;
+    PointIdxPair(PointIdx p1, PointIdx p2): p1(p1), p2(p2){}
+    PointIdxPair(int p1x, int p1y, int p2x, int p2y): p1(PointIdx(p1x, p1y)), p2(PointIdx(p2x, p2y)){}
+};
 
 void normal_estimation(pcl::PointCloud<pcl::PointXYZI>::Ptr cloud, pcl::PointCloud<pcl::Normal>::Ptr normals){
     int length = cloud->points.size();
@@ -221,6 +259,7 @@ void normal_estimation(pcl::PointCloud<pcl::PointXYZI>::Ptr cloud, pcl::PointClo
 
     for (int i = 0; i < length; ++i)
     {
+        // Don't calculate normal for NANs
         if (cloud->points[i].x != cloud->points[i].x)
         {
             normals->points[i].data_n[0] = NAN;
@@ -230,76 +269,117 @@ void normal_estimation(pcl::PointCloud<pcl::PointXYZI>::Ptr cloud, pcl::PointClo
             continue;
         }
 
-        // relavite indices
-        int idx[16] = {-1,-1, 0,-1, 1,-1, 1,0, 1,1, 0,1, -1,1, -1,0};
+        // Define all pairs of indices relative to current position
 
+
+        // Array of ponits that form a traingle along with the center point
+        PointIdxPair trianglePairs[8] = {
+            PointIdxPair(PointIdx(-1, -1), PointIdx(0, -1)),
+            PointIdxPair(PointIdx(0, -1), PointIdx(1, -1)),
+            PointIdxPair(PointIdx(-1, -1), PointIdx(-1, 0)),
+            PointIdxPair(PointIdx(1, -1), PointIdx(1, 0)),
+            PointIdxPair(PointIdx(-1, 0), PointIdx(-1, -1)),
+            PointIdxPair(PointIdx(1, 0), PointIdx(1, 1)),
+            PointIdxPair(PointIdx(-1, 1), PointIdx(0, 1)),
+            PointIdxPair(PointIdx(0, 1), PointIdx(1, 1))
+        };
 
         // Normal calculation vars
         Eigen::Vector3f agregate_n(0.0f,0.0f,0.0f);
-        int count_n = 0;
+        int face_count = 0;
 
-        // previous index
-        int p1x = -1, p1y = 0;
-        int p2x = -1, p2y = 0;
+        if(i == 82455){
+            int k = 0;
+        }
 
-        int idx1, idx2;
-
-        // Calculate normal fron 8 triangles
+        // Calculate normal from 8 triangles
         for (int j = 0; j < 8; ++j)
         {
-            // relative index
-            p2x = idx[j*2];
-            p2y = idx[j*2+1]; // Update p2 index
+            PointIdxPair & relativePair = trianglePairs[j];
 
-            // abs index
-            idx1 = i + width*p1y + p1x;
-            idx2 = i + width*p2y + p2x;
+            // calculate current x and y
+            int cur_x = i%width;
+            int cur_y = i/width;
 
+            bool outbounds = false;
 
-            if ( // Not out of bounds
-                    (!(
-                        (i%width == 0 && (p2x == 1 || p1x == 1) ) || // right overun
-                        (i%width == 1 && (p2x == -1 || p1x == -1) ) || // left overun
-                        (i <= width && (p2y == -1 || p1y == -1) ) || // top overun
-                        (i/width == (height-1) && (p2y == 1 || p1y == 1) ) // bottom overun TODO:Check if this holds
-                    )) &&
-                    // No NaNs
-                    (
-                        (cloud->points[idx1].x == cloud->points[idx1].x) && // invalid point 1
-                        (cloud->points[idx2].x == cloud->points[idx2].x)	// invalid point 2
-                    )
-            )
-            {
+            // is p1 out of bounds
+            int x_pos = cur_x + relativePair.p1.x;
+            int y_pos = cur_y + relativePair.p1.y;
+            if(x_pos > width || x_pos < 0)
+                outbounds = true;
+            if(y_pos > height || y_pos < 0)
+                outbounds = true;
 
-                Eigen::Vector3f p0(cloud->points[i].x, cloud->points[i].y, cloud->points[i].z);
-                Eigen::Vector3f p1(cloud->points[idx1].x, cloud->points[idx1].y ,cloud->points[idx1].z);
-                Eigen::Vector3f p2(cloud->points[idx2].x, cloud->points[idx2].y ,cloud->points[idx2].z);
+            // is p2 out of bounds
+            x_pos = cur_x + relativePair.p2.x;
+            y_pos = cur_y + relativePair.p2.y;
+            if(x_pos > width-1 || x_pos < 0)
+                outbounds = true;
+            if(y_pos > height-1 || y_pos < 0)
+                outbounds = true;
 
+            if (!outbounds){
+
+                // Calculate absolute indices
+                int idx1 = (cur_y+relativePair.p1.y)*width + (cur_x+relativePair.p1.x);
+                int idx2 = (cur_y+relativePair.p2.y)*width + (cur_x+relativePair.p2.x);
+
+                // Ignore NAN neighbours
+                if(cloud->points[idx1].x != cloud->points[idx1].x)
+                    continue;
+                if(cloud->points[idx2].x != cloud->points[idx2].x)
+                    continue;
+
+                pcl::PointXYZI & cp0 = cloud->points[i];
+                pcl::PointXYZI & cp1 = cloud->points[idx1];
+                pcl::PointXYZI & cp2 = cloud->points[idx2];
+
+                Eigen::Vector3f p0(cp0.x, cp0.y, cp0.z);
+                Eigen::Vector3f p1(cp1.x, cp1.y ,cp1.z);
+                Eigen::Vector3f p2(cp2.x, cp2.y ,cp2.z);
+
+                // Cross product sometimes 0 0 0
                 Eigen::Vector3f tmp = ((p1 - p0).cross(p2 - p0));
+                tmp.normalize();
 
-                agregate_n= agregate_n + tmp.normalized();
-                count_n++;
+                // Normalized 0 0 0 == NaN
+                if(tmp.x() != tmp.x() ||
+                   tmp.y() != tmp.y() ||
+                   tmp.z() != tmp.z()
+                )
+                    continue;
 
-                }
-                p1x = p2x; p1y = p2y; // make p1 current p2
+                agregate_n= agregate_n + tmp;
+                face_count++;
+
+             }
 
         }
 
-        if(count_n == 0){
-                count_n = 1;
+        // Face count can be 0 or normals can cancel
+        if(agregate_n.sum() == 0){
+            normals->points[i].data_n[0] = NAN;
+            normals->points[i].data_n[1] = NAN;
+            normals->points[i].data_n[2] = NAN;
+            normals->points[i].data_n[3] = NAN;
+            continue;
         }
 
-        agregate_n = (agregate_n/count_n).normalized();
+        Eigen::Vector3f normal = (agregate_n/face_count).normalized();
 
-        Eigen::Vector4f normal(agregate_n(0), agregate_n(1), agregate_n(2),0.0f);
+        pcl::flipNormalTowardsViewpoint (cloud->points[i],
+                                         cloud->sensor_origin_[0],
+                                         cloud->sensor_origin_[1],
+                                         cloud->sensor_origin_[2],
+                                         agregate_n);
 
-        pcl::flipNormalTowardsViewpoint (cloud->points[i], cloud->sensor_origin_[0], cloud->sensor_origin_[1], cloud->sensor_origin_[2],
-                agregate_n(0), agregate_n(1), agregate_n(2));
-
-        normals->points[i].data_n[0] = agregate_n(0);
-        normals->points[i].data_n[1] = agregate_n(1);
-        normals->points[i].data_n[2] = agregate_n(2);
+        normals->points[i].data_n[0] = normal(0);
+        normals->points[i].data_n[1] = normal(1);
+        normals->points[i].data_n[2] = normal(2);
         normals->points[i].data_n[3] = 0.0f;
+
+        assert(normals->points[i].data_n[0] == normals->points[i].data_n[0]);
 
     }
 }

@@ -59,33 +59,35 @@ GLArea::GLArea(QWidget* parent )
 
 void GLArea::initializeGL()
 {
-    // Set the clear color to black
     glClearColor( 0.1f, 0.1f, 0.1f, 1.0f );
-
     glEnable(GL_DEPTH_TEST);
 
-    // Point shader and buffers
-    if ( !prepareShaderProgram(point_shader, ":/shaders/points.vert", ":/shaders/points.frag" ) )
-        return;
+    assert(prepareShaderProgram(point_shader, ":/shaders/points.vert", ":/shaders/points.frag" ) );
 
     if ( !point_shader.bind() )
     {
         qWarning() << "Could not bind shader program to context";
-        return;
+        assert(false);
     }
     point_shader.enableAttributeArray( "vertex" );
     point_shader.setAttributeBuffer( "vertex", GL_FLOAT, 0, 4 );
-
     glUniformMatrix4fv(point_shader.uniformLocation("cameraToClipMatrix"), 1, GL_FALSE, camera.projectionMatrix().data());
     glError("121");
-
-
-    // Create all buffers here
-
-    printf("size in kb: %f\n", (cm->cloud->size() * 4)/(1024.0f));
-    glError("134");
-
     point_shader.release();
+
+    // Setup normal shader
+    assert(prepareShaderProgram(normal_shader, ":/shaders/normals.vert", ":/shaders/normals.frag" ) );
+
+    if ( !normal_shader.bind() )
+    {
+        qWarning() << "Could not bind shader program to context";
+        assert(false);
+    }
+    normal_shader.enableAttributeArray( "vertex" );
+    normal_shader.setAttributeBuffer( "vertex", GL_FLOAT, 0, 3 );
+    glUniformMatrix4fv(normal_shader.uniformLocation("cameraToClipMatrix"), 1, GL_FALSE, camera.projectionMatrix().data());
+    glError("134");
+    normal_shader.release();
 
 
     // Setup OpenCL
@@ -196,6 +198,26 @@ void GLArea::paintGL(){
 
     cm->point_buffer.release();
     point_shader.release();
+    glDisable(GL_PRIMITIVE_RESTART);
+
+    //cm->point_buffer.bind();
+    //cm->point_buffer.release();
+
+    // Paint normals
+    if(cm->normal_buffer.isCreated()){
+        assert(normal_shader.bind());
+        assert(cm->normal_buffer.bind());
+        //qDebug("Normal buffer created size: %d bytes", cm->normal_buffer.size());
+        float col[4] = {1,1,1,1};
+        glUniformMatrix4fv(normal_shader.uniformLocation("cameraToClipMatrix"), 1, GL_FALSE, camera.projectionMatrix().data());
+        glUniformMatrix4fv(normal_shader.uniformLocation("modelToCameraMatrix"), 1, GL_FALSE, camera.modelviewMatrix().data());
+        glUniform3fv(normal_shader.uniformLocation("lineColour"), 1, col);
+        glEnable(GL_LINE_SMOOTH);
+        glHint(GL_LINE_SMOOTH_HINT,  GL_NICEST);
+        glDrawArrays(GL_LINES, 0, cm->cloud->size()*2);
+        cm->normal_buffer.release();
+        normal_shader.release();
+    }
 
     if(activeEditPlugin)
         activeEditPlugin->paintGL(cm, this);
@@ -231,7 +253,7 @@ void GLArea::paintGL(){
         if ((cfps>0) && (cfps<999))
             col1Text += QString("FPS: %1\n").arg(cfps,7,'f',1);
         col1Text += QString("Vertices: %1\n").arg(cm->cloud->size());
-        //col1Text += QString("Faces: %1\n").arg(mm()->cm.fn);
+        col1Text += QString("Cloud size: %1 KB\n").arg((cm->cloud->size() * 4)/(1024.0f));
 
         /*
         if(fov>5) col0Text += QString("FOV: %1\n").arg(fov);

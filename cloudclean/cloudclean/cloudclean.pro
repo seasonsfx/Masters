@@ -42,6 +42,7 @@ QMAKE_LFLAGS += -rdynamic
 INCLUDEPATH += \
         ../common/ \
         "/usr/include/pcl-1.6/" \
+        #/usr/include/vtk-5.8/ \
         "/usr/include/flann/" \
         "/usr/include/eigen3/" \
         "/opt/AMDAPP/include" \
@@ -57,6 +58,9 @@ LIBS += -lpcl_io \
         -lGL \
         -lGLU \
         -lOpenCL \
+        #-lvtkCommon \
+        #-lvtkFiltering \
+        #-lvtkRendering \
         #-lcommon
 
 OTHER_FILES += \

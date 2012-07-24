@@ -86,8 +86,8 @@ pcl::PointCloud<pcl::PointXYZI>::Ptr read_ptx(const char* filename, int subsampl
     ptx_file >> height;
 
 	// Subsample
-    cloud->width =  width/(subsample/2);
-    cloud->height = height/(subsample/2);
+    cloud->width =  width/subsample;
+    cloud->height = height/subsample;
 
 	cloud->points.resize (cloud->width * cloud->height);
 

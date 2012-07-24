@@ -1,7 +1,7 @@
 #define GL3_PROTOTYPES
 #include <../../external/gl3.h>
 #include <GL/glu.h>
-#include "edit_brush.h"
+#include "edit_brush_fpfh.h"
 #include <QIcon>
 #include <QDebug>
 #include <QResource>
@@ -59,21 +59,30 @@ bool EditBrush::StartEdit(QAction *action, CloudModel *cm, GLArea *glarea){
 
         t.start();
 
-        pcl::FPFHEstimationOMP<pcl::PointXYZI, pcl::Normal, pcl::FPFHSignature33> fpfh;
+        pcl::FPFHEstimation<pcl::PointXYZI, pcl::Normal, pcl::FPFHSignature33> fpfh;
         fpfh.setInputCloud (cm->cloud);
         fpfh.setInputNormals (cm->normals);
         fpfh.setSearchMethod(tree);
         int procs = omp_get_num_procs()/2; // Hyperthreading is bad
-        fpfh.setNumberOfThreads(procs);
+        //fpfh.setNumberOfThreads(procs);
 
         fpfhs = pcl::PointCloud<pcl::FPFHSignature33>::Ptr(new pcl::PointCloud<pcl::FPFHSignature33> ());
 
         // Use all neighbors in a sphere of radius 5cm
         // IMPORTANT: the radius used here has to be larger than the radius used to estimate the surface normals!!!
-        //fpfh.setRadiusSearch (0.05);
-        fpfh.setKSearch(5);
+        fpfh.setRadiusSearch (0.05);
+        //fpfh.setKSearch(5);
 
         fpfh.compute (*fpfhs);
+
+        for(int i = 0; i < fpfhs->size(); i++){
+            pcl::FPFHSignature33 & sig = fpfhs->at(i);
+            for(int j = 0; j < 33; j++){
+                printf("%f ", sig.histogram[j]);
+            }
+            printf("\n");
+            fflush(stdout);
+        }
 
         qDebug("Time to calc FPFH: %d ms", t.elapsed());
 

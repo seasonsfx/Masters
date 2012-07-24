@@ -1,11 +1,13 @@
 include(../../shared.pri)
 
 TARGET = edit_brush_fpfh
-HEADERS += edit_brush.h \
-    cpu_brush.h
+HEADERS += \
+    cpu_brush.h \
+    edit_brush_fpfh.h
 
 
-SOURCES += edit_brush.cpp
+SOURCES += \
+    edit_brush_fpfh.cpp
 
 INCLUDEPATH += \
         ../../cloudclean \

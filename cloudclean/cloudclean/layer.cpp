@@ -39,6 +39,7 @@ void Layer::copyToGPU(){
     }
     gl_index_buffer.bind();
     gl_index_buffer.write(0, &index[0], gl_index_buffer.size());
+    gl_index_buffer.release();
 }
 
 void Layer::copyFromGPU(){
@@ -51,6 +52,7 @@ void Layer::copyFromGPU(){
     gl_index_buffer.bind();
     if(gl_index_buffer.size() == -1){
         qDebug("GPU buffer not allocated");
+        gl_index_buffer.release();
         return;
     }
 

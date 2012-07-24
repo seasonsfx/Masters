@@ -142,12 +142,14 @@ void LayerList::reset (){
 
     CloudModel * app_data = CloudModel::Instance();
 
+    layer.gl_index_buffer.bind();
     layer.gl_index_buffer.allocate(app_data->cloud->size()*sizeof(int));
 
     for(int i = 1; i < app_data->cloud->size(); i++){
         layer.index[i] = i;
     }
     layer.copyToGPU();
+    layer.gl_index_buffer.release();
 }
 
 void LayerList::activateLayer(int i){

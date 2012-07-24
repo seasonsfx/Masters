@@ -26,10 +26,9 @@ public:
 
     pcl::PointCloud<pcl::PointXYZI>::Ptr            cloud;
     QGLBuffer                                       point_buffer;
+    QGLBuffer                                       normal_buffer;
     LayerList                                       layerList;
 
-    //pcl::KdTreeFLANN<pcl::PointXYZI>::Ptr           kdtree;
-    //pcl::PointCloud<pcl::FPFHSignature33>::Ptr      fpfhs;
     pcl::PointCloud<pcl::Normal>::Ptr               normals;
 
     // Fetch singleton

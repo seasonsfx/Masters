@@ -70,6 +70,7 @@ private:
 
     QGLFormat                               glFormat;
     QGLShaderProgram                        point_shader;
+    QGLShaderProgram                        normal_shader;
 
     int                                     start_move_x;
     int                                     start_move_y;

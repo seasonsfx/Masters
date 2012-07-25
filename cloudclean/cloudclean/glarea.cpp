@@ -13,7 +13,6 @@
 #include <QFont>
 
 GLArea::GLArea(QWidget* parent )
-    //: QGLWidget(QGLFormat(QGL::HasOverlay)),
     : QGLWidget(parent)
 {
     qApp->installEventFilter(this);
@@ -77,6 +76,7 @@ void GLArea::initializeGL()
 
     // Setup normal shader
     assert(prepareShaderProgram(normal_shader, ":/shaders/normals.vert", ":/shaders/normals.frag" ) );
+    //assert(prepareShaderProgram(normal_shader, "/home/rickert/Masters/cloudclean/cloudclean/shaders/normals.vert", "/home/rickert/Masters/cloudclean/cloudclean/shaders/normals.frag" ) );
 
     if ( !normal_shader.bind() )
     {
@@ -157,13 +157,14 @@ void GLArea::paintGL(){
     QTime time;
     time.start();
 
-    // This is reet by qpainter
+    // This is reset by qpainter
     glEnable(GL_DEPTH_TEST);
     glEnable (GL_BLEND);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDepthFunc(GL_LEQUAL);
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
+    /*
     point_shader.bind();
 
     glUniformMatrix4fv(point_shader.uniformLocation("modelToCameraMatrix"), 1, GL_FALSE, camera.modelviewMatrix().data());
@@ -198,7 +199,7 @@ void GLArea::paintGL(){
 
     cm->point_buffer.release();
     point_shader.release();
-    glDisable(GL_PRIMITIVE_RESTART);
+ */
 
     //cm->point_buffer.bind();
     //cm->point_buffer.release();
@@ -206,7 +207,6 @@ void GLArea::paintGL(){
     // Paint normals
     if(cm->normal_buffer.isCreated()){
         assert(normal_shader.bind());
-        assert(cm->normal_buffer.bind());
         //qDebug("Normal buffer created size: %d bytes", cm->normal_buffer.size());
         float col[4] = {1,1,1,1};
         glUniformMatrix4fv(normal_shader.uniformLocation("cameraToClipMatrix"), 1, GL_FALSE, camera.projectionMatrix().data());
@@ -214,7 +214,9 @@ void GLArea::paintGL(){
         glUniform3fv(normal_shader.uniformLocation("lineColour"), 1, col);
         glEnable(GL_LINE_SMOOTH);
         glHint(GL_LINE_SMOOTH_HINT,  GL_NICEST);
+        assert(cm->normal_buffer.bind());
         glDrawArrays(GL_LINES, 0, cm->cloud->size()*2);
+        glError("Draw fuckup");
         cm->normal_buffer.release();
         normal_shader.release();
     }

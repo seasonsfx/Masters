@@ -5,15 +5,19 @@
 #include <QDebug>
 #include <QTime>
 //#include <pcl/visualization/cloud_viewer.h>
+#include <GL/glu.h>
 
-int CloudModel::test(){
-    return 3;
+void inline  glError(const char * msg){
+    int err = glGetError();
+    if(err){
+        printf("%s : %s\n", msg , gluErrorString(err));
+    }
 }
 
 CloudModel* CloudModel::only_instance = NULL;
 
 CloudModel::CloudModel(QObject *parent) :
-    QObject(parent), point_buffer( QGLBuffer::VertexBuffer )
+    QObject(parent), point_buffer( QGLBuffer::VertexBuffer), normal_buffer(QGLBuffer::VertexBuffer)
 {
     cloud = pcl::PointCloud<pcl::PointXYZI>::Ptr(new pcl::PointCloud<pcl::PointXYZI>);
     x_dim = 0;
@@ -123,9 +127,10 @@ bool CloudModel::createBuffers(){
     normal_buffer.setUsagePattern( QGLBuffer::DynamicDraw );
     assert(normal_buffer.bind());
     normal_buffer.allocate(cloud->points.size() * sizeof(float) * 6);
-    float data2[6];
+
     for (int i = 0; i < (int)cloud->size(); i++)
     {
+        float data2[6];
         data2[0] = cloud->points[i].x;
         data2[1] = cloud->points[i].y;
         data2[2] = cloud->points[i].z;
@@ -133,15 +138,11 @@ bool CloudModel::createBuffers(){
         data2[4] = data2[1]+(normals->at(i).data_n[1]*0.5);
         data2[5] = data2[2]+(normals->at(i).data_n[2]*0.5);
 
-        qDebug("In: (%f, %f, %f), (%f, %f, %f)", data2[0], data2[1], data2[2], data2[3], data2[4], data2[5]);
-
         int offset = 6*sizeof(float)*i;
-        normal_buffer.write(offset, reinterpret_cast<const void *> (data), sizeof(data));
+        normal_buffer.write(offset, reinterpret_cast<const void *> (data2), sizeof(data2));
 
         float p[6] = {-1,-1,-1,-1,-1,-1};
         normal_buffer.read(offset, reinterpret_cast<void *>(p), sizeof(p));
-        qDebug("Out: (%f, %f, %f), (%f, %f, %f)", p[0], p[1], p[2], p[3], p[4], p[5]);
-
     }
 
     normal_buffer.release();

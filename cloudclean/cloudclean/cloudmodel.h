@@ -14,15 +14,13 @@ class CloudModel : public QObject
     Q_OBJECT
 public:
 
-    int test();
-
-    int K;
-    float radius;
+    int                                             K;
+    float                                           radius;
 
     std::vector< int >                              cloud_to_grid_map;
-    int     x_dim;
-    int     y_dim;
-    bool    loaded;
+    int                                             x_dim;
+    int                                             y_dim;
+    bool                                            loaded;
 
     pcl::PointCloud<pcl::PointXYZI>::Ptr            cloud;
     QGLBuffer                                       point_buffer;

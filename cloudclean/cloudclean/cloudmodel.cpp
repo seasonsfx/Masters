@@ -134,9 +134,9 @@ bool CloudModel::createBuffers(){
         data2[0] = cloud->points[i].x;
         data2[1] = cloud->points[i].y;
         data2[2] = cloud->points[i].z;
-        data2[3] = data2[0]+(normals->at(i).data_n[0]*0.5);
-        data2[4] = data2[1]+(normals->at(i).data_n[1]*0.5);
-        data2[5] = data2[2]+(normals->at(i).data_n[2]*0.5);
+        data2[3] = data2[0]+(normals->at(i).data_n[0]*0.05);
+        data2[4] = data2[1]+(normals->at(i).data_n[1]*0.05);
+        data2[5] = data2[2]+(normals->at(i).data_n[2]*0.05);
 
         int offset = 6*sizeof(float)*i;
         normal_buffer.write(offset, reinterpret_cast<const void *> (data2), sizeof(data2));
@@ -258,8 +258,8 @@ void normal_estimation(pcl::PointCloud<pcl::PointXYZI>::Ptr cloud, pcl::PointClo
     int height = cloud->height;
     normals->points.resize(length);
 
-    for (int i = 0; i < length; ++i)
-    {
+    for (int i = 0; i < length; ++i){
+
         // Don't calculate normal for NANs
         if (cloud->points[i].x != cloud->points[i].x)
         {
@@ -275,12 +275,12 @@ void normal_estimation(pcl::PointCloud<pcl::PointXYZI>::Ptr cloud, pcl::PointClo
 
         // Array of ponits that form a traingle along with the center point
         PointIdxPair trianglePairs[8] = {
-            PointIdxPair(PointIdx(-1, -1), PointIdx(0, -1)),
-            PointIdxPair(PointIdx(0, -1), PointIdx(1, -1)),
+            PointIdxPair(PointIdx(0, -1), PointIdx(-1, -1)),
+            PointIdxPair(PointIdx(1, -1), PointIdx(0, -1)),
             PointIdxPair(PointIdx(-1, -1), PointIdx(-1, 0)),
-            PointIdxPair(PointIdx(1, -1), PointIdx(1, 0)),
-            PointIdxPair(PointIdx(-1, 0), PointIdx(-1, -1)),
-            PointIdxPair(PointIdx(1, 0), PointIdx(1, 1)),
+            PointIdxPair(PointIdx(1, 0), PointIdx(1, -1)),
+            PointIdxPair(PointIdx(-1, 0), PointIdx(-1, 1)),
+            PointIdxPair(PointIdx(1, 1), PointIdx(1, 0)),
             PointIdxPair(PointIdx(-1, 1), PointIdx(0, 1)),
             PointIdxPair(PointIdx(0, 1), PointIdx(1, 1))
         };
@@ -307,9 +307,9 @@ void normal_estimation(pcl::PointCloud<pcl::PointXYZI>::Ptr cloud, pcl::PointClo
             // is p1 out of bounds
             int x_pos = cur_x + relativePair.p1.x;
             int y_pos = cur_y + relativePair.p1.y;
-            if(x_pos > width || x_pos < 0)
+            if(x_pos > width-1 || x_pos < 0)
                 outbounds = true;
-            if(y_pos > height || y_pos < 0)
+            if(y_pos > height-1 || y_pos < 0)
                 outbounds = true;
 
             // is p2 out of bounds
@@ -341,7 +341,7 @@ void normal_estimation(pcl::PointCloud<pcl::PointXYZI>::Ptr cloud, pcl::PointClo
                 Eigen::Vector3f p2(cp2.x, cp2.y ,cp2.z);
 
                 // Cross product sometimes 0 0 0
-                Eigen::Vector3f tmp = ((p1 - p0).cross(p2 - p0));
+                Eigen::Vector3f tmp = ((p2 - p0).cross(p1 - p0));
                 tmp.normalize();
 
                 // Normalized 0 0 0 == NaN
@@ -359,7 +359,7 @@ void normal_estimation(pcl::PointCloud<pcl::PointXYZI>::Ptr cloud, pcl::PointClo
         }
 
         // Face count can be 0 or normals can cancel
-        if(agregate_n.sum() == 0){
+        if(face_count == 0){
             normals->points[i].data_n[0] = NAN;
             normals->points[i].data_n[1] = NAN;
             normals->points[i].data_n[2] = NAN;
@@ -367,13 +367,9 @@ void normal_estimation(pcl::PointCloud<pcl::PointXYZI>::Ptr cloud, pcl::PointClo
             continue;
         }
 
-        Eigen::Vector3f normal = (agregate_n/face_count).normalized();
+        Eigen::Vector3f normal = agregate_n.normalized();
 
-        pcl::flipNormalTowardsViewpoint (cloud->points[i],
-                                         cloud->sensor_origin_[0],
-                                         cloud->sensor_origin_[1],
-                                         cloud->sensor_origin_[2],
-                                         agregate_n);
+        pcl::flipNormalTowardsViewpoint (cloud->points[i], 0,0,0,normal);
 
         normals->points[i].data_n[0] = normal(0);
         normals->points[i].data_n[1] = normal(1);

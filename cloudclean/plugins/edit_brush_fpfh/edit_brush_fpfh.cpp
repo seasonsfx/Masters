@@ -59,12 +59,12 @@ bool EditBrush::StartEdit(QAction *action, CloudModel *cm, GLArea *glarea){
 
         t.start();
 
-        pcl::FPFHEstimation<pcl::PointXYZI, pcl::Normal, pcl::FPFHSignature33> fpfh;
+        pcl::FPFHEstimationOMP<pcl::PointXYZI, pcl::Normal, pcl::FPFHSignature33> fpfh;
         fpfh.setInputCloud (cm->cloud);
         fpfh.setInputNormals (cm->normals);
         fpfh.setSearchMethod(tree);
         int procs = omp_get_num_procs()/2; // Hyperthreading is bad
-        //fpfh.setNumberOfThreads(procs);
+        fpfh.setNumberOfThreads(procs);
 
         fpfhs = pcl::PointCloud<pcl::FPFHSignature33>::Ptr(new pcl::PointCloud<pcl::FPFHSignature33> ());
 
@@ -74,7 +74,7 @@ bool EditBrush::StartEdit(QAction *action, CloudModel *cm, GLArea *glarea){
         //fpfh.setKSearch(5);
 
         fpfh.compute (*fpfhs);
-
+/*
         for(int i = 0; i < fpfhs->size(); i++){
             pcl::FPFHSignature33 & sig = fpfhs->at(i);
             for(int j = 0; j < 33; j++){
@@ -83,7 +83,7 @@ bool EditBrush::StartEdit(QAction *action, CloudModel *cm, GLArea *glarea){
             printf("\n");
             fflush(stdout);
         }
-
+*/
         qDebug("Time to calc FPFH: %d ms", t.elapsed());
 
     }
@@ -254,13 +254,14 @@ void EditBrush::fill(int x, int y, float radius, int source_idx, int dest_idx, C
 
             float sum = 0;
             for(int i = 0; i < 33; i++){
-                sum += pow(current_sig.histogram[i] - neigbour_sig.histogram[i], 2);
+                //qDebug("%f - %f", current_sig.histogram[i], neigbour_sig.histogram[i]);
+                sum += powf(current_sig.histogram[i] - neigbour_sig.histogram[i], 2);
             }
-            float dist = sqrt(dist);
+            float dist = sqrt(sum);
 
             qDebug("Dist %f", dist);
 
-            if(dist > 4)
+            if(dist > 40)
                 continue;
 
             myqueue.push(idx);

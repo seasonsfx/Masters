@@ -164,7 +164,7 @@ void GLArea::paintGL(){
     glDepthFunc(GL_LEQUAL);
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-    /*
+
     point_shader.bind();
 
     glUniformMatrix4fv(point_shader.uniformLocation("modelToCameraMatrix"), 1, GL_FALSE, camera.modelviewMatrix().data());
@@ -199,11 +199,11 @@ void GLArea::paintGL(){
 
     cm->point_buffer.release();
     point_shader.release();
- */
+
 
     //cm->point_buffer.bind();
     //cm->point_buffer.release();
-
+/*
     // Paint normals
     if(cm->normal_buffer.isCreated()){
         assert(normal_shader.bind());
@@ -215,12 +215,16 @@ void GLArea::paintGL(){
         glEnable(GL_LINE_SMOOTH);
         glHint(GL_LINE_SMOOTH_HINT,  GL_NICEST);
         assert(cm->normal_buffer.bind());
+
+        normal_shader.enableAttributeArray( "vertex" );
+        normal_shader.setAttributeBuffer( "vertex", GL_FLOAT, 0, 3 );
+
         glDrawArrays(GL_LINES, 0, cm->cloud->size()*2);
         glError("Draw fuckup");
         cm->normal_buffer.release();
         normal_shader.release();
     }
-
+*/
     if(activeEditPlugin)
         activeEditPlugin->paintGL(cm, this);
 

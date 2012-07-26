@@ -86,7 +86,7 @@ bool EditBrush::StartEdit(QAction *action, CloudModel *cm, GLArea *glarea){
             pcl::PointXYZI & p = cm->cloud->at(i);
 
             boost::shared_ptr <std::vector<int> > kIdxs;
-            kIdxs = boost::shared_ptr <std::vector<int> >(new std::vector);
+            kIdxs = boost::shared_ptr <std::vector<int> >(new std::vector<int>);
             vector<float> kDist;
             octree->nearestKSearch(i, K, *kIdxs, kDist);
             pcEstimator.setIndices(kIdxs);

@@ -21,7 +21,8 @@ SOURCES += \
     layerview.cpp \
     pluginmanager.cpp \
     toolbox.cpp \
-    camera.cpp
+    camera.cpp \
+    subsampledialog.cpp
 
 HEADERS  += \
     io.h \
@@ -33,7 +34,8 @@ HEADERS  += \
     layerview.h \
     pluginmanager.h \
     toolbox.h \
-    camera.h
+    camera.h \
+    subsampledialog.h
 
 QMAKE_LFLAGS += -rdynamic
 
@@ -74,7 +76,8 @@ OTHER_FILES += \
 
 FORMS += \
     layerview.ui \
-    toolbox.ui
+    toolbox.ui \
+    subsampledialog.ui
 
 RESOURCES += \
     cloudclean.qrc

@@ -188,7 +188,7 @@ void EditBrush::fill(int x, int y, float radius, int source_idx, int dest_idx, C
     std::vector<int> & source = cm->layerList.layers[source_idx].index;
     std::vector<int> & dest = cm->layerList.layers[dest_idx].index;
 
-    while (!myqueue.empty() && count++ < 10000){
+    while (!myqueue.empty() /*&& count++ < 10000*/){
         current = myqueue.front(); myqueue.pop();
 
         // Skip invalid indices, visited indices are invalid

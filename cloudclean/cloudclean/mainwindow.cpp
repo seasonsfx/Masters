@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "cloudmodel.h"
+#include "subsampledialog.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
@@ -50,12 +51,13 @@ MainWindow::MainWindow(QWidget *parent) :
 
 bool MainWindow::loadScan(){
     QString filename = QFileDialog::getOpenFileName(this, tr("Open Scan"), "~", tr("PTX Files (*.ptx)"));
+    int subsample = SubsampleDialog::getSubsample();
 
-    if(filename.length() == 0)
+    if(filename.length() == 0 || subsample == -1)
         return false;
 
     const char *ptr = filename.toAscii().data();
-    CloudModel::Instance()->loadFile(ptr, 4);
+    CloudModel::Instance()->loadFile(ptr, subsample);
     glarea->modelReloaded();
     return true;
 }

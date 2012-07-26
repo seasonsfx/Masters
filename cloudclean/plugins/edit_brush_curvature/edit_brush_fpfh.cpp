@@ -11,14 +11,13 @@
 #include "layer.h"
 #include "QAbstractItemView"
 #include <QTime>
-#include <pcl/features/fpfh_omp.h>
+#include <pcl/features/principal_curvatures.h>
 #include <omp.h>
-#include <pcl/common/pca.h>
 
 EditBrush::EditBrush()
 {
 
-    editSample = new QAction(QIcon(":/images/brush.png"), "Brush select (FPFH)", this);
+    editSample = new QAction(QIcon(":/images/brush.png"), "Brush select (Curvature)", this);
     actionList << editSample;
     foreach(QAction *editAction, actionList)
         editAction->setCheckable(true);
@@ -56,15 +55,13 @@ bool EditBrush::StartEdit(QAction *action, CloudModel *cm, GLArea *glarea){
 
         pcl::search::KdTree<pcl::PointXYZI>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZI>);
 
-        qDebug("Num of CPU: %d", omp_get_num_procs());
-
         t.start();
 
         pcl::FPFHEstimationOMP<pcl::PointXYZI, pcl::Normal, pcl::FPFHSignature33> fpfh;
         fpfh.setInputCloud (cm->cloud);
         fpfh.setInputNormals (cm->normals);
         fpfh.setSearchMethod(tree);
-        int procs = omp_get_num_procs()/2; // Hyperthreading is bad
+        int procs = 2; // omp_get_num_procs() Hyperthreading is bad
         fpfh.setNumberOfThreads(procs);
 
         fpfhs = pcl::PointCloud<pcl::FPFHSignature33>::Ptr(new pcl::PointCloud<pcl::FPFHSignature33> ());

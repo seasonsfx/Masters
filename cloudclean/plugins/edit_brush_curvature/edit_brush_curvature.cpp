@@ -1,7 +1,7 @@
 #define GL3_PROTOTYPES
 #include <../../external/gl3.h>
 #include <GL/glu.h>
-#include "edit_brush_fpfh.h"
+#include "edit_brush_curvature.h"
 #include <QIcon>
 #include <QDebug>
 #include <QResource>
@@ -11,14 +11,13 @@
 #include "layer.h"
 #include "QAbstractItemView"
 #include <QTime>
-#include <pcl/features/fpfh_omp.h>
 #include <omp.h>
 #include <pcl/common/pca.h>
 
 EditBrush::EditBrush()
 {
 
-    editSample = new QAction(QIcon(":/images/brush.png"), "Brush select (FPFH)", this);
+    editSample = new QAction(QIcon(":/images/brush.png"), "Brush select (Curvature)", this);
     actionList << editSample;
     foreach(QAction *editAction, actionList)
         editAction->setCheckable(true);
@@ -56,36 +55,46 @@ bool EditBrush::StartEdit(QAction *action, CloudModel *cm, GLArea *glarea){
 
         pcl::search::KdTree<pcl::PointXYZI>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZI>);
 
-        qDebug("Num of CPU: %d", omp_get_num_procs());
-
         t.start();
 
-        pcl::FPFHEstimationOMP<pcl::PointXYZI, pcl::Normal, pcl::FPFHSignature33> fpfh;
-        fpfh.setInputCloud (cm->cloud);
-        fpfh.setInputNormals (cm->normals);
-        fpfh.setSearchMethod(tree);
-        int procs = omp_get_num_procs()/2; // Hyperthreading is bad
-        fpfh.setNumberOfThreads(procs);
-
-        fpfhs = pcl::PointCloud<pcl::FPFHSignature33>::Ptr(new pcl::PointCloud<pcl::FPFHSignature33> ());
-
+        /*
+        pcl::PrincipalCurvaturesEstimation<pcl::PointXYZI, pcl::Normal, pcl::PrincipalCurvatures> pcEstimator;
+        pcEstimator.setInputCloud (cm->cloud);
+        pcEstimator.setInputNormals (cm->normals);
+        pcEstimator.setSearchMethod(tree);
+        pcs = pcl::PointCloud<pcl::PrincipalCurvatures>::Ptr(new pcl::PointCloud<pcl::PrincipalCurvatures>());
         // Use all neighbors in a sphere of radius 5cm
         // IMPORTANT: the radius used here has to be larger than the radius used to estimate the surface normals!!!
-        fpfh.setRadiusSearch (0.05);
-        //fpfh.setKSearch(5);
+        pcEstimator.setRadiusSearch (0.05);
+        //fpfh.setKSearch(5)
+        pcEstimator.compute (*pcs);
+        */
 
-        fpfh.compute (*fpfhs);
-/*
-        for(int i = 0; i < fpfhs->size(); i++){
-            pcl::FPFHSignature33 & sig = fpfhs->at(i);
-            for(int j = 0; j < 33; j++){
-                printf("%f ", sig.histogram[j]);
-            }
-            printf("\n");
-            fflush(stdout);
+
+        eigen_vals = boost::shared_ptr<std::vector<Eigen::Vector3f> >(new std::vector<Eigen::Vector3f>());
+        eigen_vals->resize(cm->cloud->size());
+
+        int K = 10;
+
+        pcl::PCA<pcl::PointXYZI> pcEstimator;
+        pcEstimator.setInputCloud (cm->cloud);
+
+
+
+        // For every value
+        for(int i = 0; i < cm->cloud->size(); i++){
+            pcl::PointXYZI & p = cm->cloud->at(i);
+
+            boost::shared_ptr <std::vector<int> > kIdxs;
+            kIdxs = boost::shared_ptr <std::vector<int> >(new std::vector);
+            vector<float> kDist;
+            octree->nearestKSearch(i, K, *kIdxs, kDist);
+            pcEstimator.setIndices(kIdxs);
+            eigen_vals->at(i) = pcEstimator.getEigenValues();
         }
-*/
-        qDebug("Time to calc FPFH: %d ms", t.elapsed());
+
+
+        qDebug("Time to calc PCA: %d ms", t.elapsed());
 
     }
 
@@ -217,7 +226,7 @@ void EditBrush::fill(int x, int y, float radius, int source_idx, int dest_idx, C
     std::vector<int> & source = cm->layerList.layers[source_idx].index;
     std::vector<int> & dest = cm->layerList.layers[dest_idx].index;
 
-    while (!myqueue.empty() && count++ < 10000){
+    while (!myqueue.empty() /*&& count++ < 10000*/){
         current = myqueue.front(); myqueue.pop();
 
         // Skip invalid indices, visited indices are invalid
@@ -227,8 +236,6 @@ void EditBrush::fill(int x, int y, float radius, int source_idx, int dest_idx, C
         // copy from source to dest
         dest[current] = source[current];
         source[current] = -1;
-
-        //break; // Remove this to restore functionality
 
         // push neighbours..
 
@@ -240,7 +247,7 @@ void EditBrush::fill(int x, int y, float radius, int source_idx, int dest_idx, C
         std::vector<float> pointNKNSquaredDistance(K);
         octree->nearestKSearch (cm->cloud->points[current], K, pointIdxNKNSearch, pointNKNSquaredDistance);
 
-        pcl::FPFHSignature33 & current_sig = fpfhs->at(current);
+        //pcl::PrincipalCurvatures & current_pc = pcs->at(current);
 
         for (int i = 0; i < pointIdxNKNSearch.size (); ++i)
         {
@@ -250,19 +257,35 @@ void EditBrush::fill(int x, int y, float radius, int source_idx, int dest_idx, C
             if(source[idx] == -1)
                 continue;
 
-            // Skip if to far in feature space
-            pcl::FPFHSignature33 & neigbour_sig = fpfhs->at(idx);
+            // Lets do plane select
+            // Need to classify points as a plane, line, or edge
+            Eigen::Vector3f & evals = eigen_vals->at(i);
 
-            float sum = 0;
-            for(int i = 0; i < 33; i++){
-                //qDebug("%f - %f", current_sig.histogram[i], neigbour_sig.histogram[i]);
-                sum += powf(current_sig.histogram[i] - neigbour_sig.histogram[i], 2);
+            // Make eigenvalues poistive and sort them
+            float eigenvalues[3] = {fabs(evals.x()), fabs(evals.y()), fabs(evals.z())};
+
+            for(int j = 0; j < 3; j++ ){
+                int max = j;
+                for(int k = j; k < 3; k++ ){
+                    if(eigenvalues[k] > eigenvalues[max])
+                        max = k;
+                }
+                float tmp = eigenvalues[j];
+                eigenvalues[j] = eigenvalues[max];
+                eigenvalues[max] = tmp;
             }
-            float dist = sqrt(sum);
 
-            qDebug("Dist %f", dist);
 
-            if(dist > 40)
+
+            // Select the biggest 2 eigen values
+
+            float ratio = fabs(eigenvalues[1]/eigenvalues[0]);
+
+            qDebug("New vals: %f, %f, %f", eigenvalues[0], eigenvalues[1], eigenvalues[2]);
+
+            qDebug("Ratio %f", ratio);
+
+            if(ratio < 0.5)
                 continue;
 
             myqueue.push(idx);

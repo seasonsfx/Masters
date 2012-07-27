@@ -17,12 +17,16 @@ Layer::Layer(): gl_index_buffer(QGLBuffer::IndexBuffer)
     this->visible = true;
     this->colour << rand_range(0.2f, 1.0f), rand_range(0.2f, 1.0f), rand_range(0.2f, 1.0f);
 
+    this->cpu_dirty = true;
+    this->gpu_dirty = false;
+
     bool created = gl_index_buffer.create();
 
     if(!created){
         qDebug("Did not create buffer");
         throw "a fit";
     }
+
     gl_index_buffer.setUsagePattern( QGLBuffer::DynamicDraw );
     gl_index_buffer.bind();
     gl_index_buffer.allocate(CloudModel::Instance()->cloud->size() * sizeof(int));
@@ -30,6 +34,20 @@ Layer::Layer(): gl_index_buffer(QGLBuffer::IndexBuffer)
 
     index.resize(CloudModel::Instance()->cloud->size(), -1);
 
+    // blank index
+    for(int & i: index)
+        i = -1;
+
+}
+
+bool Layer::sync(){
+    if(cpu_dirty & gpu_dirty)
+        return false;
+    if(cpu_dirty)
+        copyToGPU();
+    if(gpu_dirty)
+        copyFromGPU();
+    return true;
 }
 
 void Layer::copyToGPU(){
@@ -40,6 +58,8 @@ void Layer::copyToGPU(){
     gl_index_buffer.bind();
     gl_index_buffer.write(0, &index[0], gl_index_buffer.size());
     gl_index_buffer.release();
+    gpu_dirty = false;
+    cpu_dirty = false;
 }
 
 void Layer::copyFromGPU(){

@@ -2,7 +2,6 @@ include(../../shared.pri)
 
 TARGET = edit_brush_fpfh
 HEADERS += \
-    cpu_brush.h \
     edit_brush_fpfh.h
 
 

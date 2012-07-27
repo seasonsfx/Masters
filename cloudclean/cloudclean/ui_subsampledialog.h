@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'subsampledialog.ui'
 **
-** Created: Thu Jul 26 16:06:09 2012
+** Created: Fri Jul 27 14:43:27 2012
 **      by: Qt User Interface Compiler version 4.8.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -48,7 +48,7 @@ public:
         spinBox->setMinimum(0);
         spinBox->setMaximum(32);
         spinBox->setSingleStep(2);
-        spinBox->setValue(2);
+        spinBox->setValue(0);
 
         retranslateUi(SubsampleDialog);
         QObject::connect(buttonBox, SIGNAL(accepted()), SubsampleDialog, SLOT(accept()));

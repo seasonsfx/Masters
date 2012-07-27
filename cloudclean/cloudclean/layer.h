@@ -9,17 +9,22 @@ class Layer
 {
 public:
     Layer();
-    void copyToGPU();
-    void copyFromGPU();
     void toggleActive();
     void toggleVisible();
     void setActive(bool isActive);
+
+    void copyToGPU();
+    void copyFromGPU();
+    bool sync();
 
     QGLBuffer gl_index_buffer;
     std::vector<int> index;
     Eigen::Vector3f colour;
     bool visible;
     bool active;
+
+    bool gpu_dirty;
+    bool cpu_dirty;
 private:
 };
 

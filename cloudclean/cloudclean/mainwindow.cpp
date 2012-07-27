@@ -54,10 +54,14 @@ bool MainWindow::loadScan(){
     int subsample = SubsampleDialog::getSubsample();
 
     if(filename.length() == 0 || subsample == -1)
-        return false;
+        return false;   
 
     const char *ptr = filename.toAscii().data();
-    CloudModel::Instance()->loadFile(ptr, subsample);
+    char* f = new char[filename.length()];
+    strcpy(f,ptr);
+
+    CloudModel::Instance()->loadFile(f, subsample);
+    delete f;
     glarea->modelReloaded();
     return true;
 }

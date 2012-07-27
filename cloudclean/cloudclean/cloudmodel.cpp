@@ -4,7 +4,6 @@
 #include <pcl/filters/filter.h>
 #include <QDebug>
 #include <QTime>
-//#include <pcl/visualization/cloud_viewer.h>
 #include <GL/glu.h>
 
 void inline  glError(const char * msg){
@@ -58,12 +57,14 @@ bool CloudModel::saveFile(const char * output_file){
     std::vector<Layer> & layers = layerList.layers;
     for(unsigned int l = 0; l < layers.size(); l++){
         printf("l: %d\n", l);
-        if(!layers[l].active)
+        if(!layers[l].visible)
             continue;
         layers[l].copyFromGPU();
         for(unsigned int i = 0; i < layers[l].index.size(); i++){
             printf("i: %d\n", i);
             int idx = layers[l].index[i];
+            // for some reason bad indices sneak in here
+            // that are not -1
             if(idx == -1)
                 continue;
             original_cloud->points[cloud_to_grid_map[idx]] = cloud->points[idx];
@@ -107,22 +108,30 @@ bool CloudModel::createBuffers(){
 
     Layer & layer = layerList.layers[0];
 
-    layer.colour = Eigen::Vector3f(1.0f, 0.5f, 0.5f);
+    // Change initial layers colour
+    layer.colour = Eigen::Vector3f(1.0f, 1.0f, 1.0f);
+
+    /*layer.colour = Eigen::Vector3f(1.0f, 0.5f, 0.5f);
     layer.gl_index_buffer.create();
     layer.gl_index_buffer.setUsagePattern( QGLBuffer::DynamicDraw );
     layer.gl_index_buffer.bind();
     layer.gl_index_buffer.allocate(cloud->size() * sizeof(int) );
+*/
 
     /// Initialise the first layer to include all points
     for(unsigned int i = 0; i < cloud->size(); i++){
-        layer.gl_index_buffer.write(i*sizeof(int), reinterpret_cast<const void *>(&i), sizeof(int));
+        layer.index[i] = i;
+        //layer.gl_index_buffer.write(i*sizeof(int), reinterpret_cast<const void *>(&i), sizeof(int));
     }
 
-    layer.gl_index_buffer.release();
+    layer.cpu_dirty = true;
+    layer.sync();
+
+    //layer.gl_index_buffer.release();
 
     // Comment this out if all works
     // Load normals to gpu
-
+/*
     normal_buffer.create();
     normal_buffer.setUsagePattern( QGLBuffer::DynamicDraw );
     assert(normal_buffer.bind());
@@ -146,7 +155,7 @@ bool CloudModel::createBuffers(){
     }
 
     normal_buffer.release();
-
+*/
     qDebug("Buffers created & loaded.");
     return true;
 }

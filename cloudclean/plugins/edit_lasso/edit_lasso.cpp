@@ -300,8 +300,6 @@ void EditLasso::paintGL(CloudModel *, GLArea * glarea){
 
 bool EditLasso::mouseDoubleClickEvent  (QMouseEvent *event, CloudModel * cm, GLArea * glarea){
 
-    qDebug("DOUBLE CLICK");
-
     // End lasso
     lasso_active = !lasso_active;
     if(lasso_active){
@@ -313,8 +311,6 @@ bool EditLasso::mouseDoubleClickEvent  (QMouseEvent *event, CloudModel * cm, GLA
     }
 
     glarea->updateGL();
-
-    qDebug("DOUBLE CLICK END - Lasso size: %d", lasso.size());
 
     return true;
 }
@@ -328,13 +324,12 @@ bool EditLasso::StartEdit(QAction *action, CloudModel *cm, GLArea *glarea){
 
 
     if(lasso_buffer.isCreated()){
-        qDebug("Already initiated\n");
         return false;
     }
 
     // OpenGL
-    //if (!glarea->prepareShaderProgram(lasso_shader, ":/shaders/lasso.vert", ":/shaders/lasso.frag" ))
-    if (!glarea->prepareShaderProgram(lasso_shader, "/home/rickert/Masters/cloudclean/plugins/edit_lasso/shaders/lasso.vert", "/home/rickert/Masters/cloudclean/plugins/edit_lasso/shaders/lasso.frag" ))
+    if (!glarea->prepareShaderProgram(lasso_shader, ":/shaders/lasso.vert", ":/shaders/lasso.frag" ))
+    //if (!glarea->prepareShaderProgram(lasso_shader, "/home/rickert/Masters/cloudclean/plugins/edit_lasso/shaders/lasso.vert", "/home/rickert/Masters/cloudclean/plugins/edit_lasso/shaders/lasso.frag" ))
         return false;
 
     lasso_shader.bind();

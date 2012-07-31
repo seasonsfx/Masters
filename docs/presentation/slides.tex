@@ -45,7 +45,7 @@
 % does not look nice, try deleting the line with the fontenc.
 \usepackage{graphicx}
 
-\title{Semi-automated point cloud cleaning}
+\title{Cleaning vegetation from point clouds}
 
 \author{Rickert Mulder}
 % - Give the names in the same order as the appear in the paper.
@@ -103,7 +103,6 @@
 
 \begin{frame}{Outline}
   \tableofcontents
-  % You might wish to add the option [pausesections]
 \end{frame}
 
 
@@ -138,12 +137,14 @@
   \item
     Cultural heritage preservation.
   \item
-    Capture the spatial domain of heritage sites.
+    Capture the 3D structure of heritage sites.
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Capturing the Spatial Domain}
+\begin{frame}{Capturing the 3D structure}
   \includegraphics[width=0.60\textwidth]{pics/scanning.jpg}
+  	% There are many ways in which this can be done
+  	% Structured light, structure from motion, traingulation
     \begin{itemize}
   \item
     Laser range scanning.
@@ -165,7 +166,7 @@
   \item
   Involves the classification and segmentation of `noise'.
   \item
-  It can happen before or after registration.
+  It can be performed before or after registration.
   % duplication of work
   % more memory requirements
   % size of data input should be noted
@@ -181,6 +182,8 @@
   500 - 1000 scans per expedition.
   \item
   30 min to 2 hours per scan.
+  \item
+  Vegetation is most problematic
   % duplication of work
   % more memory requirements
   % size of data input should be noted
@@ -219,19 +222,18 @@ Existing tools vary in terms of
 
 \end{frame}
 
-
 \begin{frame}{Simple tools}
 
 \begin{columns}[T]
 \begin{column}{0.5\textwidth}
 Manual\\
 High accuracy\\
+Work well for isolated noise\\
 \textbf{Examples:}
 \begin{itemize}
-\item Point picking.
-\item Rectangle select.
-\item Lasso tool.
-\item 3D selection brushes.
+\item Rectangle select
+\item Lasso tool
+\item 3D brushes
 \end{itemize}
 
 \end{column}
@@ -245,7 +247,6 @@ High accuracy\\
 
 \begin{frame}{Semi-automated tools}
 
-
 \begin{columns}[T]
 \begin{column}{0.5\textwidth}
 
@@ -254,19 +255,19 @@ Varying accuracy\\
 Not suitable for all artefacts\\
 \textbf{Examples:}
 \begin{itemize}
-\item Plane select.
-\item Region growing based on:
+\item Plane select
+\item Flood fill using metrics such as:
 
 \begin{itemize}
-\item Point intensity or colour value.
-\item Point normals.
-\item Distance.
+\item Point intensity or colour
+\item Point normals
+\item Distance
 \end{itemize}
 
-\item Specialised selections.
+\item Specialised selections
 \begin{itemize}
-\item Power lines.
-\item Fire hydrants.
+\item Power lines
+\item Fire hydrants
 \end{itemize}
 \end{itemize}
 
@@ -280,7 +281,7 @@ Not suitable for all artefacts\\
 \end{frame}
 
 
-\begin{frame}{Fully automated}
+\begin{frame}{Fully automated tools}
 
 \begin{columns}[T]
 \begin{column}{0.5\textwidth}
@@ -290,18 +291,18 @@ Low accuracy\\
 
 \textbf{Examples:}
 \begin{itemize}
-\item Isolated point removal.
+\item Isolated point removal
 \item Point clustering based on:
 \begin{itemize}
-\item Distance.
-\item Colour/Intensity.
+\item Distance
+\item Colour/Intensity
 \end{itemize}
 \item Classification of:
 \begin{itemize}
-\item Ground.
-\item Roofs.
-\item Vegetation.
-\item XYZ planes.
+\item Ground
+\item Roofs
+\item Vegetation
+\item XYZ planes
 \end{itemize}
 
 \end{itemize}
@@ -332,17 +333,19 @@ Low accuracy\\
 
 \end{frame}
 
-\begin{frame}{General classification}
+\begin{frame}{Popular segmentation approaches}
 
 \begin{columns}[T]
 \begin{column}{0.5\textwidth}
 
 \begin{enumerate}
-\item Calculate point features.
+\item Calculate point features
+% What is a point feature
+% Characterises the local neighbourhood
 \item Classify points:
 \begin{itemize}
-\item Heuristics.
-\item Probabilistic models.
+\item Heuristics
+\item Probabilistic models
 \end{itemize}
 \end{enumerate}
 

@@ -1,0 +1,21 @@
+Hi My name is rick and the next 10 minutes will be all about my masters project.
+
+Im this presentation i tell you what I'm doing, why I'm doing it and, how I'm doing it.
+
+What am I doing?
+I'm attempting to remove plants from 3d laser scans.
+Do it fast and accurately.
+
+Why am I doing this?
+The people over at the zamani project are having a hard time doing this with existing tools.
+All types of noise is problematic but vegatation is the most problematic.
+Isolated 
+What is wrong existing software
+ 
+How am I doing this?
+Create a point cloud cleaner to remove this.
+Pont cloud cleaner is a framework to test existing algorithms and create new ones, combine them in new ways, incorporate human input.
+
+All algorithms are implemented in plugins. Makes things more managable. Idea shamelessly stolen from meshlab.
+
+Augmented aproach is taken because its higly unlikely that fully automated approaches will work.

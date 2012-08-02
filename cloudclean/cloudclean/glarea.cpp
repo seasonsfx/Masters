@@ -58,7 +58,8 @@ GLArea::GLArea(QWidget* parent )
 
 void GLArea::initializeGL()
 {
-    glClearColor( 0.1f, 0.1f, 0.1f, 1.0f );
+    //glClearColor( 0.1f, 0.1f, 0.1f, 1.0f );
+    glClearColor( 0.9f, 0.9f, 0.9f, 1.0f );
     glEnable(GL_DEPTH_TEST);
 
     assert(prepareShaderProgram(point_shader, ":/shaders/points.vert", ":/shaders/points.frag" ) );

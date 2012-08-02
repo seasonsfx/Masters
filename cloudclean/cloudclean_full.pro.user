@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by Qt Creator 2.4.1, 2012-07-27T15:25:48. -->
+<!-- Written by Qt Creator 2.4.1, 2012-08-02T17:45:27. -->
 <qtcreator>
  <data>
   <variable>ProjectExplorer.Project.ActiveTarget</variable>
@@ -170,9 +170,11 @@
    </valuemap>
    <value type="int" key="ProjectExplorer.Target.DeployConfigurationCount">1</value>
    <valuemap type="QVariantMap" key="ProjectExplorer.Target.RunConfiguration.0">
-    <value type="bool" key="Analyzer.Project.UseGlobal">true</value>
     <value type="bool" key="Analyzer.Project.UseGlobal">false</value>
-    <valuelist type="QVariantList" key="Analyzer.Valgrind.AddedSuppressionFiles"/>
+    <value type="bool" key="Analyzer.Project.UseGlobal">false</value>
+    <valuelist type="QVariantList" key="Analyzer.Valgrind.AddedSuppressionFiles">
+     <value type="QString">/home/rickert/Masters/cloudclean/opengl.supp</value>
+    </valuelist>
     <valuelist type="QVariantList" key="Analyzer.Valgrind.AddedSuppressionFiles">
      <value type="QString">/home/rickert/Masters/cloudclean/opengl.supp</value>
     </valuelist>

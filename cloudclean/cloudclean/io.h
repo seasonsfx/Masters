@@ -140,7 +140,7 @@ pcl::PointCloud<pcl::PointXYZI>::Ptr read_ptx(const char* filename, int subsampl
     unsigned int i = 1;
     int sample = 0;
 
-    while(sample < width*height){
+    while(sample < width*height-1){
         if( (sample++%(subsample*subsample)) != 0){
             getline( ptx_file, line);
 			continue;

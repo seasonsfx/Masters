@@ -14,6 +14,11 @@
 #include <omp.h>
 #include <pcl/common/pca.h>
 
+
+float CURVATURE = 12;
+int NEIGHBOURS = 32;
+
+
 EditBrush::EditBrush()
 {
 
@@ -74,8 +79,6 @@ bool EditBrush::StartEdit(QAction *action, CloudModel *cm, GLArea *glarea){
         eigen_vals = boost::shared_ptr<std::vector<Eigen::Vector3f> >(new std::vector<Eigen::Vector3f>());
         eigen_vals->resize(cm->cloud->size());
 
-        int K = 10;
-
         pcl::PCA<pcl::PointXYZI> pcEstimator;
         pcEstimator.setInputCloud (cm->cloud);
 
@@ -83,14 +86,20 @@ bool EditBrush::StartEdit(QAction *action, CloudModel *cm, GLArea *glarea){
 
         // For every value
         for(int i = 0; i < cm->cloud->size(); i++){
-            pcl::PointXYZI & p = cm->cloud->at(i);
+            //pcl::PointXYZI & p = cm->cloud->at(i);
 
             boost::shared_ptr <std::vector<int> > kIdxs;
             kIdxs = boost::shared_ptr <std::vector<int> >(new std::vector<int>);
             vector<float> kDist;
-            octree->nearestKSearch(i, K, *kIdxs, kDist);
+            octree->nearestKSearch(i, NEIGHBOURS, *kIdxs, kDist);
+
+            //std::vector<int> t = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ,10, 11, 12, 13, 14, 15};
+            //boost::shared_ptr<vector<int> > idxs(new vector<int>(t));
+
             pcEstimator.setIndices(kIdxs);
+            //pcEstimator.setIndices(idxs);
             eigen_vals->at(i) = pcEstimator.getEigenValues();
+            //qDebug("Eigen values: %f %f %f", eigen_vals->at(i).x(), eigen_vals->at(i).y(), eigen_vals->at(i).z());
         }
 
 
@@ -226,7 +235,7 @@ void EditBrush::fill(int x, int y, float radius, int source_idx, int dest_idx, C
     std::vector<int> & source = cm->layerList.layers[source_idx].index;
     std::vector<int> & dest = cm->layerList.layers[dest_idx].index;
 
-    while (!myqueue.empty() /*&& count++ < 10000*/){
+    while (!myqueue.empty() && count++ < 10000){
         current = myqueue.front(); myqueue.pop();
 
         // Skip invalid indices, visited indices are invalid
@@ -261,8 +270,8 @@ void EditBrush::fill(int x, int y, float radius, int source_idx, int dest_idx, C
             // Need to classify points as a plane, line, or edge
             Eigen::Vector3f & evals = eigen_vals->at(i);
 
-            // Make eigenvalues poistive and sort them
-            float eigenvalues[3] = {fabs(evals.x()), fabs(evals.y()), fabs(evals.z())};
+
+            float eigenvalues[3] = {evals.x(), evals.y(), evals.z()};
 
             for(int j = 0; j < 3; j++ ){
                 int max = j;
@@ -276,16 +285,18 @@ void EditBrush::fill(int x, int y, float radius, int source_idx, int dest_idx, C
             }
 
 
-
             // Select the biggest 2 eigen values
 
             float ratio = fabs(eigenvalues[1]/eigenvalues[0]);
-
-            qDebug("New vals: %f, %f, %f", eigenvalues[0], eigenvalues[1], eigenvalues[2]);
-
             qDebug("Ratio %f", ratio);
 
-            if(ratio < 0.5)
+            qDebug("Sorted eigen vals: %f, %f, %f", eigenvalues[0], eigenvalues[1], eigenvalues[2]);
+
+            //bool is_edge = eigenvalues[0] * CURVATURE > eigenvalues[1];
+
+            bool is_plane = eigenvalues[1]/eigenvalues[0] > 0.8 && eigenvalues[2]/eigenvalues[0] < 0.2;
+
+            if(!is_plane)
                 continue;
 
             myqueue.push(idx);

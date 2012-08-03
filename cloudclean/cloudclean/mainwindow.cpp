@@ -58,10 +58,10 @@ bool MainWindow::loadScan(){
 
     const char *ptr = filename.toAscii().data();
     char* f = new char[filename.length()];
-    strcpy(f,ptr);
+    strcpy(f,ptr); // invalid read of size 1
 
     CloudModel::Instance()->loadFile(f, subsample);
-    delete f;
+    delete[] f; // Mismatched free() / delete / delete []
     glarea->modelReloaded();
     return true;
 }

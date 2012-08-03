@@ -51,7 +51,7 @@ GLArea::GLArea(QWidget* parent )
     setAutoFillBackground(false);    // OpenCL
     clGetPlatformIDs(1, &platform, NULL);
 
-
+    mouseDown = Qt::NoButton;
 
     srand (time(NULL));
 }
@@ -260,7 +260,8 @@ void GLArea::paintGL(){
         if ((cfps>0) && (cfps<999))
             col1Text += QString("FPS: %1\n").arg(cfps,7,'f',1);
         col1Text += QString("Vertices: %1\n").arg(cm->cloud->size());
-        col1Text += QString("Cloud size: %1 KB\n").arg((cm->cloud->size() * 4)/(1024.0f));
+        float cloud_size = (cm->cloud->size() * 4)/(1024.0f);
+        col1Text += QString("Cloud size: %1 KB\n").arg(cloud_size, 7,'f',1);
 
         /*
         if(fov>5) col0Text += QString("FOV: %1\n").arg(fov);

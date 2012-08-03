@@ -165,19 +165,14 @@ void EditLasso::lassoToLayerGPU(CloudModel * cm, GLArea * glarea){
 #include "cpu_lasso.h"
 
 void EditLasso::lassoToLayerCPU(CloudModel *cm, GLArea *glarea){
-    qDebug("Used CPU");
     std::vector<Layer> & layers = cm->layerList.layers;
 
-    QGLBuffer & source = layers[0].gl_index_buffer;
-    QGLBuffer & dest = layers[layers.size()-1].gl_index_buffer;
+    Layer & source = layers[0];
+    Layer & dest = layers[layers.size()-1];
 
     /// Create and read source index from gpu
-    int * dest_indices = new int[cm->cloud->size()];
-    int * source_indices = new int[cm->cloud->size()];
-
-    source.bind(); /// Bind source
-    source.read(0, source_indices, source.size());
-    source.release();
+    vector<int> & dest_indices = dest.index;
+    vector<int> & source_indices = source.index;
 
     // Create lasso
     int lasso_size = lasso.size();
@@ -224,20 +219,13 @@ void EditLasso::lassoToLayerCPU(CloudModel *cm, GLArea *glarea){
     }
 
     /// Write results gpu
-    dest.bind();
-    dest.write(0, dest_indices, dest.size());
-    dest.release();
+    source.cpu_dirty = true;
+    dest.cpu_dirty = true;
 
-    source.bind();
-    source.write(0, source_indices, source.size());
-    source.release();
-
-
-    delete [] source_indices;
-    delete [] dest_indices;
+    source.sync();
+    dest.sync();
 
     lasso.clear();
-    fflush(stdout);
 }
 
 

@@ -79,9 +79,6 @@ bool EditBrush::StartEdit(QAction *action, CloudModel *cm, GLArea *glarea){
         eigen_vals = boost::shared_ptr<std::vector<Eigen::Vector3f> >(new std::vector<Eigen::Vector3f>());
         eigen_vals->resize(cm->cloud->size());
 
-        pcl::PCA<pcl::PointXYZI> pcEstimator;
-        pcEstimator.setInputCloud (cm->cloud);
-
 
 
         // For every value
@@ -93,15 +90,21 @@ bool EditBrush::StartEdit(QAction *action, CloudModel *cm, GLArea *glarea){
             vector<float> kDist;
             octree->nearestKSearch(i, NEIGHBOURS, *kIdxs, kDist);
 
+
+            /*for(int n: *kIdxs.get()){
+                qDebug("Idx: %d", n);
+            }*/
+
             //std::vector<int> t = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ,10, 11, 12, 13, 14, 15};
             //boost::shared_ptr<vector<int> > idxs(new vector<int>(t));
-
-            pcEstimator.setIndices(kIdxs);
             //pcEstimator.setIndices(idxs);
+
+            pcl::PCA<pcl::PointXYZI> pcEstimator;
+            pcEstimator.setInputCloud (cm->cloud);
+            pcEstimator.setIndices(kIdxs);
             eigen_vals->at(i) = pcEstimator.getEigenValues();
             //qDebug("Eigen values: %f %f %f", eigen_vals->at(i).x(), eigen_vals->at(i).y(), eigen_vals->at(i).z());
         }
-
 
         qDebug("Time to calc PCA: %d ms", t.elapsed());
 
@@ -287,16 +290,16 @@ void EditBrush::fill(int x, int y, float radius, int source_idx, int dest_idx, C
 
             // Select the biggest 2 eigen values
 
-            float ratio = fabs(eigenvalues[1]/eigenvalues[0]);
-            qDebug("Ratio %f", ratio);
+            //float ratio = fabs(eigenvalues[1]/eigenvalues[0]);
+            //qDebug("Ratio %f", ratio);
 
             qDebug("Sorted eigen vals: %f, %f, %f", eigenvalues[0], eigenvalues[1], eigenvalues[2]);
 
-            //bool is_edge = eigenvalues[0] * CURVATURE > eigenvalues[1];
+            bool is_plane = eigenvalues[1] * CURVATURE > eigenvalues[0];
 
-            bool is_plane = eigenvalues[1]/eigenvalues[0] > 0.8 && eigenvalues[2]/eigenvalues[0] < 0.2;
+            //bool is_plane = eigenvalues[1]/eigenvalues[0] > 0.8 && eigenvalues[2]/eigenvalues[0] < 0.2;
 
-            if(!is_plane)
+            if(is_plane)
                 continue;
 
             myqueue.push(idx);

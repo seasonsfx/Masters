@@ -5,6 +5,7 @@
 #include <QDebug>
 #include <QTime>
 #include <GL/glu.h>
+#include <pcl/features/integral_image_normal.h>
 
 void inline  glError(const char * msg){
     int err = glGetError();
@@ -111,13 +112,6 @@ bool CloudModel::createBuffers(){
     // Change initial layers colour
     layer.colour = Eigen::Vector3f(1.0f, 1.0f, 1.0f);
 
-    /*layer.colour = Eigen::Vector3f(1.0f, 0.5f, 0.5f);
-    layer.gl_index_buffer.create();
-    layer.gl_index_buffer.setUsagePattern( QGLBuffer::DynamicDraw );
-    layer.gl_index_buffer.bind();
-    layer.gl_index_buffer.allocate(cloud->size() * sizeof(int) );
-*/
-
     /// Initialise the first layer to include all points
     for(unsigned int i = 0; i < cloud->size(); i++){
         layer.index[i] = i;
@@ -131,7 +125,7 @@ bool CloudModel::createBuffers(){
 
     // Comment this out if all works
     // Load normals to gpu
-/*
+
     normal_buffer.create();
     normal_buffer.setUsagePattern( QGLBuffer::DynamicDraw );
     assert(normal_buffer.bind());
@@ -143,9 +137,9 @@ bool CloudModel::createBuffers(){
         data2[0] = cloud->points[i].x;
         data2[1] = cloud->points[i].y;
         data2[2] = cloud->points[i].z;
-        data2[3] = data2[0]+(normals->at(i).data_n[0]*0.05);
-        data2[4] = data2[1]+(normals->at(i).data_n[1]*0.05);
-        data2[5] = data2[2]+(normals->at(i).data_n[2]*0.05);
+        data2[3] = data2[0]+(normals->at(i).data_n[0]*0.1);
+        data2[4] = data2[1]+(normals->at(i).data_n[1]*0.1);
+        data2[5] = data2[2]+(normals->at(i).data_n[2]*0.1);
 
         int offset = 6*sizeof(float)*i;
         normal_buffer.write(offset, reinterpret_cast<const void *> (data2), sizeof(data2));
@@ -155,12 +149,13 @@ bool CloudModel::createBuffers(){
     }
 
     normal_buffer.release();
-*/
+
     qDebug("Buffers created & loaded.");
     return true;
 }
 
 void normal_estimation(pcl::PointCloud<pcl::PointXYZI>::Ptr cloud, pcl::PointCloud<pcl::Normal>::Ptr normals);
+void normal_estimation2(pcl::PointCloud<pcl::PointXYZI>::Ptr cloud, pcl::PointCloud<pcl::Normal>::Ptr normals);
 
 bool CloudModel::loadFile(const char * input_file, int subsample){
 
@@ -183,6 +178,17 @@ bool CloudModel::loadFile(const char * input_file, int subsample){
     normal_estimation(cloud, normals_tmp);
     qDebug("Normals calculated in %d ms", t.elapsed());
 
+    // Debug
+    for(int i = 0; i < cloud->size(); i++){
+        qDebug("Point (%f, %f, %f), Normal (%f, %f, %f)",
+               cloud->points[i].x, cloud->points[i].y, cloud->points[i].z,
+               normals_tmp->points[i].normal_x,
+               normals_tmp->points[i].normal_y,
+               normals_tmp->points[i].normal_z);
+    }
+
+
+
     t.start();
     /// Filter and flatten point cloud
     pcl::removeNaNFromPointCloud(*cloud, *cloud, cloud_to_grid_map);
@@ -192,41 +198,16 @@ bool CloudModel::loadFile(const char * input_file, int subsample){
     /// Move normals to unstructured cloud
     normals = pcl::PointCloud<pcl::Normal>::Ptr(new pcl::PointCloud<pcl::Normal> ());
     normals->resize(cloud->size());
+    int nans = 0;
     for(int i = 0; i < cloud_to_grid_map.size(); i++){
         normals->points[i] = normals_tmp->points[cloud_to_grid_map[i]];
+        if(normals->points[i].normal_x != normals->points[i].normal_x)
+            nans++;
     }
+
+    qDebug("Missing normals: %d", nans);
 
     qDebug("Normals moved in  %d ms", t.elapsed());
-
-    /*
-    for(int i = 0; i < normals_tmp->size(); i++){
-        printf("normal: (%f, %f, %f)\n",
-                normals_tmp->points.at(i).data_n[0],
-                normals_tmp->points.at(i).data_n[1],
-                normals_tmp->points.at(i).data_n[2]);
-    }
-    */
-
-    /*for(int i = 0; i < normals->size(); i++){
-        printf("normal: (%f, %f, %f)\n",
-                normals->points.at(i).data_n[0],
-                normals->points.at(i).data_n[1],
-                normals->points.at(i).data_n[2]);
-    }
-    */
-
-    /*
-    pcl::visualization::PCLVisualizer viewer("PCL Viewer");
-    viewer.setBackgroundColor (0.05, 0.05, 0.05);
-    viewer.addPointCloudNormals<pcl::PointXYZI,pcl::Normal>(cloud, normals);
-
-    viewer.setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_COLOR, 1.0, 0.0, 0.0);
-    viewer.setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_LINE_WIDTH, 1);
-
-    while (!viewer.wasStopped ()){
-        viewer.spinOnce ();
-    }
-    */
 
     if(loaded)
         layerList.reset();
@@ -260,7 +241,34 @@ public:
     PointIdxPair(int p1x, int p1y, int p2x, int p2y): p1(PointIdx(p1x, p1y)), p2(PointIdx(p2x, p2y)){}
 };
 
+void normal_estimation2(pcl::PointCloud<pcl::PointXYZI>::Ptr cloud, pcl::PointCloud<pcl::Normal>::Ptr normals){
+
+    // Need to save registration details and restore the,
+
+    // save
+    Eigen::Quaternionf sensor_orientation_old = cloud->sensor_orientation_;
+    Eigen::Vector4f sensor_origin_old = cloud->sensor_origin_;
+
+    // set
+    cloud->sensor_orientation_ = Eigen::Quaternionf(1, 0, 0, 0); // no rotation
+    cloud->sensor_origin_ = Eigen::Vector4f(0, 0, 0, 0);
+
+
+    pcl::IntegralImageNormalEstimation<pcl::PointXYZI, pcl::Normal> ne;
+    ne.setNormalEstimationMethod (ne.AVERAGE_3D_GRADIENT);
+    ne.setMaxDepthChangeFactor(0.02f);
+    ne.setNormalSmoothingSize(10.0f);
+    ne.setInputCloud(cloud);
+    ne.compute(*normals);
+
+    // restore
+    cloud->sensor_orientation_ = sensor_orientation_old;
+    cloud->sensor_origin_ = sensor_origin_old;
+}
+
+
 void normal_estimation(pcl::PointCloud<pcl::PointXYZI>::Ptr cloud, pcl::PointCloud<pcl::Normal>::Ptr normals){
+
     int length = cloud->points.size();
     int width = cloud->width;
     int height = cloud->height;
@@ -367,6 +375,7 @@ void normal_estimation(pcl::PointCloud<pcl::PointXYZI>::Ptr cloud, pcl::PointClo
         }
 
         // Face count can be 0 or normals can cancel
+        // Should set to point to camera
         if(face_count == 0){
             normals->points[i].data_n[0] = NAN;
             normals->points[i].data_n[1] = NAN;
@@ -387,4 +396,6 @@ void normal_estimation(pcl::PointCloud<pcl::PointXYZI>::Ptr cloud, pcl::PointClo
         assert(normals->points[i].data_n[0] == normals->points[i].data_n[0]);
 
     }
+
 }
+

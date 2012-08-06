@@ -132,6 +132,12 @@ pcl::PointCloud<pcl::PointXYZI>::Ptr read_ptx(const char* filename, int subsampl
     ss << line;
     ss >> x >> y >> z >> intensity;
 
+    if((x == 0) && (y == 0) & (z == 0) & ( fabs(intensity - 0.5f) < 0.0001 )) {
+                    x = y = z = intensity = NAN;
+                    printf("Nan in file\n");
+                    fflush(stdout);
+    }
+
     cloud->points[0].x = x;
     cloud->points[0].y = y;
     cloud->points[0].z = z;
@@ -148,8 +154,10 @@ pcl::PointCloud<pcl::PointXYZI>::Ptr read_ptx(const char* filename, int subsampl
 
         ptx_file >> x >> y >> z >> intensity;
 
-		if((x == 0) && (y == 0) & (z == 0) & ( intensity == 0.5f)) {
+        if((x == 0) && (y == 0) & (z == 0) & ( fabs(intensity - 0.5f) < 0.0001 )) {
                         x = y = z = intensity = NAN;
+                        printf("Nan in file\n");
+                        fflush(stdout);
 		}
 
 		cloud->points[i].x = x;

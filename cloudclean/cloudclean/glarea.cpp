@@ -204,12 +204,12 @@ void GLArea::paintGL(){
 
     //cm->point_buffer.bind();
     //cm->point_buffer.release();
-/*
+
     // Paint normals
     if(cm->normal_buffer.isCreated()){
         assert(normal_shader.bind());
         //qDebug("Normal buffer created size: %d bytes", cm->normal_buffer.size());
-        float col[4] = {1,1,1,1};
+        float col[4] = {1,0,0,1};
         glUniformMatrix4fv(normal_shader.uniformLocation("cameraToClipMatrix"), 1, GL_FALSE, camera.projectionMatrix().data());
         glUniformMatrix4fv(normal_shader.uniformLocation("modelToCameraMatrix"), 1, GL_FALSE, camera.modelviewMatrix().data());
         glUniform3fv(normal_shader.uniformLocation("lineColour"), 1, col);
@@ -225,7 +225,7 @@ void GLArea::paintGL(){
         cm->normal_buffer.release();
         normal_shader.release();
     }
-*/
+
     if(activeEditPlugin)
         activeEditPlugin->paintGL(cm, this);
 

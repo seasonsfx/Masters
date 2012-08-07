@@ -179,14 +179,14 @@ bool CloudModel::loadFile(const char * input_file, int subsample){
     qDebug("Normals calculated in %d ms", t.elapsed());
 
     // Debug
-    for(int i = 0; i < cloud->size(); i++){
+    /*for(int i = 0; i < cloud->size(); i++){
         qDebug("Point (%f, %f, %f), Normal (%f, %f, %f)",
                cloud->points[i].x, cloud->points[i].y, cloud->points[i].z,
                normals_tmp->points[i].normal_x,
                normals_tmp->points[i].normal_y,
                normals_tmp->points[i].normal_z);
     }
-
+    */
 
 
     t.start();
@@ -266,6 +266,26 @@ void normal_estimation2(pcl::PointCloud<pcl::PointXYZI>::Ptr cloud, pcl::PointCl
     cloud->sensor_origin_ = sensor_origin_old;
 }
 
+bool isValidPoint(PointIdx & point, int width, int height, int index, pcl::PointCloud<pcl::PointXYZI>::Ptr cloud){
+    // calculate current x and y
+    int cur_x = index%width;
+    int cur_y = index/width;
+
+    // Bounds check
+    int x_pos = cur_x + point.x;
+    int y_pos = cur_y + point.y;
+    if(x_pos > width-1 || x_pos < 0)
+        return false;
+    if(y_pos > height-1 || y_pos < 0)
+        return false;
+
+    // Index with NaN value is not valid
+    int idx = y_pos*width + x_pos;
+    if(cloud->points[idx].x != cloud->points[idx].x)
+        return false;
+
+    return true;
+}
 
 void normal_estimation(pcl::PointCloud<pcl::PointXYZI>::Ptr cloud, pcl::PointCloud<pcl::Normal>::Ptr normals){
 
@@ -273,6 +293,18 @@ void normal_estimation(pcl::PointCloud<pcl::PointXYZI>::Ptr cloud, pcl::PointClo
     int width = cloud->width;
     int height = cloud->height;
     normals->points.resize(length);
+
+    // Relative point anticlockwise around (0,0)
+    PointIdx pointList[8] = {
+        PointIdx(1, 0),
+        PointIdx(1, -1),
+        PointIdx(0, -1),
+        PointIdx(-1, -1),
+        PointIdx(-1, 0),
+        PointIdx(-1, 1),
+        PointIdx(0, 1),
+        PointIdx(1, 1)
+    };
 
     for (int i = 0; i < length; ++i){
 
@@ -286,91 +318,84 @@ void normal_estimation(pcl::PointCloud<pcl::PointXYZI>::Ptr cloud, pcl::PointClo
             continue;
         }
 
-        // Define all pairs of indices relative to current position
-
-
-        // Array of ponits that form a traingle along with the center point
-        PointIdxPair trianglePairs[8] = {
-            PointIdxPair(PointIdx(0, -1), PointIdx(-1, -1)),
-            PointIdxPair(PointIdx(1, -1), PointIdx(0, -1)),
-            PointIdxPair(PointIdx(-1, -1), PointIdx(-1, 0)),
-            PointIdxPair(PointIdx(1, 0), PointIdx(1, -1)),
-            PointIdxPair(PointIdx(-1, 0), PointIdx(-1, 1)),
-            PointIdxPair(PointIdx(1, 1), PointIdx(1, 0)),
-            PointIdxPair(PointIdx(-1, 1), PointIdx(0, 1)),
-            PointIdxPair(PointIdx(0, 1), PointIdx(1, 1))
-        };
-
         // Normal calculation vars
         Eigen::Vector3f agregate_n(0.0f,0.0f,0.0f);
         int face_count = 0;
 
-        if(i == 82455){
-            int k = 0;
-        }
-
         // Calculate normal from 8 triangles
-        for (int j = 0; j < 8; ++j)
+        int next = 0;
+        int first = -1;
+        while (true)
         {
-            PointIdxPair & relativePair = trianglePairs[j];
+            // Find valid indices around 0,0
+            int p1idx = -1, p2idx = -1;
+
+            while(next<8){
+                if(isValidPoint(pointList[next], width, height, i, cloud)){
+                    p1idx = next++;
+                    break;
+                }
+                next++;
+            }
+
+            while(next<9){
+                // Don't want two of the same indices in different orders
+                if(next == 8 && face_count == 1)
+                    break;
+
+                // Loop around
+                if(next == 8 && face_count > 1){
+                    p2idx = first;
+                    break;
+                }
+
+                int idx = next % 8;
+                if(isValidPoint(pointList[idx], width, height, i, cloud)){
+                    p2idx = idx;
+                    break;
+                }
+                next++;
+            }
+
+            // Stop if no points in range were found
+            if(p1idx == -1 || p2idx == -1)
+                break;
+
+            if(first == -1)
+                first = p1idx;
+
+            PointIdxPair relativePair(pointList[p1idx], pointList[p2idx]);
 
             // calculate current x and y
             int cur_x = i%width;
             int cur_y = i/width;
 
-            bool outbounds = false;
+            // Calculate absolute indices
+            int idx1 = (cur_y+relativePair.p1.y)*width + (cur_x+relativePair.p1.x);
+            int idx2 = (cur_y+relativePair.p2.y)*width + (cur_x+relativePair.p2.x);
 
-            // is p1 out of bounds
-            int x_pos = cur_x + relativePair.p1.x;
-            int y_pos = cur_y + relativePair.p1.y;
-            if(x_pos > width-1 || x_pos < 0)
-                outbounds = true;
-            if(y_pos > height-1 || y_pos < 0)
-                outbounds = true;
+            pcl::PointXYZI & cp0 = cloud->points[i];
+            pcl::PointXYZI & cp1 = cloud->points[idx1];
+            pcl::PointXYZI & cp2 = cloud->points[idx2];
 
-            // is p2 out of bounds
-            x_pos = cur_x + relativePair.p2.x;
-            y_pos = cur_y + relativePair.p2.y;
-            if(x_pos > width-1 || x_pos < 0)
-                outbounds = true;
-            if(y_pos > height-1 || y_pos < 0)
-                outbounds = true;
+            Eigen::Vector3f p0(cp0.x, cp0.y, cp0.z);
+            Eigen::Vector3f p1(cp1.x, cp1.y ,cp1.z);
+            Eigen::Vector3f p2(cp2.x, cp2.y ,cp2.z);
 
-            if (!outbounds){
+            // Cross product to get normal
+            Eigen::Vector3f vec1 = p1 - p0;
+            Eigen::Vector3f vec2 = p2 - p0;
+            Eigen::Vector3f tmp = vec1.cross(vec2).normalized();
 
-                // Calculate absolute indices
-                int idx1 = (cur_y+relativePair.p1.y)*width + (cur_x+relativePair.p1.x);
-                int idx2 = (cur_y+relativePair.p2.y)*width + (cur_x+relativePair.p2.x);
+            // Normalized 0 0 0 == NaN
+            if(tmp.x() != tmp.x() ||
+               tmp.y() != tmp.y() ||
+               tmp.z() != tmp.z()
+            )
+                continue;
 
-                // Ignore NAN neighbours
-                if(cloud->points[idx1].x != cloud->points[idx1].x)
-                    continue;
-                if(cloud->points[idx2].x != cloud->points[idx2].x)
-                    continue;
-
-                pcl::PointXYZI & cp0 = cloud->points[i];
-                pcl::PointXYZI & cp1 = cloud->points[idx1];
-                pcl::PointXYZI & cp2 = cloud->points[idx2];
-
-                Eigen::Vector3f p0(cp0.x, cp0.y, cp0.z);
-                Eigen::Vector3f p1(cp1.x, cp1.y ,cp1.z);
-                Eigen::Vector3f p2(cp2.x, cp2.y ,cp2.z);
-
-                // Cross product sometimes 0 0 0
-                Eigen::Vector3f tmp = ((p2 - p0).cross(p1 - p0));
-                tmp.normalize();
-
-                // Normalized 0 0 0 == NaN
-                if(tmp.x() != tmp.x() ||
-                   tmp.y() != tmp.y() ||
-                   tmp.z() != tmp.z()
-                )
-                    continue;
-
-                agregate_n= agregate_n + tmp;
-                face_count++;
-
-             }
+            agregate_n= agregate_n + tmp;
+            face_count++;
 
         }
 

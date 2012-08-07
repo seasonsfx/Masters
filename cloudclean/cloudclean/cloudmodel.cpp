@@ -394,7 +394,14 @@ void normal_estimation(pcl::PointCloud<pcl::PointXYZI>::Ptr cloud, pcl::PointClo
             )
                 continue;
 
-            agregate_n= agregate_n + tmp;
+            // Weigh the normals accoring to distance
+
+            float avg_dist = (sqrt(vec1.squaredNorm()) + sqrt(vec2.squaredNorm()))/2;
+
+            float x = 100;
+            float weight = (x - avg_dist/x);
+
+            agregate_n= agregate_n + weight*tmp;
             face_count++;
 
         }

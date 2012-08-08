@@ -6,9 +6,9 @@ Removing unwanted vegetation from point sets
 
 ----
 
-Point cloud is the data that is returned from laser scanners
+Point clouds are the type of data that is returned from laser scanners
 
-Shoots out a laser and captures x, y z coordinates that represent the objects scanned.
+Shoots out a laser and captures x, y z coordinates that represent a point on the surface of the  object that was hit scanned.
 
 I'm trying to remove the points that correspond to trees, shrubs and grass.
 

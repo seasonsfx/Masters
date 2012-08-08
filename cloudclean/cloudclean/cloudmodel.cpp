@@ -125,7 +125,7 @@ bool CloudModel::createBuffers(){
 
     // Comment this out if all works
     // Load normals to gpu
-
+/*
     normal_buffer.create();
     normal_buffer.setUsagePattern( QGLBuffer::DynamicDraw );
     assert(normal_buffer.bind());
@@ -149,7 +149,7 @@ bool CloudModel::createBuffers(){
     }
 
     normal_buffer.release();
-
+*/
     qDebug("Buffers created & loaded.");
     return true;
 }
@@ -175,7 +175,7 @@ bool CloudModel::loadFile(const char * input_file, int subsample){
     /// Calculate normals
     pcl::PointCloud<pcl::Normal>::Ptr normals_tmp(new pcl::PointCloud<pcl::Normal> ());
 
-    normal_estimation(cloud, normals_tmp);
+    //normal_estimation(cloud, normals_tmp);
     qDebug("Normals calculated in %d ms", t.elapsed());
 
     // Debug
@@ -193,7 +193,7 @@ bool CloudModel::loadFile(const char * input_file, int subsample){
     /// Filter and flatten point cloud
     pcl::removeNaNFromPointCloud(*cloud, *cloud, cloud_to_grid_map);
     qDebug("Cloud filtered in %d ms", t.elapsed());
-
+/*
     t.start();
     /// Move normals to unstructured cloud
     normals = pcl::PointCloud<pcl::Normal>::Ptr(new pcl::PointCloud<pcl::Normal> ());
@@ -208,7 +208,7 @@ bool CloudModel::loadFile(const char * input_file, int subsample){
     qDebug("Missing normals: %d", nans);
 
     qDebug("Normals moved in  %d ms", t.elapsed());
-
+*/
     if(loaded)
         layerList.reset();
 

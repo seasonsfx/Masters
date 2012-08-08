@@ -1,0 +1,41 @@
+* Avoid terms that i dont introduce
+
+Removing unwanted vegetation from point sets
+
+* Explain pictures, mention that it might be hard to see
+
+----
+
+Point cloud is the data that is returned from laser scanners
+
+Shoots out a laser and captures x, y z coordinates that represent the objects scanned.
+
+I'm trying to remove the points that correspond to trees, shrubs and grass.
+
+---
+
+Aim of zamani project is to digitally preserve cultural heritage sites
+
+Fly around africa and use laser scanners document culturally significant sites such as castles, monuments, old temples, essentially touristy places.
+
+---
+
+Move laser scanners around to document every bit of the site, they also take panoramic pictures
+
+---
+
+All this feeds in to a pipeline
+
+---
+
+Point cloud cleaning is performed by software but has various levels of user interfevnetion.
+
+Very manual process, takes long
+
+---
+
+
+Other slides
+
+Counterbalance
+Small groups

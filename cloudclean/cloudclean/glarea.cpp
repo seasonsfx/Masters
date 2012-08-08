@@ -58,8 +58,8 @@ GLArea::GLArea(QWidget* parent )
 
 void GLArea::initializeGL()
 {
-    //glClearColor( 0.1f, 0.1f, 0.1f, 1.0f );
-    glClearColor( 0.9f, 0.9f, 0.9f, 1.0f );
+    //glClearColor( 0.9f, 0.9f, 0.9f, 1.0f );
+    glClearColor( 1.0f, 1.0f, 1.0f, 1.0f );
     glEnable(GL_DEPTH_TEST);
 
     assert(prepareShaderProgram(point_shader, ":/shaders/points.vert", ":/shaders/points.frag" ) );
@@ -177,7 +177,7 @@ void GLArea::paintGL(){
 
     glEnable(GL_PRIMITIVE_RESTART);
     glPrimitiveRestartIndex((unsigned int)-1);
-    glPointSize(5);
+    glPointSize(2);
 
     std::vector<Layer> & layers = cm->layerList.layers;
 
@@ -206,6 +206,8 @@ void GLArea::paintGL(){
     //cm->point_buffer.release();
 
     // Paint normals
+    /*
+
     if(cm->normal_buffer.isCreated()){
         assert(normal_shader.bind());
         //qDebug("Normal buffer created size: %d bytes", cm->normal_buffer.size());
@@ -226,6 +228,7 @@ void GLArea::paintGL(){
         normal_shader.release();
     }
 
+    */
     if(activeEditPlugin)
         activeEditPlugin->paintGL(cm, this);
 

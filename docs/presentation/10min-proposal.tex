@@ -45,7 +45,7 @@
 % does not look nice, try deleting the line with the fontenc.
 \usepackage{graphicx}
 
-\title{Point cloud vegetation removal}
+\title{Cleaning point cloud vegetation}
 
 \author{Rickert Mulder}
 % - Give the names in the same order as the appear in the paper.
@@ -130,18 +130,19 @@
 \begin{frame}{Aim}
 
 \begin{columns}[T]
-\begin{column}{0.5\textwidth}
+\begin{column}{1.0\textwidth}
 
 \begin{itemize}
-\item  Remove vegetation from 3d laser scans
-\item  Do so fast and accurately
+\item  Improve the speed at which vegetation can be removed from point clouds without sacrificing accuracy
 % what is a lazer scan?
 \end{itemize}
 
-\end{column}
-\begin{column}{0.5\textwidth}
+\centering
+\includegraphics[height=0.5\textheight]{pics/zamani4}
+\includegraphics[height=0.5\textheight]{pics/zamani3}
 
-\includegraphics[width=1\textwidth]{pics/tree1}
+\end{column}
+\begin{column}{0.0\textwidth}
 
 \end{column}
 \end{columns}
@@ -184,17 +185,18 @@
 \end{frame}
 
 \begin{frame}{Cleaning}
-  \includegraphics[width=1\textwidth]{pics/cleaning.png}
+\centering
+  \includegraphics[width=1\textwidth]{pics/dirty}
   \begin{itemize}
   \item
   Cleaning is the removal of unwanted objects or noise
   \item
-  Involves the classification and segmentation of noise
+  Involves classification and segmentation
   \end{itemize}
 \end{frame}
 
 \begin{frame}{Problem}
-  \includegraphics[width=1\textwidth]{pics/cleaning.png}
+  \includegraphics[width=1\textwidth]{pics/dirty2}
   \begin{itemize}
   \item
   500 - 1000 scans per expedition
@@ -216,23 +218,25 @@
 \begin{frame}{Existing software}
 % Existing software is often sluggish also
 % response times plays a big role
+
 \centering
 
-%\vskip0pt plus.5fill
-%\includegraphics[height=0.35\textheight]{pics/lasso.png}
-%\includegraphics[height=0.35\textheight]{pics/plane.png}
-%\\
-\includegraphics[width=0.8\textwidth]{pics/3DReshaper_auto_pt_cloud_seg.jpg}
-\\
-\includegraphics[width=0.50\textwidth]{pics/vrmesh-veg.png}
-\includegraphics[width=0.50\textwidth]{pics/clustering.png}
-\\
-\vskip0pt plus.5fill
+
 \includegraphics[height=0.10\textheight]{pics/cyclone.jpg}
 \includegraphics[height=0.10\textheight]{pics/pointools.jpg}
 \includegraphics[height=0.10\textheight]{pics/meshlab.png}
 %includegraphics[height=0.10\textheight]{pics/vrmesh.png}
 \includegraphics[height=0.10\textheight]{pics/3dreshaper.jpg}
+\vskip0pt plus.5fill
+\includegraphics[height=0.40\textheight]{pics/lasso.png}
+%\includegraphics[width=0.50\textwidth]{pics/vrmesh-veg.png}
+\includegraphics[height=0.40\textheight]{pics/clustering.png}
+\\
+
+\begin{itemize}
+\item
+  Various levels of user intervention
+\end{itemize}
 %Existing tools vary in terms of
 %\begin{itemize}
 %\item automation
@@ -251,55 +255,25 @@
 
 \end{frame}
 
-\begin{frame}{Point cloud segmentation \& classification}
+\begin{frame}{Vegetation classification}
 
-\begin{columns}[T]
-\begin{column}{0.5\textwidth}
-
+\centering
+\includegraphics[width=0.9\textwidth]{pics/vrmesh-veg.png}
 \begin{itemize}
-\item Point features
-\item Classify points:
-\begin{itemize}
-\item Heuristics
-\item Machine learning
-\end{itemize}
+\item Leaves much to be desired
 \end{itemize}
 
-\end{column}
-
-\begin{column}{0.5\textwidth}
-
-\includegraphics[width=1\textwidth]{pics/features.png}
-
-\end{column}
-\end{columns}
 \end{frame}
-
-%\begin{frame}{Some results}
-%
-%\includegraphics[width=0.4\textwidth]{pics/spina2.png}
-%% spina cultural heritage
-%% 600k points
-%% many unclassified
-%% principal components
-%\includegraphics[width=0.5\textwidth]{pics/shapovalov.png}
-%% uses probalitic models
-%% Associative makov networks
-%% Conditional random fields
-%% airial scans less dense
-%
-%\end{frame}
-
 
 \section{Proposal}
 
 \subsection{Aim}
 
-\begin{frame}{Aim}
+\begin{frame}{Goal}
 \begin{itemize}
 
 \item
-Produce semi-automated tools to accurately segment vegetation in point clouds in a way that is fast and accurate.
+Create semi-automated tools to accurately segment vegetation in point clouds in a way that is fast and accurate.
 
 \begin{itemize}
 \item Allow user to make crude segmentation
@@ -307,7 +281,6 @@ Produce semi-automated tools to accurately segment vegetation in point clouds in
 \end{itemize}
 
 \end{itemize}
-
 
 \end{frame}
 
@@ -320,21 +293,28 @@ Produce semi-automated tools to accurately segment vegetation in point clouds in
 %
 %\end{frame}
 
-\subsection{Method}
+\begin{frame}{Point cloud segmentation \& classification}
 
-\begin{frame}{Method}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
 
 \begin{itemize}
-\item Investigate:
+\item Point features
+\item Classify points:
 \begin{itemize}
-  \item Point features
-  \item Heuristics
-  \item Classifiers
+\item Heuristics
+\item Classifiers
 \end{itemize}
-\item Iterative Prototyping
-\item Continuous evaluation
 \end{itemize}
 
+\end{column}
+
+\begin{column}{0.5\textwidth}
+
+\includegraphics[width=1\textwidth]{pics/features.png}
+
+\end{column}
+\end{columns}
 \end{frame}
 
 \begin{frame}{System}
@@ -352,7 +332,11 @@ Produce semi-automated tools to accurately segment vegetation in point clouds in
 \item Push load to GPU
 \end{itemize}
 
+\item Built in collaboration with Zamani
+\item Iterative Prototyping
+
 \end{itemize}
+
 
 \end{column}
 \begin{column}{0.3\textwidth}
@@ -372,7 +356,7 @@ Produce semi-automated tools to accurately segment vegetation in point clouds in
 	\begin{itemize}
 		\item Expert opinion
 		\item User study to measure time and accuracy
-		\item Compare segmentations to those produced by VRMesh and Terrascan
+		\item Compare results to existing system 
 	\end{itemize}
 	
 \end{column}
@@ -382,43 +366,35 @@ Produce semi-automated tools to accurately segment vegetation in point clouds in
 \end{columns}
 \end{frame}
 
-\begin{frame}{Completed work}
+\begin{frame}{System thus far}
 \begin{columns}[T]
-\begin{column}{0.35\textwidth}
+\begin{column}{1\textwidth}
 	\begin{itemize}
 		\item Pluggable point cloud cleaning framework
 		\item Lasso tool, flood fill, brush tool
 	\end{itemize}
-\end{column}
-\begin{column}{0.65\textwidth}
+	
 \centering
-\includegraphics[height=0.45\textheight]{pics/app1.png}
+\includegraphics[height=0.45\textheight]{pics/myapp3.png}
+\end{column}
+\begin{column}{0.0\textwidth}
+
 \end{column}
 \end{columns}
 \end{frame}
-
-\begin{frame}{Summary}
-
-  % Keep the summary *very short*.
-  \begin{itemize}
-  \item
-    Cleaning out vegetation from point clouds is time consuming using existing tools
-  \item
-    Create system to speed up cleaning while maintaining accuracy
-  \item
-    Reduce the time it takes create models of cultural heritage sites
-  \end{itemize}
-  
-  % The following outlook is optional.
-  %\vskip0pt plus.5fill
-\end{frame}
-
 
 
 % All of the following is optional and typically not needed. 
 \appendix
 \section<presentation>*{\appendixname}
 \subsection<presentation>*{For Further Reading}
+
+\begin{frame}{Questions?}
+
+\centering
+\includegraphics[height=0.45\textheight]{pics/questions}
+
+\end{frame}
 
 \subsection{Project plan}
 \begin{frame}{Timeline}
@@ -456,6 +432,21 @@ Final Draft & 7 July 2013\\
 \end{columns}
 \end{frame}
 
+
+\begin{frame}{Related work}
+
+\includegraphics[width=0.4\textwidth]{pics/spina2.png}
+% spina cultural heritage
+% 600k points
+% many unclassified
+% principal components
+\includegraphics[width=0.5\textwidth]{pics/shapovalov.png}
+% uses probalitic models
+% Associative makov networks
+% Conditional random fields
+% airial scans less dense
+
+\end{frame}
 
 %\begin{frame}[allowframebreaks]
 %  \frametitle<presentation>{For Further Reading}

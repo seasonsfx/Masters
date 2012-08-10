@@ -62,7 +62,7 @@ bool CloudModel::saveFile(const char * output_file){
             continue;
         layers[l].copyFromGPU();
         for(unsigned int i = 0; i < layers[l].index.size(); i++){
-            printf("i: %d\n", i);
+            //printf("i: %d\n", i);
             int idx = layers[l].index[i];
             // for some reason bad indices sneak in here
             // that are not -1

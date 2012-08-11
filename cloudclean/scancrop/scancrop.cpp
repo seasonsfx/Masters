@@ -152,8 +152,8 @@ int main(int argc, char**argv){
     // Count nans
     for(int i = 0; i < cloud.points.size(); i++){
         if(IS_NAN(cloud.points[i].x) || IS_NAN(cloud.points[i].y) || IS_NAN(cloud.points[i].z) || IS_NAN(cloud.points[i].intensity)){
-            int row = i%cloud.width;
-            int col = i/cloud.width;
+            int col = i%cloud.width;
+            int row = i/cloud.width;
             nans_in_rows[row]++;
             nans_in_columns[col]++;
         }

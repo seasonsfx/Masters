@@ -37,7 +37,7 @@ public:
 
     bool prepareShaderProgram( QGLShaderProgram& shader,
                                const QString& vertexShaderPath,
-                               const QString& fragmentShaderPath );
+                               const QString& fragmentShaderPath, const QString &geometryShaderPath );
 
     Eigen::Vector2f normalized_mouse(int x, int y);
 

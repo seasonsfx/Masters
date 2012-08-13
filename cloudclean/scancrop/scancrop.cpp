@@ -30,6 +30,10 @@ public:
 
 
 void read_ptx(const char* filename, pointcloud& cloud){
+    int valid = 0;
+    int nans = 0;
+    int nulls = 0;
+
     // Makes things faster apparently
     //std::cin.sync_with_stdio(false);
 	std::ifstream ptx_file(filename, std::ios_base::binary);
@@ -81,19 +85,19 @@ void read_ptx(const char* filename, pointcloud& cloud){
     for(int i = 1; i < cloud.width*cloud.height; i++){
         ptx_file >> x >> y >> z >> intensity;
 
-        if((x == 0) && (y == 0) && (z == 0) && ( fabs(intensity - 0.5f) < 0.0001 )) {
+        if((x == 0) && (y == 0) && (z == 0)) {
             x = y = z = intensity = NAN;
+            nans++;
 		}
+        else{
+            valid++;
+        }
 
 		cloud.points[i].x = x;
 		cloud.points[i].y = y;
 		cloud.points[i].z = z;
 		cloud.points[i].intensity = intensity;
 	}
-
-    /*for(int i = 0; i < cloud.points.size(); i++){
-        printf("(%f, %f, %f)\n", cloud.points[i].x, cloud.points[i].y, cloud.points[i].z, cloud.points[i].intensity);
-    }*/
 
     ptx_file.close();
 
@@ -138,49 +142,59 @@ bool save_ptx(const char* filename, pointcloud& cloud){
     return true;
 }
 
+void crop(pointcloud& cloud){
+
+}
+
 
 int main(int argc, char**argv){
-    pointcloud cloud;
-
     assert(argc == 3);
-
+    pointcloud cloud;
     read_ptx(argv[1], cloud);
 
-    std::vector<int> nans_in_rows(cloud.height, 0);
-    std::vector<int> nans_in_columns(cloud.width, 0);
+    std::vector<int> nans_in_row(cloud.height, 0);
+    std::vector<int> nans_in_col(cloud.width, 0);
+
+    int valid = 0;
 
     // Count nans
     for(int i = 0; i < cloud.points.size(); i++){
         if(IS_NAN(cloud.points[i].x) || IS_NAN(cloud.points[i].y) || IS_NAN(cloud.points[i].z) || IS_NAN(cloud.points[i].intensity)){
-            int col = i%cloud.width;
-            int row = i/cloud.width;
-            nans_in_rows[row]++;
-            nans_in_columns[col]++;
+            int x = i%cloud.width;
+            int y = i/cloud.width;
+            nans_in_row[y]++;
+            nans_in_col[x]++;
+        }
+        else{
+            //printf("%f ", cloud.points[i].intensity);
+            valid++;
         }
     }
 
-    printf("Rows\n");
-    for(int i = 0; i < nans_in_rows.size(); i++)
-        printf("%d ",nans_in_rows[i]);
+    printf("Valid points: %d \n", valid);
+/*
+    printf("y\n");
+    for(int i = 0; i < nans_in_row.size(); i++)
+        printf("%d ",nans_in_row[i]);
     printf("\n");
 
-    printf("Cols\n");
-    for(int i = 0; i < nans_in_columns.size(); i++)
-        printf("%d ",nans_in_columns[i]);
+    printf("x\n");
+    for(int i = 0; i < nans_in_col.size(); i++)
+        printf("%d ",nans_in_col[i]);
     printf("\n");
-
+*/
     pointcloud croppedcloud;
 
     croppedcloud.width = 0;
     croppedcloud.height = 0;
 
     // Calc new dimentions
-    for(int i = 0; i < nans_in_rows.size(); i++)
-        if(nans_in_rows[i] != cloud.width)
+    for(int i = 0; i < nans_in_row.size(); i++)
+        if(nans_in_row[i] != cloud.width)
             croppedcloud.height++;
 
-    for(int i = 0; i < nans_in_columns.size(); i++)
-        if(nans_in_columns[i] != cloud.height)
+    for(int i = 0; i < nans_in_col.size(); i++)
+        if(nans_in_col[i] != cloud.height)
             croppedcloud.width++;
 
     printf("New dim %d, %d\n", croppedcloud.width, croppedcloud.height);
@@ -197,11 +211,16 @@ int main(int argc, char**argv){
     int crop_i = 0;
 
     for(int i = 0; i < cloud.points.size(); i++){
-        int row = i%cloud.width;
-        int col = i/cloud.width;
+        int y = i%cloud.width;
+        int x = i/cloud.width;
 
-        if(nans_in_rows[row] == cloud.width || nans_in_columns[col] == cloud.height)
+        if(nans_in_row[x] == cloud.width || nans_in_col[y] == cloud.height)
             continue;
+
+        if(crop_i > croppedcloud.points.size()-1){
+            printf("Over size, %d > %d\n", crop_i, (int)croppedcloud.points.size());
+            return 1;
+        }
 
         croppedcloud.points[crop_i++] = cloud.points[i];
     }

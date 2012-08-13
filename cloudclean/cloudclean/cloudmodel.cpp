@@ -60,7 +60,7 @@ bool CloudModel::saveFile(const char * output_file){
         printf("l: %d\n", l);
         if(!layers[l].visible)
             continue;
-        layers[l].copyFromGPU();
+        layers[l].sync();
         for(unsigned int i = 0; i < layers[l].index.size(); i++){
             //printf("i: %d\n", i);
             int idx = layers[l].index[i];
@@ -125,6 +125,26 @@ bool CloudModel::createBuffers(){
 
     // Comment this out if all works
     // Load normals to gpu
+
+
+    normal_buffer.create();
+    normal_buffer.setUsagePattern( QGLBuffer::DynamicDraw );
+    assert(normal_buffer.bind());
+    normal_buffer.allocate(cloud->points.size() * sizeof(float) * 3);
+
+    for (int i = 0; i < (int)cloud->size(); i++)
+    {
+        float data2[3];
+        data2[0] = (normals->at(i).data_n[0]*0.1);
+        data2[1] = (normals->at(i).data_n[1]*0.1);
+        data2[2] = (normals->at(i).data_n[2]*0.1);
+
+        int offset = 3*sizeof(float)*i;
+        normal_buffer.write(offset, reinterpret_cast<const void *> (data2), sizeof(data2));
+    }
+
+    normal_buffer.release();
+
 /*
     normal_buffer.create();
     normal_buffer.setUsagePattern( QGLBuffer::DynamicDraw );
@@ -175,7 +195,7 @@ bool CloudModel::loadFile(const char * input_file, int subsample){
     /// Calculate normals
     pcl::PointCloud<pcl::Normal>::Ptr normals_tmp(new pcl::PointCloud<pcl::Normal> ());
 
-    //normal_estimation(cloud, normals_tmp);
+    normal_estimation(cloud, normals_tmp);
     qDebug("Normals calculated in %d ms", t.elapsed());
 
     // Debug
@@ -188,12 +208,12 @@ bool CloudModel::loadFile(const char * input_file, int subsample){
     }
     */
 
-
     t.start();
     /// Filter and flatten point cloud
     pcl::removeNaNFromPointCloud(*cloud, *cloud, cloud_to_grid_map);
     qDebug("Cloud filtered in %d ms", t.elapsed());
-/*
+
+
     t.start();
     /// Move normals to unstructured cloud
     normals = pcl::PointCloud<pcl::Normal>::Ptr(new pcl::PointCloud<pcl::Normal> ());
@@ -208,7 +228,7 @@ bool CloudModel::loadFile(const char * input_file, int subsample){
     qDebug("Missing normals: %d", nans);
 
     qDebug("Normals moved in  %d ms", t.elapsed());
-*/
+
     if(loaded)
         layerList.reset();
 
@@ -395,13 +415,13 @@ void normal_estimation(pcl::PointCloud<pcl::PointXYZI>::Ptr cloud, pcl::PointClo
                 continue;
 
             // Weigh the normals accoring to distance
-
-            float avg_dist = (sqrt(vec1.squaredNorm()) + sqrt(vec2.squaredNorm()))/2;
-
+            /*float avg_dist = (sqrt(vec1.squaredNorm()) + sqrt(vec2.squaredNorm()))/2;
             float x = 100;
             float weight = (x - avg_dist/x);
-
             agregate_n= agregate_n + weight*tmp;
+*/
+            agregate_n += tmp;
+
             face_count++;
 
         }

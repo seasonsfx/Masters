@@ -11,6 +11,8 @@ QT       += core gui opengl
 TARGET = CloudClean
 TEMPLATE = app
 
+RCC_DIR = shaders
+
 SOURCES += \
     main.cpp \
     layerlist.cpp \

@@ -58,11 +58,11 @@ GLArea::GLArea(QWidget* parent )
 
 void GLArea::initializeGL()
 {
-    //glClearColor( 0.9f, 0.9f, 0.9f, 1.0f );
-    glClearColor( 1.0f, 1.0f, 1.0f, 1.0f );
+    glClearColor( 0.9f, 0.9f, 0.9f, 1.0f );
+    //glClearColor( 1.0f, 1.0f, 1.0f, 1.0f );
     glEnable(GL_DEPTH_TEST);
 
-    assert(prepareShaderProgram(point_shader, ":/shaders/points.vert", ":/shaders/points.frag" ) );
+    assert(prepareShaderProgram(point_shader, ":/shaders/points.vert", ":/shaders/points.frag", "" ) );
 
     if ( !point_shader.bind() )
     {
@@ -76,7 +76,7 @@ void GLArea::initializeGL()
     point_shader.release();
 
     // Setup normal shader
-    assert(prepareShaderProgram(normal_shader, ":/shaders/normals.vert", ":/shaders/normals.frag" ) );
+    assert(prepareShaderProgram(normal_shader, ":/shaders/normals.vert", ":/shaders/normals.frag", ":/shaders/normals.geom" ) );
     //assert(prepareShaderProgram(normal_shader, "/home/rickert/Masters/cloudclean/cloudclean/shaders/normals.vert", "/home/rickert/Masters/cloudclean/cloudclean/shaders/normals.frag" ) );
 
     if ( !normal_shader.bind() )
@@ -124,17 +124,21 @@ Eigen::Vector2f GLArea::normalized_mouse(int x, int y){
 }
 
 
-bool GLArea::prepareShaderProgram(QGLShaderProgram & shader, const QString& vertexShaderPath, const QString& fragmentShaderPath )
+bool GLArea::prepareShaderProgram(QGLShaderProgram & shader, const QString& vertexShaderPath, const QString& fragmentShaderPath,  const QString& geometryShaderPath)
 {
-    // Load and compile the vertex shader
     bool result = shader.addShaderFromSourceFile( QGLShader::Vertex, vertexShaderPath );
     if ( !result )
         qWarning() << shader.log();
 
-    // Load and compile the fragment shader
     result = shader.addShaderFromSourceFile( QGLShader::Fragment, fragmentShaderPath );
     if ( !result )
         qWarning() << shader.log();
+
+    if (geometryShaderPath.length() > 0){
+        result = shader.addShaderFromSourceFile( QGLShader::Geometry, geometryShaderPath );
+        if ( !result )
+            qWarning() << shader.log();
+    }
 
     // Link them to resolve any references.
     result = shader.link();
@@ -206,7 +210,7 @@ void GLArea::paintGL(){
     //cm->point_buffer.release();
 
     // Paint normals
-    /*
+
 
     if(cm->normal_buffer.isCreated()){
         assert(normal_shader.bind());
@@ -217,18 +221,24 @@ void GLArea::paintGL(){
         glUniform3fv(normal_shader.uniformLocation("lineColour"), 1, col);
         glEnable(GL_LINE_SMOOTH);
         glHint(GL_LINE_SMOOTH_HINT,  GL_NICEST);
+
         assert(cm->normal_buffer.bind());
+        normal_shader.enableAttributeArray( "pointnormal" );
+        normal_shader.setAttributeBuffer( "pointnormal", GL_FLOAT, 0, 3 );
+        cm->normal_buffer.release();
 
+        assert(cm->point_buffer.bind());
         normal_shader.enableAttributeArray( "vertex" );
-        normal_shader.setAttributeBuffer( "vertex", GL_FLOAT, 0, 3 );
+        normal_shader.setAttributeBuffer( "vertex", GL_FLOAT, 0, 4 );
+        cm->point_buffer.release();
 
-        glDrawArrays(GL_LINES, 0, cm->cloud->size()*2);
-        glError("Draw fuckup");
+        glDrawArrays(GL_POINTS, 0, cm->cloud->size());
+        glError("Draw 'bad word'");
         cm->normal_buffer.release();
         normal_shader.release();
     }
 
-    */
+
     if(activeEditPlugin)
         activeEditPlugin->paintGL(cm, this);
 

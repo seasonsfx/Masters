@@ -316,7 +316,7 @@ bool EditLasso::StartEdit(QAction *action, CloudModel *cm, GLArea *glarea){
     }
 
     // OpenGL
-    if (!glarea->prepareShaderProgram(lasso_shader, ":/shaders/lasso.vert", ":/shaders/lasso.frag" ))
+    if (!glarea->prepareShaderProgram(lasso_shader, ":/shaders/lasso.vert", ":/shaders/lasso.frag", ""))
     //if (!glarea->prepareShaderProgram(lasso_shader, "/home/rickert/Masters/cloudclean/plugins/edit_lasso/shaders/lasso.vert", "/home/rickert/Masters/cloudclean/plugins/edit_lasso/shaders/lasso.frag" ))
         return false;
 

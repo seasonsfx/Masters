@@ -23,7 +23,6 @@ public:
 
     pcl::PointCloud<pcl::PointXYZI>::Ptr            cloud;
     QGLBuffer                                       point_buffer;
-    QGLBuffer                                       normal_buffer;
     LayerList                                       layerList;
     pcl::PointCloud<pcl::Normal>::Ptr               normals;
 

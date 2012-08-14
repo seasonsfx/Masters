@@ -1,6 +1,8 @@
 #ifndef HELPERS_H
 #define HELPERS_H
 
+#include <GL/glu.h>
+
 // Helper function to get error string
 // *********************************************************************
 const char* oclErrorString(cl_int error)

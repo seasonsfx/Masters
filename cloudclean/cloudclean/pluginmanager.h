@@ -1,6 +1,5 @@
 #ifndef PLUGINMANAGER_H
 #define PLUGINMANAGER_H
-#include <QDir>
 #include "../common/interfaces.h"
 #include <vector>
 
@@ -13,6 +12,11 @@ public:
 
     QVector<QAction *> editActionList;
     std::vector<EditPluginInterface *> editPlugins;
+    EditPluginInterface* activeEditPlugin;
+
+    QVector<QAction *> vizActionList;
+    std::vector<VizPluginInterface *> vizPlugins;
+    VizPluginInterface* activeVizPlugin;
 };
 
 #endif // PLUGINMANAGER_H

@@ -1,8 +1,12 @@
-#include "pluginmanager.h"
+#include <assert.h>
+
 #include <QString>
 #include <QApplication>
 #include <QPluginLoader>
 #include <QDebug>
+#include <QDir>
+
+#include "pluginmanager.h"
 
 static QString DLLExtension() {
 #if defined(Q_OS_WIN)
@@ -18,7 +22,8 @@ static QString DLLExtension() {
 
 PluginManager::PluginManager()
 {
-
+    activeEditPlugin = NULL;
+    activeVizPlugin = NULL;
 }
 
 PluginManager::~PluginManager(){
@@ -48,15 +53,31 @@ void PluginManager::loadPlugins(){
             continue;
         }
 
-        EditPluginInterface * editPlugin = qobject_cast<EditPluginInterface *>(plugin);
-        if(editPlugin){
-            qDebug("Plugin loaded!\n");
-            fflush(stdout);
-            editPlugins.push_back(editPlugin);
+        if(fileName.contains("edit_")){
 
-            foreach(QAction* editAction, editPlugin->actions())
-                editActionList.push_back(editAction);
+            EditPluginInterface * editPlugin = qobject_cast<EditPluginInterface *>(plugin);
+            if(editPlugin){
+                qDebug("Plugin loaded!\n");
+                editPlugins.push_back(editPlugin);
 
+                foreach(QAction* editAction, editPlugin->actions())
+                    editActionList.push_back(editAction);
+
+            }
         }
+
+        if(fileName.contains("viz_")){
+
+            VizPluginInterface * vizPlugin = qobject_cast<VizPluginInterface *>(plugin);
+            if(vizPlugin){
+                qDebug("Viz plugin loaded!\n");
+                vizPlugins.push_back(vizPlugin);
+
+                foreach(QAction* vizAction, vizPlugin->actions())
+                    vizActionList.push_back(vizAction);
+
+            }
+        }
+
     }
 }

@@ -1,24 +1,27 @@
-#include "glarea.h"
-#include "qapplication.h"
 #include <cstdio>
 #include <fstream>
 #include <iostream>
 #include <ctime>
-#include <Eigen/Dense>
-#include "utilities.h"
 #include <time.h>
 #include <stdlib.h>
-#include "interfaces.h"
+
+#include <Eigen/Dense>
 #include <QTime>
 #include <QFont>
 
-GLArea::GLArea(QWidget* parent )
+#include "glarea.h"
+#include "qapplication.h"
+#include "interfaces.h"
+#include "utilities.h"
+#include "pluginmanager.h"
+
+GLArea::GLArea(QWidget* parent, PluginManager *pm, CloudModel *cm)
     : QGLWidget(parent)
 {
     qApp->installEventFilter(this);
-    cm = CloudModel::Instance();
+    this->cm = cm;
+    this->pm = pm;
 
-    activeEditPlugin = NULL;
     cfps=0;
     lastTime=0;
 
@@ -74,21 +77,6 @@ void GLArea::initializeGL()
     glUniformMatrix4fv(point_shader.uniformLocation("cameraToClipMatrix"), 1, GL_FALSE, camera.projectionMatrix().data());
     glError("121");
     point_shader.release();
-
-    // Setup normal shader
-    assert(prepareShaderProgram(normal_shader, ":/shaders/normals.vert", ":/shaders/normals.frag", ":/shaders/normals.geom" ) );
-    //assert(prepareShaderProgram(normal_shader, "/home/rickert/Masters/cloudclean/cloudclean/shaders/normals.vert", "/home/rickert/Masters/cloudclean/cloudclean/shaders/normals.frag" ) );
-
-    if ( !normal_shader.bind() )
-    {
-        qWarning() << "Could not bind shader program to context";
-        assert(false);
-    }
-    normal_shader.enableAttributeArray( "vertex" );
-    normal_shader.setAttributeBuffer( "vertex", GL_FLOAT, 0, 3 );
-    glUniformMatrix4fv(normal_shader.uniformLocation("cameraToClipMatrix"), 1, GL_FALSE, camera.projectionMatrix().data());
-    glError("134");
-    normal_shader.release();
 
 
     // Setup OpenCL
@@ -200,47 +188,21 @@ void GLArea::paintGL(){
         glError("289");
         layers[i].gl_index_buffer.release();
         glError("289");
+
+        if(pm->activeVizPlugin)
+            pm->activeVizPlugin->paintLayer(i, cm, this);
+
     }
 
     cm->point_buffer.release();
     point_shader.release();
 
 
-    //cm->point_buffer.bind();
-    //cm->point_buffer.release();
+    if(pm->activeEditPlugin)
+        pm->activeEditPlugin->paintGL(cm, this);
 
-    // Paint normals
-
-
-    if(cm->normal_buffer.isCreated()){
-        assert(normal_shader.bind());
-        //qDebug("Normal buffer created size: %d bytes", cm->normal_buffer.size());
-        float col[4] = {1,0,0,1};
-        glUniformMatrix4fv(normal_shader.uniformLocation("cameraToClipMatrix"), 1, GL_FALSE, camera.projectionMatrix().data());
-        glUniformMatrix4fv(normal_shader.uniformLocation("modelToCameraMatrix"), 1, GL_FALSE, camera.modelviewMatrix().data());
-        glUniform3fv(normal_shader.uniformLocation("lineColour"), 1, col);
-        glEnable(GL_LINE_SMOOTH);
-        glHint(GL_LINE_SMOOTH_HINT,  GL_NICEST);
-
-        assert(cm->normal_buffer.bind());
-        normal_shader.enableAttributeArray( "pointnormal" );
-        normal_shader.setAttributeBuffer( "pointnormal", GL_FLOAT, 0, 3 );
-        cm->normal_buffer.release();
-
-        assert(cm->point_buffer.bind());
-        normal_shader.enableAttributeArray( "vertex" );
-        normal_shader.setAttributeBuffer( "vertex", GL_FLOAT, 0, 4 );
-        cm->point_buffer.release();
-
-        glDrawArrays(GL_POINTS, 0, cm->cloud->size());
-        glError("Draw 'bad word'");
-        cm->normal_buffer.release();
-        normal_shader.release();
-    }
-
-
-    if(activeEditPlugin)
-        activeEditPlugin->paintGL(cm, this);
+    if(pm->activeVizPlugin)
+        pm->activeVizPlugin->paintGL(cm, this);
 
     //////////////////////////////////////
 
@@ -332,13 +294,13 @@ inline float rand_range(float from, float to){
 
 
 void GLArea::mouseDoubleClickEvent ( QMouseEvent * event ){
-    if(activeEditPlugin && !activeEditPlugin->mouseDoubleClickEvent(event, cm, this))
+    if(pm->activeEditPlugin && !pm->activeEditPlugin->mouseDoubleClickEvent(event, cm, this))
         return;
 }
 
 void GLArea::mouseMoveEvent ( QMouseEvent * event ){
 
-    if(activeEditPlugin && !activeEditPlugin->mouseMoveEvent(event, cm, this))
+    if(pm->activeEditPlugin && !pm->activeEditPlugin->mouseMoveEvent(event, cm, this))
         return;
 
     if(mouseDown == Qt::RightButton)
@@ -355,7 +317,7 @@ void GLArea::mouseMoveEvent ( QMouseEvent * event ){
 
 void GLArea::mousePressEvent ( QMouseEvent * event ){
 
-    if(activeEditPlugin && !activeEditPlugin->mousePressEvent(event, cm, this))
+    if(pm->activeEditPlugin && !pm->activeEditPlugin->mousePressEvent(event, cm, this))
         return;
 
     mouseDown = event->button();
@@ -371,7 +333,7 @@ void GLArea::mousePressEvent ( QMouseEvent * event ){
 
 void GLArea::mouseReleaseEvent ( QMouseEvent * event ){
 
-    if(activeEditPlugin && !activeEditPlugin->mouseReleaseEvent(event, cm, this))
+    if(pm->activeEditPlugin && !pm->activeEditPlugin->mouseReleaseEvent(event, cm, this))
         return;
 
     if(event->button() == Qt::RightButton)
@@ -397,7 +359,7 @@ inline float distance(Eigen::Vector3f x0, Eigen::Vector3f x1, Eigen::Vector3f x2
 
 void GLArea::wheelEvent ( QWheelEvent * event ){
 
-    if(activeEditPlugin && !activeEditPlugin->wheelEvent(event, cm, this))
+    if(pm->activeEditPlugin && !pm->activeEditPlugin->wheelEvent(event, cm, this))
         return;
 
     camera.mouseWheel(event->delta());
@@ -406,7 +368,7 @@ void GLArea::wheelEvent ( QWheelEvent * event ){
 
 void GLArea::keyPressEvent ( QKeyEvent * event ){
 
-    if(activeEditPlugin && !activeEditPlugin->keyPressEvent(event, cm, this))
+    if(pm->activeEditPlugin && !pm->activeEditPlugin->keyPressEvent(event, cm, this))
         return;
 
     // Set up inverse rotation

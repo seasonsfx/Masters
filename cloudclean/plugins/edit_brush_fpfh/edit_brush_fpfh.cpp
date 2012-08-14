@@ -1,23 +1,26 @@
 #define GL3_PROTOTYPES
 #include <../../external/gl3.h>
 #include <GL/glu.h>
-#include "edit_brush_fpfh.h"
+
 #include <QIcon>
 #include <QDebug>
 #include <QResource>
-#include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
+
+#include <QAbstractItemView>
+#include <QTime>
+
+#include <pcl/features/fpfh_omp.h>
+#include <pcl/common/pca.h>
+#include <omp.h>
+
+#include "edit_brush_fpfh.h"
 #include "utilities.h"
 #include "layer.h"
-#include "QAbstractItemView"
-#include <QTime>
-#include <pcl/features/fpfh_omp.h>
-#include <omp.h>
-#include <pcl/common/pca.h>
+#include "glarea.h"
+#include "cloudmodel.h"
 
 EditBrush::EditBrush()
 {
-
     editSample = new QAction(QIcon(":/images/brush.png"), "Brush select (FPFH)", this);
     actionList << editSample;
     foreach(QAction *editAction, actionList)

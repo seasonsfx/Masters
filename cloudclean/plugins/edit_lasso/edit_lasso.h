@@ -1,12 +1,13 @@
 #ifndef EDITLASSO_H
 #define EDITLASSO_H
 
+#include <vector>
+
 #include <QObject>
 #include <QAction>
-#include "../../common/interfaces.h"
-#include <Eigen/Dense>
-#include <vector>
+
 #include <QGLShaderProgram>
+#include <QGLBuffer>
 
 #ifdef __APPLE__
 #include <OpenCL/opencl.h>
@@ -14,6 +15,9 @@
 #include <CL/cl.h>
 #endif
 
+#include <Eigen/Dense>
+
+#include "../../common/interfaces.h"
 #include "settings.h"
 
 class GLArea;

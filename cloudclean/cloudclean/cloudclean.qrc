@@ -2,8 +2,5 @@
     <qresource prefix="/">
         <file>shaders/points.frag</file>
         <file>shaders/points.vert</file>
-        <file>shaders/normals.frag</file>
-        <file>shaders/normals.vert</file>
-        <file>shaders/normals.geom</file>
     </qresource>
 </RCC>

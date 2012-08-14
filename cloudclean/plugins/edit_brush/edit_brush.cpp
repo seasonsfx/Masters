@@ -1,17 +1,16 @@
 #define GL3_PROTOTYPES
 #include <../../external/gl3.h>
-#include <GL/glu.h>
 #include "edit_brush.h"
 #include <QIcon>
 #include <QDebug>
 #include <QResource>
-#include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include <QTime>
+#include <QAbstractItemView>
+
 #include "utilities.h"
 #include "layer.h"
-#include "QAbstractItemView"
-//#include <pcl/kdtree/kdtree.h>
-#include <QTime>
+#include "glarea.h"
+#include "cloudmodel.h"
 
 EditBrush::EditBrush()
 {

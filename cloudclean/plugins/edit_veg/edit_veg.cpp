@@ -1,12 +1,14 @@
 #define GL3_PROTOTYPES
 #include <../../external/gl3.h>
-#include "edit_veg.h"
+
 #include <QIcon>
 #include <QDebug>
 #include <QResource>
-#include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
+
+#include "edit_veg.h"
 #include "utilities.h"
+#include "glarea.h"
+#include "cloudmodel.h"
 
 EditVeg::EditVeg()
 {

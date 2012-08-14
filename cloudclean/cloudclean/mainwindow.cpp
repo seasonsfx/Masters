@@ -8,7 +8,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
    // Create objects
-   glarea = new GLArea(this);
+   cm = CloudModel::Instance();
+   glarea = new GLArea(this, &pm, cm);
    layerView = new LayerView(this);
    toolbox = new Toolbox(this);
 
@@ -17,6 +18,7 @@ MainWindow::MainWindow(QWidget *parent) :
    saveFile = new QAction("Save As", fileMenu);
 
    toolsMenu = menuBar()->addMenu(tr("&Tools"));
+   vizMenu = menuBar()->addMenu(tr("&Visualization"));
 
    // Config
    layerView->setAllowedAreas (Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
@@ -33,10 +35,14 @@ MainWindow::MainWindow(QWidget *parent) :
    setCentralWidget(glarea);
 
    // Load plugins
-   pluginManager.loadPlugins();
-   foreach(QAction* editAction, pluginManager.editActionList){
+   pm.loadPlugins();
+   foreach(QAction* editAction, pm.editActionList){
        toolsMenu->addAction(editAction);
        connect(editAction, SIGNAL(triggered()), this, SLOT(applyEditMode()));
+   }
+   foreach(QAction* vizAction, pm.vizActionList){
+       vizMenu->addAction(vizAction);
+       connect(vizAction, SIGNAL(triggered()), this, SLOT(applyVizMode()));
    }
 
    // Wire signals and slots
@@ -88,24 +94,57 @@ void MainWindow::applyEditMode(){
 
     EditPluginInterface * plugin = qobject_cast<EditPluginInterface *>(action->parent());
 
-    if(glarea->activeEditPlugin){
-        glarea->activeEditPlugin->EndEdit(CloudModel::Instance(), glarea);
+    if(pm.activeEditPlugin){
+        pm.activeEditPlugin->EndEdit(CloudModel::Instance(), glarea);
 
         // Deactivate current plugin if clicked again
-        if(glarea->activeEditPlugin == plugin){
+        if(pm.activeEditPlugin == plugin){
             plugin->EndEdit(CloudModel::Instance(), glarea);
-            glarea->activeEditPlugin = NULL;
+            pm.activeEditPlugin = NULL;
             emit setSettingsWidget(new QWidget(this));
             return;
         }
-        glarea->activeEditPlugin = NULL;
+        pm.activeEditPlugin = NULL;
     }
 
-    glarea->activeEditPlugin = plugin;
+    pm.activeEditPlugin = plugin;
 
-    QWidget * settings = glarea->activeEditPlugin->getSettingsWidget(this);
+    QWidget * settings = pm.activeEditPlugin->getSettingsWidget(this);
     emit setSettingsWidget(settings);
 
     plugin->StartEdit(action, CloudModel::Instance(), glarea);
+
+}
+
+void MainWindow::applyVizMode(){
+
+    QAction *action = qobject_cast<QAction *>(sender());
+
+    if(!CloudModel::Instance()->isLoaded()) { //prevents crash without cloud
+        action->setChecked(false);
+        return;
+    }
+
+    VizPluginInterface * plugin = qobject_cast<VizPluginInterface *>(action->parent());
+
+    if(pm.activeVizPlugin){
+        pm.activeVizPlugin->EndViz(CloudModel::Instance(), glarea);
+
+        // Deactivate current plugin if clicked again
+        if(pm.activeVizPlugin == plugin){
+            plugin->EndViz(CloudModel::Instance(), glarea);
+            pm.activeVizPlugin = NULL;
+            emit setSettingsWidget(new QWidget(this));
+            return;
+        }
+        pm.activeVizPlugin = NULL;
+    }
+
+    pm.activeVizPlugin = plugin;
+
+    //QWidget * settings = pm.activeVizPlugin->getSettingsWidget(this);
+    //emit setSettingsWidget(settings);
+
+    plugin->StartViz(action, CloudModel::Instance(), glarea);
 
 }

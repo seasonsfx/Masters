@@ -1,16 +1,21 @@
 #define GL3_PROTOTYPES
+
+#include <iostream>
+
+#define GL3_PROTOTYPES
 #include <../../external/gl3.h>
-#include "edit_lasso.h"
+
 #include <QIcon>
 #include <QDebug>
 #include <QResource>
-#include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include "utilities.h"
-#include <iostream>
 #include <QPolygon>
 #include <QPainter>
 #include <QTime>
+
+#include "cloudmodel.h"
+#include "glarea.h"
+#include "edit_lasso.h"
+#include "utilities.h"
 
 EditLasso::EditLasso()
 {

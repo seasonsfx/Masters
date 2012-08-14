@@ -1,11 +1,13 @@
-#include "cloudmodel.h"
 #include <ctime>
-#include "io.h"
-#include <pcl/filters/filter.h>
+
 #include <QDebug>
 #include <QTime>
-#include <GL/glu.h>
+#include <pcl/filters/filter.h>
 #include <pcl/features/integral_image_normal.h>
+#include <GL/glu.h>
+
+#include "cloudmodel.h"
+#include "io.h"
 
 void inline  glError(const char * msg){
     int err = glGetError();
@@ -17,7 +19,7 @@ void inline  glError(const char * msg){
 CloudModel* CloudModel::only_instance = NULL;
 
 CloudModel::CloudModel(QObject *parent) :
-    QObject(parent), point_buffer( QGLBuffer::VertexBuffer), normal_buffer(QGLBuffer::VertexBuffer)
+    QObject(parent), point_buffer( QGLBuffer::VertexBuffer)
 {
     cloud = pcl::PointCloud<pcl::PointXYZI>::Ptr(new pcl::PointCloud<pcl::PointXYZI>);
     x_dim = 0;
@@ -126,50 +128,6 @@ bool CloudModel::createBuffers(){
     // Comment this out if all works
     // Load normals to gpu
 
-
-    normal_buffer.create();
-    normal_buffer.setUsagePattern( QGLBuffer::DynamicDraw );
-    assert(normal_buffer.bind());
-    normal_buffer.allocate(cloud->points.size() * sizeof(float) * 3);
-
-    for (int i = 0; i < (int)cloud->size(); i++)
-    {
-        float data2[3];
-        data2[0] = (normals->at(i).data_n[0]*0.1);
-        data2[1] = (normals->at(i).data_n[1]*0.1);
-        data2[2] = (normals->at(i).data_n[2]*0.1);
-
-        int offset = 3*sizeof(float)*i;
-        normal_buffer.write(offset, reinterpret_cast<const void *> (data2), sizeof(data2));
-    }
-
-    normal_buffer.release();
-
-/*
-    normal_buffer.create();
-    normal_buffer.setUsagePattern( QGLBuffer::DynamicDraw );
-    assert(normal_buffer.bind());
-    normal_buffer.allocate(cloud->points.size() * sizeof(float) * 6);
-
-    for (int i = 0; i < (int)cloud->size(); i++)
-    {
-        float data2[6];
-        data2[0] = cloud->points[i].x;
-        data2[1] = cloud->points[i].y;
-        data2[2] = cloud->points[i].z;
-        data2[3] = data2[0]+(normals->at(i).data_n[0]*0.1);
-        data2[4] = data2[1]+(normals->at(i).data_n[1]*0.1);
-        data2[5] = data2[2]+(normals->at(i).data_n[2]*0.1);
-
-        int offset = 6*sizeof(float)*i;
-        normal_buffer.write(offset, reinterpret_cast<const void *> (data2), sizeof(data2));
-
-        float p[6] = {-1,-1,-1,-1,-1,-1};
-        normal_buffer.read(offset, reinterpret_cast<void *>(p), sizeof(p));
-    }
-
-    normal_buffer.release();
-*/
     qDebug("Buffers created & loaded.");
     return true;
 }

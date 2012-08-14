@@ -28,12 +28,13 @@
 #undef KeyPress // Defined in X11/X.h, interferes with QEvent::KeyPress
 
 class EditPluginInterface;
+class PluginManager;
 
 class GLArea : public QGLWidget
 {
     Q_OBJECT
 public:
-    GLArea( QWidget* parent = 0 );
+    GLArea( QWidget* parent = 0, PluginManager *pm = NULL, CloudModel *cm = NULL);
 
     bool prepareShaderProgram( QGLShaderProgram& shader,
                                const QString& vertexShaderPath,
@@ -66,11 +67,8 @@ private:
 
     QFont qFont;
 
-    CloudModel *                            cm;
-
     QGLFormat                               glFormat;
     QGLShaderProgram                        point_shader;
-    QGLShaderProgram                        normal_shader;
 
     int                                     start_move_x;
     int                                     start_move_y;
@@ -93,9 +91,10 @@ public:
     Qt::MouseButton                         mouseDown;
     bool                                    moved;
 
-    EditPluginInterface *                   activeEditPlugin;
-
     Camera                                  camera;
+
+    CloudModel *                            cm;
+    PluginManager *                         pm;
 };
 
 #endif // GLWIDGET_H

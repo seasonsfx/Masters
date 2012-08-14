@@ -25,15 +25,18 @@ public slots:
     bool loadScan();
     bool saveScan();
     void applyEditMode();
+    void applyVizMode();
 
 private:
     QMenu *fileMenu;
     QMenu *toolsMenu;
+    QMenu *vizMenu;
     QAction *openFile;
     QAction *saveFile;
     LayerView * layerView;
     Toolbox * toolbox;
-    PluginManager pluginManager;
+    CloudModel * cm;
+    PluginManager pm;
 
 public:
     GLArea * glarea;

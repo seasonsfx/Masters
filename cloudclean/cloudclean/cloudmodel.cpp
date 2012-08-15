@@ -60,8 +60,8 @@ bool CloudModel::saveFile(const char * output_file){
     std::vector<Layer> & layers = layerList.layers;
     for(unsigned int l = 0; l < layers.size(); l++){
         printf("l: %d\n", l);
-        if(!layers[l].visible)
-            continue;
+        //if(!layers[l].visible)
+        //    continue;
         layers[l].sync();
         for(unsigned int i = 0; i < layers[l].index.size(); i++){
             //printf("i: %d\n", i);
@@ -158,7 +158,6 @@ void filter(pcl::PointCloud<pcl::PointXYZI>& cloud, pcl::PointCloud<pcl::Normal>
     cloud.width  = j;
     cloud.is_dense = true;
 
-    qDebug("Cloud: %d, Points: %d", cloud.size(), normals.size());
 }
 
 bool CloudModel::loadFile(const char * input_file, int subsample){
@@ -175,16 +174,13 @@ bool CloudModel::loadFile(const char * input_file, int subsample){
     x_dim = cloud->width;
     y_dim = cloud->height;
 
-    /// Calculate normals
     t.start();
     normals = pcl::PointCloud<pcl::Normal>::Ptr(new pcl::PointCloud<pcl::Normal>);
     normal_estimation(cloud, normals);
     qDebug("Normals calculated in %d ms", t.elapsed());
 
-    ///// Filter normals & cloud //////
     t.start();
     filter(*cloud, *normals, cloud_to_grid_map);
-    qDebug("Cloud: %d, Points: %d", cloud->size(), normals->size());
     qDebug("Normals filtered in %d ms", t.elapsed());
 
     if(loaded)

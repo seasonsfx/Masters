@@ -217,10 +217,12 @@ void EditBrush::fill(int x, int y, float radius, int source_idx, int dest_idx, C
     int current;
     int count = 0; // Stops ape shit
 
+    pcl::FPFHSignature33 & source_sig = fpfhs->at(source_idx);
+
     std::vector<int> & source = cm->layerList.layers[source_idx].index;
     std::vector<int> & dest = cm->layerList.layers[dest_idx].index;
 
-    while (!myqueue.empty() && count++ < 10000){
+    while (!myqueue.empty() /*&& count++ < 10000*/){
         current = myqueue.front(); myqueue.pop();
 
         // Skip invalid indices, visited indices are invalid
@@ -237,7 +239,7 @@ void EditBrush::fill(int x, int y, float radius, int source_idx, int dest_idx, C
 
         int idx;
 
-        int K = 5;
+        int K = 4;
 
         std::vector<int> pointIdxNKNSearch(K);
         std::vector<float> pointNKNSquaredDistance(K);
@@ -265,7 +267,7 @@ void EditBrush::fill(int x, int y, float radius, int source_idx, int dest_idx, C
 
             qDebug("Dist %f", dist);
 
-            if(dist > 40)
+            if(dist > 100)
                 continue;
 
             myqueue.push(idx);

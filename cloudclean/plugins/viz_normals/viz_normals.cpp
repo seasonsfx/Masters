@@ -29,7 +29,7 @@ VizNormals::~VizNormals()
 }
 
 bool VizNormals::StartViz(QAction *action, CloudModel *cm, GLArea *glarea){
-    try{
+
     if(!normal_buffer.isCreated()){
 
         // Setup normal shader
@@ -64,12 +64,6 @@ bool VizNormals::StartViz(QAction *action, CloudModel *cm, GLArea *glarea){
         }
 
         normal_buffer.release();
-    }
-    }
-    catch(exception e){
-        qDebug("Cloud size: %d, Normals size: %d", cm->cloud->size(), cm->normals->size());
-        qDebug("Cloud size: %d, Normals size: %d", cm->cloud->points.size(), cm->normals->points.size());
-        qDebug("%s", e.what());
     }
 
     return true;

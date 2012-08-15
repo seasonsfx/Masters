@@ -14,7 +14,9 @@
 #include </usr/include/eigen3/Eigen/Core>
 #include </usr/include/eigen3/Eigen/Geometry>
 
-#define IS_NAN(num) (num!=num)
+inline bool isNaN(float val){
+    return (val != val);
+}
 
 bool save_ptx(const char* filename, pcl::PointCloud<pcl::PointXYZI>::Ptr cloud){
     std::ofstream ptx_file(filename);
@@ -53,7 +55,7 @@ bool save_ptx(const char* filename, pcl::PointCloud<pcl::PointXYZI>::Ptr cloud){
 
     // Print points
     for(unsigned int i = 0; i < cloud->points.size(); i++){
-        if(IS_NAN(cloud->points[i].x) || IS_NAN(cloud->points[i].y) || IS_NAN(cloud->points[i].z || IS_NAN(cloud->points[i].intensity))){
+        if(isNaN(cloud->points[i].x) || isNaN(cloud->points[i].y) || isNaN(cloud->points[i].z || isNaN(cloud->points[i].intensity))){
             ptx_file << "0 0 0 0.5" << std::endl;
         }
         else{

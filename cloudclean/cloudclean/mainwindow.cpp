@@ -72,6 +72,12 @@ bool MainWindow::loadScan(){
     return true;
 }
 
+bool MainWindow::loadScan(char * filename, int subsample){
+    CloudModel::Instance()->loadFile(filename, subsample);
+    glarea->modelReloaded();
+    return true;
+}
+
 bool MainWindow::saveScan(){
     QString filename = QFileDialog::getSaveFileName(this, tr("Save Scan"), "~", tr("PTX Files (*.ptx)"));
 

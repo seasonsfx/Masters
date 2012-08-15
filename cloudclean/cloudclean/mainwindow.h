@@ -17,6 +17,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 public:
     explicit MainWindow(QWidget *parent = 0);
+    bool loadScan(char * filename, int subsample);
     
 signals:
     void reloadCloud();

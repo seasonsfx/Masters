@@ -117,16 +117,10 @@ bool CloudModel::createBuffers(){
     /// Initialise the first layer to include all points
     for(unsigned int i = 0; i < cloud->size(); i++){
         layer.index[i] = i;
-        //layer.gl_index_buffer.write(i*sizeof(int), reinterpret_cast<const void *>(&i), sizeof(int));
     }
 
     layer.cpu_dirty = true;
     layer.sync();
-
-    //layer.gl_index_buffer.release();
-
-    // Comment this out if all works
-    // Load normals to gpu
 
     qDebug("Buffers created & loaded.");
     return true;
@@ -155,16 +149,6 @@ bool CloudModel::loadFile(const char * input_file, int subsample){
 
     normal_estimation(cloud, normals_tmp);
     qDebug("Normals calculated in %d ms", t.elapsed());
-
-    // Debug
-    /*for(int i = 0; i < cloud->size(); i++){
-        qDebug("Point (%f, %f, %f), Normal (%f, %f, %f)",
-               cloud->points[i].x, cloud->points[i].y, cloud->points[i].z,
-               normals_tmp->points[i].normal_x,
-               normals_tmp->points[i].normal_y,
-               normals_tmp->points[i].normal_z);
-    }
-    */
 
     t.start();
     /// Filter and flatten point cloud

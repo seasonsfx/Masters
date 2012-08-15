@@ -115,19 +115,19 @@ pcl::PointCloud<pcl::PointXYZI>::Ptr read_ptx(const char* filename, int subsampl
 
 	ptx_file >> std::ws;
 
-	// Read points
+    ///////////// Start processing points ////////////////
 	std::string line;
 	float x, y, z, intensity;
 
-    // determine format
+    // Determine format
+    /*
     getline( ptx_file, line);
     int tokens = 1;
     for(int i = 0; i< line.length(); i++)
         if(line[i] == ' ') tokens++;
     assert(tokens == 4);
 
-    // read first line
-
+    // Read first line to out sniff format
     std::stringstream ss(std::stringstream::in | std::stringstream::out);
     ss << line;
     ss >> x >> y >> z >> intensity;
@@ -140,15 +140,26 @@ pcl::PointCloud<pcl::PointXYZI>::Ptr read_ptx(const char* filename, int subsampl
     cloud->points[0].y = y;
     cloud->points[0].z = z;
     cloud->points[0].intensity = intensity;
-
-    unsigned int i = 1;
+*/
+    unsigned int i = 0;
     int sample = 0;
+    int row = 0, col = 0;
 
-    while(sample < width*height-1){
-        if( (sample++%(subsample*subsample)) != 0){
-            getline( ptx_file, line);
-			continue;
-		}
+    while(sample < width*height){
+        row = sample / width;
+        col = sample % width;
+
+        //qDebug("%d::%d", row, col);
+
+        // Only process every subsample-ith row and column
+        if((row+1)%subsample != 0 || (col+1)%subsample != 0){
+            //getline( ptx_file, line);
+            ptx_file >> x >> y >> z >> intensity;
+            sample++;
+            continue;
+        }
+        //qDebug("Sample number %d", sample);
+        sample++;
 
         ptx_file >> x >> y >> z >> intensity;
 

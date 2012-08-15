@@ -42,7 +42,7 @@ bool EditBrush::mouseDoubleClickEvent  (QMouseEvent *event, CloudModel * cm, GLA
 }
 
 bool EditBrush::StartEdit(QAction *action, CloudModel *cm, GLArea *glarea){
-    // Set up kdtree and octre if not set up yet
+    // Set up kdtree and octree if not set up yet
 
     if(octree.get() == NULL){
         QTime t;

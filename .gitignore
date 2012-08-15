@@ -6,6 +6,7 @@
 *~
 .fuse_*
 *.pro.user
+qrc_*
 # Docs
 /docs/*/*.pdf
 *.snm

@@ -173,9 +173,6 @@ pcl::PointCloud<pcl::PointXYZI>::Ptr read_ptx(const char* filename, int subsampl
 		cloud->points[i].intensity = intensity;
 
         i++;
-
-        if(i > cloud->width*cloud->height)
-            break;
 	}
 	return cloud;
 }

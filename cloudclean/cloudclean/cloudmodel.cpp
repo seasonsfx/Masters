@@ -127,7 +127,39 @@ bool CloudModel::createBuffers(){
 }
 
 void normal_estimation(pcl::PointCloud<pcl::PointXYZI>::Ptr cloud, pcl::PointCloud<pcl::Normal>::Ptr normals);
-void normal_estimation2(pcl::PointCloud<pcl::PointXYZI>::Ptr cloud, pcl::PointCloud<pcl::Normal>::Ptr normals);
+
+void filter(pcl::PointCloud<pcl::PointXYZI>& cloud, pcl::PointCloud<pcl::Normal>& normals, std::vector<int> &index){
+    index.resize(normals.points.size ());
+    size_t j = 0;
+    for (size_t i = 0; i < normals.points.size (); ++i)
+    {
+           if (!pcl_isfinite (normals.points[i].normal_x) ||
+               !pcl_isfinite (normals.points[i].normal_y) ||
+               !pcl_isfinite (normals.points[i].normal_z))
+             continue;
+           normals.points[j] = normals.points[i];
+           index[j] = i;
+           j++;
+     }
+
+    // Resize to the correct size
+    normals.points.resize (j);
+    index.resize (j);
+    normals.height = 1;
+    normals.width  = j;
+    normals.is_dense = true;
+
+    // Filter cloud
+    for(int i = 0; i < j; i++){
+        cloud.points[i] = cloud.points[index[i]];
+    }
+    cloud.points.resize(j);
+    cloud.height = 1;
+    cloud.width  = j;
+    cloud.is_dense = true;
+
+    qDebug("Cloud: %d, Points: %d", cloud.size(), normals.size());
+}
 
 bool CloudModel::loadFile(const char * input_file, int subsample){
 
@@ -143,33 +175,17 @@ bool CloudModel::loadFile(const char * input_file, int subsample){
     x_dim = cloud->width;
     y_dim = cloud->height;
 
-    t.start();
     /// Calculate normals
-    pcl::PointCloud<pcl::Normal>::Ptr normals_tmp(new pcl::PointCloud<pcl::Normal> ());
-
-    normal_estimation(cloud, normals_tmp);
+    t.start();
+    normals = pcl::PointCloud<pcl::Normal>::Ptr(new pcl::PointCloud<pcl::Normal>);
+    normal_estimation(cloud, normals);
     qDebug("Normals calculated in %d ms", t.elapsed());
 
+    ///// Filter normals & cloud //////
     t.start();
-    /// Filter and flatten point cloud
-    pcl::removeNaNFromPointCloud(*cloud, *cloud, cloud_to_grid_map);
-    qDebug("Cloud filtered in %d ms", t.elapsed());
-
-
-    t.start();
-    /// Move normals to unstructured cloud
-    normals = pcl::PointCloud<pcl::Normal>::Ptr(new pcl::PointCloud<pcl::Normal> ());
-    normals->resize(cloud->size());
-    int nans = 0;
-    for(int i = 0; i < cloud_to_grid_map.size(); i++){
-        normals->points[i] = normals_tmp->points[cloud_to_grid_map[i]];
-        if(normals->points[i].normal_x != normals->points[i].normal_x)
-            nans++;
-    }
-
-    qDebug("Missing normals: %d", nans);
-
-    qDebug("Normals moved in  %d ms", t.elapsed());
+    filter(*cloud, *normals, cloud_to_grid_map);
+    qDebug("Cloud: %d, Points: %d", cloud->size(), normals->size());
+    qDebug("Normals filtered in %d ms", t.elapsed());
 
     if(loaded)
         layerList.reset();
@@ -202,31 +218,6 @@ public:
     PointIdxPair(PointIdx p1, PointIdx p2): p1(p1), p2(p2){}
     PointIdxPair(int p1x, int p1y, int p2x, int p2y): p1(PointIdx(p1x, p1y)), p2(PointIdx(p2x, p2y)){}
 };
-
-void normal_estimation2(pcl::PointCloud<pcl::PointXYZI>::Ptr cloud, pcl::PointCloud<pcl::Normal>::Ptr normals){
-
-    // Need to save registration details and restore the,
-
-    // save
-    Eigen::Quaternionf sensor_orientation_old = cloud->sensor_orientation_;
-    Eigen::Vector4f sensor_origin_old = cloud->sensor_origin_;
-
-    // set
-    cloud->sensor_orientation_ = Eigen::Quaternionf(1, 0, 0, 0); // no rotation
-    cloud->sensor_origin_ = Eigen::Vector4f(0, 0, 0, 0);
-
-
-    pcl::IntegralImageNormalEstimation<pcl::PointXYZI, pcl::Normal> ne;
-    ne.setNormalEstimationMethod (ne.AVERAGE_3D_GRADIENT);
-    ne.setMaxDepthChangeFactor(0.02f);
-    ne.setNormalSmoothingSize(10.0f);
-    ne.setInputCloud(cloud);
-    ne.compute(*normals);
-
-    // restore
-    cloud->sensor_orientation_ = sensor_orientation_old;
-    cloud->sensor_origin_ = sensor_origin_old;
-}
 
 bool isValidPoint(PointIdx & point, int width, int height, int index, pcl::PointCloud<pcl::PointXYZI>::Ptr cloud){
     // calculate current x and y

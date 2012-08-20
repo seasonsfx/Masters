@@ -2,11 +2,13 @@ include(../../shared.pri)
 
 TARGET = edit_brush_fpfh
 HEADERS += \
-    edit_brush_fpfh.h
+    edit_brush_fpfh.h \
+    settings.h
 
 
 SOURCES += \
-    edit_brush_fpfh.cpp
+    edit_brush_fpfh.cpp \
+    settings.cpp
 
 INCLUDEPATH += \
         ../../cloudclean \
@@ -30,3 +32,6 @@ LIBS += -lpcl_io \
 
 RESOURCES += \
     edit_brush.qrc
+
+FORMS += \
+    settings.ui

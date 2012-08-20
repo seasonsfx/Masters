@@ -21,6 +21,7 @@
 
 EditBrush::EditBrush()
 {
+    settings = new Settings();
     editSample = new QAction(QIcon(":/images/brush.png"), "Brush select (FPFH)", this);
     actionList << editSample;
     foreach(QAction *editAction, actionList)
@@ -30,6 +31,7 @@ EditBrush::EditBrush()
 
 EditBrush::~EditBrush()
 {
+    delete settings;
 }
 
 void EditBrush::paintGL(CloudModel *, GLArea * glarea){
@@ -78,16 +80,7 @@ bool EditBrush::StartEdit(QAction *action, CloudModel *cm, GLArea *glarea){
         //fpfh.setKSearch(5);
 
         fpfh.compute (*fpfhs);
-/*
-        for(int i = 0; i < fpfhs->size(); i++){
-            pcl::FPFHSignature33 & sig = fpfhs->at(i);
-            for(int j = 0; j < 33; j++){
-                printf("%f ", sig.histogram[j]);
-            }
-            printf("\n");
-            fflush(stdout);
-        }
-*/
+
         qDebug("Time to calc FPFH: %d ms", t.elapsed());
 
     }
@@ -196,6 +189,36 @@ int EditBrush::pointPick(int x, int y, float radius, int source_idx, Eigen::Vect
     return min_index;
 }
 
+inline float euclidianDist(pcl::FPFHSignature33 &a, pcl::FPFHSignature33 &b){
+    float sum = 0;
+    for(int i = 0; i < 33; i++){
+        sum += powf(a.histogram[i] - b.histogram[i], 2);
+    }
+    return sqrt(sum);
+}
+
+inline float cosineDist(pcl::FPFHSignature33 &a, pcl::FPFHSignature33 &b){
+    float sum = 0.0f;
+    for(int i = 0; i < 33; i++){
+        sum += powf(a.histogram[i], 2);
+    }
+    int lenA = sqrt(sum);
+
+    sum = 0.0f;
+    for(int i = 0; i < 33; i++){
+        sum += powf(b.histogram[i], 2);
+    }
+    int lenB = sqrt(sum);
+
+    float dotted = 0.0f;
+    for(int i = 0; i < 33; i++){
+        dotted += a.histogram[i] * b.histogram[i];
+    }
+
+    return dotted / (lenA*lenB);
+
+}
+
 void EditBrush::fill(int x, int y, float radius, int source_idx, int dest_idx, CloudModel *cm, GLArea * glarea){
 
     Eigen::Vector3f p1, p2;
@@ -222,6 +245,10 @@ void EditBrush::fill(int x, int y, float radius, int source_idx, int dest_idx, C
     std::vector<int> & source = cm->layerList.layers[source_idx].index;
     std::vector<int> & dest = cm->layerList.layers[dest_idx].index;
 
+    int K = settings->neighbours;
+
+    DistanceEnum distFunc = settings->distanceFunc;
+
     while (!myqueue.empty() /*&& count++ < 10000*/){
         current = myqueue.front(); myqueue.pop();
 
@@ -238,8 +265,6 @@ void EditBrush::fill(int x, int y, float radius, int source_idx, int dest_idx, C
         // push neighbours..
 
         int idx;
-
-        int K = 4;
 
         std::vector<int> pointIdxNKNSearch(K);
         std::vector<float> pointNKNSquaredDistance(K);
@@ -258,16 +283,16 @@ void EditBrush::fill(int x, int y, float radius, int source_idx, int dest_idx, C
             // Skip if to far in feature space
             pcl::FPFHSignature33 & neigbour_sig = fpfhs->at(idx);
 
-            float sum = 0;
-            for(int i = 0; i < 33; i++){
-                //qDebug("%f - %f", current_sig.histogram[i], neigbour_sig.histogram[i]);
-                sum += powf(current_sig.histogram[i] - neigbour_sig.histogram[i], 2);
-            }
-            float dist = sqrt(sum);
+            float dist = 0;
+
+            if(distFunc == EUCLIDIAN)
+                dist = euclidianDist(current_sig, neigbour_sig);
+            if(distFunc == COSINE)
+                dist = cosineDist(current_sig, neigbour_sig);
 
             qDebug("Dist %f", dist);
 
-            if(dist > 100)
+            if(dist > settings->threshold)
                 continue;
 
             myqueue.push(idx);
@@ -314,7 +339,7 @@ bool EditBrush::mouseReleaseEvent(QMouseEvent *event, CloudModel * cm, GLArea * 
         }
 
 
-        if(dest_layer == -1){
+        if(dest_layer == -1 || dest_layer > cm->layerList.layers.size()-1){
             cm->layerList.newLayer();
             dest_layer = cm->layerList.layers.size()-1;
         }
@@ -334,5 +359,10 @@ QList<QAction *> EditBrush::actions() const{
 QString EditBrush::getEditToolDescription(QAction *){
     return "Info";
 }
+
+QWidget * EditBrush::getSettingsWidget(QWidget *){
+    return settings;
+}
+
 
 Q_EXPORT_PLUGIN2(pnp_editbrush, EditBrush)

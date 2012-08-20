@@ -57,10 +57,14 @@ MainWindow::MainWindow(QWidget *parent) :
 
 bool MainWindow::loadScan(){
     QString filename = QFileDialog::getOpenFileName(this, tr("Open Scan"), "~", tr("PTX Files (*.ptx)"));
+
+    if(filename.length() == 0)
+        return false;
+
     int subsample = SubsampleDialog::getSubsample();
 
-    if(filename.length() == 0 || subsample == -1)
-        return false;   
+    if(subsample == -1)
+        return false;
 
     const char *ptr = filename.toAscii().data();
     char* f = new char[filename.length()];

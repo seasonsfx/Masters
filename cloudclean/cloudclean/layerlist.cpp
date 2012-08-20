@@ -105,14 +105,14 @@ void LayerList::mergeLayers(std::vector<int> indices){
     int dest_idx = indices[0];
     std::vector<int> & dest = layers[dest_idx].index;
 
-    layers[dest_idx].copyFromGPU();
+    layers[dest_idx].sync();
 
     indices.erase(indices.begin());
 
     // Copy every layer to the first layer
     foreach(int i, indices){
 
-        layers[i].copyFromGPU();
+        layers[dest_idx].sync();
 
         // Copy each individual index
         for(int j = 0; j < dest.size(); j++){
@@ -122,10 +122,12 @@ void LayerList::mergeLayers(std::vector<int> indices){
             }
             dest[j] = layers[i].index[j];
         }
+
     }
 
     deleteLayers(indices);
-    layers[dest_idx].copyToGPU();
+    layers[dest_idx].cpu_dirty = 1;
+    layers[dest_idx].sync();
 }
 
 void LayerList::selectModeChanged(int index){

@@ -1,15 +1,18 @@
 #ifndef EDITBRUSH_H
 #define EDITBRUSH_H
 
+#include <vector>
+
 #include <QObject>
 #include <QAction>
-#include "../../common/interfaces.h"
-#include <Eigen/Dense>
-#include <vector>
 #include <QGLShaderProgram>
+#include <Eigen/Dense>
 #include <pcl/octree/octree.h>
 #include <pcl/features/fpfh.h>
 #include <pcl/features/normal_3d.h>
+
+#include "../../common/interfaces.h"
+#include <settings.h>
 
 #ifdef __APPLE__
 #include <OpenCL/opencl.h>
@@ -39,6 +42,7 @@ public:
     //bool wheelEvent(QWheelEvent*, CloudModel *, GLArea * ){}
     QList<QAction *> actions() const;
     QString getEditToolDescription(QAction *);
+    QWidget * getSettingsWidget(QWidget *);
 
 private:
     void fill(int x, int y, float radius, int source_idx, int dest_idx, CloudModel *cm, GLArea * glarea);
@@ -53,6 +57,8 @@ private:
     pcl::PointCloud<pcl::FPFHSignature33>::Ptr fpfhs;
 
     int dest_layer;
+
+    Settings *                      settings;
 
 };
 

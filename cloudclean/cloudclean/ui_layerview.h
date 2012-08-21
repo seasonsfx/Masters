@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'layerview.ui'
 **
-** Created: Wed Aug 15 16:07:52 2012
+** Created: Tue Aug 21 17:37:05 2012
 **      by: Qt User Interface Compiler version 4.8.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -43,7 +43,7 @@ public:
     {
         if (LayerView->objectName().isEmpty())
             LayerView->setObjectName(QString::fromUtf8("LayerView"));
-        LayerView->resize(251, 514);
+        LayerView->resize(268, 214);
         dockWidgetContents = new QWidget();
         dockWidgetContents->setObjectName(QString::fromUtf8("dockWidgetContents"));
         verticalLayout_2 = new QVBoxLayout(dockWidgetContents);
@@ -55,6 +55,7 @@ public:
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(listView->sizePolicy().hasHeightForWidth());
         listView->setSizePolicy(sizePolicy);
+        listView->setMinimumSize(QSize(250, 0));
 
         verticalLayout_2->addWidget(listView);
 

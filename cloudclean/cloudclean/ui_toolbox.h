@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'toolbox.ui'
 **
-** Created: Wed Aug 15 16:07:52 2012
+** Created: Tue Aug 21 16:57:13 2012
 **      by: Qt User Interface Compiler version 4.8.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -34,7 +34,8 @@ public:
     {
         if (Toolbox->objectName().isEmpty())
             Toolbox->setObjectName(QString::fromUtf8("Toolbox"));
-        Toolbox->resize(256, 493);
+        Toolbox->resize(283, 493);
+        Toolbox->setMinimumSize(QSize(96, 200));
         dockWidgetContents = new QWidget();
         dockWidgetContents->setObjectName(QString::fromUtf8("dockWidgetContents"));
         verticalLayout = new QVBoxLayout(dockWidgetContents);
@@ -44,7 +45,7 @@ public:
         settingsArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QString::fromUtf8("scrollAreaWidgetContents"));
-        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 236, 448));
+        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 263, 448));
         QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);

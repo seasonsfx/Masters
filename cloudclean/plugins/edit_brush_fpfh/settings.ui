@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>205</width>
-    <height>300</height>
+    <width>209</width>
+    <height>481</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,82 +15,150 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QGroupBox" name="radioGroup">
+    <widget class="QGroupBox" name="threshBox">
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>80</height>
+       <height>0</height>
       </size>
      </property>
      <property name="title">
-      <string>Distance function</string>
+      <string>Threshold function</string>
      </property>
-     <widget class="QRadioButton" name="euclid">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>30</y>
-        <width>151</width>
-        <height>22</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Euclidian</string>
-      </property>
-      <property name="checked">
-       <bool>true</bool>
-      </property>
-     </widget>
-     <widget class="QRadioButton" name="cosine">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>50</y>
-        <width>141</width>
-        <height>22</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Cosine</string>
-      </property>
-     </widget>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QRadioButton" name="euclidianRad">
+        <property name="text">
+         <string>Euclidian</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QDoubleSpinBox" name="euclidian">
+        <property name="minimum">
+         <double>1.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>200.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>1.000000000000000</double>
+        </property>
+        <property name="value">
+         <double>25.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="cosineRad">
+        <property name="text">
+         <string>Cosine</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QDoubleSpinBox" name="cosine">
+        <property name="mouseTracking">
+         <bool>true</bool>
+        </property>
+        <property name="accelerated">
+         <bool>true</bool>
+        </property>
+        <property name="maximum">
+         <double>1.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>0.010000000000000</double>
+        </property>
+        <property name="value">
+         <double>0.100000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="intensityRad">
+        <property name="text">
+         <string>Intensity</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QDoubleSpinBox" name="intensity">
+        <property name="maximum">
+         <double>1.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>0.010000000000000</double>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
    <item>
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>Threshold</string>
+    <widget class="QGroupBox" name="neighbourBox">
+     <property name="title">
+      <string>Neigbours</string>
      </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QDoubleSpinBox" name="thresholdSpinner">
-     <property name="mouseTracking">
-      <bool>true</bool>
-     </property>
-     <property name="accelerated">
-      <bool>true</bool>
-     </property>
-     <property name="maximum">
-      <double>200.000000000000000</double>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Neighbours</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QSpinBox" name="neighboursSpinner">
-     <property name="minimum">
-      <number>1</number>
-     </property>
-     <property name="value">
-      <number>4</number>
-     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <item>
+       <widget class="QRadioButton" name="kRad">
+        <property name="text">
+         <string>K</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSpinBox" name="k">
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="value">
+         <number>4</number>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="fixedRad">
+        <property name="text">
+         <string>Fixed radius (m?)</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QDoubleSpinBox" name="fixed">
+        <property name="minimum">
+         <double>0.050000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>0.050000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="dynRad">
+        <property name="text">
+         <string>Dynamic radius coef</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QDoubleSpinBox" name="dyn">
+        <property name="minimum">
+         <double>0.100000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>0.100000000000000</double>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
    <item>

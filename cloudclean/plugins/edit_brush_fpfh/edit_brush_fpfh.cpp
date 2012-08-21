@@ -22,7 +22,7 @@
 EditBrush::EditBrush()
 {
     settings = new Settings();
-    editSample = new QAction(QIcon(":/images/brush.png"), "Brush select (FPFH)", this);
+    editSample = new QAction(QIcon(":/images/brush.png"), "Flood fill (FPFH)", this);
     actionList << editSample;
     foreach(QAction *editAction, actionList)
         editAction->setCheckable(true);
@@ -200,23 +200,35 @@ inline float euclidianDist(pcl::FPFHSignature33 &a, pcl::FPFHSignature33 &b){
 inline float cosineDist(pcl::FPFHSignature33 &a, pcl::FPFHSignature33 &b){
     float sum = 0.0f;
     for(int i = 0; i < 33; i++){
-        sum += powf(a.histogram[i], 2);
+        sum += a.histogram[i] * a.histogram[i];
     }
-    int lenA = sqrt(sum);
+    float lenA = sqrt(sum);
 
     sum = 0.0f;
     for(int i = 0; i < 33; i++){
-        sum += powf(b.histogram[i], 2);
+        sum += b.histogram[i] * b.histogram[i];
     }
-    int lenB = sqrt(sum);
+    float lenB = sqrt(sum);
 
     float dotted = 0.0f;
     for(int i = 0; i < 33; i++){
         dotted += a.histogram[i] * b.histogram[i];
     }
 
-    return dotted / (lenA*lenB);
+    float cosineSimilarity = dotted / (lenA*lenB);
 
+    float angularSimlarity = acos(cosineSimilarity)/M_PI;
+
+    return angularSimlarity;
+
+}
+
+inline float intensityDist(float a, float b){
+    return fabs(a - b);
+}
+
+inline float density(float radius){
+    return 1.0f/(2.0f*M_PI*radius*radius);
 }
 
 void EditBrush::fill(int x, int y, float radius, int source_idx, int dest_idx, CloudModel *cm, GLArea * glarea){
@@ -238,18 +250,17 @@ void EditBrush::fill(int x, int y, float radius, int source_idx, int dest_idx, C
     std::queue<int> myqueue;
     myqueue.push(min_index);
     int current;
-    int count = 0; // Stops ape shit
 
-    pcl::FPFHSignature33 & source_sig = fpfhs->at(source_idx);
+    pcl::FPFHSignature33 & source_sig = fpfhs->at(min_index);
 
     std::vector<int> & source = cm->layerList.layers[source_idx].index;
     std::vector<int> & dest = cm->layerList.layers[dest_idx].index;
 
-    int K = settings->neighbours;
+    int K = settings->kNeigbours();
 
     DistanceEnum distFunc = settings->distanceFunc;
 
-    while (!myqueue.empty() /*&& count++ < 10000*/){
+    while (!myqueue.empty()){
         current = myqueue.front(); myqueue.pop();
 
         // Skip invalid indices, visited indices are invalid
@@ -285,15 +296,25 @@ void EditBrush::fill(int x, int y, float radius, int source_idx, int dest_idx, C
 
             float dist = 0;
 
-            if(distFunc == EUCLIDIAN)
+            if(distFunc == EUCLIDIAN){
                 dist = euclidianDist(current_sig, neigbour_sig);
-            if(distFunc == COSINE)
-                dist = cosineDist(current_sig, neigbour_sig);
-
-            qDebug("Dist %f", dist);
-
-            if(dist > settings->threshold)
-                continue;
+                qDebug("Euclidion dist %f", dist);
+                if(dist > settings->euclidianDist())
+                    continue;
+            }
+            else if(distFunc == COSINE){
+                dist = cosineDist(source_sig, neigbour_sig);
+                //dist = cosineDist(current_sig, neigbour_sig);
+                qDebug("Cosine dist %f", dist);
+                if(dist > settings->cosineDist())
+                    continue;
+            }
+            else if(distFunc == INTENSITY){
+                dist = intensityDist(cm->cloud->points[current].intensity, cm->cloud->points[idx].intensity);
+                qDebug("Intensity dist %f", dist);
+                if(dist > settings->intensityDist())
+                    continue;
+            }
 
             myqueue.push(idx);
         }

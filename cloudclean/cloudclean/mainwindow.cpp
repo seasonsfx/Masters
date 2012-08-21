@@ -6,7 +6,6 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
 {
 
-
    // Create objects
    cm = CloudModel::Instance();
    glarea = new GLArea(this, &pm, cm);
@@ -24,7 +23,7 @@ MainWindow::MainWindow(QWidget *parent) :
    layerView->setAllowedAreas (Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
    toolbox->setAllowedAreas (Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
    toolbox->hide();
-   glarea->setMinimumSize(700, 500);
+   glarea->setMinimumSize(900, 600);
 
    // Layout
    fileMenu->addAction(openFile);

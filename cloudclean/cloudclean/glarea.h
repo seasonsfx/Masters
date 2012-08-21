@@ -76,11 +76,7 @@ private:
     float                                   cfps;
     float                                   lastTime;
 
-    //TODO: Move out of here
-    bool                                    filling;
-    std::vector<pcl::FPFHSignature33>       stats;
-    pcl::FPFHSignature33                    mean;
-    pcl::FPFHSignature33                    stdev;
+    int                                     point_size;
 
 public:
     cl_platform_id                          platform;

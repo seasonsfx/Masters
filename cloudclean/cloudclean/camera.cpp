@@ -235,6 +235,8 @@ void Camera::mouseMove(int x, int y){
 void Camera::mouseWheel(int val){
     // Mouse seems to move in 120 increments
     //qDebug("Wheel: %d", val);
-    val = val/120.0f;
-    adjustPosition(0,0, val*0.2);
+    val = -val/60.0f;
+    if(mFoV + val < 170.0f && mFoV + val > 2.0f)
+        setFoV(mFoV + val);
+    //adjustPosition(0,0, val*0.2);
 }

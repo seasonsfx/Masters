@@ -24,9 +24,6 @@ GLArea::GLArea(QWidget* parent, PluginManager *pm, CloudModel *cm)
 
     cfps=0;
     lastTime=0;
-
-    //TODO: Move out of here
-    filling = false;
     
     camera.setDepthRange(0.1f, 100.0f);
     camera.setAspect(this->width() / float(this->height()));
@@ -34,6 +31,7 @@ GLArea::GLArea(QWidget* parent, PluginManager *pm, CloudModel *cm)
     moved = false;
     start_move_x = 0;
     start_move_y = 0;
+    point_size = 2;
 
     glFormat.setVersion( 3, 3 );
     glFormat.setProfile( QGLFormat::CoreProfile );
@@ -50,7 +48,7 @@ GLArea::GLArea(QWidget* parent, PluginManager *pm, CloudModel *cm)
     setAutoBufferSwap ( true );
     setMouseTracking( true );
 
-    // overlay painting related
+
     setAutoFillBackground(false);    // OpenCL
     clGetPlatformIDs(1, &platform, NULL);
 
@@ -161,6 +159,7 @@ void GLArea::paintGL(){
     point_shader.bind();
 
     glUniformMatrix4fv(point_shader.uniformLocation("modelToCameraMatrix"), 1, GL_FALSE, camera.modelviewMatrix().data());
+    glUniformMatrix4fv(point_shader.uniformLocation("cameraToClipMatrix"), 1, GL_FALSE, camera.projectionMatrix().data());
     glError("274");
 
     cm->point_buffer.bind();
@@ -169,7 +168,7 @@ void GLArea::paintGL(){
 
     glEnable(GL_PRIMITIVE_RESTART);
     glPrimitiveRestartIndex((unsigned int)-1);
-    glPointSize(2);
+    glPointSize(point_size);
 
     std::vector<Layer> & layers = cm->layerList.layers;
 
@@ -401,6 +400,18 @@ void GLArea::keyPressEvent ( QKeyEvent * event ){
             break;
     case Qt::Key_E:
             camera.adjustPosition(0,offset,0); // down
+            break;
+    case Qt::Key_R:
+            if(event->modifiers() == Qt::ControlModifier)
+                camera.setPosition(0,0,0); // down
+            break;
+    case Qt::Key_Plus:
+            if(point_size < 30)
+                point_size++;
+            break;
+    case Qt::Key_Minus:
+            if(point_size > 1)
+                point_size--;
             break;
     }
     updateGL();

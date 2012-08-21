@@ -6,7 +6,7 @@
 *~
 .fuse_*
 *.pro.user
-qrc_*
+qrc_*.cpp
 # Docs
 /docs/*/*.pdf
 *.snm

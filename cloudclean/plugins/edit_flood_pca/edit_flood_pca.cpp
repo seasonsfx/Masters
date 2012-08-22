@@ -234,9 +234,15 @@ int EditBrush::pointPick(int x, int y, float radius, int source_idx, Eigen::Vect
     return min_index;
 }
 
+inline float clamp(float x, float a, float b)
+{
+    return x < a ? a : (x > b ? b : x);
+}
+
 inline float angularSimilarity(Eigen::Vector3f &a, Eigen::Vector3f &b){
-    float cosineSimilarity = a.dot(b) / (a.norm()*b.norm());
-    float angularSimlarity = acos(cosineSimilarity)/M_PI;
+    float cosine = a.dot(b) / (a.norm()*b.norm());
+    cosine = clamp(cosine, 0.0f, 1.0f);
+    float angularSimlarity = acos(cosine)/M_PI;
     return angularSimlarity;
 }
 

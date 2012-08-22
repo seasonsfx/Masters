@@ -5,24 +5,24 @@
 #include <QIcon>
 #include <QDebug>
 #include <QResource>
-
 #include <QAbstractItemView>
 #include <QTime>
 
-#include <pcl/features/fpfh_omp.h>
-#include <pcl/common/pca.h>
 #include <omp.h>
+#include <pcl/common/pca.h>
 
-#include "edit_flood_fpfh.h"
+#include "edit_flood_normals.h"
 #include "utilities.h"
 #include "layer.h"
 #include "glarea.h"
 #include "cloudmodel.h"
 
+
 EditBrush::EditBrush()
 {
     settings = new Settings();
-    editSample = new QAction(QIcon(":/images/brush.png"), "Flood fill (FPFH)", this);
+    kNoise = settings->kNoise();
+    editSample = new QAction(QIcon(":/images/brush.png"), "Floodfill (Normal stdev)", this);
     actionList << editSample;
     foreach(QAction *editAction, actionList)
         editAction->setCheckable(true);
@@ -43,8 +43,72 @@ bool EditBrush::mouseDoubleClickEvent  (QMouseEvent *event, CloudModel * cm, GLA
     return true;
 }
 
+
+inline float clamp(float x, float a, float b)
+{
+    return x < a ? a : (x > b ? b : x);
+}
+
+void EditBrush::calcLocalNoise(CloudModel *cm){
+
+    kNoise = settings->kNoise();
+
+    QTime t;
+    t.start();
+
+    // For every value
+    for(int i = 0; i < cm->cloud->size(); i++){
+
+        boost::shared_ptr <std::vector<int> > kIdxs;
+        kIdxs = boost::shared_ptr <std::vector<int> >(new std::vector<int>);
+        vector<float> kDist;
+        octree->nearestKSearch(i, kNoise , *kIdxs, kDist);
+
+        std::vector<float> angles;
+        angles.resize(kNoise);
+
+        Eigen::Map<Eigen::Vector3f> current(cm->normals->at(i).data_n);
+
+        float sumOfSquares = 0.0f;
+        float sum = 0.0f;
+
+        for(int idx : *kIdxs){
+
+            Eigen::Map<Eigen::Vector3f> neighbour(cm->normals->at(idx).data_n);
+
+            float cosine = neighbour.dot(current) /
+                    neighbour.norm()*current.norm();
+
+            cosine = clamp(cosine, 0.0f, 1.0f);
+
+            // Normalised angle
+            float angle = acos(cosine)/M_PI;
+/*
+            qDebug("Current: %f %f %f, Neighbour: %f %f %f",
+                   cm->normals->at(i).data_n[0], cm->normals->at(i).data_n[1], cm->normals->at(i).data_n[2],
+                   cm->normals->at(idx).data_n[0], cm->normals->at(idx).data_n[1], cm->normals->at(idx).data_n[2]);
+            qDebug("Cosine: %f, Angle: %f", cosine, angle);
+*/
+            sum += angle;
+            sumOfSquares += angle*angle;
+
+        }
+
+        float stdDev = sqrt( (sumOfSquares/kNoise) - pow(sum/kNoise, 2));
+
+        noise_vals->at(i) = stdDev;
+        /*
+        qDebug("Sum of squares: %f, Sum: %f, N: %d", sumOfSquares, sum, kNoise);
+        qDebug("Noise stdev: %f", stdDev);
+        */
+    }
+
+    qDebug("Time to calc Noise metric: %d ms", t.elapsed());
+
+}
+
 bool EditBrush::StartEdit(QAction *action, CloudModel *cm, GLArea *glarea){
-    // Set up kdtree and octree if not set up yet
+    // Set up kdtree and octre if not set up yet
 
     if(octree.get() == NULL){
         QTime t;
@@ -59,30 +123,10 @@ bool EditBrush::StartEdit(QAction *action, CloudModel *cm, GLArea *glarea){
 
         qDebug("Time to create octree: %d ms", t.elapsed());
 
-        pcl::search::KdTree<pcl::PointXYZI>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZI>);
+        noise_vals = boost::shared_ptr<std::vector<float> >(new std::vector<float>());
+        noise_vals->resize(cm->cloud->size());
 
-        qDebug("Num of CPU: %d", omp_get_num_procs());
-
-        t.start();
-
-        pcl::FPFHEstimationOMP<pcl::PointXYZI, pcl::Normal, pcl::FPFHSignature33> fpfh;
-        fpfh.setInputCloud (cm->cloud);
-        fpfh.setInputNormals (cm->normals);
-        fpfh.setSearchMethod(tree);
-        int procs = omp_get_num_procs()/2; // Hyperthreading is bad
-        fpfh.setNumberOfThreads(procs);
-
-        fpfhs = pcl::PointCloud<pcl::FPFHSignature33>::Ptr(new pcl::PointCloud<pcl::FPFHSignature33> ());
-
-        // Use all neighbors in a sphere of radius 5cm
-        // IMPORTANT: the radius used here has to be larger than the radius used to estimate the surface normals!!!
-        fpfh.setRadiusSearch (0.05);
-        //fpfh.setKSearch(5);
-
-        fpfh.compute (*fpfhs);
-
-        qDebug("Time to calc FPFH: %d ms", t.elapsed());
-
+        calcLocalNoise(cm);
     }
 
     cm->layerList.setSelectMode(QAbstractItemView::SingleSelection);
@@ -189,53 +233,10 @@ int EditBrush::pointPick(int x, int y, float radius, int source_idx, Eigen::Vect
     return min_index;
 }
 
-inline float euclidianDist(pcl::FPFHSignature33 &a, pcl::FPFHSignature33 &b){
-    float sum = 0;
-    for(int i = 0; i < 33; i++){
-        sum += powf(a.histogram[i] - b.histogram[i], 2);
-    }
-    return sqrt(sum);
-}
-
-inline float clamp(float x, float a, float b)
-{
-    return x < a ? a : (x > b ? b : x);
-}
-
-inline float cosineDist(pcl::FPFHSignature33 &a, pcl::FPFHSignature33 &b){
-    float sum = 0.0f;
-    for(int i = 0; i < 33; i++){
-        sum += a.histogram[i] * a.histogram[i];
-    }
-    float lenA = sqrt(sum);
-
-    sum = 0.0f;
-    for(int i = 0; i < 33; i++){
-        sum += b.histogram[i] * b.histogram[i];
-    }
-    float lenB = sqrt(sum);
-
-    float dotted = 0.0f;
-    for(int i = 0; i < 33; i++){
-        dotted += a.histogram[i] * b.histogram[i];
-    }
-
-    float cosine = dotted / (lenA*lenB);
-
-    cosine = clamp(cosine, 0.0f, 1.0f);
-
-    float angularSimlarity = acos(cosine)/M_PI;
-
+inline float angularSimilarity(Eigen::Vector3f &a, Eigen::Vector3f &b){
+    float cosineSimilarity = a.dot(b) / (a.norm()*b.norm());
+    float angularSimlarity = acos(cosineSimilarity)/M_PI;
     return angularSimlarity;
-
-}
-
-inline float intensityDist(float a, float b){
-    return fabs(a - b);
-}
-
-inline float density(float radius){
-    return 1.0f/(2.0f*M_PI*radius*radius);
 }
 
 void EditBrush::fill(int x, int y, float radius, int source_idx, int dest_idx, CloudModel *cm, GLArea * glarea){
@@ -249,23 +250,24 @@ void EditBrush::fill(int x, int y, float radius, int source_idx, int dest_idx, C
 
     qDebug("Time to pick point: %d ms", t.elapsed());
 
-
-    t.start();
     if(min_index == -1)
         return;
+
+    t.start();
+    // Recalculate PCA if the K neighbourhood has changed
+    if(kNoise != settings->kNoise())
+        calcLocalNoise(cm);
 
     std::queue<int> myqueue;
     myqueue.push(min_index);
     int current;
 
-    pcl::FPFHSignature33 & source_sig = fpfhs->at(min_index);
-
     std::vector<int> & source = cm->layerList.layers[source_idx].index;
     std::vector<int> & dest = cm->layerList.layers[dest_idx].index;
 
-    int K = settings->kNeigbours();
-
-    DistanceEnum distFunc = settings->distanceFunc;
+    int K = settings->kConnectvity();
+    float minNoise = settings->minNoise();
+    float maxNoise = settings->maxNoise();
 
     while (!myqueue.empty()){
         current = myqueue.front(); myqueue.pop();
@@ -278,17 +280,13 @@ void EditBrush::fill(int x, int y, float radius, int source_idx, int dest_idx, C
         dest[current] = source[current];
         source[current] = -1;
 
-        //break; // Remove this to restore functionality
-
         // push neighbours..
 
-        int idx;
+        int idx = -1;
 
         std::vector<int> pointIdxNKNSearch(K);
         std::vector<float> pointNKNSquaredDistance(K);
         octree->nearestKSearch (cm->cloud->points[current], K, pointIdxNKNSearch, pointNKNSquaredDistance);
-
-        pcl::FPFHSignature33 & current_sig = fpfhs->at(current);
 
         for (int i = 0; i < pointIdxNKNSearch.size (); ++i)
         {
@@ -298,30 +296,16 @@ void EditBrush::fill(int x, int y, float radius, int source_idx, int dest_idx, C
             if(source[idx] == -1)
                 continue;
 
-            // Skip if to far in feature space
-            pcl::FPFHSignature33 & neigbour_sig = fpfhs->at(idx);
+            //float diff = abs(noise_vals->at(current) - noise_vals->at(idx));
 
-            float dist = 0;
+            float noise = noise_vals->at(current);
 
-            if(distFunc == EUCLIDIAN){
-                dist = euclidianDist(current_sig, neigbour_sig);
-                qDebug("Euclidion dist %f", dist);
-                if(dist > settings->euclidianDist())
-                    continue;
-            }
-            else if(distFunc == COSINE){
-                dist = cosineDist(source_sig, neigbour_sig);
-                //dist = cosineDist(current_sig, neigbour_sig);
-                qDebug("Cosine dist %f", dist);
-                if(dist > settings->cosineDist())
-                    continue;
-            }
-            else if(distFunc == INTENSITY){
-                dist = intensityDist(cm->cloud->points[current].intensity, cm->cloud->points[idx].intensity);
-                qDebug("Intensity dist %f", dist);
-                if(dist > settings->intensityDist())
-                    continue;
-            }
+            qDebug("Noise %f. Min: %f, Max; %f", noise, minNoise, maxNoise);
+
+            if(noise < minNoise || noise > maxNoise)
+                continue;
+
+
 
             myqueue.push(idx);
         }
@@ -329,8 +313,12 @@ void EditBrush::fill(int x, int y, float radius, int source_idx, int dest_idx, C
 
     qDebug("Time to fill : %d ms", t.elapsed());
     t.start();
-    cm->layerList.layers[source_idx].copyToGPU();
-    cm->layerList.layers[dest_idx].copyToGPU();
+
+    cm->layerList.layers[source_idx].cpu_dirty = true;
+    cm->layerList.layers[dest_idx].cpu_dirty = true;
+
+    cm->layerList.layers[source_idx].sync();
+    cm->layerList.layers[dest_idx].sync();
 
    qDebug("Time to copy to GPU: %d ms", t.elapsed());
 
@@ -367,7 +355,7 @@ bool EditBrush::mouseReleaseEvent(QMouseEvent *event, CloudModel * cm, GLArea * 
         }
 
 
-        if(dest_layer == -1 || dest_layer > cm->layerList.layers.size()-1){
+        if(dest_layer == -1 || dest_layer >= cm->layerList.layers.size()){
             cm->layerList.newLayer();
             dest_layer = cm->layerList.layers.size()-1;
         }
@@ -391,6 +379,5 @@ QString EditBrush::getEditToolDescription(QAction *){
 QWidget * EditBrush::getSettingsWidget(QWidget *){
     return settings;
 }
-
 
 Q_EXPORT_PLUGIN2(pnp_editbrush, EditBrush)

@@ -31,3 +31,8 @@ LIBS += -lpcl_io \
 
 RESOURCES += \
     viz_normals.qrc
+
+OTHER_FILES += \
+    shaders/normals.vert \
+    shaders/normals.geom \
+    shaders/normals.frag

@@ -1,12 +1,14 @@
 #ifndef EDITBRUSH_H
 #define EDITBRUSH_H
 
+#include <vector>
+
 #include <QObject>
 #include <QAction>
-#include "../../common/interfaces.h"
-#include <Eigen/Dense>
-#include <vector>
 #include <QGLShaderProgram>
+
+#include <Eigen/Dense>
+
 #include <pcl/octree/octree.h>
 #include <pcl/features/principal_curvatures.h>
 
@@ -15,6 +17,9 @@
 #else
 #include <CL/cl.h>
 #endif
+
+#include "../../common/interfaces.h"
+#include "settings.h"
 
 class GLArea;
 
@@ -38,8 +43,10 @@ public:
     //bool wheelEvent(QWheelEvent*, CloudModel *, GLArea * ){}
     QList<QAction *> actions() const;
     QString getEditToolDescription(QAction *);
+    QWidget * getSettingsWidget(QWidget *);
 
 private:
+    void calcPCA(CloudModel *cm);
     void fill(int x, int y, float radius, int source_idx, int dest_idx, CloudModel *cm, GLArea * glarea);
     int pointPick(int x, int y, float radius, int source_idx, Eigen::Vector3f& p1, Eigen::Vector3f& p2, CloudModel *cm, GLArea * glarea);
 
@@ -47,13 +54,15 @@ private:
     QList <QAction *>                       actionList;
     QAction *                               editSample;
 
-    //pcl::PointCloud<pcl::Normal>::Ptr normals;
+    Settings *                              settings;
+
     pcl::octree::OctreePointCloudSearch<pcl::PointXYZI>::Ptr  octree;
-    //pcl::PointCloud<pcl::PrincipalCurvatures>::Ptr pcs;
 
     boost::shared_ptr<std::vector<Eigen::Vector3f> > eigen_vals;
 
-    int dest_layer;
+    int                                      dest_layer;
+
+    int                                      kPCA;
 
 };
 

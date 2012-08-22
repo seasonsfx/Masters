@@ -97,23 +97,22 @@ void LayerList::deleteLayers(std::vector<int> indices){
 }
 
 /// Merge the layers listed
-void LayerList::mergeLayers(std::vector<int> indices){
+void LayerList::mergeLayers(std::vector<int> layersToMerge){
 
-    if(indices.size() < 2)
+    if(layersToMerge.size() < 2)
         return;
 
-    int dest_idx = indices[0];
+    int dest_idx = layersToMerge[0];
     std::vector<int> & dest = layers[dest_idx].index;
 
     layers[dest_idx].sync();
 
-    indices.erase(indices.begin());
+    // Delete first in list
+    layersToMerge.erase(layersToMerge.begin());
 
     // Copy every layer to the first layer
-    foreach(int i, indices){
-
-        layers[dest_idx].sync();
-
+    for(int i : layersToMerge){
+        qDebug("Merging layer %d into %d", i, dest_idx);
         // Copy each individual index
         for(int j = 0; j < dest.size(); j++){
             // Dest must be -1 and source must not be -1
@@ -125,7 +124,7 @@ void LayerList::mergeLayers(std::vector<int> indices){
 
     }
 
-    deleteLayers(indices);
+    deleteLayers(layersToMerge);
     layers[dest_idx].cpu_dirty = 1;
     layers[dest_idx].sync();
 }

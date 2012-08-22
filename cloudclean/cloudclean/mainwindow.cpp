@@ -105,12 +105,12 @@ void MainWindow::applyEditMode(){
 
     if(pm.activeEditPlugin){
         pm.activeEditPlugin->EndEdit(CloudModel::Instance(), glarea);
-
+        pm.activeEditPlugin->getSettingsWidget(this)->hide();
         // Deactivate current plugin if clicked again
         if(pm.activeEditPlugin == plugin){
             plugin->EndEdit(CloudModel::Instance(), glarea);
             pm.activeEditPlugin = NULL;
-            emit setSettingsWidget(new QWidget(this));
+            //emit setSettingsWidget(new QWidget(this));
             return;
         }
         pm.activeEditPlugin = NULL;
@@ -119,6 +119,7 @@ void MainWindow::applyEditMode(){
     pm.activeEditPlugin = plugin;
 
     QWidget * settings = pm.activeEditPlugin->getSettingsWidget(this);
+    pm.activeEditPlugin->getSettingsWidget(this)->show();
     emit setSettingsWidget(settings);
 
     plugin->StartEdit(action, CloudModel::Instance(), glarea);

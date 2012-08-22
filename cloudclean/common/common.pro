@@ -4,7 +4,8 @@ QT += opengl
 
 HEADERS += \
     interfaces.h \
-    utilities.h
+    utilities.h \
+    timer.hpp
     #../cloudclean/cloudmodel.h \
     #../cloudclean/glarea.h
 

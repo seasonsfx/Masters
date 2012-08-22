@@ -64,6 +64,7 @@ bool VizNormals::StartViz(QAction *action, CloudModel *cm, GLArea *glarea){
         }
 
         normal_buffer.release();
+        glError("normal buffer bad");
     }
 
     return true;

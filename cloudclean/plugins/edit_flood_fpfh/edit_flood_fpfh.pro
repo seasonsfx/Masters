@@ -1,13 +1,14 @@
 include(../../shared.pri)
 
-TARGET = edit_brush_curvature
+TARGET = edit_flood_fpfh
 HEADERS += \
-    edit_brush_curvature.h
+    edit_flood_fpfh.h \
+    settings.h
 
-QMAKE_CXXFLAGS += -DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET
 
 SOURCES += \
-    edit_brush_curvature.cpp
+    edit_flood_fpfh.cpp \
+    settings.cpp
 
 INCLUDEPATH += \
         ../../cloudclean \
@@ -31,3 +32,6 @@ LIBS += -lpcl_io \
 
 RESOURCES += \
     edit_brush.qrc
+
+FORMS += \
+    settings.ui

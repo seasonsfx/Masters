@@ -1,13 +1,14 @@
 include(../../shared.pri)
 
-TARGET = edit_brush_fpfh
+TARGET = edit_flood_pca
 HEADERS += \
-    edit_brush_fpfh.h \
+    edit_flood_pca.h \
     settings.h
 
+QMAKE_CXXFLAGS += -DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET
 
 SOURCES += \
-    edit_brush_fpfh.cpp \
+    edit_flood_pca.cpp \
     settings.cpp
 
 INCLUDEPATH += \
@@ -23,6 +24,7 @@ LIBS += -lpcl_io \
         -lpcl_common  \
         -lpcl_features  \
         -lpcl_kdtree  \
+        -lpcl_octree  \
         -lpcl_visualization \
         -lpcl_search \
         -lpcl_filters \

@@ -41,7 +41,7 @@ signals:
 
 public slots:
     void deleteLayers(std::vector<int> indices);
-    void mergeLayers(std::vector<int> indices);
+    void mergeLayers(std::vector<int> layersToMerge);
     void selectModeChanged(int index);
 
 };

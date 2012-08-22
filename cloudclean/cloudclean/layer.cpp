@@ -1,9 +1,9 @@
-#include "layer.h"
-
 #include <stdlib.h>
 #include <time.h>
 #include <vector>
 #include <stdexcept>
+
+#include "layer.h"
 #include "cloudmodel.h"
 
 inline float rand_range(float from, float to){

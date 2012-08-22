@@ -14,6 +14,7 @@ Toolbox::~Toolbox()
 }
 
 void Toolbox::setSettingsWidget(QWidget * widget){
-    ui->settingsArea->setWidget(widget );
+    //ui->settingsArea->setWidget(widget);
+    ui->content->addWidget(widget);
     this->show();
 }

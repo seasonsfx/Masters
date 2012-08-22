@@ -13,5 +13,5 @@ void main( void )
 {
     vec4 vertex_out = vec4(vertex.x, vertex.y, vertex.z, 1.0f);
     normal = pointnormal;
-    gl_Position = cameraToClipMatrix * modelToCameraMatrix * vertex_out;
+    gl_Position = vertex_out;
 }

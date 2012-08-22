@@ -56,9 +56,9 @@ private:
     pcl::octree::OctreePointCloudSearch<pcl::PointXYZI>::Ptr  octree;
     pcl::PointCloud<pcl::FPFHSignature33>::Ptr fpfhs;
 
-    int dest_layer;
+    int                                     dest_layer;
 
-    Settings *                      settings;
+    Settings *                              settings;
 
 };
 

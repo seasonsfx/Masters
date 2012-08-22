@@ -169,7 +169,7 @@ bool CloudModel::loadFile(const char * input_file, int subsample){
 
     cloud = read_ptx(input_file, subsample);
 
-    qDebug("File loaded in %d ms", t.elapsed());
+    qDebug("File loaded in %d ms with %d points", t.elapsed(), cloud->size());
 
     x_dim = cloud->width;
     y_dim = cloud->height;
@@ -343,12 +343,6 @@ void normal_estimation(pcl::PointCloud<pcl::PointXYZI>::Ptr cloud, pcl::PointClo
             )
                 continue;
 
-            // Weigh the normals accoring to distance
-            /*float avg_dist = (sqrt(vec1.squaredNorm()) + sqrt(vec2.squaredNorm()))/2;
-            float x = 100;
-            float weight = (x - avg_dist/x);
-            agregate_n= agregate_n + weight*tmp;
-*/
             agregate_n += tmp;
 
             face_count++;
@@ -372,9 +366,11 @@ void normal_estimation(pcl::PointCloud<pcl::PointXYZI>::Ptr cloud, pcl::PointClo
         normals->points[i].data_n[0] = normal(0);
         normals->points[i].data_n[1] = normal(1);
         normals->points[i].data_n[2] = normal(2);
-        normals->points[i].data_n[3] = 0.0f;
+        normals->points[i].data_n[3] = 1.0f;
 
-        assert(normals->points[i].data_n[0] == normals->points[i].data_n[0]);
+        //qDebug("Normal: %f, %f, %f", normal(0), normal(1), normal(2));
+
+        //assert(normals->points[i].data_n[0] == normals->points[i].data_n[0]);
 
     }
 

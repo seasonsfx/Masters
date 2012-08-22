@@ -20,6 +20,7 @@ LIBS += -lpcl_io \
         -lpcl_common  \
         -lpcl_features  \
         -lpcl_kdtree  \
+        -lpcl_octree  \
         -lpcl_visualization \
         -lpcl_search \
         -lpcl_filters \

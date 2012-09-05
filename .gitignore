@@ -1,5 +1,6 @@
 # Code
 /cloudclean/CloudClean
+Makefile
 *.run
 *.pgm
 *.o

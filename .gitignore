@@ -1,5 +1,7 @@
 # Code
 /cloudclean/CloudClean
+*.run
+*.pgm
 *.o
 *.a
 *.so

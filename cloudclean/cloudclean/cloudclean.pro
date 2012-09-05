@@ -24,7 +24,8 @@ SOURCES += \
     pluginmanager.cpp \
     toolbox.cpp \
     camera.cpp \
-    subsampledialog.cpp
+    subsampledialog.cpp \
+    pointpicker.cpp
 
 HEADERS  += \
     io.h \
@@ -37,7 +38,8 @@ HEADERS  += \
     pluginmanager.h \
     toolbox.h \
     camera.h \
-    subsampledialog.h
+    subsampledialog.h \
+    pointpicker.h
 
 QMAKE_LFLAGS += -rdynamic
 
@@ -45,19 +47,20 @@ QMAKE_LFLAGS += -rdynamic
 
 INCLUDEPATH += \
         ../common/ \
-        "/usr/include/pcl-1.6/" \
+        "/usr/local/include/pcl-1.7/" \
         #/usr/include/vtk-5.8/ \
         "/usr/include/flann/" \
         "/usr/include/eigen3/" \
         "/opt/AMDAPP/include" \
-        "/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc"
+        "/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc" \
+        "/usr/local/lib"
 
 LIBS += -lpcl_io \
         -lpcl_common  \
         -lpcl_features  \
         -lpcl_kdtree  \
         -lpcl_visualization \
-        -lpcl_search \
+        -lpcl_octree  \
         -lpcl_filters \
         -lGL \
         -lGLU \

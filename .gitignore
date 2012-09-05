@@ -1,12 +1,14 @@
 # Code
-#/cloudclean/CloudClean
+/cloudclean/CloudClean
 *.o
 *.a
 *.so
+*.so.*
 *~
 .fuse_*
 *.pro.user
 qrc_*.cpp
+ui_*.h
 # Docs
 /docs/*/*.pdf
 *.snm

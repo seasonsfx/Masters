@@ -12,7 +12,7 @@
 #include "glarea.h"
 #include "cloudmodel.h"
 
-EditBrush::EditBrush()
+EditPlugin::EditPlugin()
 {
 
     editSample = new QAction(QIcon(":/images/brush.png"), "Brush select", this);
@@ -22,20 +22,20 @@ EditBrush::EditBrush()
 
 }
 
-EditBrush::~EditBrush()
+EditPlugin::~EditPlugin()
 {
 }
 
-void EditBrush::paintGL(CloudModel *, GLArea * glarea){
+void EditPlugin::paintGL(CloudModel *, GLArea * glarea){
 
 }
 
-bool EditBrush::mouseDoubleClickEvent  (QMouseEvent *event, CloudModel * cm, GLArea * glarea){
+bool EditPlugin::mouseDoubleClickEvent  (QMouseEvent *event, CloudModel * cm, GLArea * glarea){
 
     return true;
 }
 
-bool EditBrush::StartEdit(QAction *action, CloudModel *cm, GLArea *glarea){
+bool EditPlugin::StartEdit(QAction *action, CloudModel *cm, GLArea *glarea){
     // Set up kdtree and octre if not set up yet
 
     if(octree.get() == NULL){
@@ -64,7 +64,7 @@ bool EditBrush::StartEdit(QAction *action, CloudModel *cm, GLArea *glarea){
     dest_layer = -1;
     return true;
 }
-bool EditBrush::EndEdit(CloudModel * cm, GLArea *){
+bool EditPlugin::EndEdit(CloudModel * cm, GLArea *){
     emit cm->layerList.setSelectMode(QAbstractItemView::MultiSelection);
 
     for(auto a: actionList){
@@ -73,104 +73,12 @@ bool EditBrush::EndEdit(CloudModel * cm, GLArea *){
     return true;
 }
 
-void clickRay(int x, int y, Eigen::Vector3f& p1, Eigen::Vector3f& p2, GLArea * glarea){
-
-    double dX, dY, dZ, dClickY;
-
-    // Convert matrices to doubles
-    double mvmatrix[16];
-    double projmatrix[16];
-    for (int i = 0; i < 16; ++i){
-        projmatrix[i] = glarea->camera.projectionMatrix().data()[i];
-        mvmatrix[i] = glarea->camera.modelviewMatrix().data()[i];
-    }
-
-    // Fetch viewport
-    int viewport[4];
-    glGetIntegerv(GL_VIEWPORT, viewport);
-
-    // Invert y axis
-    dClickY = double (glarea->height() - y);
-
-    // Unproject
-    gluUnProject ((double) x, dClickY, 0.0, mvmatrix, projmatrix, viewport, &dX, &dY, &dZ);
-    p1 = Eigen::Vector3f ( (float) dX, (float) dY, (float) dZ );
-    gluUnProject ((double) x, dClickY, 1.0f, mvmatrix, projmatrix, viewport, &dX, &dY, &dZ);
-    p2 = Eigen::Vector3f ( (float) dX, (float) dY, (float) dZ );
-}
-
-inline float pointToLineDist(Eigen::Vector3f point, Eigen::Vector3f x1, Eigen::Vector3f x2){
-    return (x2-x1).cross(x1-point).squaredNorm()/(x2-x1).squaredNorm();
-}
-
-int EditBrush::pointPick(int x, int y, float radius, int source_idx, Eigen::Vector3f& p1, Eigen::Vector3f& p2, CloudModel *cm, GLArea * glarea){
-
-    Layer & layer = cm->layerList.layers[source_idx];
-
-    clickRay(x, y, p1, p2, glarea);
-    Eigen::Vector3f line = p2-p1;
-
-    int min_index = -1;
-    float min_val = FLT_MAX;
-
-    // Need to narrow down candidates
-
-    Eigen::Vector3f& origin = p1;
-    Eigen::Vector3f direction = p2-p1;
-    std::vector<int> intercept_indices;
-
-    octree->getIntersectedVoxelIndices(origin, direction, intercept_indices);
-
-
-    // Find point
-    for (int i: intercept_indices) {
-
-        //skip indices not in layer
-        if(layer.index[i] == -1)
-            continue;
-
-        // Save some memory by using map
-        pcl::PointXYZI & p = cm->cloud->points[i];
-        Eigen::Vector3f point = Eigen::Vector3f(p.x, p.y, p.z);
-        //Eigen::Map<Eigen::Vector3f> point = Eigen::Vector3f::Map(p.data, 3);
-
-        // Skip points not on the ray
-        Eigen::Vector3f projPoint = (point.dot(line)/line.dot(line))*line;
-        float lineLength = sqrt(line.squaredNorm());
-        float distViaPoint = sqrt((p2-projPoint).squaredNorm()) + sqrt((projPoint-p1).squaredNorm());
-        if(lineLength-distViaPoint > 0.01)
-            continue;
-
-        // Skip points to far from the ray
-        // Uncomment this to restore functionality
-        /*
-        float projDist = (projPoint-point).squaredNorm();
-        if(projDist > radius)
-            continue;
-        */
-
-        float dist = pointToLineDist(point, p1, p2);
-
-        if(dist < min_val){
-            min_index = i;
-            min_val = dist;
-        }
-    }
-
-    if(min_index == -1)
-        qDebug("Cannot find closest point\n");
-
-    return min_index;
-}
-
-void EditBrush::fill(int x, int y, float radius, int source_idx, int dest_idx, CloudModel *cm, GLArea * glarea){
-
-    Eigen::Vector3f p1, p2;
+void EditPlugin::fill(int x, int y, float radius, int source_idx, int dest_idx, CloudModel *cm, GLArea * glarea){
 
     QTime t;
     t.start();
 
-    int min_index = pointPick(x, y, radius, source_idx, p1, p2, cm, glarea);
+    int min_index = glarea->pp->pick(x, y, source_idx);
 
     qDebug("Time to pick point: %d ms", t.elapsed());
 
@@ -231,12 +139,12 @@ void EditBrush::fill(int x, int y, float radius, int source_idx, int dest_idx, C
 
 }
 
-bool EditBrush::mousePressEvent  (QMouseEvent *event, CloudModel *, GLArea * glarea){
+bool EditPlugin::mousePressEvent  (QMouseEvent *event, CloudModel *, GLArea * glarea){
 
     return true;
 }
 
-bool EditBrush::mouseMoveEvent   (QMouseEvent *event, CloudModel *, GLArea * glarea){
+bool EditPlugin::mouseMoveEvent   (QMouseEvent *event, CloudModel *, GLArea * glarea){
 
     if(glarea->moved){
 
@@ -245,7 +153,7 @@ bool EditBrush::mouseMoveEvent   (QMouseEvent *event, CloudModel *, GLArea * gla
     return true;
 }
 
-bool EditBrush::mouseReleaseEvent(QMouseEvent *event, CloudModel * cm, GLArea * glarea){
+bool EditPlugin::mouseReleaseEvent(QMouseEvent *event, CloudModel * cm, GLArea * glarea){
 
     if (!glarea->moved && event->button() == Qt::LeftButton){
         // Single selection switched on, on edit start
@@ -276,11 +184,11 @@ bool EditBrush::mouseReleaseEvent(QMouseEvent *event, CloudModel * cm, GLArea * 
     return true;
 }
 
-QList<QAction *> EditBrush::actions() const{
+QList<QAction *> EditPlugin::actions() const{
     return actionList;
 }
-QString EditBrush::getEditToolDescription(QAction *){
+QString EditPlugin::getEditToolDescription(QAction *){
     return "Info";
 }
 
-Q_EXPORT_PLUGIN2(pnp_editbrush, EditBrush)
+Q_EXPORT_PLUGIN2(pnp_editbrush, EditPlugin)

@@ -1,11 +1,17 @@
 include(../../shared.pri)
 
-TARGET = edit_brush
-HEADERS += edit_brush.h \
-    cpu_brush.h
+TARGET = edit_mincut
+HEADERS += \
+    edit_mincut.h \
+    settings.h \
+    mincut.h
 
+QMAKE_CXXFLAGS += -DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET
 
-SOURCES += edit_brush.cpp
+SOURCES += \
+    edit_mincut.cpp \
+    settings.cpp \
+    mincut.cpp
 
 INCLUDEPATH += \
         ../../cloudclean \
@@ -19,8 +25,6 @@ INCLUDEPATH += \
 LIBS += -lpcl_io \
         -lpcl_common  \
         -lpcl_features  \
-        -lpcl_kdtree  \
-        -lpcl_octree  \
         -lpcl_visualization \
         -lpcl_search \
         -lpcl_filters \
@@ -29,4 +33,7 @@ LIBS += -lpcl_io \
         -lOpenCL
 
 RESOURCES += \
-    edit_brush.qrc
+    edit_mincut.qrc
+
+FORMS += \
+    settings.ui

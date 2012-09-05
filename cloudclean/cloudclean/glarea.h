@@ -23,6 +23,7 @@
 
 #include "cloudmodel.h"
 #include "camera.h"
+#include "pointpicker.h"
 
 #include <GL/glx.h>
 #undef KeyPress // Defined in X11/X.h, interferes with QEvent::KeyPress
@@ -91,6 +92,7 @@ public:
 
     CloudModel *                            cm;
     PluginManager *                         pm;
+    PointPicker *                           pp;
 };
 
 #endif // GLWIDGET_H

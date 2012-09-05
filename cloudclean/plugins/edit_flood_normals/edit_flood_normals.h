@@ -10,7 +10,6 @@
 #include <Eigen/Dense>
 
 #include <pcl/octree/octree.h>
-#include <pcl/features/principal_curvatures.h>
 
 #ifdef __APPLE__
 #include <OpenCL/opencl.h>
@@ -23,13 +22,13 @@
 
 class GLArea;
 
-class EditBrush : public QObject, public EditPluginInterface
+class EditPlugin : public QObject, public EditPluginInterface
 {
     Q_OBJECT
     Q_INTERFACES(EditPluginInterface)
 public:
-    EditBrush();
-    ~EditBrush();
+    EditPlugin();
+    ~EditPlugin();
 
     bool StartEdit(QAction *action, CloudModel * cm, GLArea * glarea);
     bool EndEdit(CloudModel * cm, GLArea * glarea);

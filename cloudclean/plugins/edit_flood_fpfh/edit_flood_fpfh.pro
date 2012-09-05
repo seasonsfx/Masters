@@ -3,17 +3,17 @@ include(../../shared.pri)
 TARGET = edit_flood_fpfh
 HEADERS += \
     edit_flood_fpfh.h \
-    settings.h
+    settings.h \
 
 
 SOURCES += \
     edit_flood_fpfh.cpp \
-    settings.cpp
+    settings.cpp \
 
 INCLUDEPATH += \
         ../../cloudclean \
         ../../common \
-        "/usr/include/pcl-1.6/" \
+        "/usr/local/include/pcl-1.7/" \
         "/usr/include/flann/" \
         "/usr/include/eigen3/" \
         "/opt/AMDAPP/include" \

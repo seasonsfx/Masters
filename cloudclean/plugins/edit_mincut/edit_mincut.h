@@ -1,19 +1,24 @@
-#ifndef EDITBRUSH_H
-#define EDITBRUSH_H
+#ifndef EDITPLUGIN_H
+#define EDITPLUGIN_H
+
+#include <vector>
 
 #include <QObject>
 #include <QAction>
-#include "../../common/interfaces.h"
-#include <Eigen/Dense>
-#include <vector>
 #include <QGLShaderProgram>
-#include <pcl/octree/octree.h>
+
+#include <Eigen/Dense>
+
+#include <pcl/search/search.h>
 
 #ifdef __APPLE__
 #include <OpenCL/opencl.h>
 #else
 #include <CL/cl.h>
 #endif
+
+#include "../../common/interfaces.h"
+#include "settings.h"
 
 class GLArea;
 
@@ -34,8 +39,10 @@ public:
     bool mouseReleaseEvent(QMouseEvent *event, CloudModel * cm, GLArea * glarea);
     QList<QAction *> actions() const;
     QString getEditToolDescription(QAction *);
+    QWidget * getSettingsWidget(QWidget *);
 
 private:
+    void calcPCA(CloudModel *cm);
     void fill(int x, int y, float radius, int source_idx, int dest_idx, CloudModel *cm, GLArea * glarea);
     int pointPick(int x, int y, float radius, int source_idx, Eigen::Vector3f& p1, Eigen::Vector3f& p2, CloudModel *cm, GLArea * glarea);
 
@@ -43,11 +50,10 @@ private:
     QList <QAction *>                       actionList;
     QAction *                               editSample;
 
-    //pcl::KdTreeFLANN<pcl::PointXYZI>::Ptr   kdtree;
-    pcl::octree::OctreePointCloudSearch<pcl::PointXYZI>::Ptr  octree;
+    Settings *                              settings;
 
-    int dest_layer;
+    int                                     dest_layer;
 
 };
 
-#endif // EDITBRUSH_H
+#endif // EDITPLUGIN_H

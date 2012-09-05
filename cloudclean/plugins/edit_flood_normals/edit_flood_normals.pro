@@ -14,7 +14,7 @@ SOURCES += \
 INCLUDEPATH += \
         ../../cloudclean \
         ../../common \
-        "/usr/include/pcl-1.6/" \
+        "/usr/local/include/pcl-1.7/" \
         "/usr/include/flann/" \
         "/usr/include/eigen3/" \
         "/opt/AMDAPP/include" \

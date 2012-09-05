@@ -37,9 +37,6 @@ public:
     bool mousePressEvent  (QMouseEvent *event, CloudModel *, GLArea * glarea);
     bool mouseMoveEvent   (QMouseEvent *event, CloudModel *, GLArea * glarea);
     bool mouseReleaseEvent(QMouseEvent *event, CloudModel *, GLArea * glarea);
-    //bool keyReleaseEvent  (QKeyEvent *, CloudModel *, GLArea *){}
-    //bool keyPressEvent    (QKeyEvent *, CloudModel *, GLArea *){}
-    //bool wheelEvent(QWheelEvent*, CloudModel *, GLArea * ){}
     QList<QAction *> actions() const;
     QString getEditToolDescription(QAction *);
     QWidget * getSettingsWidget(QWidget *glarea);

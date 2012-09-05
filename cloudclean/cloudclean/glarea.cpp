@@ -21,6 +21,7 @@ GLArea::GLArea(QWidget* parent, PluginManager *pm, CloudModel *cm)
     qApp->installEventFilter(this);
     this->cm = cm;
     this->pm = pm;
+    pp = nullptr;
 
     cfps=0;
     lastTime=0;
@@ -264,6 +265,11 @@ void GLArea::modelReloaded(){
     orientation.linear() = rot;
     orientation.translation() = cm->cloud->sensor_origin_.head(3);
     camera.setObjectOrientationMatrix(orientation);
+
+    if(pp != nullptr)
+        delete pp;
+    pp = new PointPicker(this,cm, 0);
+
 }
 
 void GLArea::updateFps(float frameTime)

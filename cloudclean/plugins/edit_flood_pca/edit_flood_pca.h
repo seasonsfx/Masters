@@ -23,13 +23,13 @@
 
 class GLArea;
 
-class EditBrush : public QObject, public EditPluginInterface
+class EditPlugin : public QObject, public EditPluginInterface
 {
     Q_OBJECT
     Q_INTERFACES(EditPluginInterface)
 public:
-    EditBrush();
-    ~EditBrush();
+    EditPlugin();
+    ~EditPlugin();
 
     bool StartEdit(QAction *action, CloudModel * cm, GLArea * glarea);
     bool EndEdit(CloudModel * cm, GLArea * glarea);

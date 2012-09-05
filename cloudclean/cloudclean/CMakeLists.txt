@@ -8,7 +8,7 @@ include_directories (
 	${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}
 	${QT_QTCORE_INCLUDE_DIR} ${QT_QTGUI_INCLUDE_DIR} ${QT_QTCORE_INCLUDE_DIR} ${QT_QTGUI_INCLUDE_DIR} ${QT_QTOPENGL_INCLUDE_DIR}
 	interfaces
-	/usr/include/pcl-1.6/
+	/usr/local/include/pcl-1.7/
 	/usr/include/flann/
 	/usr/include/eigen3/
 	/opt/AMDAPP/include

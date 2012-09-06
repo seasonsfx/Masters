@@ -17,7 +17,7 @@
 class MinCut
 {
 public:
-    MinCut(CloudModel *cm, int layer, int source);
+    MinCut(CloudModel *cm, int index, int source_layer, int dest_layer);
 
 private:
     void createGraph();

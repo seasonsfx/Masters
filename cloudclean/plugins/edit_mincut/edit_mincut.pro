@@ -20,12 +20,14 @@ INCLUDEPATH += \
         "/usr/include/flann/" \
         "/usr/include/eigen3/" \
         "/opt/AMDAPP/include" \
-        "/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc"
+        "/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc" \
+        /usr/include/vtk-5.8/
 
 LIBS += -lpcl_io \
         -lpcl_common  \
         -lpcl_features  \
         -lpcl_visualization \
+        -lpcl_segmentation \
         -lpcl_search \
         -lpcl_filters \
         -lGL \

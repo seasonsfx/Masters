@@ -1,8 +1,8 @@
 #include "mincut.h"
 #include <QDebug>
 
-//#include <pcl/segmentation/min_cut_segmentation.h>
-//#include <pcl/visualization/cloud_viewer.h>
+#include <pcl/segmentation/min_cut_segmentation.h>
+#include <pcl/visualization/cloud_viewer.h>
 
 MinCut::MinCut(CloudModel * cm, int index, int source_layer, int dest_layer)
 {

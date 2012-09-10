@@ -78,7 +78,7 @@ void EditPlugin::fill(int x, int y, float radius, int source_idx, int dest_idx, 
     if(index == -1)
         return;
 
-    MinCut seg(cm, index, source_idx, dest_idx);
+    MinCut mc(cm, source_idx, dest_idx);
 
 
 }

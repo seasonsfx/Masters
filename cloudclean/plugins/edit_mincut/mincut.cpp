@@ -4,32 +4,18 @@
 #include <pcl/segmentation/min_cut_segmentation.h>
 #include <pcl/visualization/cloud_viewer.h>
 
-MinCut::MinCut(CloudModel * cm, int index, int source_layer, int dest_layer)
+using namespace std;
+
+MinCut::MinCut(CloudModel * cm, int source_layer_idx, int dest_layer_idx)
 {
-    std::vector<int> & slayer = cm->layerList.layers[source_layer].index;
-    std::vector<int> & dlayer = cm->layerList.layers[dest_layer].index;
+    source_layer = &cm->layerList.layers[source_layer_idx].index;
+    dest_layer = &cm->layerList.layers[dest_layer_idx].index;
 
-    pcl::IndicesPtr indices (&slayer);
+    kdtree = pcl::search::KdTree<pcl::PointXYZI>::Ptr(new pcl::search::KdTree<pcl::PointXYZI>);
 
-    pcl::MinCutSegmentation<pcl::PointXYZI> seg;
-    seg.setInputCloud (cm->cloud);
-    seg.setIndices (indices);
+    pcl::IndicesConstPtr indices(source_layer);
 
-
-    pcl::PointCloud<pcl::PointXYZI>::Ptr foreground_points(new pcl::PointCloud<pcl::PointXYZI> ());
-    pcl::PointXYZI point = cm->cloud->at(index);
-    foreground_points->points.push_back(point);
-    seg.setForegroundPoints (foreground_points);
-
-    seg.setSigma (0.25);
-    seg.setRadius (3.0433856);
-    seg.setNumberOfNeighbours (14);
-    seg.setSourceWeight (0.8);
-
-    std::vector <pcl::PointIndices> clusters;
-    seg.extract (clusters);
-
-    qDebug() << "Maximum flow is " << seg.getMaxFlow ();
+    kdtree->setInputCloud(cm->cloud, indices);
 
     /*
     // Blank
@@ -50,14 +36,38 @@ MinCut::MinCut(CloudModel * cm, int index, int source_layer, int dest_layer)
     cm->layerList.layers[dest_layer].sync();
 */
 
-    pcl::PointCloud <pcl::PointXYZRGB>::Ptr colored_cloud = seg.getColoredCloud ();
-    pcl::visualization::CloudViewer viewer ("Cluster viewer");
-    viewer.showCloud(colored_cloud);
-    while (!viewer.wasStopped ()){}
-
 }
 
-void MinCut::createGraph(){
+void MinCut::createGraph(int k){
 
+
+
+    graph.reset();
+    graph = boost::shared_ptr<Graph>(new Graph());
+
+
+    IndexMap vertex_index_map = get(boost::vertex_index, *graph);
+    WeightMap edge_weight_map = get(boost::edge_weight, *graph);
+
+
+    // Create vertices
+    for(int i : *source_layer){
+        Vertex v = add_vertex(*graph);
+        vertex_index_map[v] = i;
+    }
+
+    // Create egde
+    for(int i : *source_layer){
+        std::vector<int> pointIdxNKNSearch(k);
+        std::vector<float> pointNKNSquaredDistance(k);
+        kdtree->nearestKSearch (kdtree->getInputCloud()->points[i], k, pointIdxNKNSearch, pointNKNSquaredDistance);
+        // add vertex and its neighbours to graph
+
+        for(int dest_idx : pointIdxNKNSearch)
+            add_edge(i, dest_idx, *graph);
+
+
+
+    }
 }
 

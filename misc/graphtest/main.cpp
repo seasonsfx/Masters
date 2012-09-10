@@ -21,6 +21,7 @@ typedef boost::property_traits<WeightMap>::value_type EdgeWeight;
 
 typedef boost::property_map<Graph, boost::vertex_index2_t>::type IndexMap;
 typedef boost::property_traits<IndexMap>::value_type Index;
+typedef boost::property_traits<IndexMap>::key_type IndexKey;
 
 typedef boost::graph_traits<Graph>::vertex_iterator vertex_iter;
 
@@ -32,7 +33,7 @@ int main(){
 
 	std::vector<int> faux_neighbours = {1, 3, 5 , 9, 10, 11};
 
-	std::map<Vertex, int> IVMap;
+	std::map<int, Vertex> IVMap;
 
 	boost::shared_ptr<Graph> graph;
 	graph = boost::shared_ptr<Graph>(new Graph());
@@ -63,27 +64,41 @@ int main(){
 	}
 
 
-	BOOST_AUTO(parities, boost::make_one_bit_color_map(num_vertices(*graph), get(boost::vertex_index, *graph)));
+	auto parities = boost::make_one_bit_color_map(num_vertices(*graph), get(boost::vertex_index, *graph));
 
 	float w = boost::stoer_wagner_min_cut(*graph, get(boost::edge_weight, *graph), boost::parity_map(parities));
+
 
 	cout << "The min-cut weight of G is " << w << ".\n" << endl;
 	//assert(w == 7);
 
 	cout << "One set of vertices consists of:" << endl;
 	size_t i;
-	for (i = 0; i < num_vertices(*graph); ++i) {
-	if (get(parities, i))
-	  cout << i << " " << vertex_index_map[i] << endl;
+	for (vp = vertices(*graph); vp.first != vp.second; ++vp.first) {
+		Vertex v = *vp.first;
+		int idx = vertex_index_map[v];
+		if (get(parities, (IndexKey)i))
+		  cout << v << " " << idx << endl;
 	}
 	cout << endl;
 
 	cout << "The other set of vertices consists of:" << endl;
-	for (i = 0; i < num_vertices(*graph); ++i) {
-	if (!get(parities, i))
-	  cout << i << " " << vertex_index_map[i] << endl;
+	for (vp = vertices(*graph); vp.first != vp.second; ++vp.first) {
+		Vertex v = *vp.first;
+		int idx = vertex_index_map[v];
+		if (!get(parities, (IndexKey)i))
+	  		cout << v << " " << idx << endl;
 	}
 	cout << endl;
+
+
+	// Iterate through the edges and print them out
+	Vertex v1, v2;
+	typedef boost::graph_traits<Graph>::edge_iterator edge_iter;
+	//std::pair<edge_iter, edge_iter> ep;
+	edge_iter ei, ei_end;
+	for (tie(ei, ei_end) = edges(*graph); ei != ei_end; ++ei)
+	  std::cout << edge_weight_map[*ei] << endl;
 
 	return EXIT_SUCCESS;
 

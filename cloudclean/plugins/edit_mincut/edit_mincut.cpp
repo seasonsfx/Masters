@@ -8,7 +8,7 @@
 #include <QAbstractItemView>
 #include <QTime>
 
-#include <pcl/segmentation/min_cut_segmentation.h>
+//#include <pcl/segmentation/min_cut_segmentation.h>
 
 #include "edit_mincut.h"
 #include "utilities.h"
@@ -79,6 +79,8 @@ void EditPlugin::fill(int x, int y, float radius, int source_idx, int dest_idx, 
         return;
 
     MinCut mc(cm, source_idx, dest_idx);
+    mc.createGraph(14);
+    mc.segment();
 
 
 }

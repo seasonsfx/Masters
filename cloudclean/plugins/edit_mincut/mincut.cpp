@@ -1,13 +1,20 @@
 #include "mincut.h"
+
+#include <utility>
+#include <map>
+
 #include <QDebug>
 
-#include <pcl/segmentation/min_cut_segmentation.h>
+//#include <pcl/segmentation/min_cut_segmentation.h>
 #include <pcl/visualization/cloud_viewer.h>
 
 using namespace std;
 
 MinCut::MinCut(CloudModel * cm, int source_layer_idx, int dest_layer_idx)
 {
+    source = &cm->layerList.layers[source_layer_idx];
+    dest = &cm->layerList.layers[dest_layer_idx];
+
     source_layer = &cm->layerList.layers[source_layer_idx].index;
     dest_layer = &cm->layerList.layers[dest_layer_idx].index;
 
@@ -17,57 +24,83 @@ MinCut::MinCut(CloudModel * cm, int source_layer_idx, int dest_layer_idx)
 
     kdtree->setInputCloud(cm->cloud, indices);
 
-    /*
-    // Blank
-    for(int i = 0; i < dlayer.size(); i++){
-        dlayer[i] = -1;
-    }
-
-    // Commit changes
-    for(int i : clusters[0].indices){
-        dlayer[i] = i;
-        slayer[i] = -1;
-    }
-
-    cm->layerList.layers[source_layer].cpu_dirty = true;
-    cm->layerList.layers[dest_layer].cpu_dirty = true;
-
-    cm->layerList.layers[source_layer].sync();
-    cm->layerList.layers[dest_layer].sync();
-*/
-
 }
 
 void MinCut::createGraph(int k){
 
-
-
     graph.reset();
     graph = boost::shared_ptr<Graph>(new Graph());
 
-
-    IndexMap vertex_index_map = get(boost::vertex_index, *graph);
+    // Property maps, vertices and edges are keys to these things and return graph properties
+    IndexMap vertex_index_map = get(boost::vertex_index2, *graph);
     WeightMap edge_weight_map = get(boost::edge_weight, *graph);
 
+    // So we know which index values in the cloud, maps to which vertices in the graph
+    std::map<int, Vertex> IVMap;
 
     // Create vertices
     for(int i : *source_layer){
         Vertex v = add_vertex(*graph);
+        IVMap[i] = v;
         vertex_index_map[v] = i;
     }
 
-    // Create egde
-    for(int i : *source_layer){
+
+    // for each vertex add edges
+    for (std::pair<vertex_iter, vertex_iter> vp = vertices(*graph); vp.first != vp.second; ++vp.first) {
+
+        // Storage for neighbours
         std::vector<int> pointIdxNKNSearch(k);
         std::vector<float> pointNKNSquaredDistance(k);
-        kdtree->nearestKSearch (kdtree->getInputCloud()->points[i], k, pointIdxNKNSearch, pointNKNSquaredDistance);
-        // add vertex and its neighbours to graph
 
-        for(int dest_idx : pointIdxNKNSearch)
-            add_edge(i, dest_idx, *graph);
+        Vertex source_vertex = *vp.first;
+        int source_vertex_idx = vertex_index_map[source_vertex];
 
+        // Find neighbours
+        kdtree->nearestKSearch (kdtree->getInputCloud()->points[source_vertex_idx], k, pointIdxNKNSearch, pointNKNSquaredDistance);
 
+        // Add all the neighbours
+        for(int i = 0; i < pointIdxNKNSearch.size(); i++){
+
+            int dest_vertex_idx = pointIdxNKNSearch[i];
+
+            Vertex dest_vertex = IVMap[dest_vertex_idx];
+            Edge edge = (add_edge(source_vertex, dest_vertex, *graph)).first;
+
+            // need to assign weight also I think
+            float weight = pointNKNSquaredDistance[i];
+            edge_weight_map[edge] = weight;
+        }
 
     }
+
+}
+
+float MinCut::segment(){
+    IndexMap vertex_index_map = get(boost::vertex_index2, *graph);
+
+    auto parities = boost::make_one_bit_color_map(num_vertices(*graph), get(boost::vertex_index, *graph));
+    float w = boost::stoer_wagner_min_cut(*graph, get(boost::edge_weight, *graph), boost::parity_map(parities));
+
+
+    // Apply changes
+
+    for (std::pair<vertex_iter, vertex_iter> vp = vertices(*graph); vp.first != vp.second; ++vp.first) {
+            Vertex v = *vp.first;
+            int idx = vertex_index_map[v];
+            if (get(parities, v)){
+                dest_layer->at(idx) = idx;
+                source_layer->at(idx) = -1;
+            }
+            else{
+                dest_layer->at(idx) = -1;
+                source_layer->at(idx) = idx;
+            }
+
+    }
+
+    source->copyToGPU();
+    dest->copyToGPU();
+
 }
 

@@ -32,7 +32,8 @@ LIBS += -lpcl_io \
         -lpcl_filters \
         -lGL \
         -lGLU \
-        -lOpenCL
+        -lOpenCL \
+        -lboost_system
 
 RESOURCES += \
     edit_mincut.qrc

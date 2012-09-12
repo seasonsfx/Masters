@@ -2,6 +2,7 @@
 
 #include <utility>
 #include <map>
+#include <math.h>
 
 #include <QDebug>
 
@@ -13,6 +14,7 @@ using namespace std;
 MinCut::MinCut(CloudModel * cm, int source_layer_idx, int dest_layer_idx)
 {
     qDebug("Source: %d, Dest %d", source_layer_idx, dest_layer_idx);
+    this->cm = cm;
     source = &cm->layerList.layers[source_layer_idx];
     dest = &cm->layerList.layers[dest_layer_idx];
 
@@ -21,13 +23,11 @@ MinCut::MinCut(CloudModel * cm, int source_layer_idx, int dest_layer_idx)
 
     kdtree = pcl::search::KdTree<pcl::PointXYZI>::Ptr(new pcl::search::KdTree<pcl::PointXYZI>);
 
-    pcl::IndicesConstPtr indices(source_layer);
-
-    kdtree->setInputCloud(cm->cloud, indices);
+    kdtree->setInputCloud(cm->cloud, pcl::IndicesConstPtr(new std::vector<int>(*source_layer)));
 
 }
 
-void MinCut::createGraph(int k){
+void MinCut::createGraph(int k, pcl::PointXYZI & clickPoint){
     qDebug("Creating graph");
     graph.reset();
     graph = boost::shared_ptr<Graph>(new Graph());
@@ -73,9 +73,17 @@ void MinCut::createGraph(int k){
             Edge edge = (add_edge(source_vertex, dest_vertex, *graph)).first;
 
             // need to assign weight also I think
-            float weight = pointNKNSquaredDistance[i];
-            edge_weight_map[edge] = weight;
-            qDebug("Edge from %d to %d", source_vertex_idx, dest_vertex_idx);
+            //float weight = pointNKNSquaredDistance[i];
+
+            pcl::PointXYZI & destPoint = cm->cloud->points[dest_vertex_idx];
+
+
+
+            float dist = sqrt( pow(clickPoint.x - destPoint.x, 2) +
+                               pow(clickPoint.y - destPoint.y, 2));
+
+            edge_weight_map[edge] = 1/dist;
+            //qDebug("Edge from %d to %d", source_vertex_idx, dest_vertex_idx);
         }
 
     }

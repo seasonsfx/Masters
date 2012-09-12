@@ -41,7 +41,7 @@ class MinCut
 public:
     MinCut(CloudModel *cm, int source_layer_idx, int dest_layer_idx);
 
-    void createGraph(int k);
+    void createGraph(int k, pcl::PointXYZI & clickPoint);
     void setWeights(int source_idx, int sink_idx);
     float segment();
 
@@ -55,6 +55,7 @@ private:
     vector<int> * dest_layer;
     Layer * source;
     Layer * dest;
+    CloudModel * cm;
     boost::shared_ptr<Graph> graph;
 };
 

@@ -78,8 +78,10 @@ void EditPlugin::fill(int x, int y, float radius, int source_idx, int dest_idx, 
     if(index == -1)
         return;
 
+    pcl::PointXYZI & p = cm->cloud->points[index];
+
     MinCut mc(cm, source_idx, dest_idx);
-    mc.createGraph(14);
+    mc.createGraph(14, p);
     mc.segment();
 
 

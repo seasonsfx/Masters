@@ -12,6 +12,7 @@ using namespace std;
 
 MinCut::MinCut(CloudModel * cm, int source_layer_idx, int dest_layer_idx)
 {
+    qDebug("Source: %d, Dest %d", source_layer_idx, dest_layer_idx);
     source = &cm->layerList.layers[source_layer_idx];
     dest = &cm->layerList.layers[dest_layer_idx];
 
@@ -27,7 +28,7 @@ MinCut::MinCut(CloudModel * cm, int source_layer_idx, int dest_layer_idx)
 }
 
 void MinCut::createGraph(int k){
-
+    qDebug("Creating graph");
     graph.reset();
     graph = boost::shared_ptr<Graph>(new Graph());
 
@@ -38,14 +39,18 @@ void MinCut::createGraph(int k){
     // So we know which index values in the cloud, maps to which vertices in the graph
     std::map<int, Vertex> IVMap;
 
+    qDebug("Adding vertices");
     // Create vertices
     for(int i : *source_layer){
+        if(i == -1)
+            continue;
         Vertex v = add_vertex(*graph);
         IVMap[i] = v;
         vertex_index_map[v] = i;
     }
 
 
+    qDebug("Adding edges");
     // for each vertex add edges
     for (std::pair<vertex_iter, vertex_iter> vp = vertices(*graph); vp.first != vp.second; ++vp.first) {
 
@@ -70,18 +75,24 @@ void MinCut::createGraph(int k){
             // need to assign weight also I think
             float weight = pointNKNSquaredDistance[i];
             edge_weight_map[edge] = weight;
+            qDebug("Edge from %d to %d", source_vertex_idx, dest_vertex_idx);
         }
 
     }
 
+
 }
 
 float MinCut::segment(){
+    qDebug("Start segmentation");
     IndexMap vertex_index_map = get(boost::vertex_index2, *graph);
 
+    qDebug("Making map");
     auto parities = boost::make_one_bit_color_map(num_vertices(*graph), get(boost::vertex_index, *graph));
+    qDebug("Stoer wagner");
     float w = boost::stoer_wagner_min_cut(*graph, get(boost::edge_weight, *graph), boost::parity_map(parities));
 
+    qDebug("Saving");
 
     // Apply changes
 

@@ -15,77 +15,80 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QGroupBox" name="groupBox">
+    <widget class="QGroupBox" name="groupBox_2">
      <property name="title">
-      <string>Threshold</string>
+      <string>Parameters</string>
      </property>
-     <layout class="QGridLayout" name="gridLayout_2">
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>Eigen ratio </string>
+     <layout class="QGridLayout" name="gridLayout" columnstretch="1,0">
+      <item row="4" column="1">
+       <widget class="QDoubleSpinBox" name="radius">
+        <property name="accelerated">
+         <bool>true</bool>
         </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QDoubleSpinBox" name="eigen2">
-        <property name="singleStep">
-         <double>0.100000000000000</double>
-        </property>
-        <property name="value">
-         <double>1.000000000000000</double>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QDoubleSpinBox" name="eigen3">
-        <property name="singleStep">
-         <double>0.100000000000000</double>
-        </property>
-        <property name="value">
-         <double>0.500000000000000</double>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QDoubleSpinBox" name="eigen1">
-        <property name="singleStep">
-         <double>0.100000000000000</double>
-        </property>
-        <property name="value">
-         <double>1.000000000000000</double>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1">
-       <widget class="QDoubleSpinBox" name="deviation">
-        <property name="maximum">
-         <double>1.000000000000000</double>
+        <property name="minimum">
+         <double>0.010000000000000</double>
         </property>
         <property name="singleStep">
          <double>0.010000000000000</double>
         </property>
         <property name="value">
-         <double>0.100000000000000</double>
+         <double>3.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QDoubleSpinBox" name="sigma">
+        <property name="accelerated">
+         <bool>true</bool>
+        </property>
+        <property name="minimum">
+         <double>0.010000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>0.010000000000000</double>
+        </property>
+        <property name="value">
+         <double>0.250000000000000</double>
         </property>
        </widget>
       </item>
       <item row="3" column="0">
        <widget class="QLabel" name="label_3">
         <property name="text">
-         <string>Deviation</string>
+         <string>Source weight</string>
         </property>
        </widget>
       </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QGroupBox" name="groupBox_2">
-     <property name="title">
-      <string>Neighbours</string>
-     </property>
-     <layout class="QGridLayout" name="gridLayout" columnstretch="1,7">
+      <item row="3" column="1">
+       <widget class="QDoubleSpinBox" name="sourceWeight">
+        <property name="accelerated">
+         <bool>true</bool>
+        </property>
+        <property name="minimum">
+         <double>0.010000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>0.010000000000000</double>
+        </property>
+        <property name="value">
+         <double>0.800000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1">
+       <widget class="QCheckBox" name="isHorisonal">
+        <property name="text">
+         <string>Horisonal</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Radius (meters)</string>
+        </property>
+       </widget>
+      </item>
       <item row="1" column="0">
        <widget class="QLabel" name="label">
         <property name="text">
@@ -94,29 +97,19 @@
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QSpinBox" name="kConnect">
+       <widget class="QSpinBox" name="kNeigbours">
         <property name="minimum">
          <number>1</number>
         </property>
         <property name="value">
-         <number>4</number>
+         <number>14</number>
         </property>
        </widget>
       </item>
       <item row="2" column="0">
        <widget class="QLabel" name="label_4">
         <property name="text">
-         <string>K PCA</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QSpinBox" name="kPCA">
-        <property name="minimum">
-         <number>4</number>
-        </property>
-        <property name="value">
-         <number>20</number>
+         <string>Sigma</string>
         </property>
        </widget>
       </item>

@@ -78,12 +78,55 @@ void EditPlugin::fill(int x, int y, float radius, int source_idx, int dest_idx, 
     if(index == -1)
         return;
 
-    pcl::PointXYZI & p = cm->cloud->points[index];
+    pcl::PointXYZI p = cm->cloud->points[index];
 
-    MinCut mc(cm, source_idx, dest_idx);
-    mc.createGraph(14, p);
-    mc.segment();
+    // Need to get rid of the -1 from the indices
+    pcl::IndicesPtr source_indices(new std::vector<int>);
+    for(int idx : cm->layerList.layers[source_idx].index){
+        if(idx = -1)
+            continue;
+        source_indices->push_back(idx);
+    }
 
+    MinCut seg;
+    seg.setInputCloud(cm->cloud);
+    seg.setIndices(pcl::IndicesPtr(new std::vector<int>(cm->layerList.layers[source_idx].index)));
+
+    pcl::PointCloud<pcl::PointXYZI>::Ptr foreground_points(new pcl::PointCloud<pcl::PointXYZI> ());
+    foreground_points->points.push_back(p);
+    seg.setForegroundPoints (foreground_points);
+
+    seg.setSigma (settings->sigma());
+    seg.setRadius (settings->radius());
+    seg.setNumberOfNeighbours (settings->kConnectvity());
+    seg.setSourceWeight (settings->sourceWeight());
+    //seg.setHorisonalRadius(settings->horisontalRadius());
+
+    std::vector <pcl::PointIndices> clusters;
+    seg.extract (clusters);
+
+    assert(clusters.size() != 0);
+
+    // blank source & dest
+    for(int i = 0; i < cm->cloud->points.size(); i++){
+        cm->layerList.layers[source_idx].index[i] = -1;
+        cm->layerList.layers[dest_idx].index[i] = -1;
+    }
+
+
+    // put clusters into layer
+    for(int idx : clusters[0].indices){
+        //qDebug("Cluster 0:  %d", idx);
+        cm->layerList.layers[source_idx].index[idx] = idx;
+    }
+
+    for(int idx : clusters[1].indices){
+        //qDebug("Cluster 1:  %d", idx);
+        cm->layerList.layers[dest_idx].index[idx] = idx;
+    }
+
+    cm->layerList.layers[source_idx].copyToGPU();
+    cm->layerList.layers[dest_idx].copyToGPU();
 
 }
 

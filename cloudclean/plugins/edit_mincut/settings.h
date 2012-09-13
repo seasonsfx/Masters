@@ -20,7 +20,10 @@ public:
     float deviation();
 
     int kConnectvity();
-    int kPCA();
+    float sigma();
+    float radius();
+    bool horisontalRadius();
+    float sourceWeight();
 
 private:
     Ui::Settings *ui;

@@ -236,42 +236,6 @@ void EditLasso::lassoToLayerCPU(CloudModel *cm, GLArea *glarea){
 
 void EditLasso::paintGL(CloudModel *, GLArea * glarea){
 
-
-    lasso_shader.bind();
-
-    float colour[4] = {0.0f, 0.0f, 1.0f, 0.5f};
-    glUniform4fv(lasso_shader.uniformLocation("planeColour"), 1, colour);
-    float depth = (settings->getDepth()*2)-1;
-    glUniform1f(lasso_shader.uniformLocation("depth"), depth);
-
-    glUniformMatrix4fv(lasso_shader.uniformLocation("modelview"), 1, false, glarea->camera.modelviewMatrix().matrix().data());
-    glUniformMatrix4fv(lasso_shader.uniformLocation("projection"), 1, false, glarea->camera.projectionMatrix().matrix().data());
-
-    glError("300");
-    lasso_buffer.bind();
-
-    glError("305");
-
-    lasso_shader.enableAttributeArray( "point" );
-    lasso_shader.setAttributeBuffer( "point", GL_FLOAT, 0, 2 );
-    glError("309");
-
-    float square[8] = {
-        -1.0f, -1.0f,
-        1.0f, -1.0f,
-        1.0f, 1.0f,
-        -1.0f, 1.0
-        };
-
-    lasso_buffer.write(0, reinterpret_cast<const void *> (square), sizeof(square));
-    glPointSize(5);
-    glDrawArrays( GL_TRIANGLE_FAN, 0, 4);
-
-    lasso_buffer.release();
-    lasso_shader.release();
-    glError("329");
-
-
     QPainter painter(glarea);
     painter.beginNativePainting();
     painter.setPen(Qt::green);
@@ -316,35 +280,6 @@ bool EditLasso::StartEdit(QAction *action, CloudModel *cm, GLArea *glarea){
         lassoMethod = USE_GPU;
 
 
-    if(lasso_buffer.isCreated()){
-        return false;
-    }
-
-    // OpenGL
-    if (!glarea->prepareShaderProgram(lasso_shader, ":/shaders/lasso.vert", ":/shaders/lasso.frag", ""))
-    //if (!glarea->prepareShaderProgram(lasso_shader, "/home/rickert/Masters/cloudclean/plugins/edit_lasso/shaders/lasso.vert", "/home/rickert/Masters/cloudclean/plugins/edit_lasso/shaders/lasso.frag" ))
-        return false;
-
-    lasso_shader.bind();
-    lasso_buffer.create();
-    lasso_buffer.setUsagePattern( QGLBuffer::DynamicDraw );
-    if ( !lasso_buffer.bind() )
-    {
-        qWarning() << "Could not bind vertex buffer to the context";
-        return false;
-    }
-    lasso_buffer.allocate(sizeof(float) * 2 * 4);
-    if ( !lasso_shader.bind() )
-    {
-        qWarning() << "Could not bind shader program to context";
-        return false;
-    }
-    lasso_shader.enableAttributeArray( "point" );
-    lasso_shader.setAttributeBuffer( "point", GL_FLOAT, 0, 2 );
-
-    lasso_shader.release();
-    lasso_buffer.release();
-
     if(lassoMethod == USE_GPU){
         // Avoid double initialisation
         if(kernelsize != 0)
@@ -358,8 +293,6 @@ bool EditLasso::StartEdit(QAction *action, CloudModel *cm, GLArea *glarea){
         const char* source = qsource.constData();
 
         const size_t kernelsize = qsource.size();
-
-        //qDebug("Source (size %ld): %s", kernelsize, source);
 
         int err;
         program = clCreateProgramWithSource(glarea->context, 1, &source,
@@ -422,7 +355,7 @@ bool EditLasso::mouseReleaseEvent(QMouseEvent *event, CloudModel *, GLArea * gla
     if (!glarea->moved && event->button() == Qt::LeftButton){
             addLassoPoint(glarea->normalized_mouse(event->x(), event->y()));
     }
-    qDebug("CLICK - Lasso size: %d", lasso.size());
+
     return true;
 }
 

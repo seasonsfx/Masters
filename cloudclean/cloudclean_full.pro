@@ -7,5 +7,7 @@ SUBDIRS = common \
     plugins/edit_brush \
     plugins/edit_flood_fpfh\
     plugins/edit_flood_pca \
+    plugins/edit_flood_smoothness \
     plugins/viz_normals \
-    plugins/edit_mincut
+    plugins/edit_mincut \
+    plugins/edit_mincut2

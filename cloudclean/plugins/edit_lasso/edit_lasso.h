@@ -58,9 +58,6 @@ private:
     QAction *                       editLassoCPU;
     QAction *                       editLassoGPU;
 
-    QGLShaderProgram                lasso_shader;
-    QGLBuffer                       lasso_buffer;
-    QGLBuffer                       lasso_index;
     bool                            lasso_active;
     std::vector<Eigen::Vector2f>    lasso;
     cl_program                      program;

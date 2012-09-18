@@ -43,9 +43,7 @@ public:
     QWidget * getSettingsWidget(QWidget *);
 
 private:
-    void calcPCA(CloudModel *cm);
-    void fill(int x, int y, float radius, int source_idx, int dest_idx, CloudModel *cm, GLArea * glarea);
-    int pointPick(int x, int y, float radius, int source_idx, Eigen::Vector3f& p1, Eigen::Vector3f& p2, CloudModel *cm, GLArea * glarea);
+    void segment(int source_idx, int dest_idx, CloudModel *cm, GLArea *glarea);
 
 private:
     QList <QAction *>                       actionList;
@@ -56,8 +54,8 @@ private:
     int                                     dest_layer;
 
     Lasso                                   lasso;
+    bool                                    lasso_active;
     Eigen::Vector2f                         normalised_mouse_loc;
-    std::vector<Eigen::Vector2f>            polygon_lasso;
 };
 
 #endif // EDITPLUGIN_H

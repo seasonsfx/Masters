@@ -16,10 +16,10 @@ public:
     void drawLasso(Eigen::Vector2f mouseLoc, GLArea * glarea);
     void clear();
     std::vector<Eigen::Vector2f> getPolygon();
-    void getIndices(Eigen::Matrix4f gmat,
-                    pcl::PointCloud<Eigen::MatrixXf> &cloud,
+    void getIndices(Eigen::Matrix4f & ndc_mat,
+                    pcl::PointCloud<pcl::PointXYZI> *cloud,
                     std::vector<int> & source,
-                    std::vector<int> &dest);
+                    std::vector<int> & dest);
 
 private:
     std::vector<Eigen::Vector2f>    points;

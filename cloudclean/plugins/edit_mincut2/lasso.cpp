@@ -4,6 +4,9 @@
 
 #include <QPolygonF>
 #include <QPainter>
+#include <QDebug>
+
+#include "utilities.h"
 
 Lasso::Lasso()
 {
@@ -19,10 +22,8 @@ int rand(int value)
 
 float cross2D(Eigen::Vector2f lineA, Eigen::Vector2f lineB, Eigen::Vector2f other)
 {
-    Eigen::Vector2f dA, dB;
-    dA.x() = lineA.x() - other.x(); dA.y() = lineA.y() - other.y();
-    dB.x() = lineB.x() - other.x(); dB.y() = lineB.y() - other.y();
-
+    Eigen::Vector2f dA = lineA - other;
+    Eigen::Vector2f dB = lineB - other;
     return dA.x()*dB.y() - dA.y()*dB.x();
 }
 
@@ -34,7 +35,6 @@ int side(float a)
         return 1;
     return 0;
 }
-
 
 inline float pointDistance(Eigen::Vector2f & pointA, Eigen::Vector2f & pointB)
 {
@@ -75,9 +75,9 @@ float randomAngle(int* lastRandom)
 Eigen::Vector2f randomLineSegment(Eigen::Vector2f & origin, int* lastRandom)
 {
     float angle = randomAngle(lastRandom);
-    Eigen::Vector2f endPoint();
-    endPoint << 10000.0f*cos(angle) + origin.x(),
-            10000.0f*sin(angle) + origin.y();
+    Eigen::Vector2f endPoint;
+    endPoint << (10000.0f*cos(angle) + origin.x()),
+            (10000.0f*sin(angle) + origin.y());
     return endPoint;
 }
 
@@ -89,14 +89,14 @@ bool pointInsidePolygon(std::vector<Eigen::Vector2f> polygon, Eigen::Vector2f po
     {
         Eigen::Vector2f endPoint = randomLineSegment(point, &lastRandom);
 
-        for(int i = 0; i < n; ++i)
+        for(int i = 0; i < polygon.size(); ++i)
             if(pointOnLineSegment(point, endPoint, polygon[i]))
                 continue;
 
         int hits = 0;
 
-        for(int i = 0; i < n; ++i){
-            if(intersects(polygon[i], polygon[(i + 1) % n], point, endPoint)){
+        for(int i = 0; i < polygon.size(); ++i){
+            if(intersects(polygon[i], polygon[(i + 1) % polygon.size()], point, endPoint)){
                 ++hits;
             }
         }
@@ -106,7 +106,14 @@ bool pointInsidePolygon(std::vector<Eigen::Vector2f> polygon, Eigen::Vector2f po
 
 
 void Lasso::addPoint(Eigen::Vector2f point){
+    qDebug("New point: (%f, %f)", point.x(), point.y());
     points.push_back(point);
+}
+
+inline QPointF screenPoint(Eigen::Vector2f & p, int width, int height){
+    float x = (p.x()+1)*(width/2.0f);
+    float y = (-p.y()+1)*(height/2.0f);
+    return QPointF(x, y);
 }
 
 void Lasso::drawLasso(Eigen::Vector2f mouseLoc, GLArea * glarea){
@@ -114,16 +121,23 @@ void Lasso::drawLasso(Eigen::Vector2f mouseLoc, GLArea * glarea){
 
     // Conversion is a bit of a hack
     for(auto p: points){
-        polygon << QPointF(p.x(), p.y());
+        // to screen space
+
+        polygon << screenPoint(p, glarea->width(), glarea->height());
     }
 
-    polygon << QPointF(mouseLoc.x(), mouseLoc.y());
+    polygon << screenPoint(mouseLoc, glarea->width(), glarea->height());
+
+    qDebug("Drawing polygon");
+    qDebug() << polygon;
 
     QPainter painter(glarea);
     painter.beginNativePainting();
     painter.setPen(Qt::green);
     painter.drawPolygon(polygon);
     painter.endNativePainting();
+
+    glError("Paint polygon failed");
 }
 
 void Lasso::clear(){
@@ -135,31 +149,33 @@ std::vector<Eigen::Vector2f> Lasso::getPolygon(){
 }
 
 void Lasso::getIndices(Eigen::Matrix4f & ndc_mat,
-                pcl::PointCloud<pcl::PointXYZI> & cloud,
+                pcl::PointCloud<pcl::PointXYZI> * cloud,
                 std::vector<int> & source,
                 std::vector<int> & dest){
 
 
     float * matdata = ndc_mat.data();
-    dest.resize(source.size());
 
-    for(int i = 0; i < source.size(); i++){
-        int idx = i;
+    for(int idx : source){
 
         if(idx == -1)
             continue;
 
-        pcl::PointXYZI & p = cm->cloud->points[idx];
-        float point[4] = {p.x, p.y, p.z, p.intensity};
+        pcl::PointXYZI & p = cloud->points[idx];
 
         /// project point
-        proj(matdata, point);
+        Eigen::Vector4f p_4;
+        p_4 << p.x, p.y, p.z, 1;
+        p_4 = ndc_mat * p_4;
+
+        Eigen::Vector2f p_2;
+        p_2 << p_4.x(), p_4.y();
 
         /// do lasso test
-        bool in_lasso = pointInsidePolygon(points, point);
+        bool in_lasso = pointInsidePolygon(points, p_2);
 
         if(in_lasso){
-            dest[idx] = source_indices[idx];
+            dest.push_back(idx);
         }
 
     }

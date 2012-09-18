@@ -95,9 +95,10 @@ void EditPlugin::fill(int x, int y, float radius, int source_idx, int dest_idx, 
     pcl::PointCloud<pcl::PointXYZI>::Ptr foreground_points(new pcl::PointCloud<pcl::PointXYZI> ());
     foreground_points->points.push_back(p);
     seg.setForegroundPoints (foreground_points);
-
-    seg.setSigma (settings->sigma());
     seg.setRadius (settings->radius());
+
+    seg.setSigma (settings->sigma()); // I think this is density
+
     seg.setNumberOfNeighbours (settings->kConnectvity());
     seg.setSourceWeight (settings->sourceWeight());
     //seg.setHorisonalRadius(settings->horisontalRadius());
@@ -155,7 +156,7 @@ bool EditPlugin::mouseReleaseEvent(QMouseEvent *event, CloudModel * cm, GLArea *
             Layer & l = cm->layerList.layers[i];
             if(l.active && l.visible){
                 source_layer = i;
-                l.copyFromGPU();
+                l.sync();;
                 break;
             }
         }

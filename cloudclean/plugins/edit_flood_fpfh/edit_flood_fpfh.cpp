@@ -265,7 +265,7 @@ bool EditPlugin::mouseReleaseEvent(QMouseEvent *event, CloudModel * cm, GLArea *
             Layer & l = cm->layerList.layers[i];
             if(l.active && l.visible){
                 source_layer = i;
-                l.copyFromGPU();
+                l.sync();;
                 break;
             }
         }

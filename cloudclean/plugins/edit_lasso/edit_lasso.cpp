@@ -1,5 +1,3 @@
-#define GL3_PROTOTYPES
-
 #include <iostream>
 
 #define GL3_PROTOTYPES
@@ -244,6 +242,7 @@ void EditLasso::paintGL(CloudModel *, GLArea * glarea){
 
     // Conversion is a bit of a hack
     for(auto p: lasso){
+        // convert points to screen space
         float x = (p.x()+1)*(glarea->width()/2.0f);
         float y = (-p.y()+1)*(glarea->height()/2.0f);
         polygon << QPointF(x, y);

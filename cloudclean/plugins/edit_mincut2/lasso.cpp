@@ -7,28 +7,15 @@
 #include <QDebug>
 
 #include "utilities.h"
+#include <time.h>
+#include <cstdlib>
 
 Lasso::Lasso()
 {
+    srand ( time(NULL) );
 }
 
-int rand(int value)
-{
-    const int a = 1103515245;
-    const int c = 12345;
-
-    return (a*value) + c;
-}
-
-float cross2D(Eigen::Vector2f lineA, Eigen::Vector2f lineB, Eigen::Vector2f other)
-{
-    Eigen::Vector2f dA = lineA - other;
-    Eigen::Vector2f dB = lineB - other;
-    return dA.x()*dB.y() - dA.y()*dB.x();
-}
-
-int side(float a)
-{
+int inline side(float a){
     if(a < -1e-6)
         return -1;
     if(a > 1e-6)
@@ -36,61 +23,56 @@ int side(float a)
     return 0;
 }
 
-inline float pointDistance(Eigen::Vector2f & pointA, Eigen::Vector2f & pointB)
+bool isPointOnLineSegment(Eigen::Vector2f lineA,
+                        Eigen::Vector2f lineB,
+                        Eigen::Vector2f pointC)
 {
-    return (pointA - pointB).norm();
-}
-
-bool pointOnLineSegment(Eigen::Vector2f lineA, Eigen::Vector2f lineB, Eigen::Vector2f pointC)
-{
-    float lineLength = pointDistance(lineA, lineB);
-    float viaPoint = pointDistance(lineA, pointC) + pointDistance(lineB, pointC);
+    float lineLength = (lineA - lineB).norm();
+    float viaPoint = (lineA - pointC).norm() + (lineB - pointC).norm();
     return fabs(viaPoint - lineLength) < 1e-6;
 }
 
 bool oppositeSides(Eigen::Vector2f lineA, Eigen::Vector2f lineB, Eigen::Vector2f pointC, Eigen::Vector2f pointD)
 {
-    float crossC = cross2D(lineA, lineB, pointC);
-    float crossD = cross2D(lineA, lineB, pointD);
+    Eigen::Vector2f lineDir = lineA-lineB;
+    Eigen::Vector2f pointDir1 = lineA-pointC;
+    Eigen::Vector2f pointDir2 = lineA-pointD;
 
-    int sideC = side(crossC);
-    int sideD = side(crossD);
+    float cross1 = lineDir.x()*pointDir1.y() - lineDir.y()*pointDir1.x();
+    float cross2 = lineDir.x()*pointDir2.y() - lineDir.y()*pointDir2.x();
 
+    int sideC = side(cross1);
+    int sideD = side(cross2);
     return sideC != sideD;
 }
 
-bool intersects(Eigen::Vector2f lineA1, Eigen::Vector2f lineA2, Eigen::Vector2f lineB1, Eigen::Vector2f lineB2)
-{
-    if(oppositeSides(lineA1, lineA2, lineB1, lineB2) && oppositeSides(lineB1, lineB2, lineA1, lineA2))
+bool intersects(Eigen::Vector2f lineA1,
+                Eigen::Vector2f lineA2,
+                Eigen::Vector2f lineB1,
+                Eigen::Vector2f lineB2){
+    if(oppositeSides(lineA1, lineA2, lineB1, lineB2) &&
+            oppositeSides(lineB1, lineB2, lineA1, lineA2))
         return true;
     return false;
 }
 
-float randomAngle(int* lastRandom)
-{
-    *lastRandom = rand(*lastRandom);
-    return 2.0f*M_PI*(*lastRandom % 10000)/10000.0f;
-}
-
-Eigen::Vector2f randomLineSegment(Eigen::Vector2f & origin, int* lastRandom)
-{
-    float angle = randomAngle(lastRandom);
+Eigen::Vector2f randomLineSegment(Eigen::Vector2f & origin){
+    float rand_angle = 2.0f*M_PI*(rand() % 10000)/10000.0f;
     Eigen::Vector2f endPoint;
-    endPoint << (10000.0f*cos(angle) + origin.x()),
-            (10000.0f*sin(angle) + origin.y());
+    endPoint << (10000.0f*cos(rand_angle) + origin.x()),
+            (10000.0f*sin(rand_angle) + origin.y());
     return endPoint;
 }
 
-bool pointInsidePolygon(std::vector<Eigen::Vector2f> polygon, Eigen::Vector2f point)
-{
-    int lastRandom = rand(1);
+bool pointInsidePolygon(std::vector<Eigen::Vector2f> polygon,
+                        Eigen::Vector2f point){
 
     while(true)
     {
-        Eigen::Vector2f endPoint = randomLineSegment(point, &lastRandom);
+        Eigen::Vector2f endPoint = randomLineSegment(point);
 
         for(int i = 0; i < polygon.size(); ++i)
-            if(pointOnLineSegment(point, endPoint, polygon[i]))
+            if(isPointOnLineSegment(point, endPoint, polygon[i]))
                 continue;
 
         int hits = 0;
@@ -116,17 +98,20 @@ inline QPointF screenPoint(Eigen::Vector2f & p, int width, int height){
     return QPointF(x, y);
 }
 
-void Lasso::drawLasso(Eigen::Vector2f mouseLoc, GLArea * glarea){
+void Lasso::drawLasso(Eigen::Vector2f mouseLoc,
+                      GLArea * glarea){
     QPolygonF polygon;
 
     // Conversion is a bit of a hack
     for(auto p: points){
         // to screen space
 
-        polygon << screenPoint(p, glarea->width(), glarea->height());
+        polygon << screenPoint(p, glarea->width(),
+                               glarea->height());
     }
 
-    polygon << screenPoint(mouseLoc, glarea->width(), glarea->height());
+    polygon << screenPoint(mouseLoc, glarea->width(),
+                           glarea->height());
 
     qDebug("Drawing polygon");
     qDebug() << polygon;
@@ -170,6 +155,7 @@ void Lasso::getIndices(Eigen::Matrix4f & ndc_mat,
 
         Eigen::Vector2f p_2;
         p_2 << p_4.x(), p_4.y();
+        p_2 /= p_4.z();
 
         /// do lasso test
         bool in_lasso = pointInsidePolygon(points, p_2);

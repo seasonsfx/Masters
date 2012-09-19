@@ -56,6 +56,9 @@ public:
 
     void setInputCloud (PointCloud::Ptr &cloud);
 
+    void setBoundingPolygon(std::vector<Eigen::Vector3f> & polygon, Eigen::Vector3f &centoid);
+    void setCameraOrigin(Eigen::Vector3f & origin);
+
     /** \brief Returns normalization value for binary potentials. For more information see the article. */
     double
     getSigma () const;
@@ -150,6 +153,9 @@ public:
     getColoredCloud ();
 
     protected:
+
+    float closestPolyLineDist(Eigen::Vector3f & point) const;
+    float distFromCenter(Eigen::Vector3f & point) const;
 
     /** \brief This method simply builds the graph that will be used during the segmentation. */
     bool
@@ -296,7 +302,10 @@ public:
     /** \brief Signalizes if the graph is valid. */
     bool graph_is_valid_;
 
-    bool horisonal_radius_;
+
+    std::vector<Eigen::Vector3f> polygon_;
+    Eigen::Vector3f polygon_centoid_;
+    Eigen::Vector3f cam_origin_;
 
     /** \brief Stores the points that are known to be in the foreground. */
     std::vector<pcl::PointXYZI, Eigen::aligned_allocator<pcl::PointXYZI> > foreground_points_;

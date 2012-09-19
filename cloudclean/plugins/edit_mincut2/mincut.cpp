@@ -29,8 +29,7 @@ MinCut::MinCut () :
   edge_marker_ (0),
   source_ (),/////////////////////////////////
   sink_ (),///////////////////////////////////
-  max_flow_ (0.0),
-  horisonal_radius_(false)
+  max_flow_ (0.0)
 {
 }
 
@@ -64,6 +63,16 @@ MinCut::setInputCloud (PointCloud::Ptr &cloud)
   graph_is_valid_ = false;
   unary_potentials_are_valid_ = false;
   binary_potentials_are_valid_ = false;
+}
+
+
+void MinCut::setBoundingPolygon(std::vector<Eigen::Vector3f> &polygon, Eigen::Vector3f &centoid){
+    polygon_ = polygon;
+    polygon_centoid_ = centoid;
+}
+
+void MinCut::setCameraOrigin(Eigen::Vector3f & origin){
+    cam_origin_ = origin;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -172,25 +181,6 @@ MinCut::setForegroundPoints (typename pcl::PointCloud<pcl::PointXYZI>::Ptr foreg
   foreground_points_.reserve (foreground_points->points.size ());
   for (size_t i_point = 0; i_point < foreground_points->points.size (); i_point++)
     foreground_points_.push_back (foreground_points->points[i_point]);
-
-  unary_potentials_are_valid_ = false;
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
- std::vector<pcl::PointXYZI, Eigen::aligned_allocator<pcl::PointXYZI> >
-MinCut::getBackgroundPoints () const
-{
-  return (background_points_);
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
- void
-MinCut::setBackgroundPoints (typename pcl::PointCloud<pcl::PointXYZI>::Ptr background_points)
-{
-  background_points_.clear ();
-  background_points_.reserve (background_points->points.size ());
-  for (size_t i_point = 0; i_point < background_points->points.size (); i_point++)
-    background_points_.push_back (background_points->points[i_point]);
 
   unary_potentials_are_valid_ = false;
 }
@@ -366,12 +356,83 @@ MinCut::buildGraph ()
   return (true);
 }
 
+inline Eigen::Vector3f pointOnPlane(Eigen::Vector4f & plane){
+    Eigen::Vector3f point_on_plane(0,0,0);
+
+    // Find non zero coef
+    int non_zero_coef_idx = -1;
+    for(int i = 0; i < 3; i++){
+        if(plane[i] != 0){
+            non_zero_coef_idx = i;
+        }
+    }
+    assert(non_zero_coef_idx != -1 && "Invalid plane");
+    point_on_plane[non_zero_coef_idx] = -plane.w()/plane[non_zero_coef_idx];
+    return point_on_plane;
+}
+
+float distToPlane(Eigen::Vector3f & point, Eigen::Vector4f & plane){
+    Eigen::Vector3f normal = plane.head<3>();
+    Eigen::Vector3f vec_to_point = point - pointOnPlane(plane);
+    float dist = fabs(normal.dot(vec_to_point))/normal.norm();
+    return dist;
+}
+
+Eigen::Vector4f getPlane(Eigen::Vector3f p1, Eigen::Vector3f p2, Eigen::Vector3f p3){
+    Eigen::Vector3f normal = (p2 - p1).cross(p3 - p1);
+    float d = -(normal.dot(p1));
+    Eigen::Vector4f plane; plane << normal.x(), normal.y(), normal.z(), d;
+    return plane;
+}
+
+// Finds and returns the distance to the closest plane defined by a line and
+// the camera origin
+float MinCut::closestPolyLineDist(Eigen::Vector3f & point) const{
+    float min = FLT_MAX;
+
+    for(int i = 0; i < polygon_.size(); i++){
+        int p1 = i, p2 = (i+1)%polygon_.size();
+        Eigen::Vector4f plane = getPlane(polygon_[p1], polygon_[p2], cam_origin_);
+        float dist = distToPlane(point, plane);
+        if(dist < min){
+            min = dist;
+        }
+    }
+
+    return min;
+}
+
+float MinCut::distFromCenter(Eigen::Vector3f & point) const{
+    Eigen::Vector3f center_line = polygon_centoid_ - cam_origin_;
+    return abs(point.dot(center_line))/center_line.norm();
+
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
  void
 MinCut::calculateUnaryPotential (int point, double& source_weight, double& sink_weight) const
 {
-  // Given an abritrary point in the cloud.
+     // Source weight constant
 
+     // Penalize point close to the polygon boundry
+
+     Eigen::Vector3f p;
+     p << input_->points[point].x,
+             input_->points[point].y,
+             input_->points[point].z;
+
+     // Apply background penalty
+     double dist_to_center = distFromCenter(p);
+     double dist_to_boudry = closestPolyLineDist(p);
+
+     sink_weight = dist_to_center/(dist_to_center+dist_to_boudry);
+
+     // Apply forground penalty
+     source_weight = source_weight_;
+
+
+/*
+  // Given an abritrary point in the cloud.
   double min_dist_to_foreground = std::numeric_limits<double>::max ();
   double closest_foreground_point[2];
   closest_foreground_point[0] = closest_foreground_point[1] = 0; // initial closest point is the first point?
@@ -401,34 +462,10 @@ MinCut::calculateUnaryPotential (int point, double& source_weight, double& sink_
 
   // Apply forground penalty
   source_weight = source_weight_;
+
+ */
+
   return;
-/*
-  if (background_points_.size () == 0)
-    return;
-
-  for (int i_point = 0; i_point < background_points_.size (); i_point++)
-  {
-    double dist = 0.0;
-    dist += (background_points_[i_point].x - initial_point[0]) * (background_points_[i_point].x - initial_point[0]);
-    dist += (background_points_[i_point].y - initial_point[1]) * (background_points_[i_point].y - initial_point[1]);
-    if (min_dist_to_background > dist)
-    {
-      min_dist_to_background = dist;
-      closest_background_point[0] = background_points_[i_point].x;
-      closest_background_point[1] = background_points_[i_point].y;
-    }
-  }
-
-  if (min_dist_to_background <= epsilon_)
-  {
-    source_weight = 0.0;
-    sink_weight = 1.0;
-    return;
-  }
-
-  source_weight = 1.0 / (1.0 + pow (min_dist_to_background / min_dist_to_foreground, 0.5));
-  sink_weight = 1 - source_weight;
-*/
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

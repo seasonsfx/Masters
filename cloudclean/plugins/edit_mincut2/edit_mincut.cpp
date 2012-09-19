@@ -126,6 +126,58 @@ QWidget * EditPlugin::getSettingsWidget(QWidget *){
     return settings;
 }
 
+Eigen::Vector3f unProjectNDC(const Eigen::Matrix4f & proj,
+                             const Eigen::Matrix4f & mv,
+                             const float z,
+                             const Eigen::Vector2f p){
+
+    Eigen::Vector4f screen_p(p.x(), p.y(), z, 1.0f);
+    Eigen::Vector4f unprojected_p = (proj * mv).inverse() * screen_p;
+    unprojected_p /= unprojected_p[3];
+    assert(unprojected_p.w() != 0.0f);
+    return unprojected_p.head<3>();
+}
+
+// Unproject from 2D NDC space
+std::vector<Eigen::Vector3f> unProjectPolygonNDC(
+                                const Eigen::Matrix4f & proj,
+                                const Eigen::Matrix4f & mv,
+                                const float z,
+                                const std::vector<Eigen::Vector2f> inpoly){
+
+    std::vector<Eigen::Vector3f> unprojected_polygon;
+
+    for(Eigen::Vector2f p: inpoly){
+        Eigen::Vector4f screen_p(p.x(), p.y(), z, 1.0f);
+        // Unproject
+        Eigen::Vector4f unprojected_p = (proj * mv).inverse() * screen_p;
+        unprojected_p /= unprojected_p[3];
+        assert(unprojected_p.w() != 0.0f);
+        unprojected_polygon.push_back(unprojected_p.head<3>());
+    }
+
+    return unprojected_polygon;
+}
+
+Eigen::Vector2f centoid(const std::vector<Eigen::Vector2f> polygon){
+    float x = 0, y = 0;
+
+    float signedArea = 0;
+
+    for(int i = 0; i < polygon.size(); i++){
+        Eigen::Vector2f p1 = polygon[i];
+        Eigen::Vector2f p2 = polygon[(i+1)%polygon.size()];
+
+        float a = p1.x()*p2.y() - p2.x()-p1.y();
+        signedArea += a;
+        x += (p1.x() + p2.x())*a;
+        y += (p1.y() + p2.y())*a;
+    }
+
+    x/=(6*signedArea);
+    y/=(6*signedArea);
+    return Eigen::Vector2f(x,y);
+}
 
 void EditPlugin::segment(int source_idx, int dest_idx, CloudModel *cm, GLArea * glarea){
 
@@ -137,26 +189,32 @@ void EditPlugin::segment(int source_idx, int dest_idx, CloudModel *cm, GLArea * 
     pcl::IndicesPtr inside_lasso_indices(new std::vector<int>);
     lasso.getIndices(ndc_trans, &*cm->cloud, source_layer, *inside_lasso_indices);
 
-    for(int i : dest_layer)
-        dest_layer[i] = -1;
-
-    for(int i : *inside_lasso_indices){
-        dest_layer[i] = i;
-        source_layer[i] = -1;
-    }
-
-/*
     MinCut seg;
     seg.setInputCloud(cm->cloud);
     seg.setIndices(inside_lasso_indices);
+    auto polygon = lasso.getPolygon();
 
-    // Changes to algorithm happens here
+    float z = 1.0f;
 
-    pcl::PointCloud<pcl::PointXYZI>::Ptr foreground_points(new pcl::PointCloud<pcl::PointXYZI> ());
-    foreground_points->points.push_back(p);
-    seg.setForegroundPoints (foreground_points);
+    std::vector<Eigen::Vector3f> poly3d = unProjectPolygonNDC(
+                                    glarea->camera.projectionMatrix().matrix(),
+                                    glarea->camera.modelviewMatrix().matrix(),
+                                    z,
+                                    polygon);
 
-    seg.setSigma (settings->sigma());
+
+    Eigen::Vector2f centoid2d = centoid(polygon);
+    Eigen::Vector3f centoid3d = unProjectNDC(
+                glarea->camera.projectionMatrix().matrix(),
+                glarea->camera.modelviewMatrix().matrix(),
+                z,
+                centoid2d);
+
+
+    seg.setBoundingPolygon(poly3d, centoid3d);
+
+    seg.setSigma (settings->sigma()); // Density me thinks
+                                      // try set this dynamically
     seg.setRadius (settings->radius());
     seg.setNumberOfNeighbours (settings->kConnectvity());
     seg.setSourceWeight (settings->sourceWeight());
@@ -175,15 +233,13 @@ void EditPlugin::segment(int source_idx, int dest_idx, CloudModel *cm, GLArea * 
 
     // put clusters into layer
     for(int idx : clusters[0].indices){
-        //qDebug("Cluster 0:  %d", idx);
         cm->layerList.layers[source_idx].index[idx] = idx;
     }
 
     for(int idx : clusters[1].indices){
-        //qDebug("Cluster 1:  %d", idx);
         cm->layerList.layers[dest_idx].index[idx] = idx;
     }
-*/
+
     cm->layerList.layers[source_idx].copyToGPU();
     cm->layerList.layers[dest_idx].copyToGPU();
 

@@ -51,9 +51,6 @@ protected:
     virtual void paintGL();
     void updateFps(float frameTime);
 
-
-    void click(int x, int y);
-
     void mouseDoubleClickEvent ( QMouseEvent * event );
     void mouseMoveEvent ( QMouseEvent * event );
     void mousePressEvent ( QMouseEvent * event );

@@ -146,6 +146,23 @@ void GLArea::resizeGL( int w, int h )
 
 void GLArea::paintGL(){
 
+    ////////////////////////////
+/*
+    std::cout << "Cam: " << std::endl;
+
+    Eigen::Matrix4f cam = camera.modelviewMatrix().matrix();
+
+    std::cout << cam  << std::endl;
+
+    Eigen::Matrix4f proj = camera.projectionMatrix().matrix();
+
+    std::cout << "Proj: " << std::endl;
+
+    std::cout << proj << std::endl;
+*/
+
+    ///////////////////////////
+
     QTime time;
     time.start();
 
@@ -347,7 +364,7 @@ void GLArea::mouseReleaseEvent ( QMouseEvent * event ){
         camera.mouseRelease(event->x(), event->y());
 
     if(!moved){
-        //click(event->x(), event->y());
+
     }
 
     updateGL();

@@ -56,9 +56,6 @@ public:
 
     void setInputCloud (PointCloud::Ptr &cloud);
 
-    void setBoundingPolygon(std::vector<Eigen::Vector3f> & polygon, Eigen::Vector3f &centoid);
-    void setCameraOrigin(Eigen::Vector3f origin);
-
     /** \brief Returns normalization value for binary potentials. For more information see the article. */
     double
     getSigma () const;
@@ -154,9 +151,6 @@ public:
 
     protected:
 
-    float closestPolyLineDist(Eigen::Vector3f & point) const;
-    float distFromCenter(Eigen::Vector3f & point) const;
-
     /** \brief This method simply builds the graph that will be used during the segmentation. */
     bool
     buildGraph ();
@@ -208,6 +202,10 @@ public:
 /////////////////////////////////
 
 public:
+
+    inline void setNormals(pcl::PointCloud<pcl::Normal>::Ptr normals){
+        this->normals_ = normals;
+    }
 
     /** \brief Get a pointer to the input point cloud dataset. */
     inline PointCloudConstPtr const
@@ -275,6 +273,10 @@ public:
 
     protected:
 
+    pcl::PointCloud<pcl::FPFHSignature33>::Ptr fpfhs_;
+
+    pcl::PointCloud<pcl::Normal>::Ptr normals_;
+
     /** \brief Stores the sigma coefficient. It is used for finding smooth costs. More information can be found in the article. */
     double inverse_sigma_;
 
@@ -302,10 +304,7 @@ public:
     /** \brief Signalizes if the graph is valid. */
     bool graph_is_valid_;
 
-
-    std::vector<Eigen::Vector3f> polygon_;
-    Eigen::Vector3f polygon_centoid_;
-    Eigen::Vector3f cam_origin_;
+    bool horisonal_radius_;
 
     /** \brief Stores the points that are known to be in the foreground. */
     std::vector<pcl::PointXYZI, Eigen::aligned_allocator<pcl::PointXYZI> > foreground_points_;

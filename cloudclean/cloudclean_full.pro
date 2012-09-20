@@ -10,4 +10,5 @@ SUBDIRS = common \
     plugins/edit_flood_smoothness \
     plugins/viz_normals \
     plugins/edit_mincut \
-    plugins/edit_mincut2
+    plugins/edit_mincut2 \
+    plugins/edit_mincut3

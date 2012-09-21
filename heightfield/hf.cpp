@@ -40,7 +40,8 @@ void setpoint(std::string & line, float & x, float & y, float &z, float &intensi
 	ss >> x >> y >> z >> intensity;
 
 	if((x == 0) && (y == 0) & (z == 0)) {
-    	x = y = z = intensity = 0.0f;
+		intensity = 1.0f;
+    	x = y = z = 0;
 	}
 }
 
@@ -70,6 +71,9 @@ void writeImage(const char * filename, int width, int height, DI* di){
 
 	for(int i = 0; i< width*height; i++){
 		char val = (di[i].distance/max_depth)*255;
+
+		if(di[i].distance < 0.0001)
+			val = 255;
 		//char val = di[i].intensity*255;
 	    //char val = (di[i].distance/max_depth)*di[i].intensity*255;
 		outfile.write(&val, 1);

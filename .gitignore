@@ -1,6 +1,7 @@
 # Code
 /cloudclean/CloudClean
 Makefile
+*.webm
 *.run
 *.pgm
 *.o

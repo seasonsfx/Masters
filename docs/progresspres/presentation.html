@@ -19,7 +19,7 @@
 	<link rel="stylesheet" href="deckjs/extensions/scale/deck.scale.css">
 
 	<!-- Style theme. More available in /themes/style/ or create your own. -->
-	<link rel="stylesheet" href="deckjs/themes/style/swiss.css">
+	<link rel="stylesheet" href="deckjs/themes/style/web-2.0.css">
 	
 	<!-- Transition theme. More available in /themes/transition/ or create your own. -->
 	<link rel="stylesheet" href="deckjs/themes/transition/horizontal-slide.css">
@@ -33,6 +33,7 @@
 
 <section class="slide">
 	<h1>Weeding Pointclouds</h1>
+	<img src="pics/tree.png" style="float:right"/>
 </section>
 
 <section class="slide">
@@ -54,13 +55,147 @@
 </section>
 
 <section class="slide">
-	<h2>What does the data look like?</h2>
-	<img src="pics/songo.jpg" style="float:right;"/>
+	<h1>Trees you say?</h1>
+</section>
+
+<section class="slide">
+	<h2>Yes!</h2>
+	<img src="pics/tree.jpg"/>
+</section>
+
+<section class="slide">
+	<h2>Trees!</h2>
+	<img src="pics/shrubs.jpg"/>
+</section>
+
+<section class="slide">
+	<h2>Everywhere!</h2>
+	<img src="pics/songo.jpg"/>
+</section>
+
+
+<section class="slide">
+	<h2>Laser range scans</h2>
+	<video src="demo.webm" controls>
+        This is fallback content to display if the browser
+        does not support the video element.
+	</video>
+</section>
+
+<section class="slide">
+	<h2>2.5D data</h2>
+	<img src="pics/intensity.png" class="slide"/>
+	<img src="pics/dist.png" class="slide"/>
+</section>
+
+<section class="slide">
+	<h1>Finding trees</h1>
+</section>
+
+<section class="slide">
+	<h2>Normals</h2>
+	<img src="pics/normals.png"/>
+</section>
+
+<section class="slide">
+	<h2>Normal noise metric</h2>
 	<ul>
-		<li class ="slide"> 2.5D laser range scans
-		<li class ="slide"> 16 million points per scan
+		<li> Calculate a noise metric for each point</li>
+		<li> User specifies how noisey </li>
+		<li> User clicks point in tree </li>
+		<li> Grow region to neighbours, if LOWER_BOUND &gt; point_noise_metric &lt; UPPER_BOUND </li>
 	</ul>
 </section>
+
+<section class="slide">
+	<h2>Noise metric (Details)</h2>
+	<ul>
+		<li> For each point, find K neighbours.</li>
+		<li> In current neighborhood, calculate standard angular deviation from mean (normalised to range [0-1]).</li> <!-- Whoops uses current instead mean -->
+		<li> User clicks point in tree.</li>
+		<li> Grow region to neighbours, if LOWER_BOUND &gt; point_noise_metric &lt; UPPER_BOUND </li>
+		<!--<li class ="slide"> Noise value for wall: 0.000529</li> -->
+		<!--<li class ="slide"> Noise value for tree: 0.007813</li> -->
+	</ul>
+</section>
+
+<section class="slide">
+	<h2>Does it work?</h2>
+	<ul>
+		<li class ="slide"> Nope</li>
+		<li class ="slide"> Region doesn't grow very far</li>
+		<li class ="slide"> Turbulant areas seen to be isolated</li>
+		<li class ="slide"> Could be a problem with normal estimation</li>
+	</ul>
+</section>
+	
+<section class="slide">
+	<h2>Fast Point Feature Histograms (FPFH)</h2>
+	<ul>
+		<li> FPFH characterises points in local neighbourhood (uses normals)</li>
+		<img src="pics/fpfh.png"/>
+	</ul>
+</section>
+
+<section class="slide">
+	<h2>FPFH region growing</h2>
+	<ul>
+		<li>Grow region to neighbours within a threshold feature distance.</li>
+		<li>Euclidian distance or Cosine similarity used.</li>
+		<img src="pics/plane.png" class="slide"/>
+	</ul>
+</section>
+
+<section class="slide">
+	<h2>Region growing with principle components</h2>
+	<ul>
+		<li>Calculate the PC for every point in K-neighbourhood.</li>
+		<li>Sort eigen values from high to low.</li>
+		<li>User specifies an eigen value ratio (a:b:c).</li>
+		<li>Use cosine similarity to compare specified ratio to eigen values.</li>
+		<li>Grow region if neigbour conforms to ratio</li>
+	</ul>
+</section>
+
+<section class="slide">
+	<h2>Region growing with principle components</h2>
+	<ul>
+		<li>1:0:0 finds edges</li>
+		<li>1:1:0 finds planes</li>
+		<img src="pics/plane_pca.png" class="slide"/>
+	</ul>
+</section>
+
+
+<section class="slide">
+	<h2>Min Cuts</h2>
+	<ul>
+		<li>Set up a K-neighbourhood graph</li>
+		<li>Points are highly connected to other points in the same object</li>
+		<li>Points are weakly connected to points the background</li>
+
+		<li>Weights between points = exp(-distance/density)^2</li>
+		<li>Have user select point on object (tree)</li>
+		<li>Penalise edges far away from center</li>
+
+		<li>S-T cut seperates object from background</li>
+	</ul>
+</section>
+
+<section class="slide">
+	<h2>Min Cuts</h2>
+	<ul>
+		<li>Works pretty well.</li>
+		<li>Results dependent on correct parameters.</li>
+		<li>Working on an I'm provement.</li>
+	</ul>
+	<img src="pics/mincut.png" class="slide"/>
+</section>
+
+<section class="slide">
+	<h1>Questions?</h1>
+</section>
+
 
 <!-- End slides. -->
 

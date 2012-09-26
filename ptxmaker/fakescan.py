@@ -50,7 +50,7 @@ def discretise(scan_range, step, object_list):
 
 def factor(num):
 	n = num -1
-	while n > 1:
+	while n > 0:
 		if num%n == 0:
 			return (num/n, n)
 		n = n-1

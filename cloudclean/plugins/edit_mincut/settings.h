@@ -22,7 +22,7 @@ public:
     int kConnectvity();
     float sigma();
     float radius();
-    bool horisontalRadius();
+    bool showGraph();
     float sourceWeight();
 
 private:

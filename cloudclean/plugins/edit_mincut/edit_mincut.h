@@ -19,6 +19,7 @@
 
 #include "../../common/interfaces.h"
 #include "settings.h"
+#include "mincut.h"
 
 class GLArea;
 
@@ -53,6 +54,7 @@ private:
     Settings *                              settings;
 
     int                                     dest_layer;
+    MinCut                                  seg;
 
 };
 

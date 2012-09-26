@@ -49,10 +49,18 @@ public:
 
       typedef boost::graph_traits< mGraph >::in_edge_iterator InEdgeIterator;
 
+      struct gData{
+          std::vector<int> vertices;
+          std::set<std::pair<int, int> > edges;
+          std::vector<float> weights;
+          std::vector<float> capacity;
+      };
 
 public:
     MinCut();
     ~MinCut();
+
+    boost::shared_ptr<gData> getGraphData();
 
     void setInputCloud (PointCloud::Ptr &cloud);
 

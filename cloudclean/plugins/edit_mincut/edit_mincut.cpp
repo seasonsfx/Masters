@@ -34,7 +34,9 @@ EditPlugin::~EditPlugin()
 }
 
 void EditPlugin::paintGL(CloudModel *, GLArea * glarea){
+    if(settings->showGraph()){
 
+    }
 }
 
 bool EditPlugin::mouseDoubleClickEvent  (QMouseEvent *event, CloudModel * cm, GLArea * glarea){
@@ -88,7 +90,6 @@ void EditPlugin::fill(int x, int y, float radius, int source_idx, int dest_idx, 
         source_indices->push_back(idx);
     }
 
-    MinCut seg;
     seg.setInputCloud(cm->cloud);
     seg.setIndices(pcl::IndicesPtr(new std::vector<int>(cm->layerList.layers[source_idx].index)));
 

@@ -25,8 +25,8 @@ float Settings::radius(){
     return ui->radius->value();
 }
 
-bool Settings::horisontalRadius(){
-    return ui->isHorisonal->isChecked();
+bool Settings::showGraph(){
+    return ui->showGraph->isChecked();
 }
 
 float Settings::sourceWeight(){

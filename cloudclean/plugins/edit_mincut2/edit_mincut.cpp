@@ -225,14 +225,6 @@ void EditPlugin::segment(int source_idx, int dest_idx, CloudModel *cm, GLArea * 
 
     assert(clusters.size() != 0);
 
-    // blank source & dest
-    /*
-    for(int i = 0; i < cm->cloud->points.size(); i++){
-        cm->layerList.layers[source_idx].index[i] = -1;
-        cm->layerList.layers[dest_idx].index[i] = -1;
-    }
-    */
-
     // put clusters into layer
     for(int idx : clusters[0].indices){
         cm->layerList.layers[source_idx].index[idx] = idx;

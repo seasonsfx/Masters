@@ -56,6 +56,21 @@ MinCut::~MinCut ()
   indices_.reset ();
 }
 
+boost::shared_ptr<gData> MinCut::getGraphData(){
+    boost::shared_ptr<gData> data = boost::shared_ptr<gData>(new gData());
+
+    std::pair<VertexIterator, VertexIterator> vp;
+    for (vp = vertices(g); vp.first != vp.second; ++vp.first){
+        data->vertices.push_back();
+    }
+
+    (*capacity_)[reverse_edge];
+
+    ResidualCapacityMap residual_capacity = boost::get (boost::edge_residual_capacity, *graph_);
+
+    return data;
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
  void
 MinCut::setInputCloud (PointCloud::Ptr &cloud)

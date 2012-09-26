@@ -20,6 +20,7 @@
 #include "../../common/interfaces.h"
 #include "lasso.h"
 #include "settings.h"
+#include "mincut.h"
 
 class GLArea;
 
@@ -56,6 +57,8 @@ private:
     Lasso                                   lasso;
     bool                                    lasso_active;
     Eigen::Vector2f                         normalised_mouse_loc;
+
+
 };
 
 #endif // EDITPLUGIN_H

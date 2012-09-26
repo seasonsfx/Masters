@@ -76,9 +76,9 @@
        </widget>
       </item>
       <item row="5" column="1">
-       <widget class="QCheckBox" name="isHorisonal">
+       <widget class="QCheckBox" name="showGraph">
         <property name="text">
-         <string>Horisonal</string>
+         <string>Show graph</string>
         </property>
        </widget>
       </item>

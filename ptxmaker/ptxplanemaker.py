@@ -4,19 +4,20 @@ EPSILON = 0.01
 
 def drange(start, stop, step):
 	r = start
-	while r < stop:
+	while stop - r > 0.000001:
 		yield r
 		r += step
 
 # define region
 # define density
 class sphere(object):
-	def __init__(self, rad):
+	def __init__(self, rad, x, y):
 		self.radius = rad;
+		self.x = x
+		self.y = y
 
-	def line_intercept(self, source, dir):
-		is_on_surface = abs(x**2 + y**2 + z**2 - self.radius**2) < error
-		#is_on_surface = x**2 + y**2 + z**2 < self.radius**2
+	def has_support(self, x, y, error):
+		is_on_surface = abs((x-self.x)**2 + (y-self.y)**2) < self.radius**2
 		return is_on_surface
 
 
@@ -38,19 +39,27 @@ def toFile(points, dim,  filename):
 
 def discretise(scan_range, step, object_list):
 	points = []
+	count = 0
 	for x in drange(scan_range['x'][0], scan_range['x'][1], step):
+		count = count + 1
+
 		for y in drange(scan_range['y'][0], scan_range['y'][1], step):
-			for z in drange(scan_range['z'][0], scan_range['z'][1], step):
-				for obj in object_list:
-					if(obj.has_support(x, y, z, EPSILON)):
-						points.append((round(x,4), round(y,4), round(z,4)))
-						break # one object is enough
+			
+			support = False
+			for obj in object_list:
+				if(obj.has_support(x, y, EPSILON)):
+					points.append((round(x,4), round(y,4), 0, 0.5))
+					support = True
+					break # one object is enough
+			if not support:
+				points.append((0, 0, 0, 0.5))
+	#print count
 
 	return points
 
 def factor(num):
 	n = num -1
-	while n > 0:
+	while n > 1:
 		if num%n == 0:
 			return (num/n, n)
 		n = n-1
@@ -59,13 +68,12 @@ def factor(num):
 def main():
 	points = []
 	scan_range = {
-					'x': [-4.0, 4.0],
-					'y': [-4.0, 4.0],
-					'z': [-4.0, 4.0],
+					'x': [0.0, 4.0],
+					'y': [0.0, 4.0],
 				}
 
-	object_list = [sphere(4.0)]
-	step = 0.05
+	object_list = [sphere(1, 1, 2), sphere(1, 3, 2)]
+	step = 0.1
 
 	points = discretise(scan_range, step, object_list)
 
@@ -75,7 +83,8 @@ def main():
 
 	assert(n != 0)
 
-	dim =  factor(n)
+	#dim =  factor(n)
+	dim = (int((scan_range['x'][1] - scan_range['x'][0])/step), int((scan_range['y'][1] - scan_range['y'][0])/step) )
 	print dim
 
 	toFile(points, dim,  "out.ptx")

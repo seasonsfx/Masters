@@ -5,8 +5,6 @@
 #include <pcl/search/kdtree.h>
 #include <stdlib.h>
 #include <cmath>
-#include <pcl/features/fpfh.h>
-#include <QDebug>
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -56,6 +54,22 @@ MinCut::~MinCut ()
   edge_marker_.clear ();
   input_.reset ();
   indices_.reset ();
+}
+
+boost::shared_ptr<MinCut::gData> MinCut::getGraphData(){
+    boost::shared_ptr<MinCut::gData> data = boost::shared_ptr<MinCut::gData>(new MinCut::gData());
+
+    std::pair<VertexIterator, VertexIterator> vp;
+    for (vp = vertices(graph_); vp.first != vp.second; ++vp.first){
+        int vertex_idx =
+        data->vertices.push_back();
+    }
+
+    (*capacity_)[reverse_edge];
+
+    ResidualCapacityMap residual_capacity = boost::get (boost::edge_residual_capacity, *graph_);
+
+    return data;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -289,18 +303,6 @@ MinCut::getGraph () const
  bool
 MinCut::buildGraph ()
 {
-
-     // Calculate fpfhs
-     pcl::FPFHEstimation<pcl::PointXYZI, pcl::Normal, pcl::FPFHSignature33> fpfh;
-     fpfh.setInputCloud (input_);
-     fpfh.setInputNormals (normals_);
-     fpfh.setIndices(indices_);
-     pcl::search::KdTree<pcl::PointXYZI>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZI>);
-     fpfh.setSearchMethod (tree);
-     fpfh.setKSearch(14);
-     fpfhs_ = pcl::PointCloud<pcl::FPFHSignature33>::Ptr (new pcl::PointCloud<pcl::FPFHSignature33>());
-     fpfh.compute (*fpfhs_);
-
   int number_of_points = static_cast<int> (input_->points.size ());
   int number_of_indices = static_cast<int> (indices_->size ());
 
@@ -366,7 +368,7 @@ MinCut::buildGraph ()
   for (int i_point = 0; i_point < number_of_indices; i_point++)
   {
     int point_index = (*indices_)[i_point];
-    search_->nearestKSearch (i_point, number_of_neighbours_, neighbours, distances);
+    search_->nearestKSearch (i_point, number_of_neighbours_, neighbours, distances); // is this right?
     for (size_t i_nghbr = 1; i_nghbr < neighbours.size (); i_nghbr++) // WHY skip the first neighbour?
     {
       double weight = calculateBinaryPotential (point_index, neighbours[i_nghbr]);
@@ -471,23 +473,6 @@ MinCut::addEdge (int source, int target, double weight)
   return (true);
 }
 
- inline float euclidianDist(pcl::FPFHSignature33 &a, pcl::FPFHSignature33 &b){
-
-
-     //printf("[");
-
-     float sum = 0;
-     for(int i = 0; i < 33; i++){
-         sum += powf(a.histogram[i] - b.histogram[i], 2);
-         //printf("(%f, %f) ", a.histogram[i], b.histogram[i]);
-     }
-     //printf("]\n");
-
-     //printf("sum: %f, sqrt sum: %f\n", sum, sqrt(sum));
-
-     return sqrt(sum);
- }
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
  double
 MinCut::calculateBinaryPotential (int source, int target) const
@@ -498,13 +483,7 @@ MinCut::calculateBinaryPotential (int source, int target) const
   distance += (input_->points[source].y - input_->points[target].y) * (input_->points[source].y - input_->points[target].y);
   distance += (input_->points[source].z - input_->points[target].z) * (input_->points[source].z - input_->points[target].z);
   distance *= inverse_sigma_;
-
-  // Feature space distace
-  float feature_dist = euclidianDist(fpfhs_->at(source), fpfhs_->at(target));
-  //qDebug("Dist( %f ), FeatureDist( %f )", distance, feature_dist);
-
-
-  weight = exp (-distance*feature_dist);
+  weight = exp (-distance);
 
   return (weight);
 }
@@ -513,7 +492,6 @@ MinCut::calculateBinaryPotential (int source, int target) const
  bool
 MinCut::recalculateUnaryPotentials ()
 {
-
   OutEdgeIterator src_edge_iter;
   OutEdgeIterator src_edge_end;
   std::pair<EdgeDescriptor, bool> sink_edge;
@@ -545,7 +523,6 @@ MinCut::recalculateUnaryPotentials ()
  bool
 MinCut::recalculateBinaryPotentials ()
 {
-
   int number_of_points = static_cast<int> (indices_->size ());
 
   VertexIterator vertex_iter;
@@ -597,7 +574,7 @@ MinCut::assembleLabels (ResidualCapacityMap& residual_capacity)
   labels.resize (input_->points.size (), 0);
   int number_of_indices = static_cast<int> (indices_->size ());
   for (int i_point = 0; i_point < number_of_indices; i_point++)
-    labels[(*indices_)[i_point]] = 1; // assined 1 if in index
+    labels[(*indices_)[i_point]] = 1;
 
   clusters_.clear ();
 

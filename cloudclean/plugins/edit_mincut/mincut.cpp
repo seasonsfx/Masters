@@ -56,11 +56,12 @@ MinCut::~MinCut ()
   indices_.reset ();
 }
 
-boost::shared_ptr<gData> MinCut::getGraphData(){
-    boost::shared_ptr<gData> data = boost::shared_ptr<gData>(new gData());
+boost::shared_ptr<MinCut::gData> MinCut::getGraphData(){
+    boost::shared_ptr<MinCut::gData> data = boost::shared_ptr<MinCut::gData>(new MinCut::gData());
 
     std::pair<VertexIterator, VertexIterator> vp;
-    for (vp = vertices(g); vp.first != vp.second; ++vp.first){
+    for (vp = vertices(graph_); vp.first != vp.second; ++vp.first){
+        int vertex_idx =
         data->vertices.push_back();
     }
 

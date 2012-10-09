@@ -365,11 +365,11 @@ MinCut::buildGraph ()
   search_->setInputCloud (input_, indices_);
   for (int i_point = 0; i_point < number_of_indices; i_point++)
   {
-    int point_index = (*indices_)[i_point];
+    int point_index = (*indices_)[i_point]; // Get index in cloud
     search_->nearestKSearch (i_point, number_of_neighbours_, neighbours, distances);
     for (size_t i_nghbr = 1; i_nghbr < neighbours.size (); i_nghbr++) // WHY skip the first neighbour?
     {
-      double weight = calculateBinaryPotential (point_index, neighbours[i_nghbr]);
+      double weight = calculateBinaryPotential (point_index, neighbours[i_nghbr]); // pass in cloud indices??
       addEdge (point_index, neighbours[i_nghbr], weight);
       addEdge (neighbours[i_nghbr], point_index, weight);
     }
@@ -446,6 +446,7 @@ MinCut::calculateUnaryPotential (int point, double& source_weight, double& sink_
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+ // takes cloud indices
  bool
 MinCut::addEdge (int source, int target, double weight)
 {

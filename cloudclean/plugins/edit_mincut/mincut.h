@@ -7,6 +7,7 @@
 #include <pcl/segmentation/boost.h>
 #include <string>
 #include <set>
+#include <vector>
 
 class MinCut
 {
@@ -53,8 +54,8 @@ public:
           std::vector<int> vertices;
           std::vector<int> vertex_label;
           std::set<std::pair<int, int> > edges;
-          std::vector<int> edge_label;
-          std::vector<float> edge_weights;
+          std::map<std::pair<int, int>, int> edge_label;
+          std::map<std::pair<int, int>, float> edge_weights;
       };
 
 public:
@@ -157,6 +158,10 @@ public:
     /** \brief Returns the colored cloud. Points that belong to the object have the same color. */
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr
     getColoredCloud ();
+
+
+    void
+    getClusters(std::vector <pcl::PointIndices> &clusters);
 
     protected:
 

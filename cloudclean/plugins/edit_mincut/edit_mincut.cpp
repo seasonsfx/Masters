@@ -34,7 +34,12 @@ EditPlugin::~EditPlugin()
 }
 
 void EditPlugin::paintGL(CloudModel *, GLArea * glarea){
-    if(settings->showGraph()){
+    if(settings->showGraph() && *gdata){
+        // paint all points
+            // set up vertex buffer
+            // copy to vertex buffer
+            // draw
+        // paint all edges
 
     }
 }
@@ -85,13 +90,16 @@ void EditPlugin::fill(int x, int y, float radius, int source_idx, int dest_idx, 
     // Need to get rid of the -1 from the indices
     pcl::IndicesPtr source_indices(new std::vector<int>);
     for(int idx : cm->layerList.layers[source_idx].index){
-        if(idx = -1)
+        if(idx == -1)
             continue;
         source_indices->push_back(idx);
     }
 
+    assert(source_indices->size() != 0 && "Source indices empty");
+
     seg.setInputCloud(cm->cloud);
-    seg.setIndices(pcl::IndicesPtr(new std::vector<int>(cm->layerList.layers[source_idx].index)));
+    seg.setIndices(source_indices);
+    //seg.setIndices(pcl::IndicesPtr(new std::vector<int>(cm->layerList.layers[source_idx].index)));
 
     pcl::PointCloud<pcl::PointXYZI>::Ptr foreground_points(new pcl::PointCloud<pcl::PointXYZI> ());
     foreground_points->points.push_back(p);
@@ -108,6 +116,9 @@ void EditPlugin::fill(int x, int y, float radius, int source_idx, int dest_idx, 
     seg.extract (clusters);
 
     assert(clusters.size() != 0);
+
+    // set viz data
+    gdata = seg.getGraphData();
 
     // blank source & dest
     for(int i = 0; i < cm->cloud->points.size(); i++){

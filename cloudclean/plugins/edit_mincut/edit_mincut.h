@@ -55,6 +55,7 @@ private:
 
     int                                     dest_layer;
     MinCut                                  seg;
+    boost::shared_ptr<MinCut::gData>        gdata;
 
 };
 

@@ -59,15 +59,68 @@ MinCut::~MinCut ()
 boost::shared_ptr<MinCut::gData> MinCut::getGraphData(){
     boost::shared_ptr<MinCut::gData> data = boost::shared_ptr<MinCut::gData>(new MinCut::gData());
 
-    std::pair<VertexIterator, VertexIterator> vp;
-    for (vp = vertices(graph_); vp.first != vp.second; ++vp.first){
-        int vertex_idx =
-        data->vertices.push_back();
+    // Finds all points in index
+    std::vector<int> labels;
+    labels.resize (input_->points.size (), 0);
+    int number_of_indices = static_cast<int> (indices_->size ());
+    for (int i_point = 0; i_point < number_of_indices; i_point++)
+      labels[(*indices_)[i_point]] = 1;
+
+    // Should be set after running extract
+    ResidualCapacityMap residual_capacity = boost::get (boost::edge_residual_capacity, *graph_);
+
+    // Set vertices
+    OutEdgeIterator edge_iter, edge_end;
+    for ( boost::tie (edge_iter, edge_end) = boost::out_edges (source_, *graph_); edge_iter != edge_end; edge_iter++ )
+    {
+      // set indices
+      data->vertices.push_back(edge_iter->m_target);
+
+      // set label
+      if (labels[edge_iter->m_target] == 1)
+      {
+        if (residual_capacity[*edge_iter] > epsilon_)
+          data->vertex_label.push_back(0);
+        else
+          data->vertex_label.push_back(0);
+      }
     }
 
-    (*capacity_)[reverse_edge];
+    // Set up edges
+    for(int idx : data->vertices){
+        // For every neighbour edge
+        for ( boost::tie (edge_iter, edge_end) = boost::out_edges (idx, *graph_); edge_iter != edge_end; edge_iter++ ) {
+            VertexDescriptor target = edge_iter->m_target;
+            if(target == source_ || target == sink_)
+                continue;
 
-    ResidualCapacityMap residual_capacity = boost::get (boost::edge_residual_capacity, *graph_);
+            // Add edge
+            int a = idx, b = static_cast<int>(target);
+            assert(a !=b);
+            if(a > b){ int tmp = a; a = b; b = tmp;}
+            std::pair<int, int> edge = std::make_pair(a, b);
+            data->edges.insert(edge);
+
+            // Label edge
+            int label = -1;
+            if(data->vertex_label[idx] == data->vertex_label[static_cast<int>(target)]){
+                if(data->vertex_label[idx] == 0)
+                    label = 0;
+                else
+                    label = 1;
+            }
+            else{
+                label = 2; // bridging between classes
+            }
+            data->edge_label.insert(std::make_pair(edge, label));
+
+            // Set weight
+            float weight = residual_capacity[*edge_iter];
+            data->edge_weights.insert(std::make_pair(edge, weight));
+
+            // what about the flow?
+        }
+    }
 
     return data;
 }
@@ -276,8 +329,9 @@ MinCut::extract (std::vector <pcl::PointIndices>& clusters)
   // Copy current clusters to input ref?? WHY?
   if ( graph_is_valid_ && unary_potentials_are_valid_ && binary_potentials_are_valid_ )
   {
-    clusters.reserve (clusters_.size ());
-    std::copy (clusters_.begin (), clusters_.end (), std::back_inserter (clusters));
+    //clusters.reserve (clusters_.size ());
+    //std::copy (clusters_.begin (), clusters_.end (), std::back_inserter (clusters));
+    getClusters(clusters);
     deinitCompute ();
     return;
   }
@@ -448,6 +502,7 @@ MinCut::calculateUnaryPotential (int point, double& source_weight, double& sink_
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+ // input cloud indices
  bool
 MinCut::addEdge (int source, int target, double weight)
 {
@@ -592,6 +647,21 @@ MinCut::assembleLabels (ResidualCapacityMap& residual_capacity)
         clusters_[0].indices.push_back (static_cast<int> (edge_iter->m_target));
     }
   }
+}
+
+void
+MinCut::getClusters(std::vector <pcl::PointIndices> & clusters){
+    // assuming that clusters_ contain indexes in the graph
+    // converting them into cloud indices
+    pcl::PointIndices segment;
+    clusters.resize (2, segment);
+    for(int i : clusters_[0].indices){
+        clusters[0].indices.push_back(i);
+    }
+
+    for(int i : clusters_[1].indices){
+        clusters[1].indices.push_back(i);
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

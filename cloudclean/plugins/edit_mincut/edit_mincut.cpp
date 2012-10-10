@@ -18,8 +18,10 @@
 #include "mincut.h"
 
 
-EditPlugin::EditPlugin()
+EditPlugin::EditPlugin():
+    vertex_buffer(QGLBuffer::IndexBuffer), edge_buffer(QGLBuffer::IndexBuffer)
 {
+    gdata_dirty = true;
     settings = new Settings();
     editSample = new QAction(QIcon(":/images/mincut.svg"), "Min cut", this);
     actionList << editSample;
@@ -33,15 +35,102 @@ EditPlugin::~EditPlugin()
     delete settings;
 }
 
-void EditPlugin::paintGL(CloudModel *, GLArea * glarea){
-    if(settings->showGraph() && *gdata){
-        // paint all points
-            // set up vertex buffer
-            // copy to vertex buffer
-            // draw
-        // paint all edges
+void EditPlugin::paintGL(CloudModel * cm, GLArea * glarea){
+    if(!settings->showGraph())
+        return;
+
+    if(!vertex_buffer.isCreated()){
+        // Perpare shader
+        assert(glarea->prepareShaderProgram(viz_shader,
+                                            ":/shaders/points.vert",
+                                            ":/shaders/points.frag",
+                                            "" ) );
+
+        if ( !viz_shader.bind() ) {
+            qWarning() << "Could not bind shader program to context";
+            assert(false);
+        }
+        viz_shader.enableAttributeArray( "vertex" );
+        viz_shader.setAttributeBuffer( "vertex", GL_FLOAT, 0, 4 );
+        glUniformMatrix4fv(viz_shader.uniformLocation("modelToCameraMatrix"),
+                           1, GL_FALSE, glarea->camera.modelviewMatrix().data());
+        glUniformMatrix4fv(viz_shader.uniformLocation("cameraToClipMatrix"),
+                           1, GL_FALSE, glarea->camera.projectionMatrix().data());
+        viz_shader.release();
+        edge_buffer.create();
+        vertex_buffer.create();
+    }
+
+
+    // load data
+    if(gdata_dirty){
+        qDebug("loading gdata");
+        gdata = seg.getGraphData();
+
+        // create buffers
+
+        edge_buffer.bind();
+        size_t edge_size = 2 * sizeof(int);
+        size_t edge_buffer_size = gdata->edges.size() * edge_size;
+        edge_buffer.allocate(edge_buffer_size);
+        for(int i = 0; i < gdata->edges.size(); i++){
+            std::pair<int, int> & edge = gdata->edges[i];
+            int data[] = {edge.first, edge.second};
+            edge_buffer.write(i*edge_size, data, edge_size);
+        }
+        edge_buffer.release();
+
+
+        vertex_buffer.bind();
+        size_t vertex_buffer_size = gdata->vertices.size() * sizeof(int);
+        vertex_buffer.allocate(vertex_buffer_size);
+        for(int i = 0; i < gdata->vertices.size(); i++){
+            int data = gdata->vertices[i];
+            vertex_buffer.write(i*edge_size, &data, sizeof(int));
+        }
+        vertex_buffer.release();
+
+        gdata_dirty = false;
 
     }
+
+    // paint
+
+    viz_shader.bind();
+    edge_buffer.bind();
+    cm->point_buffer.bind();
+    viz_shader.enableAttributeArray( "vertex" );
+    viz_shader.setAttributeBuffer( "vertex", GL_FLOAT, 0, 4 );
+    glUniformMatrix4fv(viz_shader.uniformLocation("modelToCameraMatrix"),
+                       1, GL_FALSE, glarea->camera.modelviewMatrix().data());
+    glUniformMatrix4fv(viz_shader.uniformLocation("cameraToClipMatrix"),
+                       1, GL_FALSE, glarea->camera.projectionMatrix().data());
+
+
+    // Draw edges
+    for(int i = 0; i < gdata->edges.size(); i++){
+        float colour[3] = {0,0,0};
+        if(gdata->edge_label[i] == 0)
+            colour[0] = 1; // red
+        else if(gdata->edge_label[i] == 1)
+            colour[2] = 1; // blue
+        else if(gdata->edge_label[i] == 2)
+            colour[1] = 1; // green
+
+        glUniform3fv(viz_shader.uniformLocation("elColour"), 1, colour);
+        glLineWidth(gdata->edge_weights[i]);
+        glDrawRangeElements(GL_LINES, i*2, i*2+1, 2, GL_UNSIGNED_INT, 0);
+    }
+
+    edge_buffer.release();
+    cm->point_buffer.release();
+    viz_shader.release();
+
+    // paint all points
+        // set up vertex buffer
+        // copy to vertex buffer
+        // draw
+    // paint all edges
 }
 
 bool EditPlugin::mouseDoubleClickEvent  (QMouseEvent *event, CloudModel * cm, GLArea * glarea){
@@ -79,7 +168,7 @@ inline float angularSimilarity(Eigen::Vector3f &a, Eigen::Vector3f &b){
 }
 
 void EditPlugin::fill(int x, int y, float radius, int source_idx, int dest_idx, CloudModel *cm, GLArea * glarea){
-
+    qDebug("running min cut");
     int index = glarea->pp->pick(x, y, source_idx);
 
     if(index == -1)
@@ -117,8 +206,7 @@ void EditPlugin::fill(int x, int y, float radius, int source_idx, int dest_idx, 
 
     assert(clusters.size() != 0);
 
-    // set viz data
-    gdata = seg.getGraphData();
+    gdata_dirty = true;
 
     // blank source & dest
     for(int i = 0; i < cm->cloud->points.size(); i++){

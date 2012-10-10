@@ -5,6 +5,7 @@
 #include <pcl/search/kdtree.h>
 #include <stdlib.h>
 #include <cmath>
+#include <QDebug>
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -57,6 +58,7 @@ MinCut::~MinCut ()
 }
 
 boost::shared_ptr<MinCut::gData> MinCut::getGraphData(){
+    qDebug("get graph data called!");
     boost::shared_ptr<MinCut::gData> data = boost::shared_ptr<MinCut::gData>(new MinCut::gData());
 
     // Finds all points in index
@@ -86,7 +88,12 @@ boost::shared_ptr<MinCut::gData> MinCut::getGraphData(){
       }
     }
 
+
     // Set up edges
+
+    // checks for duplicates
+    std::set<std::pair<int, int> > edge_marker;
+
     for(int idx : data->vertices){
         // For every neighbour edge
         for ( boost::tie (edge_iter, edge_end) = boost::out_edges (idx, *graph_); edge_iter != edge_end; edge_iter++ ) {
@@ -94,14 +101,24 @@ boost::shared_ptr<MinCut::gData> MinCut::getGraphData(){
             if(target == source_ || target == sink_)
                 continue;
 
-            // Add edge
+            // Set up edge
             int a = idx, b = static_cast<int>(target);
             assert(a !=b);
             if(a > b){ int tmp = a; a = b; b = tmp;}
             std::pair<int, int> edge = std::make_pair(a, b);
-            data->edges.insert(edge);
+            //bool inserted;
+            //std::set<int, int>::iterator iter;
+            //boost::tie (iter, inserted) = edge_marker.insert(edge);
+            auto retpair = edge_marker.insert(edge);
 
-            // Label edge
+            // if not inserted
+            if(!retpair.second)
+                continue;
+
+            // Add edge
+            data->edges.push_back(edge);
+
+            // Determine label
             int label = -1;
             if(data->vertex_label[idx] == data->vertex_label[static_cast<int>(target)]){
                 if(data->vertex_label[idx] == 0)
@@ -112,11 +129,13 @@ boost::shared_ptr<MinCut::gData> MinCut::getGraphData(){
             else{
                 label = 2; // bridging between classes
             }
-            data->edge_label.insert(std::make_pair(edge, label));
+
+            // Set label
+            data->edge_label.push_back(label);
 
             // Set weight
             float weight = residual_capacity[*edge_iter];
-            data->edge_weights.insert(std::make_pair(edge, weight));
+            data->edge_weights.push_back(weight);
 
             // what about the flow?
         }
@@ -330,8 +349,8 @@ MinCut::extract (std::vector <pcl::PointIndices>& clusters)
   if ( graph_is_valid_ && unary_potentials_are_valid_ && binary_potentials_are_valid_ )
   {
     //clusters.reserve (clusters_.size ());
-    //std::copy (clusters_.begin (), clusters_.end (), std::back_inserter (clusters));
-    getClusters(clusters);
+    std::copy (clusters_.begin (), clusters_.end (), std::back_inserter (clusters));
+    //getClusters(clusters);
     deinitCompute ();
     return;
   }

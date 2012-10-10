@@ -53,9 +53,9 @@ public:
       struct gData{
           std::vector<int> vertices;
           std::vector<int> vertex_label;
-          std::set<std::pair<int, int> > edges;
-          std::map<std::pair<int, int>, int> edge_label;
-          std::map<std::pair<int, int>, float> edge_weights;
+          std::vector<std::pair<int, int> > edges;
+          std::vector<int> edge_label;
+          std::vector<float> edge_weights;
       };
 
 public:

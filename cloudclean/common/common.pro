@@ -6,7 +6,8 @@ HEADERS += \
     interfaces.h \
     utilities.h \
 
-SOURCES+=
+SOURCES+= \
+    utilities.cpp
     #../cloudclean/cloudmodel.cpp \
     #../cloudclean/glarea.cpp \
 

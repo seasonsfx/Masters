@@ -6,6 +6,7 @@
 #include <QObject>
 #include <QAction>
 #include <QGLShaderProgram>
+#include <QGLBuffer>
 
 #include <Eigen/Dense>
 
@@ -33,7 +34,7 @@ public:
 
     bool StartEdit(QAction *action, CloudModel * cm, GLArea * glarea);
     bool EndEdit(CloudModel * cm, GLArea * glarea);
-    void paintGL(CloudModel *, GLArea *glarea);
+    void paintGL(CloudModel * cm, GLArea *glarea);
     bool mouseDoubleClickEvent  (QMouseEvent *event, CloudModel * cm, GLArea * glarea);
     bool mousePressEvent  (QMouseEvent *event, CloudModel *, GLArea * glarea);
     bool mouseMoveEvent   (QMouseEvent *event, CloudModel *, GLArea * glarea);
@@ -55,7 +56,13 @@ private:
 
     int                                     dest_layer;
     MinCut                                  seg;
+
+    // Viz data
     boost::shared_ptr<MinCut::gData>        gdata;
+    bool                                    gdata_dirty;
+    QGLBuffer                               edge_buffer;
+    QGLBuffer                               vertex_buffer;
+    QGLShaderProgram                        viz_shader;
 
 };
 

@@ -66,7 +66,6 @@ private:
     QFont qFont;
 
     QGLFormat                               glFormat;
-    QGLShaderProgram                        point_shader;
 
     int                                     start_move_x;
     int                                     start_move_y;
@@ -77,6 +76,8 @@ private:
     int                                     point_size;
 
 public:
+    QGLShaderProgram                        point_shader;
+
     cl_platform_id                          platform;
     cl_device_id                            device;
     cl_context                              context;

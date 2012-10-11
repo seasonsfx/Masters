@@ -97,18 +97,53 @@ void EditPlugin::paintGL(CloudModel * cm, GLArea * glarea){
     // paint
 
     viz_shader.bind();
-    edge_buffer.bind();
-    cm->point_buffer.bind();
-    viz_shader.enableAttributeArray( "vertex" );
-    viz_shader.setAttributeBuffer( "vertex", GL_FLOAT, 0, 4 );
     glUniformMatrix4fv(viz_shader.uniformLocation("modelToCameraMatrix"),
                        1, GL_FALSE, glarea->camera.modelviewMatrix().data());
+    glError("edit cut 1");
     glUniformMatrix4fv(viz_shader.uniformLocation("cameraToClipMatrix"),
                        1, GL_FALSE, glarea->camera.projectionMatrix().data());
+    glError("edit cut 2");
+
+
+    // enable attribur in shader
+    viz_shader.enableAttributeArray( "vertex" );
+    // bind the buffer to be used with this attribute
+    cm->point_buffer.bind();
+    // specify how to interpret buffer
+    viz_shader.setAttributeBuffer( "vertex", GL_FLOAT, 0, 4 );
+    // this should be done for all attributes
+
+    float colour[3] = {1,0,0};
+    glUniform3fv(viz_shader.uniformLocation("elColour"), 1, colour);
+
+    glLineWidth(1.0);
+    edge_buffer.bind();
+    glDrawElements(GL_LINES, gdata->edges.size(), GL_UNSIGNED_INT, 0);
+    glError("edit cut 4");
+
+
+    // Draw test line
+    /*QGLBuffer myBuff;
+    myBuff.create();
+    myBuff.allocate(sizeof(float)*8);
+    float data[] = {
+            0, 0, 0, 0,
+            1, 1, 1, 1
+    };
+    myBuff.write(0,data,sizeof(float)*8);
+    myBuff.bind();
+    viz_shader.enableAttributeArray( "vertex" );
+    viz_shader.setAttributeBuffer( "vertex", GL_FLOAT, 0, 4 );
+    glDrawArrays(GL_LINES, 0, 2);
+    myBuff.release();
+    */
+
 
 
     // Draw edges
-    for(int i = 0; i < gdata->edges.size(); i++){
+
+
+    /*for(int i = 0; i < gdata->edges.size(); i++){
         float colour[3] = {0,0,0};
         if(gdata->edge_label[i] == 0)
             colour[0] = 1; // red
@@ -118,13 +153,17 @@ void EditPlugin::paintGL(CloudModel * cm, GLArea * glarea){
             colour[1] = 1; // green
 
         glUniform3fv(viz_shader.uniformLocation("elColour"), 1, colour);
-        glLineWidth(gdata->edge_weights[i]);
+        //glLineWidth(gdata->edge_weights[i]);
+        glLineWidth(1.0);
         glDrawRangeElements(GL_LINES, i*2, i*2+1, 2, GL_UNSIGNED_INT, 0);
+        glError("edit cut 3");
     }
+    */
 
     edge_buffer.release();
     cm->point_buffer.release();
     viz_shader.release();
+    glError("edit cut 4");
 
     // paint all points
         // set up vertex buffer

@@ -118,6 +118,8 @@ boost::shared_ptr<MinCut::gData> MinCut::getGraphData(){
             // Add edge
             data->edges.push_back(edge);
 
+            //qDebug("edge(%d, %d)", edge.first, edge.second);
+
             // Determine label
             int label = -1;
             if(data->vertex_label[idx] == data->vertex_label[static_cast<int>(target)]){

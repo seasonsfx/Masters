@@ -4,15 +4,13 @@ TARGET = edit_mincut
 HEADERS += \
     edit_mincut.h \
     settings.h \
-    mincut.h \
-    mincut_stoer.h
+    mincut.h
 
 QMAKE_CXXFLAGS += -DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET
 
 SOURCES += \
     edit_mincut.cpp \
     settings.cpp \
-    mincut_stoer.cpp \
     mincut.cpp
 
 INCLUDEPATH += \

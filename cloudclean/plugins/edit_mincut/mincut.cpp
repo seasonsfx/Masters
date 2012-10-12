@@ -61,30 +61,34 @@ boost::shared_ptr<MinCut::gData> MinCut::getGraphData(){
     qDebug("get graph data called!");
     boost::shared_ptr<MinCut::gData> data = boost::shared_ptr<MinCut::gData>(new MinCut::gData());
 
-    // Finds all points in index
+    // Finds all points that are indexed
     std::vector<int> labels;
     labels.resize (input_->points.size (), 0);
     int number_of_indices = static_cast<int> (indices_->size ());
     for (int i_point = 0; i_point < number_of_indices; i_point++)
-      labels[(*indices_)[i_point]] = 1;
+        labels[(*indices_)[i_point]] = 1;
 
-    // Should be set after running extract
+    // Note: Only valid after extract was run
     ResidualCapacityMap residual_capacity = boost::get (boost::edge_residual_capacity, *graph_);
+
+    // temporary vertices
+    std::vector<int> tmp_vertices;
+    std::vector<int> tmp_labels;
 
     // Set vertices
     OutEdgeIterator edge_iter, edge_end;
     for ( boost::tie (edge_iter, edge_end) = boost::out_edges (source_, *graph_); edge_iter != edge_end; edge_iter++ )
     {
-      // set indices
-      data->vertices.push_back(edge_iter->m_target);
-
-      // set label
-      if (labels[edge_iter->m_target] == 1)
-      {
-        if (residual_capacity[*edge_iter] > epsilon_)
-          data->vertex_label.push_back(0);
-        else
-          data->vertex_label.push_back(0);
+      if (labels[edge_iter->m_target] == 1){
+        if (residual_capacity[*edge_iter] > epsilon_){
+            data->source_vertices.push_back(edge_iter->m_target);
+            tmp_labels.push_back(0);
+        }
+        else{
+            data->sink_vertices.push_back(edge_iter->m_target);
+            tmp_labels.push_back(1);
+        }
+        tmp_vertices.push_back(edge_iter->m_target);
       }
     }
 
@@ -94,7 +98,7 @@ boost::shared_ptr<MinCut::gData> MinCut::getGraphData(){
     // checks for duplicates
     std::set<std::pair<int, int> > edge_marker;
 
-    for(int idx : data->vertices){
+    for(int idx : tmp_vertices){
         // For every neighbour edge
         for ( boost::tie (edge_iter, edge_end) = boost::out_edges (idx, *graph_); edge_iter != edge_end; edge_iter++ ) {
             VertexDescriptor target = edge_iter->m_target;
@@ -106,38 +110,29 @@ boost::shared_ptr<MinCut::gData> MinCut::getGraphData(){
             assert(a !=b);
             if(a > b){ int tmp = a; a = b; b = tmp;}
             std::pair<int, int> edge = std::make_pair(a, b);
-            //bool inserted;
-            //std::set<int, int>::iterator iter;
-            //boost::tie (iter, inserted) = edge_marker.insert(edge);
             auto retpair = edge_marker.insert(edge);
 
-            // if not inserted
+            // Continue the egde was previously inserted
             if(!retpair.second)
-                continue;
+                continue;            
 
-            // Add edge
-            data->edges.push_back(edge);
-
-            //qDebug("edge(%d, %d)", edge.first, edge.second);
+            float weight = residual_capacity[*edge_iter];
 
             // Determine label
-            int label = -1;
-            if(data->vertex_label[idx] == data->vertex_label[static_cast<int>(target)]){
-                if(data->vertex_label[idx] == 0)
-                    label = 0;
-                else
-                    label = 1;
+            if(tmp_labels[idx] == tmp_labels[static_cast<int>(target)]){
+                if(tmp_labels[idx] == 0){
+                    data->source_edges.push_back(edge);
+                    data->source_edge_weights.push_back(weight);
+                }
+                else{
+                    data->sink_edges.push_back(edge);
+                    data->sink_edge_weights.push_back(weight);
+                }
             }
             else{
-                label = 2; // bridging between classes
+                data->bridge_edges.push_back(edge);
+                data->bridge_edge_weights.push_back(weight);
             }
-
-            // Set label
-            data->edge_label.push_back(label);
-
-            // Set weight
-            float weight = residual_capacity[*edge_iter];
-            data->edge_weights.push_back(weight);
 
             // what about the flow?
         }

@@ -19,7 +19,11 @@
 
 
 EditPlugin::EditPlugin():
-    vertex_buffer(QGLBuffer::IndexBuffer), edge_buffer(QGLBuffer::IndexBuffer)
+    source_vertex_buffer(QGLBuffer::IndexBuffer),
+    sink_vertex_buffer(QGLBuffer::IndexBuffer),
+    source_edge_buffer(QGLBuffer::IndexBuffer),
+    sink_edge_buffer(QGLBuffer::IndexBuffer),
+    bridge_edge_buffer(QGLBuffer::IndexBuffer)
 {
     gdata_dirty = true;
     settings = new Settings();
@@ -35,17 +39,46 @@ EditPlugin::~EditPlugin()
     delete settings;
 }
 
+inline void edgesToBuffer(std::vector<std::pair<int, int> > & edges,
+                     QGLBuffer & buff){
+
+    // create buffers
+    buff.bind();
+    size_t edge_size = 2 * sizeof(int);
+    size_t edge_buffer_size = edges.size() * edge_size;
+    buff.allocate(edge_buffer_size);
+    for(int i = 0; i < edges.size(); i++){
+        std::pair<int, int> & edge = edges[i];
+        int data[] = {edge.first, edge.second};
+        buff.write(i*edge_size, data, edge_size);
+    }
+    buff.release();
+}
+
+inline void verticesToBuffer(std::vector<int> & vertices,
+                     QGLBuffer & buff){
+
+    // create buffers
+    buff.bind();
+    size_t vertex_buffer_size = vertices.size() * sizeof(int);
+    buff.allocate(vertex_buffer_size);
+    for(int i = 0; i < vertices.size(); i++){
+        int data = vertices[i];
+        buff.write(i*sizeof(int), &data, sizeof(int));
+    }
+    buff.release();
+}
+
 void EditPlugin::paintGL(CloudModel * cm, GLArea * glarea){
     if(!settings->showGraph())
         return;
 
-    if(!vertex_buffer.isCreated()){
-        // Perpare shader
+    // Perpare shader
+    if(!viz_shader.isLinked()){
         assert(glarea->prepareShaderProgram(viz_shader,
                                             ":/shaders/points.vert",
                                             ":/shaders/points.frag",
                                             "" ) );
-
         if ( !viz_shader.bind() ) {
             qWarning() << "Could not bind shader program to context";
             assert(false);
@@ -57,38 +90,23 @@ void EditPlugin::paintGL(CloudModel * cm, GLArea * glarea){
         glUniformMatrix4fv(viz_shader.uniformLocation("cameraToClipMatrix"),
                            1, GL_FALSE, glarea->camera.projectionMatrix().data());
         viz_shader.release();
-        edge_buffer.create();
-        vertex_buffer.create();
+        source_edge_buffer.create();
+        sink_edge_buffer.create();
+        bridge_edge_buffer.create();
+        source_vertex_buffer.create();
+        sink_vertex_buffer.create();
     }
-
 
     // load data
     if(gdata_dirty){
         qDebug("loading gdata");
         gdata = seg.getGraphData();
 
-        // create buffers
-
-        edge_buffer.bind();
-        size_t edge_size = 2 * sizeof(int);
-        size_t edge_buffer_size = gdata->edges.size() * edge_size;
-        edge_buffer.allocate(edge_buffer_size);
-        for(int i = 0; i < gdata->edges.size(); i++){
-            std::pair<int, int> & edge = gdata->edges[i];
-            int data[] = {edge.first, edge.second};
-            edge_buffer.write(i*edge_size, data, edge_size);
-        }
-        edge_buffer.release();
-
-
-        vertex_buffer.bind();
-        size_t vertex_buffer_size = gdata->vertices.size() * sizeof(int);
-        vertex_buffer.allocate(vertex_buffer_size);
-        for(int i = 0; i < gdata->vertices.size(); i++){
-            int data = gdata->vertices[i];
-            vertex_buffer.write(i*edge_size, &data, sizeof(int));
-        }
-        vertex_buffer.release();
+        edgesToBuffer(gdata->source_edges, source_edge_buffer);
+        edgesToBuffer(gdata->sink_edges, sink_edge_buffer);
+        edgesToBuffer(gdata->bridge_edges, bridge_edge_buffer);
+        verticesToBuffer(gdata->source_vertices, source_vertex_buffer);
+        verticesToBuffer(gdata->sink_vertices, sink_vertex_buffer);
 
         gdata_dirty = false;
 
@@ -104,7 +122,6 @@ void EditPlugin::paintGL(CloudModel * cm, GLArea * glarea){
                        1, GL_FALSE, glarea->camera.projectionMatrix().data());
     glError("edit cut 2");
 
-
     // enable attribur in shader
     viz_shader.enableAttributeArray( "vertex" );
     // bind the buffer to be used with this attribute
@@ -113,63 +130,28 @@ void EditPlugin::paintGL(CloudModel * cm, GLArea * glarea){
     viz_shader.setAttributeBuffer( "vertex", GL_FLOAT, 0, 4 );
     // this should be done for all attributes
 
-    float colour[3] = {1,0,0};
+    float colour[3] = {1,0,0}; // Red
     glUniform3fv(viz_shader.uniformLocation("elColour"), 1, colour);
-
     glLineWidth(1.0);
-    edge_buffer.bind();
-    glDrawElements(GL_LINES, gdata->edges.size(), GL_UNSIGNED_INT, 0);
-    glError("edit cut 4");
+    source_edge_buffer.bind();
+    glDrawElements(GL_LINES, gdata->source_edges.size(), GL_UNSIGNED_INT, 0);
 
+    colour[0] = 0; colour[1] = 1; // Green
+    glUniform3fv(viz_shader.uniformLocation("elColour"), 1, colour);
+    glLineWidth(1.0);
+    sink_edge_buffer.bind();
+    glDrawElements(GL_LINES, gdata->sink_edges.size(), GL_UNSIGNED_INT, 0);
 
-    // Draw test line
-    /*QGLBuffer myBuff;
-    myBuff.create();
-    myBuff.allocate(sizeof(float)*8);
-    float data[] = {
-            0, 0, 0, 0,
-            1, 1, 1, 1
-    };
-    myBuff.write(0,data,sizeof(float)*8);
-    myBuff.bind();
-    viz_shader.enableAttributeArray( "vertex" );
-    viz_shader.setAttributeBuffer( "vertex", GL_FLOAT, 0, 4 );
-    glDrawArrays(GL_LINES, 0, 2);
-    myBuff.release();
-    */
+    colour[1] = 0; colour[2] = 1; // Blue
+    glUniform3fv(viz_shader.uniformLocation("elColour"), 1, colour);
+    glLineWidth(1.0);
+    bridge_edge_buffer.bind();
+    glDrawElements(GL_LINES, gdata->sink_edges.size(), GL_UNSIGNED_INT, 0);
 
-
-
-    // Draw edges
-
-
-    /*for(int i = 0; i < gdata->edges.size(); i++){
-        float colour[3] = {0,0,0};
-        if(gdata->edge_label[i] == 0)
-            colour[0] = 1; // red
-        else if(gdata->edge_label[i] == 1)
-            colour[2] = 1; // blue
-        else if(gdata->edge_label[i] == 2)
-            colour[1] = 1; // green
-
-        glUniform3fv(viz_shader.uniformLocation("elColour"), 1, colour);
-        //glLineWidth(gdata->edge_weights[i]);
-        glLineWidth(1.0);
-        glDrawRangeElements(GL_LINES, i*2, i*2+1, 2, GL_UNSIGNED_INT, 0);
-        glError("edit cut 3");
-    }
-    */
-
-    edge_buffer.release();
+    bridge_edge_buffer.release();
     cm->point_buffer.release();
     viz_shader.release();
-    glError("edit cut 4");
-
-    // paint all points
-        // set up vertex buffer
-        // copy to vertex buffer
-        // draw
-    // paint all edges
+    glError("edit cut 5");
 }
 
 bool EditPlugin::mouseDoubleClickEvent  (QMouseEvent *event, CloudModel * cm, GLArea * glarea){

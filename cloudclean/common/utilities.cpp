@@ -82,13 +82,13 @@ const char* oclErrorString(cl_int error)
 
 }
 
-void inline clError(const char * msg, cl_int err){
+void clError(const char * msg, cl_int err){
     if(err)
         qWarning() << msg << oclErrorString(err);
 }
 
 
-void inline  glError(const char * msg){
+void glError(const char * msg){
     int err = glGetError();
     if(err){
         printf("%s : %s\n", msg , gluErrorString(err));
@@ -96,7 +96,7 @@ void inline  glError(const char * msg){
 }
 
 
-inline void proj(float* mat, float* point){
+void proj(float* mat, float* point){
 
     float p0[4] = {0.0f, 0.0f, 0.0f, 0.0f};
 

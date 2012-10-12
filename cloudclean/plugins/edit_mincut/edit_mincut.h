@@ -60,8 +60,11 @@ private:
     // Viz data
     boost::shared_ptr<MinCut::gData>        gdata;
     bool                                    gdata_dirty;
-    QGLBuffer                               edge_buffer;
-    QGLBuffer                               vertex_buffer;
+    QGLBuffer                               source_edge_buffer;
+    QGLBuffer                               sink_edge_buffer;
+    QGLBuffer                               bridge_edge_buffer;
+    QGLBuffer                               source_vertex_buffer;
+    QGLBuffer                               sink_vertex_buffer;
     QGLShaderProgram                        viz_shader;
 
 };

@@ -11,10 +11,10 @@
 // *********************************************************************
 const char* oclErrorString(cl_int error);
 
-void inline clError(const char * msg, cl_int err);
+void clError(const char * msg, cl_int err);
 
-void inline  glError(const char * msg);
+void glError(const char * msg);
 
-inline void proj(float* mat, float* point);
+void proj(float* mat, float* point);
 
 #endif // HELPERS_H

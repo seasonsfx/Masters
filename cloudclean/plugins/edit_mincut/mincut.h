@@ -51,11 +51,14 @@ public:
       typedef boost::graph_traits< mGraph >::in_edge_iterator InEdgeIterator;
 
       struct gData{
-          std::vector<int> vertices;
-          std::vector<int> vertex_label;
-          std::vector<std::pair<int, int> > edges;
-          std::vector<int> edge_label;
-          std::vector<float> edge_weights;
+          std::vector<int> source_vertices;
+          std::vector<int> sink_vertices;
+          std::vector<std::pair<int, int> > source_edges;
+          std::vector<std::pair<int, int> > sink_edges;
+          std::vector<std::pair<int, int> > bridge_edges;
+          std::vector<float> source_edge_weights;
+          std::vector<float> sink_edge_weights;
+          std::vector<float> bridge_edge_weights;
       };
 
 public:

@@ -53,7 +53,7 @@ INCLUDEPATH += \
         "/usr/include/eigen3/" \
         "/opt/AMDAPP/include" \
         "/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc" \
-        "/usr/local/lib"
+        "/usr/local/lib" \
 
 LIBS += -lpcl_io \
         -lpcl_common  \
@@ -65,10 +65,8 @@ LIBS += -lpcl_io \
         -lGL \
         -lGLU \
         -lOpenCL \
-        #-lvtkCommon \
-        #-lvtkFiltering \
-        #-lvtkRendering \
-        #-lcommon
+        -L../common \
+        -lcommon
 
 OTHER_FILES += \
     shaders/points.vert \

@@ -3,5 +3,6 @@
         <file>images/mincut.svg</file>
         <file>shader/graph.frag</file>
         <file>shader/graph.vert</file>
+        <file>shader/graph.geom</file>
     </qresource>
 </RCC>

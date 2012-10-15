@@ -78,7 +78,7 @@ void EditPlugin::paintGL(CloudModel * cm, GLArea * glarea){
         assert(glarea->prepareShaderProgram(viz_shader,
                                             ":/shader/graph.vert",
                                             ":/shader/graph.frag",
-                                            "" ) );
+                                            ":/shader/graph.geom" ) );
         if ( !viz_shader.bind() ) {
             qWarning() << "Could not bind shader program to context";
             assert(false);

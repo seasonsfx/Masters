@@ -76,8 +76,8 @@ void EditPlugin::paintGL(CloudModel * cm, GLArea * glarea){
     // Perpare shader
     if(!viz_shader.isLinked()){
         assert(glarea->prepareShaderProgram(viz_shader,
-                                            ":/shaders/points.vert",
-                                            ":/shaders/points.frag",
+                                            ":/shader/graph.vert",
+                                            ":/shader/graph.frag",
                                             "" ) );
         if ( !viz_shader.bind() ) {
             qWarning() << "Could not bind shader program to context";
@@ -90,6 +90,7 @@ void EditPlugin::paintGL(CloudModel * cm, GLArea * glarea){
         glUniformMatrix4fv(viz_shader.uniformLocation("cameraToClipMatrix"),
                            1, GL_FALSE, glarea->camera.projectionMatrix().data());
         viz_shader.release();
+
         source_edge_buffer.create();
         sink_edge_buffer.create();
         bridge_edge_buffer.create();
@@ -134,19 +135,19 @@ void EditPlugin::paintGL(CloudModel * cm, GLArea * glarea){
     glUniform3fv(viz_shader.uniformLocation("elColour"), 1, colour);
     glLineWidth(1.0);
     source_edge_buffer.bind();
-    glDrawElements(GL_LINES, gdata->source_edges.size(), GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_LINES, gdata->source_edges.size()*2, GL_UNSIGNED_INT, 0);
 
     colour[0] = 0; colour[1] = 1; // Green
     glUniform3fv(viz_shader.uniformLocation("elColour"), 1, colour);
     glLineWidth(1.0);
     sink_edge_buffer.bind();
-    glDrawElements(GL_LINES, gdata->sink_edges.size(), GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_LINES, gdata->sink_edges.size()*2, GL_UNSIGNED_INT, 0);
 
     colour[1] = 0; colour[2] = 1; // Blue
     glUniform3fv(viz_shader.uniformLocation("elColour"), 1, colour);
     glLineWidth(1.0);
     bridge_edge_buffer.bind();
-    glDrawElements(GL_LINES, gdata->sink_edges.size(), GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_LINES, gdata->bridge_edges.size()*2, GL_UNSIGNED_INT, 0);
 
     bridge_edge_buffer.release();
     cm->point_buffer.release();

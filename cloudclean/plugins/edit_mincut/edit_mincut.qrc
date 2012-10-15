@@ -1,7 +1,7 @@
 <RCC>
     <qresource prefix="/">
         <file>images/mincut.svg</file>
-        <file>shader/points.frag</file>
-        <file>shader/points.vert</file>
+        <file>shader/graph.frag</file>
+        <file>shader/graph.vert</file>
     </qresource>
 </RCC>

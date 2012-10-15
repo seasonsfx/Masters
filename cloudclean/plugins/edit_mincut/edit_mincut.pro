@@ -8,6 +8,8 @@ HEADERS += \
 
 QMAKE_CXXFLAGS += -DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET
 
+RCC_DIR = shader
+
 SOURCES += \
     edit_mincut.cpp \
     settings.cpp \
@@ -40,3 +42,8 @@ RESOURCES += \
 
 FORMS += \
     settings.ui
+
+OTHER_FILES += \
+    shader/graph.frag \
+    shader/graph.vert \
+    shader/graph.geom

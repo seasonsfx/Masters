@@ -98,6 +98,10 @@ boost::shared_ptr<MinCut::gData> MinCut::getGraphData(){
     // checks for duplicates
     std::set<std::pair<int, int> > edge_marker;
 
+    // Find maximum edge weight
+
+    float max_weight = 0;
+
     for(int idx : tmp_vertices){
         // For every neighbour edge
         for ( boost::tie (edge_iter, edge_end) = boost::out_edges (idx, *graph_); edge_iter != edge_end; edge_iter++ ) {
@@ -116,7 +120,10 @@ boost::shared_ptr<MinCut::gData> MinCut::getGraphData(){
             if(!retpair.second)
                 continue;            
 
-            float weight = residual_capacity[*edge_iter];
+            float weight = residual_capacity[*edge_iter] / max_weight;
+
+            if(weight > max_weight)
+                max_weight = weight;
 
             // Determine label
             if(tmp_labels[idx] == tmp_labels[static_cast<int>(target)]){
@@ -137,6 +144,14 @@ boost::shared_ptr<MinCut::gData> MinCut::getGraphData(){
             // what about the flow?
         }
     }
+
+    // normalise weights
+    for(int i = 0; i < data->source_edge_weights; i++)
+        data->source_edge_weights[i] /= max_weight;
+    for(int i = 0; i < data->sink_edge_weights; i++)
+        data->sink_edge_weights[i] /= max_weight;
+    for(int i = 0; i < data->bridge_edge_weights; i++)
+        data->bridge_edge_weights[i] /= max_weight;
 
     return data;
 }

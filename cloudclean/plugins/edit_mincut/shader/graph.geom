@@ -27,7 +27,7 @@ void main(void)
     colour = vec4(elColour, 1.0f);
     EmitVertex();
 
-    gl_Position = cameraToClipMatrix * modelToCameraMatrix * (start + 0.01 * width_dir);
+    gl_Position = cameraToClipMatrix * modelToCameraMatrix * (start + 0.005 * width_dir);
     colour = vec4(elColour, 1.0f);
     EmitVertex();
 
@@ -37,7 +37,7 @@ void main(void)
     colour = vec4(elColour, 1.0f);
     EmitVertex();
 
-    gl_Position = cameraToClipMatrix * modelToCameraMatrix * (end + 0.01 * width_dir);
+    gl_Position = cameraToClipMatrix * modelToCameraMatrix * (end + 0.005 * width_dir);
     colour = vec4(elColour, 1.0f);
     EmitVertex();
 

@@ -69,6 +69,20 @@ inline void verticesToBuffer(std::vector<int> & vertices,
     buff.release();
 }
 
+inline void weightsToBuffer(std::vector<float> & weights,
+                     QGLBuffer & buff){
+
+    // create buffers
+    buff.bind();
+    size_t vertex_buffer_size = weights.size() * sizeof(float);
+    buff.allocate(vertex_buffer_size);
+    for(int i = 0; i < weights.size(); i++){
+        float data = weights[i];
+        buff.write(i*sizeof(float), &data, sizeof(float));
+    }
+    buff.release();
+}
+
 void EditPlugin::paintGL(CloudModel * cm, GLArea * glarea){
     if(!settings->showGraph())
         return;

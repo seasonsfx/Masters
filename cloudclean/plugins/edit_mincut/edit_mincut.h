@@ -63,6 +63,13 @@ private:
     QGLBuffer                               source_edge_buffer;
     QGLBuffer                               sink_edge_buffer;
     QGLBuffer                               bridge_edge_buffer;
+
+    QGLBuffer                               source_edge_weight_buffer;
+    QGLBuffer                               sink_edge_weight_buffer;
+    QGLBuffer                               bridge_edge_weight_buffer;
+
+    GLuint                                  textures[3];
+
     QGLBuffer                               source_vertex_buffer;
     QGLBuffer                               sink_vertex_buffer;
     QGLShaderProgram                        viz_shader;

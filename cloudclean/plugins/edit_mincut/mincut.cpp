@@ -146,11 +146,11 @@ boost::shared_ptr<MinCut::gData> MinCut::getGraphData(){
     }
 
     // normalise weights
-    for(int i = 0; i < data->source_edge_weights; i++)
+    for(int i = 0; i < data->source_edge_weights.size(); i++)
         data->source_edge_weights[i] /= max_weight;
-    for(int i = 0; i < data->sink_edge_weights; i++)
+    for(int i = 0; i < data->sink_edge_weights.size(); i++)
         data->sink_edge_weights[i] /= max_weight;
-    for(int i = 0; i < data->bridge_edge_weights; i++)
+    for(int i = 0; i < data->bridge_edge_weights.size(); i++)
         data->bridge_edge_weights[i] /= max_weight;
 
     return data;

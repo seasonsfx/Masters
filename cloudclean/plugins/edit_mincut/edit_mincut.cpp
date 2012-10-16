@@ -48,8 +48,8 @@ inline void edgesToBuffer(std::vector<std::pair<int, int> > & edges,
     size_t edge_buffer_size = edges.size() * edge_size;
     buff.allocate(edge_buffer_size);
     for(int i = 0; i < edges.size(); i++){
-        std::pair<int, int> & edge = edges[i];
-        int data[] = {edge.first, edge.second};
+        std::pair<int, int> & edge = edges [i];
+        int data [] = {edge.first, edge.second};
         buff.write(i*edge_size, data, edge_size);
     }
     buff.release();
@@ -63,7 +63,7 @@ inline void verticesToBuffer(std::vector<int> & vertices,
     size_t vertex_buffer_size = vertices.size() * sizeof(int);
     buff.allocate(vertex_buffer_size);
     for(int i = 0; i < vertices.size(); i++){
-        int data = vertices[i];
+        int data = vertices [i];
         buff.write(i*sizeof(int), &data, sizeof(int));
     }
     buff.release();
@@ -77,7 +77,7 @@ inline void weightsToBuffer(std::vector<float> & weights,
     size_t vertex_buffer_size = weights.size() * sizeof(float);
     buff.allocate(vertex_buffer_size);
     for(int i = 0; i < weights.size(); i++){
-        float data = weights[i];
+        float data = weights [i];
         buff.write(i*sizeof(float), &data, sizeof(float));
     }
     buff.release();
@@ -103,6 +103,7 @@ void EditPlugin::paintGL(CloudModel * cm, GLArea * glarea){
                            1, GL_FALSE, glarea->camera.modelviewMatrix().data());
         glUniformMatrix4fv(viz_shader.uniformLocation("cameraToClipMatrix"),
                            1, GL_FALSE, glarea->camera.projectionMatrix().data());
+        glUniform1i(viz_shader.uniformLocation("sampler"), 0);
         viz_shader.release();
 
         source_edge_buffer.create();
@@ -110,6 +111,14 @@ void EditPlugin::paintGL(CloudModel * cm, GLArea * glarea){
         bridge_edge_buffer.create();
         source_vertex_buffer.create();
         sink_vertex_buffer.create();
+
+        source_edge_weight_buffer.create();
+        sink_edge_weight_buffer.create();
+        bridge_edge_weight_buffer.create();
+
+        // Create textures ids
+        glGenTextures(3,textures);
+
     }
 
     // load data
@@ -122,6 +131,10 @@ void EditPlugin::paintGL(CloudModel * cm, GLArea * glarea){
         edgesToBuffer(gdata->bridge_edges, bridge_edge_buffer);
         verticesToBuffer(gdata->source_vertices, source_vertex_buffer);
         verticesToBuffer(gdata->sink_vertices, sink_vertex_buffer);
+
+        weightsToBuffer(gdata->source_edge_weights, source_edge_weight_buffer);
+        weightsToBuffer(gdata->sink_edge_weights, sink_edge_weight_buffer);
+        weightsToBuffer(gdata->bridge_edge_weights, bridge_edge_weight_buffer);
 
         gdata_dirty = false;
 
@@ -145,22 +158,31 @@ void EditPlugin::paintGL(CloudModel * cm, GLArea * glarea){
     viz_shader.setAttributeBuffer( "vertex", GL_FLOAT, 0, 4 );
     // this should be done for all attributes
 
-    float colour[3] = {1,0,0}; // Red
+    float colour [3] = {1,0,0}; // Red
     glUniform3fv(viz_shader.uniformLocation("elColour"), 1, colour);
     glLineWidth(1.0);
     source_edge_buffer.bind();
+    glBindTexture(GL_TEXTURE_BUFFER, textures [0]);
+    glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, source_edge_weight_buffer.bufferId());
+    glBindTexture(GL_TEXTURE_BUFFER, 0);
     glDrawElements(GL_LINES, gdata->source_edges.size()*2, GL_UNSIGNED_INT, 0);
 
-    colour[0] = 0; colour[1] = 1; // Green
+    colour [0] = 0; colour [1] = 1; // Green
     glUniform3fv(viz_shader.uniformLocation("elColour"), 1, colour);
     glLineWidth(1.0);
     sink_edge_buffer.bind();
+    glBindTexture(GL_TEXTURE_BUFFER, textures [0]);
+    glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, source_edge_weight_buffer.bufferId());
+    glBindTexture(GL_TEXTURE_BUFFER, 0);
     glDrawElements(GL_LINES, gdata->sink_edges.size()*2, GL_UNSIGNED_INT, 0);
 
-    colour[1] = 0; colour[2] = 1; // Blue
+    colour [1] = 0; colour [2] = 1; // Blue
     glUniform3fv(viz_shader.uniformLocation("elColour"), 1, colour);
     glLineWidth(1.0);
     bridge_edge_buffer.bind();
+    glBindTexture(GL_TEXTURE_BUFFER, textures [0]);
+    glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, source_edge_weight_buffer.bufferId());
+    glBindTexture(GL_TEXTURE_BUFFER, 0);
     glDrawElements(GL_LINES, gdata->bridge_edges.size()*2, GL_UNSIGNED_INT, 0);
 
     bridge_edge_buffer.release();
@@ -210,11 +232,11 @@ void EditPlugin::fill(int x, int y, float radius, int source_idx, int dest_idx, 
     if(index == -1)
         return;
 
-    pcl::PointXYZI p = cm->cloud->points[index];
+    pcl::PointXYZI p = cm->cloud->points [index];
 
     // Need to get rid of the -1 from the indices
     pcl::IndicesPtr source_indices(new std::vector<int>);
-    for(int idx : cm->layerList.layers[source_idx].index){
+    for(int idx : cm->layerList.layers [source_idx].index){
         if(idx == -1)
             continue;
         source_indices->push_back(idx);
@@ -224,7 +246,7 @@ void EditPlugin::fill(int x, int y, float radius, int source_idx, int dest_idx, 
 
     seg.setInputCloud(cm->cloud);
     seg.setIndices(source_indices);
-    //seg.setIndices(pcl::IndicesPtr(new std::vector<int>(cm->layerList.layers[source_idx].index)));
+    //seg.setIndices(pcl::IndicesPtr(new std::vector<int>(cm->layerList.layers [source_idx].index)));
 
     pcl::PointCloud<pcl::PointXYZI>::Ptr foreground_points(new pcl::PointCloud<pcl::PointXYZI> ());
     foreground_points->points.push_back(p);
@@ -246,24 +268,24 @@ void EditPlugin::fill(int x, int y, float radius, int source_idx, int dest_idx, 
 
     // blank source & dest
     for(int i = 0; i < cm->cloud->points.size(); i++){
-        cm->layerList.layers[source_idx].index[i] = -1;
-        cm->layerList.layers[dest_idx].index[i] = -1;
+        cm->layerList.layers [source_idx].index [i] = -1;
+        cm->layerList.layers [dest_idx].index [i] = -1;
     }
 
 
     // put clusters into layer
-    for(int idx : clusters[0].indices){
+    for(int idx : clusters [0].indices){
         //qDebug("Cluster 0:  %d", idx);
-        cm->layerList.layers[source_idx].index[idx] = idx;
+        cm->layerList.layers [source_idx].index [idx] = idx;
     }
 
-    for(int idx : clusters[1].indices){
+    for(int idx : clusters [1].indices){
         //qDebug("Cluster 1:  %d", idx);
-        cm->layerList.layers[dest_idx].index[idx] = idx;
+        cm->layerList.layers [dest_idx].index [idx] = idx;
     }
 
-    cm->layerList.layers[source_idx].copyToGPU();
-    cm->layerList.layers[dest_idx].copyToGPU();
+    cm->layerList.layers [source_idx].copyToGPU();
+    cm->layerList.layers [dest_idx].copyToGPU();
 
 }
 
@@ -289,7 +311,7 @@ bool EditPlugin::mouseReleaseEvent(QMouseEvent *event, CloudModel * cm, GLArea *
         int source_layer = -1;
 
         for(int i = 0; i < cm->layerList.layers.size(); i++){
-            Layer & l = cm->layerList.layers[i];
+            Layer & l = cm->layerList.layers [i];
             if(l.active && l.visible){
                 source_layer = i;
                 l.sync();;

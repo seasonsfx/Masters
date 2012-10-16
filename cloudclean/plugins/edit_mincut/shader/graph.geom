@@ -3,16 +3,22 @@
 layout (lines) in;
 layout (triangle_strip, max_vertices=4) out;
 
+
 in float line_width[];
 out vec4 colour;
 
+uniform samplerBuffer sampler;
 uniform vec3 elColour;
 uniform mat4 cameraToClipMatrix;
 uniform mat4 modelToCameraMatrix;
 
 void main(void)
 {
-    float width = line_width[0];
+    //float width = line_width[0];
+    float normalised_width = texelFetch(sampler, gl_PrimitiveIDIn).r;
+
+    float width = normalised_width;
+
     vec4 start = gl_in[0].gl_Position;
     vec4 end = gl_in[1].gl_Position;
 
@@ -27,7 +33,7 @@ void main(void)
     colour = vec4(elColour, 1.0f);
     EmitVertex();
 
-    gl_Position = cameraToClipMatrix * modelToCameraMatrix * (start + 0.005 * width_dir);
+    gl_Position = cameraToClipMatrix * modelToCameraMatrix * (start + width * width_dir);
     colour = vec4(elColour, 1.0f);
     EmitVertex();
 
@@ -37,7 +43,7 @@ void main(void)
     colour = vec4(elColour, 1.0f);
     EmitVertex();
 
-    gl_Position = cameraToClipMatrix * modelToCameraMatrix * (end + 0.005 * width_dir);
+    gl_Position = cameraToClipMatrix * modelToCameraMatrix * (end + width * width_dir);
     colour = vec4(elColour, 1.0f);
     EmitVertex();
 

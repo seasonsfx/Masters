@@ -15,7 +15,7 @@ uniform mat4 modelToCameraMatrix;
 void main(void)
 {
     //float width = line_width[0];
-    float normalised_width = texelFetch(sampler, gl_PrimitiveIDIn).r;
+    float normalised_width = texelFetch(sampler, gl_PrimitiveIDIn).x;
 
     float width = normalised_width;
 

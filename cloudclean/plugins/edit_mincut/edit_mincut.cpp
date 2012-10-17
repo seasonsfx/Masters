@@ -164,7 +164,7 @@ void EditPlugin::paintGL(CloudModel * cm, GLArea * glarea){
     source_edge_buffer.bind();
     glBindTexture(GL_TEXTURE_BUFFER, textures [0]);
     glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, source_edge_weight_buffer.bufferId());
-    glBindTexture(GL_TEXTURE_BUFFER, 0);
+    //glBindTexture(GL_TEXTURE_BUFFER, 0);
     glDrawElements(GL_LINES, gdata->source_edges.size()*2, GL_UNSIGNED_INT, 0);
 
     colour [0] = 0; colour [1] = 1; // Green
@@ -172,8 +172,8 @@ void EditPlugin::paintGL(CloudModel * cm, GLArea * glarea){
     glLineWidth(1.0);
     sink_edge_buffer.bind();
     glBindTexture(GL_TEXTURE_BUFFER, textures [0]);
-    glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, source_edge_weight_buffer.bufferId());
-    glBindTexture(GL_TEXTURE_BUFFER, 0);
+    glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, sink_edge_weight_buffer.bufferId());
+    //glBindTexture(GL_TEXTURE_BUFFER, 0);
     glDrawElements(GL_LINES, gdata->sink_edges.size()*2, GL_UNSIGNED_INT, 0);
 
     colour [1] = 0; colour [2] = 1; // Blue
@@ -181,8 +181,8 @@ void EditPlugin::paintGL(CloudModel * cm, GLArea * glarea){
     glLineWidth(1.0);
     bridge_edge_buffer.bind();
     glBindTexture(GL_TEXTURE_BUFFER, textures [0]);
-    glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, source_edge_weight_buffer.bufferId());
-    glBindTexture(GL_TEXTURE_BUFFER, 0);
+    glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, bridge_edge_weight_buffer.bufferId());
+    //glBindTexture(GL_TEXTURE_BUFFER, 0);
     glDrawElements(GL_LINES, gdata->bridge_edges.size()*2, GL_UNSIGNED_INT, 0);
 
     bridge_edge_buffer.release();

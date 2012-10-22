@@ -62,10 +62,7 @@ inline void verticesToBuffer(std::vector<int> & vertices,
     buff.bind();
     size_t vertex_buffer_size = vertices.size() * sizeof(int);
     buff.allocate(vertex_buffer_size);
-    for(int i = 0; i < vertices.size(); i++){
-        int data = vertices [i];
-        buff.write(i*sizeof(int), &data, sizeof(int));
-    }
+    buff.write(0, &vertices[0], vertex_buffer_size);
     buff.release();
 }
 
@@ -76,10 +73,12 @@ inline void weightsToBuffer(std::vector<float> & weights,
     buff.bind();
     size_t vertex_buffer_size = weights.size() * sizeof(float);
     buff.allocate(vertex_buffer_size);
-    for(int i = 0; i < weights.size(); i++){
-        float data = weights [i];
-        buff.write(i*sizeof(float), &data, sizeof(float));
-    }
+
+    /*for(int i = 0; i < weights.size(); i++){
+        qDebug("Weight: %f", weights [i]);
+    }*/
+
+    buff.write(0, &weights[0], vertex_buffer_size);
     buff.release();
 }
 
@@ -163,7 +162,9 @@ void EditPlugin::paintGL(CloudModel * cm, GLArea * glarea){
     glLineWidth(1.0);
     source_edge_buffer.bind();
     glBindTexture(GL_TEXTURE_BUFFER, textures [0]);
+    glError("edit cut 000");
     glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, source_edge_weight_buffer.bufferId());
+    glError("edit cut 111");
     //glBindTexture(GL_TEXTURE_BUFFER, 0);
     glDrawElements(GL_LINES, gdata->source_edges.size()*2, GL_UNSIGNED_INT, 0);
 

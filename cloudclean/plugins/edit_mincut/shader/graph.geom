@@ -16,8 +16,9 @@ void main(void)
 {
     //float width = line_width[0];
     float normalised_width = texelFetch(sampler, gl_PrimitiveIDIn).x;
+    //float normalised_width = texelFetch(sampler, 0).x;
 
-    float width = normalised_width;
+    float width = normalised_width * 0.01;
 
     vec4 start = gl_in[0].gl_Position;
     vec4 end = gl_in[1].gl_Position;

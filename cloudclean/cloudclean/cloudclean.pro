@@ -25,7 +25,8 @@ SOURCES += \
     toolbox.cpp \
     camera.cpp \
     subsampledialog.cpp \
-    pointpicker.cpp
+    pointpicker.cpp \
+    ../common/utilities.cpp
 
 HEADERS  += \
     io.h \
@@ -65,8 +66,8 @@ LIBS += -lpcl_io \
         -lGL \
         -lGLU \
         -lOpenCL \
-        -L../common \
-        -lcommon
+        #-L../common \
+        #-lcommon
 
 OTHER_FILES += \
     shaders/points.vert \

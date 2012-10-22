@@ -120,7 +120,7 @@ boost::shared_ptr<MinCut::gData> MinCut::getGraphData(){
             if(!retpair.second)
                 continue;            
 
-            float weight = residual_capacity[*edge_iter] / max_weight;
+            float weight = residual_capacity[*edge_iter];
 
             if(weight > max_weight)
                 max_weight = weight;
@@ -145,6 +145,14 @@ boost::shared_ptr<MinCut::gData> MinCut::getGraphData(){
         }
     }
 
+    for(int i = 0; i < data->source_edge_weights.size(); i++)
+        qDebug("source weight : %f", data->source_edge_weights[i]);
+    for(int i = 0; i < data->sink_edge_weights.size(); i++)
+        qDebug("sink weight : %f", data->sink_edge_weights[i]);
+    for(int i = 0; i < data->bridge_edge_weights.size(); i++)
+        qDebug("bridge weight : %f", data->bridge_edge_weights[i]);
+
+
     // normalise weights
     for(int i = 0; i < data->source_edge_weights.size(); i++)
         data->source_edge_weights[i] /= max_weight;
@@ -152,6 +160,8 @@ boost::shared_ptr<MinCut::gData> MinCut::getGraphData(){
         data->sink_edge_weights[i] /= max_weight;
     for(int i = 0; i < data->bridge_edge_weights.size(); i++)
         data->bridge_edge_weights[i] /= max_weight;
+
+
 
     return data;
 }

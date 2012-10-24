@@ -6,6 +6,7 @@ Settings::Settings(QWidget *parent) :
     ui(new Ui::Settings)
 {
     ui->setupUi(this);
+    connect(ui->showGraph, SIGNAL(clicked()), this, SLOT(graphToggle()));
 }
 
 Settings::~Settings()
@@ -31,4 +32,8 @@ bool Settings::showGraph(){
 
 float Settings::sourceWeight(){
     return ui->sourceWeight->value();
+}
+
+void Settings::graphToggle(){
+    emit repaint();
 }

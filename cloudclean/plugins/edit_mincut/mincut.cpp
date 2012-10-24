@@ -145,13 +145,13 @@ boost::shared_ptr<MinCut::gData> MinCut::getGraphData(){
         }
     }
 
-    for(int i = 0; i < data->source_edge_weights.size(); i++)
+    /*for(int i = 0; i < data->source_edge_weights.size(); i++)
         qDebug("source weight : %f", data->source_edge_weights[i]);
     for(int i = 0; i < data->sink_edge_weights.size(); i++)
         qDebug("sink weight : %f", data->sink_edge_weights[i]);
     for(int i = 0; i < data->bridge_edge_weights.size(); i++)
         qDebug("bridge weight : %f", data->bridge_edge_weights[i]);
-
+    */
 
     // normalise weights
     for(int i = 0; i < data->source_edge_weights.size(); i++)

@@ -27,7 +27,7 @@ EditPlugin::EditPlugin():
 {
     gdata_dirty = true;
     settings = new Settings();
-    editSample = new QAction(QIcon(":/images/mincut.svg"), "Min cut", this);
+    editSample = new QAction(QIcon(":/images/mincut.svg"), "Min cut (standard)", this);
     actionList << editSample;
     foreach(QAction *editAction, actionList)
         editAction->setCheckable(true);
@@ -74,10 +74,6 @@ inline void weightsToBuffer(std::vector<float> & weights,
     size_t vertex_buffer_size = weights.size() * sizeof(float);
     buff.allocate(vertex_buffer_size);
 
-    /*for(int i = 0; i < weights.size(); i++){
-        qDebug("Weight: %f", weights [i]);
-    }*/
-
     buff.write(0, &weights[0], vertex_buffer_size);
     buff.release();
 }
@@ -103,6 +99,7 @@ void EditPlugin::paintGL(CloudModel * cm, GLArea * glarea){
         glUniformMatrix4fv(viz_shader.uniformLocation("cameraToClipMatrix"),
                            1, GL_FALSE, glarea->camera.projectionMatrix().data());
         glUniform1i(viz_shader.uniformLocation("sampler"), 0);
+        glUniform1f(viz_shader.uniformLocation("max_line_width"), 0.005f);
         viz_shader.release();
 
         source_edge_buffer.create();
@@ -199,10 +196,11 @@ bool EditPlugin::mouseDoubleClickEvent  (QMouseEvent *event, CloudModel * cm, GL
 
 bool EditPlugin::StartEdit(QAction *action, CloudModel *cm, GLArea *glarea){
     // Set up kdtree and octre if not set up yet
-
     cm->layerList.setSelectMode(QAbstractItemView::SingleSelection);
-
     dest_layer = -1;
+
+    connect(settings, SIGNAL(repaint()), glarea, SLOT(repaint()), Qt::UniqueConnection);
+
     return true;
 }
 bool EditPlugin::EndEdit(CloudModel * cm, GLArea *){

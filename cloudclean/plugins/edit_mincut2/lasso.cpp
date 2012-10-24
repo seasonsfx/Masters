@@ -113,8 +113,8 @@ void Lasso::drawLasso(Eigen::Vector2f mouseLoc,
     polygon << screenPoint(mouseLoc, glarea->width(),
                            glarea->height());
 
-    qDebug("Drawing polygon");
-    qDebug() << polygon;
+    //qDebug("Drawing polygon");
+    //qDebug() << polygon;
 
     QPainter painter(glarea);
     painter.beginNativePainting();

@@ -5,7 +5,7 @@
 #include <pcl/search/kdtree.h>
 #include <stdlib.h>
 #include <cmath>
-
+#include <QDebug>
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -53,6 +53,107 @@ MinCut::~MinCut ()
   edge_marker_.clear ();
   input_.reset ();
   indices_.reset ();
+}
+
+boost::shared_ptr<MinCut::gData> MinCut::getGraphData(){
+    qDebug("get graph data called!");
+    boost::shared_ptr<MinCut::gData> data = boost::shared_ptr<MinCut::gData>(new MinCut::gData());
+
+    // Finds all points that are indexed
+    std::vector<int> labels;
+    labels.resize (input_->points.size (), 0);
+    int number_of_indices = static_cast<int> (indices_->size ());
+    for (int i_point = 0; i_point < number_of_indices; i_point++)
+        labels[(*indices_)[i_point]] = 1;
+
+    // Note: Only valid after extract was run
+    ResidualCapacityMap residual_capacity = boost::get (boost::edge_residual_capacity, *graph_);
+
+    // temporary vertices
+    std::vector<int> tmp_vertices;
+    std::vector<int> tmp_labels;
+
+    // Set vertices
+    OutEdgeIterator edge_iter, edge_end;
+    for ( boost::tie (edge_iter, edge_end) = boost::out_edges (source_, *graph_); edge_iter != edge_end; edge_iter++ )
+    {
+      if (labels[edge_iter->m_target] == 1){
+        if (residual_capacity[*edge_iter] > epsilon_){
+            data->source_vertices.push_back(edge_iter->m_target);
+            tmp_labels.push_back(0);
+        }
+        else{
+            data->sink_vertices.push_back(edge_iter->m_target);
+            tmp_labels.push_back(1);
+        }
+        tmp_vertices.push_back(edge_iter->m_target);
+      }
+    }
+
+
+    // Set up edges
+
+    // checks for duplicates
+    std::set<std::pair<int, int> > edge_marker;
+
+    // Find maximum edge weight
+
+    float max_weight = 0;
+
+    for(int idx : tmp_vertices){
+        // For every neighbour edge
+        for ( boost::tie (edge_iter, edge_end) = boost::out_edges (idx, *graph_); edge_iter != edge_end; edge_iter++ ) {
+            VertexDescriptor target = edge_iter->m_target;
+            if(target == source_ || target == sink_)
+                continue;
+
+            // Set up edge
+            int a = idx, b = static_cast<int>(target);
+            assert(a !=b);
+            if(a > b){ int tmp = a; a = b; b = tmp;}
+            std::pair<int, int> edge = std::make_pair(a, b);
+            auto retpair = edge_marker.insert(edge);
+
+            // Continue the egde was previously inserted
+            if(!retpair.second)
+                continue;
+
+            float weight = residual_capacity[*edge_iter];
+
+            if(weight > max_weight)
+                max_weight = weight;
+
+            // Determine label
+            if(tmp_labels[idx] == tmp_labels[static_cast<int>(target)]){
+                if(tmp_labels[idx] == 0){
+                    data->source_edges.push_back(edge);
+                    data->source_edge_weights.push_back(weight);
+                }
+                else{
+                    data->sink_edges.push_back(edge);
+                    data->sink_edge_weights.push_back(weight);
+                }
+            }
+            else{
+                data->bridge_edges.push_back(edge);
+                data->bridge_edge_weights.push_back(weight);
+            }
+
+            // what about the flow?
+        }
+    }
+
+    // normalise weights
+    for(int i = 0; i < data->source_edge_weights.size(); i++)
+        data->source_edge_weights[i] /= max_weight;
+    for(int i = 0; i < data->sink_edge_weights.size(); i++)
+        data->sink_edge_weights[i] /= max_weight;
+    for(int i = 0; i < data->bridge_edge_weights.size(); i++)
+        data->bridge_edge_weights[i] /= max_weight;
+
+
+
+    return data;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

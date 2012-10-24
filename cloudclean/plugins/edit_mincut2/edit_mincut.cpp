@@ -9,19 +9,25 @@
 #include <QTime>
 
 #include "edit_mincut.h"
-//#include "utilities.h"
+#include "utilities.h"
 #include "layer.h"
 #include "glarea.h"
 #include "cloudmodel.h"
 #include "mincut.h"
 
 
-EditPlugin::EditPlugin()
+EditPlugin::EditPlugin():
+    source_vertex_buffer(QGLBuffer::IndexBuffer),
+    sink_vertex_buffer(QGLBuffer::IndexBuffer),
+    source_edge_buffer(QGLBuffer::IndexBuffer),
+    sink_edge_buffer(QGLBuffer::IndexBuffer),
+    bridge_edge_buffer(QGLBuffer::IndexBuffer)
 {
+    gdata_dirty = true;
     lasso_active = false;
     normalised_mouse_loc = Eigen::Vector2f(0,0);
     settings = new Settings();
-    editSample = new QAction(QIcon(":/images/mincut.svg"), "Min cut 2", this);
+    editSample = new QAction(QIcon(":/images/mincut.svg"), "Min cut (lasso)", this);
     actionList << editSample;
     foreach(QAction *editAction, actionList)
         editAction->setCheckable(true);
@@ -33,8 +39,162 @@ EditPlugin::~EditPlugin()
     delete settings;
 }
 
-void EditPlugin::paintGL(CloudModel *, GLArea * glarea){
+inline void edgesToBuffer(std::vector<std::pair<int, int> > & edges,
+                     QGLBuffer & buff){
+
+    // create buffers
+    buff.bind();
+    size_t edge_size = 2 * sizeof(int);
+    size_t edge_buffer_size = edges.size() * edge_size;
+    buff.allocate(edge_buffer_size);
+    for(int i = 0; i < edges.size(); i++){
+        std::pair<int, int> & edge = edges [i];
+        int data [] = {edge.first, edge.second};
+        buff.write(i*edge_size, data, edge_size);
+    }
+    buff.release();
+}
+
+inline void verticesToBuffer(std::vector<int> & vertices,
+                     QGLBuffer & buff){
+
+    // create buffers
+    buff.bind();
+    size_t vertex_buffer_size = vertices.size() * sizeof(int);
+    buff.allocate(vertex_buffer_size);
+    buff.write(0, &vertices[0], vertex_buffer_size);
+    buff.release();
+}
+
+inline void weightsToBuffer(std::vector<float> & weights,
+                     QGLBuffer & buff){
+
+    // create buffers
+    buff.bind();
+    size_t vertex_buffer_size = weights.size() * sizeof(float);
+    buff.allocate(vertex_buffer_size);
+
+    buff.write(0, &weights[0], vertex_buffer_size);
+    buff.release();
+}
+
+
+void EditPlugin::paintGL(CloudModel * cm, GLArea * glarea){
     lasso.drawLasso(normalised_mouse_loc, glarea);
+
+    if(!settings->showGraph())
+            return;
+
+        // Perpare shader
+        if(!viz_shader.isLinked()){
+            assert(glarea->prepareShaderProgram(viz_shader,
+                                                ":/shader/graph.vert",
+                                                ":/shader/graph.frag",
+                                                ":/shader/graph.geom" ) );
+            if ( !viz_shader.bind() ) {
+                qWarning() << "Could not bind shader program to context";
+                assert(false);
+            }
+            viz_shader.enableAttributeArray( "vertex" );
+            viz_shader.setAttributeBuffer( "vertex", GL_FLOAT, 0, 4 );
+            glUniformMatrix4fv(viz_shader.uniformLocation("modelToCameraMatrix"),
+                               1, GL_FALSE, glarea->camera.modelviewMatrix().data());
+            glUniformMatrix4fv(viz_shader.uniformLocation("cameraToClipMatrix"),
+                               1, GL_FALSE, glarea->camera.projectionMatrix().data());
+            glUniform1i(viz_shader.uniformLocation("sampler"), 0);
+            glUniform1f(viz_shader.uniformLocation("max_line_width"), 0.005f);
+            viz_shader.release();
+
+            source_edge_buffer.create();
+            sink_edge_buffer.create();
+            bridge_edge_buffer.create();
+            source_vertex_buffer.create();
+            sink_vertex_buffer.create();
+
+            source_edge_weight_buffer.create();
+            sink_edge_weight_buffer.create();
+            bridge_edge_weight_buffer.create();
+
+            // Create textures ids
+            glGenTextures(3,textures);
+
+        }
+
+        // load data
+        if(gdata_dirty){
+            qDebug("loading gdata");
+            gdata = seg.getGraphData();
+
+            qDebug("Source edges: %d", gdata->source_edges.size());
+            qDebug("Sink edges: %d", gdata->sink_edges.size());
+
+            edgesToBuffer(gdata->source_edges, source_edge_buffer);
+            edgesToBuffer(gdata->sink_edges, sink_edge_buffer);
+            edgesToBuffer(gdata->bridge_edges, bridge_edge_buffer);
+            verticesToBuffer(gdata->source_vertices, source_vertex_buffer);
+            verticesToBuffer(gdata->sink_vertices, sink_vertex_buffer);
+
+            weightsToBuffer(gdata->source_edge_weights, source_edge_weight_buffer);
+            weightsToBuffer(gdata->sink_edge_weights, sink_edge_weight_buffer);
+            weightsToBuffer(gdata->bridge_edge_weights, bridge_edge_weight_buffer);
+
+            gdata_dirty = false;
+
+        }
+
+        // paint
+
+        viz_shader.bind();
+        glUniformMatrix4fv(viz_shader.uniformLocation("modelToCameraMatrix"),
+                           1, GL_FALSE, glarea->camera.modelviewMatrix().data());
+        glError("edit cut 1");
+        glUniformMatrix4fv(viz_shader.uniformLocation("cameraToClipMatrix"),
+                           1, GL_FALSE, glarea->camera.projectionMatrix().data());
+        glError("edit cut 2");
+
+        // enable attribur in shader
+        viz_shader.enableAttributeArray( "vertex" );
+        // bind the buffer to be used with this attribute
+        cm->point_buffer.bind();
+        // specify how to interpret buffer
+        viz_shader.setAttributeBuffer( "vertex", GL_FLOAT, 0, 4 );
+        // this should be done for all attributes
+
+        float colour [3] = {1,0,0}; // Red
+        glUniform3fv(viz_shader.uniformLocation("elColour"), 1, colour);
+        glLineWidth(1.0);
+        source_edge_buffer.bind();
+        glBindTexture(GL_TEXTURE_BUFFER, textures [0]);
+        glError("edit cut 000");
+        glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, source_edge_weight_buffer.bufferId());
+        glError("edit cut 111");
+        //glBindTexture(GL_TEXTURE_BUFFER, 0);
+        qDebug("Size %d", source_edge_buffer.size());
+        glDrawElements(GL_LINES, gdata->source_edges.size()*2, GL_UNSIGNED_INT, 0);
+
+        colour [0] = 0; colour [1] = 1; // Green
+        glUniform3fv(viz_shader.uniformLocation("elColour"), 1, colour);
+        glLineWidth(1.0);
+        sink_edge_buffer.bind();
+        glBindTexture(GL_TEXTURE_BUFFER, textures [0]);
+        glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, sink_edge_weight_buffer.bufferId());
+        //glBindTexture(GL_TEXTURE_BUFFER, 0);
+        glDrawElements(GL_LINES, gdata->sink_edges.size()*2, GL_UNSIGNED_INT, 0);
+
+        colour [1] = 0; colour [2] = 1; // Blue
+        glUniform3fv(viz_shader.uniformLocation("elColour"), 1, colour);
+        glLineWidth(1.0);
+        bridge_edge_buffer.bind();
+        glBindTexture(GL_TEXTURE_BUFFER, textures [0]);
+        glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, bridge_edge_weight_buffer.bufferId());
+        //glBindTexture(GL_TEXTURE_BUFFER, 0);
+        glDrawElements(GL_LINES, gdata->bridge_edges.size()*2, GL_UNSIGNED_INT, 0);
+
+        bridge_edge_buffer.release();
+        cm->point_buffer.release();
+        viz_shader.release();
+        glError("edit cut 5");
+
 }
 
 bool EditPlugin::mouseDoubleClickEvent  (QMouseEvent *event, CloudModel * cm, GLArea * glarea){
@@ -45,6 +205,8 @@ bool EditPlugin::mouseDoubleClickEvent  (QMouseEvent *event, CloudModel * cm, GL
 bool EditPlugin::StartEdit(QAction *action, CloudModel *cm, GLArea *glarea){
     cm->layerList.setSelectMode(QAbstractItemView::SingleSelection);
     dest_layer = -1;
+
+    connect(settings, SIGNAL(repaint()), glarea, SLOT(repaint()), Qt::UniqueConnection);
     return true;
 }
 bool EditPlugin::EndEdit(CloudModel * cm, GLArea *){
@@ -189,7 +351,6 @@ void EditPlugin::segment(int source_idx, int dest_idx, CloudModel *cm, GLArea * 
     pcl::IndicesPtr inside_lasso_indices(new std::vector<int>);
     lasso.getIndices(ndc_trans, &*cm->cloud, source_layer, *inside_lasso_indices);
 
-    MinCut seg;
     seg.setInputCloud(cm->cloud);
     seg.setIndices(inside_lasso_indices);
     auto polygon = lasso.getPolygon();
@@ -224,6 +385,7 @@ void EditPlugin::segment(int source_idx, int dest_idx, CloudModel *cm, GLArea * 
     seg.extract (clusters);
 
     assert(clusters.size() != 0);
+    gdata_dirty = true;
 
     // put clusters into layer
     for(int idx : clusters[0].indices){

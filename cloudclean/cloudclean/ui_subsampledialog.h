@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'subsampledialog.ui'
 **
-** Created: Mon Oct 22 14:16:23 2012
+** Created: Wed Oct 24 19:45:25 2012
 **      by: Qt User Interface Compiler version 4.8.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!

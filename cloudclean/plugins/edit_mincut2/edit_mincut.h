@@ -34,7 +34,7 @@ public:
 
     bool StartEdit(QAction *action, CloudModel * cm, GLArea * glarea);
     bool EndEdit(CloudModel * cm, GLArea * glarea);
-    void paintGL(CloudModel *, GLArea *glarea);
+    void paintGL(CloudModel * cm, GLArea *glarea);
     bool mouseDoubleClickEvent  (QMouseEvent *event, CloudModel * cm, GLArea * glarea);
     bool mousePressEvent  (QMouseEvent *event, CloudModel *, GLArea * glarea);
     bool mouseMoveEvent   (QMouseEvent *event, CloudModel *, GLArea * glarea);
@@ -53,10 +53,28 @@ private:
     Settings *                              settings;
 
     int                                     dest_layer;
+    MinCut                                  seg;
 
     Lasso                                   lasso;
     bool                                    lasso_active;
     Eigen::Vector2f                         normalised_mouse_loc;
+
+    // Viz data
+    boost::shared_ptr<MinCut::gData>        gdata;
+    bool                                    gdata_dirty;
+    QGLBuffer                               source_edge_buffer;
+    QGLBuffer                               sink_edge_buffer;
+    QGLBuffer                               bridge_edge_buffer;
+
+    QGLBuffer                               source_edge_weight_buffer;
+    QGLBuffer                               sink_edge_weight_buffer;
+    QGLBuffer                               bridge_edge_weight_buffer;
+
+    GLuint                                  textures[3];
+
+    QGLBuffer                               source_vertex_buffer;
+    QGLBuffer                               sink_vertex_buffer;
+    QGLShaderProgram                        viz_shader;
 
 
 };

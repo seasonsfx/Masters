@@ -25,6 +25,12 @@ public:
     bool showGraph();
     float sourceWeight();
 
+signals:
+    void repaint();
+
+private slots:
+    void graphToggle();
+
 private:
     Ui::Settings *ui;
 };

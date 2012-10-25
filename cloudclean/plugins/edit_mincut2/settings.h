@@ -25,6 +25,9 @@ public:
     bool showGraph();
     float sourceWeight();
 
+    float vertexSize();
+    float edgeWidth();
+
 signals:
     void repaint();
 

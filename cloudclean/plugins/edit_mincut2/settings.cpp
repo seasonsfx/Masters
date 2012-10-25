@@ -7,6 +7,7 @@ Settings::Settings(QWidget *parent) :
 {
     ui->setupUi(this);
     connect(ui->showGraph, SIGNAL(clicked()), this, SLOT(graphToggle()));
+    connect(ui->edgeWidth, SIGNAL(valueChanged(double)), this, SLOT(graphToggle()));
 }
 
 Settings::~Settings()
@@ -36,4 +37,12 @@ float Settings::sourceWeight(){
 
 void Settings::graphToggle(){
     emit repaint();
+}
+
+float Settings::vertexSize(){
+    return ui->vextexSize->value();
+}
+
+float Settings::edgeWidth(){
+    return ui->edgeWidth->value();
 }

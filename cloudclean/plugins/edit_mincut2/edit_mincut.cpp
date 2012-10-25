@@ -131,6 +131,7 @@ void EditPlugin::paintGL(CloudModel * cm, GLArea * glarea){
             edgesToBuffer(gdata->source_edges, source_edge_buffer);
             edgesToBuffer(gdata->sink_edges, sink_edge_buffer);
             edgesToBuffer(gdata->bridge_edges, bridge_edge_buffer);
+
             verticesToBuffer(gdata->source_vertices, source_vertex_buffer);
             verticesToBuffer(gdata->sink_vertices, sink_vertex_buffer);
 
@@ -150,6 +151,7 @@ void EditPlugin::paintGL(CloudModel * cm, GLArea * glarea){
         glError("edit cut 1");
         glUniformMatrix4fv(viz_shader.uniformLocation("cameraToClipMatrix"),
                            1, GL_FALSE, glarea->camera.projectionMatrix().data());
+        glUniform1f(viz_shader.uniformLocation("max_line_width"), settings->edgeWidth());
         glError("edit cut 2");
 
         // enable attribur in shader
@@ -162,19 +164,17 @@ void EditPlugin::paintGL(CloudModel * cm, GLArea * glarea){
 
         float colour [3] = {1,0,0}; // Red
         glUniform3fv(viz_shader.uniformLocation("elColour"), 1, colour);
-        glLineWidth(1.0);
         source_edge_buffer.bind();
         glBindTexture(GL_TEXTURE_BUFFER, textures [0]);
         glError("edit cut 000");
         glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, source_edge_weight_buffer.bufferId());
         glError("edit cut 111");
         //glBindTexture(GL_TEXTURE_BUFFER, 0);
-        qDebug("Size %d", source_edge_buffer.size());
+        //qDebug("Size %d", source_edge_buffer.size());
         glDrawElements(GL_LINES, gdata->source_edges.size()*2, GL_UNSIGNED_INT, 0);
 
         colour [0] = 0; colour [1] = 1; // Green
         glUniform3fv(viz_shader.uniformLocation("elColour"), 1, colour);
-        glLineWidth(1.0);
         sink_edge_buffer.bind();
         glBindTexture(GL_TEXTURE_BUFFER, textures [0]);
         glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, sink_edge_weight_buffer.bufferId());
@@ -183,7 +183,6 @@ void EditPlugin::paintGL(CloudModel * cm, GLArea * glarea){
 
         colour [1] = 0; colour [2] = 1; // Blue
         glUniform3fv(viz_shader.uniformLocation("elColour"), 1, colour);
-        glLineWidth(1.0);
         bridge_edge_buffer.bind();
         glBindTexture(GL_TEXTURE_BUFFER, textures [0]);
         glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, bridge_edge_weight_buffer.bufferId());
@@ -194,6 +193,54 @@ void EditPlugin::paintGL(CloudModel * cm, GLArea * glarea){
         cm->point_buffer.release();
         viz_shader.release();
         glError("edit cut 5");
+
+
+        viz_shader.release();
+
+
+        // Draw vertices
+        glarea->point_shader.bind();
+        glUniformMatrix4fv(glarea->point_shader.uniformLocation("modelToCameraMatrix"),
+                           1, GL_FALSE, glarea->camera.modelviewMatrix().data());
+        glUniformMatrix4fv(glarea->point_shader.uniformLocation("cameraToClipMatrix"),
+                           1, GL_FALSE, glarea->camera.projectionMatrix().data());
+glError("274");
+        glarea->point_shader.enableAttributeArray( "vertex" );
+        glarea->point_shader.setAttributeBuffer( "vertex", GL_FLOAT, 0, 4 );
+
+        cm->point_buffer.bind();
+
+
+        glPointSize(settings->vertexSize());
+
+        colour [0] = 1; colour [2] = 0; // Red
+        glUniform3fv(glarea->point_shader.uniformLocation("layerColour"), 1, colour);
+        source_vertex_buffer.bind();
+        qDebug("Size: %d, created = %s", source_vertex_buffer.size(),
+               source_vertex_buffer.isCreated() ? "true" : "false");
+
+
+        for(int i = 0; i < gdata->source_vertices.size(); i++){
+            qDebug("i = %d & size = %d", i, cm->cloud->size());
+            qDebug("Val cpu: %d", gdata->source_vertices[i]);
+            int num;
+            source_vertex_buffer.read(i*sizeof(int), &num, sizeof(int));
+            qDebug("Val gpu: %d", num);
+        }
+
+        glDrawElements(GL_POINTS, gdata->source_vertices.size(), GL_UNSIGNED_INT, 0);
+        source_vertex_buffer.release();
+
+        colour [0] = 0; colour [1] = 1; // Green
+        glUniform3fv(glarea->point_shader.uniformLocation("layerColour"), 1, colour);
+        sink_vertex_buffer.bind();
+        glDrawElements(GL_POINTS, gdata->sink_vertices.size(), GL_UNSIGNED_INT, 0);
+        sink_vertex_buffer.release();
+
+        cm->point_buffer.release();
+        glarea->point_shader.release();
+
+
 
 }
 
@@ -345,26 +392,33 @@ void EditPlugin::segment(int source_idx, int dest_idx, CloudModel *cm, GLArea * 
 
 
     // Fetch point indices inside the lasso
-    Eigen::Matrix4f ndc_trans = glarea->camera.projectionMatrix().matrix() * glarea->camera.modelviewMatrix().matrix();
+    Eigen::Matrix4f ndc_trans = glarea->camera.projectionMatrix().matrix() *
+            glarea->camera.modelviewMatrix().matrix();
+
     std::vector<int> & source_layer = cm->layerList.layers[source_idx].index;
     std::vector<int> & dest_layer = cm->layerList.layers[dest_idx].index;
+
+    // Get points inside lasso
     pcl::IndicesPtr inside_lasso_indices(new std::vector<int>);
     lasso.getIndices(ndc_trans, &*cm->cloud, source_layer, *inside_lasso_indices);
 
     seg.setInputCloud(cm->cloud);
     seg.setIndices(inside_lasso_indices);
+
     auto polygon = lasso.getPolygon();
 
-    float z = 1.0f;
 
+    // find the centoid of the polygon
+    Eigen::Vector2f centoid2d = centoid(polygon);
+
+    // Find the 3D polygon
+    float z = 1.0f;
     std::vector<Eigen::Vector3f> poly3d = unProjectPolygonNDC(
                                     glarea->camera.projectionMatrix().matrix(),
                                     glarea->camera.modelviewMatrix().matrix(),
                                     z,
                                     polygon);
 
-
-    Eigen::Vector2f centoid2d = centoid(polygon);
     Eigen::Vector3f centoid3d = unProjectNDC(
                 glarea->camera.projectionMatrix().matrix(),
                 glarea->camera.modelviewMatrix().matrix(),
@@ -387,16 +441,19 @@ void EditPlugin::segment(int source_idx, int dest_idx, CloudModel *cm, GLArea * 
     assert(clusters.size() != 0);
     gdata_dirty = true;
 
+    // copy the segmented region from the source to the dest
+
     // put clusters into layer
-    for(int idx : clusters[0].indices){
-        cm->layerList.layers[source_idx].index[idx] = idx;
-        cm->layerList.layers[dest_idx].index[idx] = -1;
+    /*for(int idx : clusters[0].indices){
+        //source_layer[idx] = idx;
+        //dest_layer[idx] = -1;
+    }
+*/
+    for(int idx : clusters[1].indices){
+        dest_layer[idx] = idx;
+        source_layer[idx] = -1;
     }
 
-    for(int idx : clusters[1].indices){
-        cm->layerList.layers[dest_idx].index[idx] = idx;
-        cm->layerList.layers[source_idx].index[idx] = -1;
-    }
 
     cm->layerList.layers[source_idx].copyToGPU();
     cm->layerList.layers[dest_idx].copyToGPU();

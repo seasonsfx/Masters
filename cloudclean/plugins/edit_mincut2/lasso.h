@@ -22,6 +22,7 @@ public:
                     std::vector<int> & dest);
 
 private:
+    // Points normalised
     std::vector<Eigen::Vector2f>    points;
 };
 

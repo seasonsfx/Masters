@@ -42,3 +42,10 @@ RESOURCES += \
 
 FORMS += \
     settings.ui
+
+OTHER_FILES += \
+    shader/points.vert \
+    shader/points.frag \
+    shader/graph.vert \
+    shader/graph.geom \
+    shader/graph.frag

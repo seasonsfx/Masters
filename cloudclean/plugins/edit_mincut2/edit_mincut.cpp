@@ -62,7 +62,9 @@ inline void verticesToBuffer(std::vector<int> & vertices,
     buff.bind();
     size_t vertex_buffer_size = vertices.size() * sizeof(int);
     buff.allocate(vertex_buffer_size);
+    glError("vertex mem 1");
     buff.write(0, &vertices[0], vertex_buffer_size);
+    glError("vertex mem 2");
     buff.release();
 }
 
@@ -85,7 +87,7 @@ void EditPlugin::paintGL(CloudModel * cm, GLArea * glarea){
     if(!settings->showGraph())
             return;
 
-        // Perpare shader
+        // Perpare edge shader
         if(!viz_shader.isLinked()){
             assert(glarea->prepareShaderProgram(viz_shader,
                                                 ":/shader/graph.vert",
@@ -108,8 +110,6 @@ void EditPlugin::paintGL(CloudModel * cm, GLArea * glarea){
             source_edge_buffer.create();
             sink_edge_buffer.create();
             bridge_edge_buffer.create();
-            source_vertex_buffer.create();
-            sink_vertex_buffer.create();
 
             source_edge_weight_buffer.create();
             sink_edge_weight_buffer.create();
@@ -117,8 +117,31 @@ void EditPlugin::paintGL(CloudModel * cm, GLArea * glarea){
 
             // Create textures ids
             glGenTextures(3,textures);
-
         }
+
+
+        // Perpare vertex shader
+        if(!viz_shader2.isLinked()){
+            assert(glarea->prepareShaderProgram(viz_shader2,
+                                                ":/shader/points.vert",
+                                                ":/shader/points.frag",
+                                                "" ) );
+            if ( !viz_shader2.bind() ) {
+                qWarning() << "Could not bind shader program to context";
+                assert(false);
+            }
+            viz_shader2.enableAttributeArray( "vertex" );
+            viz_shader2.setAttributeBuffer( "vertex", GL_FLOAT, 0, 4 );
+            glUniformMatrix4fv(viz_shader2.uniformLocation("modelToCameraMatrix"),
+                               1, GL_FALSE, glarea->camera.modelviewMatrix().data());
+            glUniformMatrix4fv(viz_shader2.uniformLocation("cameraToClipMatrix"),
+                               1, GL_FALSE, glarea->camera.projectionMatrix().data());
+            viz_shader2.release();
+
+            source_vertex_buffer.create();
+            sink_vertex_buffer.create();
+        }
+
 
         // load data
         if(gdata_dirty){
@@ -143,16 +166,14 @@ void EditPlugin::paintGL(CloudModel * cm, GLArea * glarea){
 
         }
 
-        // paint
+        // paint edges
 
         viz_shader.bind();
         glUniformMatrix4fv(viz_shader.uniformLocation("modelToCameraMatrix"),
                            1, GL_FALSE, glarea->camera.modelviewMatrix().data());
-        glError("edit cut 1");
         glUniformMatrix4fv(viz_shader.uniformLocation("cameraToClipMatrix"),
                            1, GL_FALSE, glarea->camera.projectionMatrix().data());
         glUniform1f(viz_shader.uniformLocation("max_line_width"), settings->edgeWidth());
-        glError("edit cut 2");
 
         // enable attribur in shader
         viz_shader.enableAttributeArray( "vertex" );
@@ -166,28 +187,25 @@ void EditPlugin::paintGL(CloudModel * cm, GLArea * glarea){
         glUniform3fv(viz_shader.uniformLocation("elColour"), 1, colour);
         source_edge_buffer.bind();
         glBindTexture(GL_TEXTURE_BUFFER, textures [0]);
-        glError("edit cut 000");
         glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, source_edge_weight_buffer.bufferId());
-        glError("edit cut 111");
-        //glBindTexture(GL_TEXTURE_BUFFER, 0);
-        //qDebug("Size %d", source_edge_buffer.size());
         glDrawElements(GL_LINES, gdata->source_edges.size()*2, GL_UNSIGNED_INT, 0);
+        glBindTexture(GL_TEXTURE_BUFFER, 0);
 
-        colour [0] = 0; colour [1] = 1; // Green
+        colour [0] = 0; colour [2] = 1; // Blue
         glUniform3fv(viz_shader.uniformLocation("elColour"), 1, colour);
         sink_edge_buffer.bind();
         glBindTexture(GL_TEXTURE_BUFFER, textures [0]);
         glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, sink_edge_weight_buffer.bufferId());
-        //glBindTexture(GL_TEXTURE_BUFFER, 0);
         glDrawElements(GL_LINES, gdata->sink_edges.size()*2, GL_UNSIGNED_INT, 0);
+        glBindTexture(GL_TEXTURE_BUFFER, 0);
 
-        colour [1] = 0; colour [2] = 1; // Blue
+        colour [2] = 0; colour [1] = 1; // Green
         glUniform3fv(viz_shader.uniformLocation("elColour"), 1, colour);
         bridge_edge_buffer.bind();
         glBindTexture(GL_TEXTURE_BUFFER, textures [0]);
         glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, bridge_edge_weight_buffer.bufferId());
-        //glBindTexture(GL_TEXTURE_BUFFER, 0);
         glDrawElements(GL_LINES, gdata->bridge_edges.size()*2, GL_UNSIGNED_INT, 0);
+        glBindTexture(GL_TEXTURE_BUFFER, 0);
 
         bridge_edge_buffer.release();
         cm->point_buffer.release();
@@ -195,50 +213,46 @@ void EditPlugin::paintGL(CloudModel * cm, GLArea * glarea){
         glError("edit cut 5");
 
 
-        viz_shader.release();
-
-
-        // Draw vertices
-        glarea->point_shader.bind();
-        glUniformMatrix4fv(glarea->point_shader.uniformLocation("modelToCameraMatrix"),
+        ////////////////// Draw vertices //////////////////////////////
+        viz_shader2.bind();
+        glUniformMatrix4fv(viz_shader2.uniformLocation("modelToCameraMatrix"),
                            1, GL_FALSE, glarea->camera.modelviewMatrix().data());
-        glUniformMatrix4fv(glarea->point_shader.uniformLocation("cameraToClipMatrix"),
+        glUniformMatrix4fv(viz_shader2.uniformLocation("cameraToClipMatrix"),
                            1, GL_FALSE, glarea->camera.projectionMatrix().data());
-glError("274");
-        glarea->point_shader.enableAttributeArray( "vertex" );
-        glarea->point_shader.setAttributeBuffer( "vertex", GL_FLOAT, 0, 4 );
 
+        // enable attribur in shader
+        viz_shader2.enableAttributeArray( "vertex" );
         cm->point_buffer.bind();
-
+        viz_shader2.setAttributeBuffer( "vertex", GL_FLOAT, 0, 4 );
 
         glPointSize(settings->vertexSize());
 
-        colour [0] = 1; colour [2] = 0; // Red
-        glUniform3fv(glarea->point_shader.uniformLocation("layerColour"), 1, colour);
+        colour [0] = 1.0f; colour [1] = 0.0f; // Red
+        glUniform3fv(viz_shader2.uniformLocation("colour"), 1, colour);
+        glError("Setting uniform is an issue");
         source_vertex_buffer.bind();
-        qDebug("Size: %d, created = %s", source_vertex_buffer.size(),
-               source_vertex_buffer.isCreated() ? "true" : "false");
-
-
-        for(int i = 0; i < gdata->source_vertices.size(); i++){
-            qDebug("i = %d & size = %d", i, cm->cloud->size());
-            qDebug("Val cpu: %d", gdata->source_vertices[i]);
-            int num;
-            source_vertex_buffer.read(i*sizeof(int), &num, sizeof(int));
-            qDebug("Val gpu: %d", num);
-        }
-
+        glError("binding");
+        assert(gdata->source_vertices.size() == source_vertex_buffer.size()/sizeof(int));
+        assert(gdata->source_vertices.size() != 0);
         glDrawElements(GL_POINTS, gdata->source_vertices.size(), GL_UNSIGNED_INT, 0);
+        glError("draw");
         source_vertex_buffer.release();
 
-        colour [0] = 0; colour [1] = 1; // Green
-        glUniform3fv(glarea->point_shader.uniformLocation("layerColour"), 1, colour);
+        colour [0] = 0.0f; colour [2] = 1.0f; // Blue
+        glUniform3fv(viz_shader2.uniformLocation("colour"), 1, colour);
+        glError("Setting uniform is an issue 2");
         sink_vertex_buffer.bind();
+        glError("binding");
+        assert(gdata->sink_vertices.size() == sink_vertex_buffer.size()/sizeof(int));
+        assert(gdata->sink_vertices.size() != 0);
         glDrawElements(GL_POINTS, gdata->sink_vertices.size(), GL_UNSIGNED_INT, 0);
+        glError("draw");
         sink_vertex_buffer.release();
 
+
+        glError("Issues");
         cm->point_buffer.release();
-        glarea->point_shader.release();
+        viz_shader2.release();
 
 
 

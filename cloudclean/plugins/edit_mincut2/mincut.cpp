@@ -186,9 +186,9 @@ MinCut::setInputCloud (PointCloud::Ptr &cloud)
 }
 
 
-void MinCut::setBoundingPolygon(std::vector<Eigen::Vector3f> &polygon, Eigen::Vector3f &centoid){
+void MinCut::setBoundingPolygon(std::vector<Eigen::Vector3f> &polygon, Eigen::Vector3f &center){
     polygon_ = polygon;
-    polygon_centoid_ = centoid;
+    subcloud_center_ = center;
 }
 
 void MinCut::setCameraOrigin(Eigen::Vector3f origin){
@@ -530,11 +530,7 @@ float MinCut::closestPolyLineDist(Eigen::Vector3f & point) const{
 }
 
 float MinCut::distFromCenter(Eigen::Vector3f & point) const{
-    Eigen::Vector3f center_line = polygon_centoid_ - cam_origin_;
-    float proj_dist = abs(point.dot(center_line))/center_line.norm();
-    Eigen::Vector3f proj_point = proj_dist * center_line.normalized();
-    float dist = (proj_point - point).norm();
-    return dist;
+    return sqrt(pow(subcloud_center_.x()-point.x(), 2) + pow(subcloud_center_.y()-point.y(), 2));
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

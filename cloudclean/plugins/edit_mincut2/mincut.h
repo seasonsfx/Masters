@@ -68,7 +68,7 @@ public:
 
     void setInputCloud (PointCloud::Ptr &cloud);
 
-    void setBoundingPolygon(std::vector<Eigen::Vector3f> & polygon, Eigen::Vector3f &centoid);
+    void setBoundingPolygon(std::vector<Eigen::Vector3f> & polygon, Eigen::Vector3f &center);
     void setCameraOrigin(Eigen::Vector3f origin);
 
     /** \brief Returns normalization value for binary potentials. For more information see the article. */
@@ -281,7 +281,7 @@ public:
 
     public:
     std::vector<Eigen::Vector3f> polygon_;
-    Eigen::Vector3f polygon_centoid_;
+    Eigen::Vector3f subcloud_center_;
     Eigen::Vector3f cam_origin_;
 
     protected:

@@ -252,13 +252,13 @@ void EditPlugin::paintGL(CloudModel * cm, GLArea * glarea){
     sink_vertex_buffer.release();
     cm->point_buffer.release();
 
-    // Draw centoid line with same shader /////////////////////////
+    // Draw center line with same shader /////////////////////////
 
     int far = 100;
-    Eigen::Vector3f center_line_dir = seg.polygon_centoid_ - seg.cam_origin_;
-    center_line_dir.normalize();
+    Eigen::Vector3f center_line_origin(seg.subcloud_center_.x(), seg.subcloud_center_.y(), 0);
+    Eigen::Vector3f center_line_dir(0, 0, 1);
 
-    Eigen::Vector3f start = seg.cam_origin_;
+    Eigen::Vector3f start = center_line_origin;
     Eigen::Vector3f end = center_line_dir * far;
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -449,7 +449,7 @@ std::vector<Eigen::Vector3f> unProjectPolygonNDC(
     return unprojected_polygon;
 }
 
-Eigen::Vector2f centoid(const std::vector<Eigen::Vector2f> polygon){
+Eigen::Vector2f centroid(const std::vector<Eigen::Vector2f> polygon){
     float x = 0, y = 0;
 
     float signedArea = 0;
@@ -469,8 +469,19 @@ Eigen::Vector2f centoid(const std::vector<Eigen::Vector2f> polygon){
     return Eigen::Vector2f(x,y);
 }
 
-void EditPlugin::segment(int source_idx, int dest_idx, CloudModel *cm, GLArea * glarea){
+Eigen::Vector3f meanPoint(pcl::IndicesPtr & indices, pcl::PointCloud<pcl::PointXYZI>::Ptr cloud){
+    Eigen::Vector3f avg_point;
 
+    for(int idx : *indices){
+        pcl::PointXYZI & p = cloud->at(idx);
+        Eigen::Vector3f tmp(p.x, p.y, p.z);
+        avg_point += tmp;
+    }
+    avg_point /= indices->size();
+    return avg_point;
+}
+
+void EditPlugin::segment(int source_idx, int dest_idx, CloudModel *cm, GLArea * glarea){
 
     // Fetch point indices inside the lasso
     Eigen::Matrix4f ndc_trans = glarea->camera.projectionMatrix().matrix() *
@@ -489,8 +500,8 @@ void EditPlugin::segment(int source_idx, int dest_idx, CloudModel *cm, GLArea * 
     auto polygon = lasso.getPolygon();
 
 
-    // find the centoid of the polygon
-    Eigen::Vector2f centoid2d = centoid(polygon);
+    // find the centroid of the polygon
+    //Eigen::Vector2f centroid2d = centroid(polygon);
 
     // Find the 3D polygon
     float z = 1.0f;
@@ -500,14 +511,16 @@ void EditPlugin::segment(int source_idx, int dest_idx, CloudModel *cm, GLArea * 
                                     z,
                                     polygon);
 
-    Eigen::Vector3f centoid3d = unProjectNDC(
+    /*Eigen::Vector3f centroid3d = unProjectNDC(
                 glarea->camera.projectionMatrix().matrix(),
                 glarea->camera.modelviewMatrix().matrix(),
                 z,
-                centoid2d);
+                centroid2d);
+    */
 
+    Eigen::Vector3f center = meanPoint(inside_lasso_indices, cm->cloud);
 
-    seg.setBoundingPolygon(poly3d, centoid3d);
+    seg.setBoundingPolygon(poly3d, center);
     seg.setCameraOrigin(glarea->camera.position());
 
     seg.setSigma (settings->sigma()); // Density me thinks

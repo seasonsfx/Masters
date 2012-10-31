@@ -8,6 +8,7 @@ Settings::Settings(QWidget *parent) :
     ui->setupUi(this);
     connect(ui->showGraph, SIGNAL(clicked()), this, SLOT(graphToggle()));
     connect(ui->edgeWidth, SIGNAL(valueChanged(double)), this, SLOT(graphToggle()));
+    connect(ui->vextexSize, SIGNAL(valueChanged(double)), this, SLOT(graphToggle()));
 }
 
 Settings::~Settings()

@@ -84,176 +84,245 @@ inline void weightsToBuffer(std::vector<float> & weights,
 void EditPlugin::paintGL(CloudModel * cm, GLArea * glarea){
     lasso.drawLasso(normalised_mouse_loc, glarea);
 
+
     if(!settings->showGraph())
             return;
 
-        // Perpare edge shader
-        if(!viz_shader.isLinked()){
-            assert(glarea->prepareShaderProgram(viz_shader,
-                                                ":/shader/graph.vert",
-                                                ":/shader/graph.frag",
-                                                ":/shader/graph.geom" ) );
-            if ( !viz_shader.bind() ) {
-                qWarning() << "Could not bind shader program to context";
-                assert(false);
-            }
-            viz_shader.enableAttributeArray( "vertex" );
-            viz_shader.setAttributeBuffer( "vertex", GL_FLOAT, 0, 4 );
-            glUniformMatrix4fv(viz_shader.uniformLocation("modelToCameraMatrix"),
-                               1, GL_FALSE, glarea->camera.modelviewMatrix().data());
-            glUniformMatrix4fv(viz_shader.uniformLocation("cameraToClipMatrix"),
-                               1, GL_FALSE, glarea->camera.projectionMatrix().data());
-            glUniform1i(viz_shader.uniformLocation("sampler"), 0);
-            glUniform1f(viz_shader.uniformLocation("max_line_width"), 0.005f);
-            viz_shader.release();
-
-            source_edge_buffer.create();
-            sink_edge_buffer.create();
-            bridge_edge_buffer.create();
-
-            source_edge_weight_buffer.create();
-            sink_edge_weight_buffer.create();
-            bridge_edge_weight_buffer.create();
-
-            // Create textures ids
-            glGenTextures(3,textures);
+    // Perpare edge shader
+    if(!viz_shader.isLinked()){
+        assert(glarea->prepareShaderProgram(viz_shader,
+                                            ":/shader/graph.vert",
+                                            ":/shader/graph.frag",
+                                            ":/shader/graph.geom" ) );
+        if ( !viz_shader.bind() ) {
+            qWarning() << "Could not bind shader program to context";
+            assert(false);
         }
-
-
-        // Perpare vertex shader
-        if(!viz_shader2.isLinked()){
-            assert(glarea->prepareShaderProgram(viz_shader2,
-                                                ":/shader/points.vert",
-                                                ":/shader/points.frag",
-                                                "" ) );
-            if ( !viz_shader2.bind() ) {
-                qWarning() << "Could not bind shader program to context";
-                assert(false);
-            }
-            viz_shader2.enableAttributeArray( "vertex" );
-            viz_shader2.setAttributeBuffer( "vertex", GL_FLOAT, 0, 4 );
-            glUniformMatrix4fv(viz_shader2.uniformLocation("modelToCameraMatrix"),
-                               1, GL_FALSE, glarea->camera.modelviewMatrix().data());
-            glUniformMatrix4fv(viz_shader2.uniformLocation("cameraToClipMatrix"),
-                               1, GL_FALSE, glarea->camera.projectionMatrix().data());
-            viz_shader2.release();
-
-            source_vertex_buffer.create();
-            sink_vertex_buffer.create();
-        }
-
-
-        // load data
-        if(gdata_dirty){
-            qDebug("loading gdata");
-            gdata = seg.getGraphData();
-
-            qDebug("Source edges: %d", gdata->source_edges.size());
-            qDebug("Sink edges: %d", gdata->sink_edges.size());
-
-            edgesToBuffer(gdata->source_edges, source_edge_buffer);
-            edgesToBuffer(gdata->sink_edges, sink_edge_buffer);
-            edgesToBuffer(gdata->bridge_edges, bridge_edge_buffer);
-
-            verticesToBuffer(gdata->source_vertices, source_vertex_buffer);
-            verticesToBuffer(gdata->sink_vertices, sink_vertex_buffer);
-
-            weightsToBuffer(gdata->source_edge_weights, source_edge_weight_buffer);
-            weightsToBuffer(gdata->sink_edge_weights, sink_edge_weight_buffer);
-            weightsToBuffer(gdata->bridge_edge_weights, bridge_edge_weight_buffer);
-
-            gdata_dirty = false;
-
-        }
-
-        // paint edges
-
-        viz_shader.bind();
+        viz_shader.enableAttributeArray( "vertex" );
+        viz_shader.setAttributeBuffer( "vertex", GL_FLOAT, 0, 4 );
         glUniformMatrix4fv(viz_shader.uniformLocation("modelToCameraMatrix"),
                            1, GL_FALSE, glarea->camera.modelviewMatrix().data());
         glUniformMatrix4fv(viz_shader.uniformLocation("cameraToClipMatrix"),
                            1, GL_FALSE, glarea->camera.projectionMatrix().data());
-        glUniform1f(viz_shader.uniformLocation("max_line_width"), settings->edgeWidth());
-
-        // enable attribur in shader
-        viz_shader.enableAttributeArray( "vertex" );
-        // bind the buffer to be used with this attribute
-        cm->point_buffer.bind();
-        // specify how to interpret buffer
-        viz_shader.setAttributeBuffer( "vertex", GL_FLOAT, 0, 4 );
-        // this should be done for all attributes
-
-        float colour [3] = {1,0,0}; // Red
-        glUniform3fv(viz_shader.uniformLocation("elColour"), 1, colour);
-        source_edge_buffer.bind();
-        glBindTexture(GL_TEXTURE_BUFFER, textures [0]);
-        glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, source_edge_weight_buffer.bufferId());
-        glDrawElements(GL_LINES, gdata->source_edges.size()*2, GL_UNSIGNED_INT, 0);
-        glBindTexture(GL_TEXTURE_BUFFER, 0);
-
-        colour [0] = 0; colour [2] = 1; // Blue
-        glUniform3fv(viz_shader.uniformLocation("elColour"), 1, colour);
-        sink_edge_buffer.bind();
-        glBindTexture(GL_TEXTURE_BUFFER, textures [0]);
-        glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, sink_edge_weight_buffer.bufferId());
-        glDrawElements(GL_LINES, gdata->sink_edges.size()*2, GL_UNSIGNED_INT, 0);
-        glBindTexture(GL_TEXTURE_BUFFER, 0);
-
-        colour [2] = 0; colour [1] = 1; // Green
-        glUniform3fv(viz_shader.uniformLocation("elColour"), 1, colour);
-        bridge_edge_buffer.bind();
-        glBindTexture(GL_TEXTURE_BUFFER, textures [0]);
-        glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, bridge_edge_weight_buffer.bufferId());
-        glDrawElements(GL_LINES, gdata->bridge_edges.size()*2, GL_UNSIGNED_INT, 0);
-        glBindTexture(GL_TEXTURE_BUFFER, 0);
-
-        bridge_edge_buffer.release();
-        cm->point_buffer.release();
+        glUniform1i(viz_shader.uniformLocation("sampler"), 0);
+        glUniform1f(viz_shader.uniformLocation("max_line_width"), 0.005f);
         viz_shader.release();
-        glError("edit cut 5");
+
+        source_edge_buffer.create();
+        sink_edge_buffer.create();
+        bridge_edge_buffer.create();
+
+        source_edge_weight_buffer.create();
+        sink_edge_weight_buffer.create();
+        bridge_edge_weight_buffer.create();
+
+        // Create textures ids
+        glGenTextures(3,textures);
+    }
 
 
-        ////////////////// Draw vertices //////////////////////////////
-        viz_shader2.bind();
+    // Perpare vertex shader
+    if(!viz_shader2.isLinked()){
+        assert(glarea->prepareShaderProgram(viz_shader2,
+                                            ":/shader/points.vert",
+                                            ":/shader/points.frag",
+                                            "" ) );
+        if ( !viz_shader2.bind() ) {
+            qWarning() << "Could not bind shader program to context";
+            assert(false);
+        }
+        viz_shader2.enableAttributeArray( "vertex" );
+        viz_shader2.setAttributeBuffer( "vertex", GL_FLOAT, 0, 4 );
         glUniformMatrix4fv(viz_shader2.uniformLocation("modelToCameraMatrix"),
                            1, GL_FALSE, glarea->camera.modelviewMatrix().data());
         glUniformMatrix4fv(viz_shader2.uniformLocation("cameraToClipMatrix"),
                            1, GL_FALSE, glarea->camera.projectionMatrix().data());
-
-        // enable attribur in shader
-        viz_shader2.enableAttributeArray( "vertex" );
-        cm->point_buffer.bind();
-        viz_shader2.setAttributeBuffer( "vertex", GL_FLOAT, 0, 4 );
-
-        glPointSize(settings->vertexSize());
-
-        colour [0] = 1.0f; colour [1] = 0.0f; // Red
-        glUniform3fv(viz_shader2.uniformLocation("colour"), 1, colour);
-        glError("Setting uniform is an issue");
-        source_vertex_buffer.bind();
-        glError("binding");
-        assert(gdata->source_vertices.size() == source_vertex_buffer.size()/sizeof(int));
-        assert(gdata->source_vertices.size() != 0);
-        glDrawElements(GL_POINTS, gdata->source_vertices.size(), GL_UNSIGNED_INT, 0);
-        glError("draw");
-        source_vertex_buffer.release();
-
-        colour [0] = 0.0f; colour [2] = 1.0f; // Blue
-        glUniform3fv(viz_shader2.uniformLocation("colour"), 1, colour);
-        glError("Setting uniform is an issue 2");
-        sink_vertex_buffer.bind();
-        glError("binding");
-        assert(gdata->sink_vertices.size() == sink_vertex_buffer.size()/sizeof(int));
-        assert(gdata->sink_vertices.size() != 0);
-        glDrawElements(GL_POINTS, gdata->sink_vertices.size(), GL_UNSIGNED_INT, 0);
-        glError("draw");
-        sink_vertex_buffer.release();
-
-
-        glError("Issues");
-        cm->point_buffer.release();
         viz_shader2.release();
 
+        source_vertex_buffer.create();
+        sink_vertex_buffer.create();
+    }
+
+
+    // load data
+    if(gdata_dirty){
+        qDebug("loading gdata");
+        gdata = seg.getGraphData();
+
+        qDebug("Source edges: %d", gdata->source_edges.size());
+        qDebug("Sink edges: %d", gdata->sink_edges.size());
+
+        edgesToBuffer(gdata->source_edges, source_edge_buffer);
+        edgesToBuffer(gdata->sink_edges, sink_edge_buffer);
+        edgesToBuffer(gdata->bridge_edges, bridge_edge_buffer);
+
+        verticesToBuffer(gdata->source_vertices, source_vertex_buffer);
+        verticesToBuffer(gdata->sink_vertices, sink_vertex_buffer);
+
+        weightsToBuffer(gdata->source_edge_weights, source_edge_weight_buffer);
+        weightsToBuffer(gdata->sink_edge_weights, sink_edge_weight_buffer);
+        weightsToBuffer(gdata->bridge_edge_weights, bridge_edge_weight_buffer);
+
+        gdata_dirty = false;
+
+    }
+
+    glEnable(GL_DEPTH_TEST);
+
+    ///////////// paint edges
+
+    viz_shader.bind();
+    glUniformMatrix4fv(viz_shader.uniformLocation("modelToCameraMatrix"),
+                       1, GL_FALSE, glarea->camera.modelviewMatrix().data());
+    glUniformMatrix4fv(viz_shader.uniformLocation("cameraToClipMatrix"),
+                       1, GL_FALSE, glarea->camera.projectionMatrix().data());
+    glUniform1f(viz_shader.uniformLocation("max_line_width"), settings->edgeWidth());
+
+    // enable attribur in shader
+    viz_shader.enableAttributeArray( "vertex" );
+    // bind the buffer to be used with this attribute
+    cm->point_buffer.bind();
+    // specify how to interpret buffer
+    viz_shader.setAttributeBuffer( "vertex", GL_FLOAT, 0, 4 );
+    // this should be done for all attributes
+
+    float colour [4] = {1,0,0,1}; // Red
+    glUniform3fv(viz_shader.uniformLocation("elColour"), 1, colour);
+    source_edge_buffer.bind();
+    glBindTexture(GL_TEXTURE_BUFFER, textures [0]);
+    glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, source_edge_weight_buffer.bufferId());
+    glDrawElements(GL_LINES, gdata->source_edges.size()*2, GL_UNSIGNED_INT, 0);
+    glBindTexture(GL_TEXTURE_BUFFER, 0);
+
+    colour [0] = 0; colour [2] = 1; // Blue
+    glUniform3fv(viz_shader.uniformLocation("elColour"), 1, colour);
+    sink_edge_buffer.bind();
+    glBindTexture(GL_TEXTURE_BUFFER, textures [0]);
+    glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, sink_edge_weight_buffer.bufferId());
+    glDrawElements(GL_LINES, gdata->sink_edges.size()*2, GL_UNSIGNED_INT, 0);
+    glBindTexture(GL_TEXTURE_BUFFER, 0);
+
+    colour [2] = 0; colour [1] = 1; // Green
+    glUniform3fv(viz_shader.uniformLocation("elColour"), 1, colour);
+    bridge_edge_buffer.bind();
+    glBindTexture(GL_TEXTURE_BUFFER, textures [0]);
+    glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, bridge_edge_weight_buffer.bufferId());
+    glDrawElements(GL_LINES, gdata->bridge_edges.size()*2, GL_UNSIGNED_INT, 0);
+    glBindTexture(GL_TEXTURE_BUFFER, 0);
+
+    bridge_edge_buffer.release();
+    cm->point_buffer.release();
+    viz_shader.release();
+    glError("edit cut 5");
+
+
+    ////////////////// Draw vertices //////////////////////////////
+
+    viz_shader2.bind();
+    glUniformMatrix4fv(viz_shader2.uniformLocation("modelToCameraMatrix"),
+                       1, GL_FALSE, glarea->camera.modelviewMatrix().data());
+    glUniformMatrix4fv(viz_shader2.uniformLocation("cameraToClipMatrix"),
+                       1, GL_FALSE, glarea->camera.projectionMatrix().data());
+
+    // enable attribur in shader
+    viz_shader2.enableAttributeArray( "vertex" );
+    cm->point_buffer.bind();
+    viz_shader2.setAttributeBuffer( "vertex", GL_FLOAT, 0, 4 );
+
+    glPointSize(settings->vertexSize());
+
+    colour [0] = 1.0f; colour [1] = 0.0f; // Red
+    glUniform4fv(viz_shader2.uniformLocation("colour"), 1, colour);
+    glError("Setting uniform is an issue");
+    source_vertex_buffer.bind();
+    glError("binding");
+    glDrawElements(GL_POINTS, gdata->source_vertices.size(), GL_UNSIGNED_INT, 0);
+    glError("draw");
+    source_vertex_buffer.release();
+
+    colour [0] = 0.0f; colour [2] = 1.0f; // Blue
+    glUniform4fv(viz_shader2.uniformLocation("colour"), 1, colour);
+    glError("Setting uniform is an issue 2");
+    sink_vertex_buffer.bind();
+    glError("binding");
+    assert(gdata->sink_vertices.size() == sink_vertex_buffer.size()/sizeof(int));
+    assert(gdata->sink_vertices.size() != 0);
+    glDrawElements(GL_POINTS, gdata->sink_vertices.size(), GL_UNSIGNED_INT, 0);
+    glError("draw");
+    sink_vertex_buffer.release();
+    cm->point_buffer.release();
+
+    // Draw centoid line with same shader /////////////////////////
+
+    int far = 100;
+    Eigen::Vector3f center_line_dir = seg.polygon_centoid_ - seg.cam_origin_;
+    center_line_dir.normalize();
+
+    Eigen::Vector3f start = seg.cam_origin_;
+    Eigen::Vector3f end = center_line_dir * far;
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+    if(!temp_buffer.isCreated())
+        temp_buffer.create();
+
+    temp_buffer.bind();
+    viz_shader2.setAttributeBuffer( "vertex", GL_FLOAT, 0, 4 );
+
+    temp_buffer.allocate(sizeof(float)*4*(seg.polygon_.size()+1)*2);
+
+    float one = 1;
+    float data[8] = {0};
+
+    memcpy(&data[0], start.data(), sizeof(float)*3); memcpy(&data[3], &one, sizeof(float));
+    memcpy(&data[4], end.data(), sizeof(float)*3); memcpy(&data[7], &one, sizeof(float));
+
+    temp_buffer.write(0, data, sizeof(float)*8);
+
+    colour [0] = 1.0f; colour [1] = 0.08f; colour [2] = 0.57f; // pink
+    colour [3] = 0.8f; // opacity
+    glUniform4fv(viz_shader2.uniformLocation("colour"), 1, colour);
+    glLineWidth(8);
+    glDrawArrays(GL_LINES, 0, 2);
+
+    glError("Draw line Issues");
+
+    // draw polygon sides
+
+    //qDebug("Start draw fan");
+
+    // for each pair of points
+    for(int i = 0 ; i < seg.polygon_.size() + 1; i ++){
+        int idx = i % seg.polygon_.size();
+
+        Eigen::Vector3f & point = seg.polygon_[idx];
+
+        Eigen::Vector3f start = seg.cam_origin_;
+        Eigen::Vector3f end = (point - seg.cam_origin_).normalized() * far;
+
+        memcpy(&data[0], start.data(), sizeof(float)*3); memcpy(&data[3], &one, sizeof(float));
+        memcpy(&data[4], end.data(), sizeof(float)*3); memcpy(&data[7], &one, sizeof(float));
+
+        //qDebug("(%f, %f, %f, %f), (%f, %f, %f, %f)", data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7] );
+
+        temp_buffer.write(i*sizeof(float)*8, data, sizeof(float)*8);
+
+    }
+    glError("Write Issues");
+
+    colour [0] = 0.0f; colour [1] = 0.0f; colour [2] = 0.0f; // black
+    glUniform4fv(viz_shader2.uniformLocation("colour"), 1, colour);
+
+    glEnable (GL_BLEND);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, (seg.polygon_.size() + 1) * 2);
+    glError("Draw Issues");
+
+    temp_buffer.release();
+
+    glError("Issues");
+
+    viz_shader2.release();
 
 
 }
@@ -324,8 +393,6 @@ bool EditPlugin::mouseReleaseEvent(QMouseEvent *event, CloudModel * cm, GLArea *
                 dest_layer = cm->layerList.layers.size()-1;
             }
 
-
-            qDebug("segmenting????????????????????");
             segment(source_layer, dest_layer, cm, glarea);
             lasso.clear();
         }

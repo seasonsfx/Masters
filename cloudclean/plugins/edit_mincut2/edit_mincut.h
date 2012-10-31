@@ -70,6 +70,8 @@ private:
     QGLBuffer                               sink_edge_weight_buffer;
     QGLBuffer                               bridge_edge_weight_buffer;
 
+    QGLBuffer                               temp_buffer;
+
     GLuint                                  textures[3];
 
     QGLBuffer                               source_vertex_buffer;

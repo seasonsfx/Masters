@@ -39,7 +39,7 @@
          <double>0.010000000000000</double>
         </property>
         <property name="value">
-         <double>0.250000000000000</double>
+         <double>1.000000000000000</double>
         </property>
        </widget>
       </item>
@@ -116,7 +116,7 @@
       <item row="2" column="0">
        <widget class="QLabel" name="label_4">
         <property name="text">
-         <string>Sigma</string>
+         <string>Sigma (density)</string>
         </property>
        </widget>
       </item>

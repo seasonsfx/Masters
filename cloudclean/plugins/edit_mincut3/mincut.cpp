@@ -502,10 +502,10 @@ MinCut::calculateBinaryPotential (int source, int target) const
 
   // Feature space distace
   float feature_dist = euclidianDist(fpfhs_->at(source), fpfhs_->at(target));
-  //qDebug("Dist( %f ), FeatureDist( %f )", distance, feature_dist);
-
 
   weight = exp (-distance*feature_dist);
+
+  //qDebug("Dist( %f ), FeatureDist( %f ), weight( %f )", distance, feature_dist, weight);
 
   return (weight);
 }

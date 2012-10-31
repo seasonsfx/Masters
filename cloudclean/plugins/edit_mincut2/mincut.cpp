@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <cmath>
 #include <QDebug>
+#include <string>
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -71,20 +72,21 @@ boost::shared_ptr<MinCut::gData> MinCut::getGraphData(){
 
     // temporary vertices
     std::vector<int> tmp_vertices;
-    std::vector<int> tmp_labels;
+    std::map<int, int> tmp_labels;
 
     // Set vertices
     OutEdgeIterator edge_iter, edge_end;
+    // for every edge connected to the source vertex (all of them)
     for ( boost::tie (edge_iter, edge_end) = boost::out_edges (source_, *graph_); edge_iter != edge_end; edge_iter++ )
     {
       if (labels[edge_iter->m_target] == 1){
         if (residual_capacity[*edge_iter] > epsilon_){
             data->source_vertices.push_back(edge_iter->m_target);
-            tmp_labels.push_back(0);
+            tmp_labels.insert(std::make_pair(edge_iter->m_target, 0));
         }
         else{
             data->sink_vertices.push_back(edge_iter->m_target);
-            tmp_labels.push_back(1);
+            tmp_labels.insert(std::make_pair(edge_iter->m_target, 1));
         }
         tmp_vertices.push_back(edge_iter->m_target);
       }
@@ -100,44 +102,61 @@ boost::shared_ptr<MinCut::gData> MinCut::getGraphData(){
 
     float max_weight = 0;
 
-    for(int idx : tmp_vertices){
+    //qDebug("Viz!!");
+
+    // for all the vertices
+    for(int i = 0; i < tmp_vertices.size(); i++){
+        int idx = tmp_vertices[i];
         // For every neighbour edge
         for ( boost::tie (edge_iter, edge_end) = boost::out_edges (idx, *graph_); edge_iter != edge_end; edge_iter++ ) {
             VertexDescriptor target = edge_iter->m_target;
             if(target == source_ || target == sink_)
                 continue;
 
-            // Set up edge
+            // Set up edge source and est
             int a = idx, b = static_cast<int>(target);
             assert(a !=b);
+            // swap if a is bigger
             if(a > b){ int tmp = a; a = b; b = tmp;}
             std::pair<int, int> edge = std::make_pair(a, b);
             auto retpair = edge_marker.insert(edge);
 
-            // Continue the egde was previously inserted
+            // Prevent duplicates, continue the edge was previously inserted
             if(!retpair.second)
                 continue;
 
-            float weight = residual_capacity[*edge_iter];
+            //float weight = residual_capacity[*edge_iter];
+
+            float weight_forward = (*capacity_)[*edge_iter];
+            float weight_reverse = (*capacity_)[(*reverse_edges_)[*edge_iter]];
+            float weight = weight_forward + weight_reverse;
 
             if(weight > max_weight)
                 max_weight = weight;
 
+            //std::string label = "None";
+
+            // i think here i'm passing the absolute index and not the index buffer index
             // Determine label
-            if(tmp_labels[idx] == tmp_labels[static_cast<int>(target)]){
+            if(tmp_labels[a] == tmp_labels[b]){
                 if(tmp_labels[idx] == 0){
                     data->source_edges.push_back(edge);
                     data->source_edge_weights.push_back(weight);
+                    //label = "source";
                 }
                 else{
                     data->sink_edges.push_back(edge);
                     data->sink_edge_weights.push_back(weight);
+                    //label = "sink";
                 }
             }
             else{
                 data->bridge_edges.push_back(edge);
                 data->bridge_edge_weights.push_back(weight);
+                //label = "bridge";
             }
+
+            //qDebug("Edge from %d to %d, weight = %f, label = %s", a, b, weight, label.c_str());
 
             // what about the flow?
         }
@@ -444,11 +463,18 @@ MinCut::buildGraph ()
   {
     int point_index = (*indices_)[i_point];
     search_->nearestKSearch (i_point, number_of_neighbours_, neighbours, distances);
-    for (size_t i_nghbr = 1; i_nghbr < neighbours.size (); i_nghbr++) // WHY skip the first neighbour?
+    //qDebug("Neighbour count: %d", neighbours.size());
+    for (size_t i_nghbr = 1; i_nghbr < neighbours.size (); i_nghbr++) // WHY skip the first neighbour? Exclude itself?
     {
       double weight = calculateBinaryPotential (point_index, neighbours[i_nghbr]);
       addEdge (point_index, neighbours[i_nghbr], weight);
       addEdge (neighbours[i_nghbr], point_index, weight);
+
+      int from = vertices_[neighbours[i_nghbr]];
+      int to = vertices_[point_index];
+      if(from > to){int tmp = from; from = to; to = tmp;}
+      //qDebug("Edge from %d to %d, weight = %f", from, to, weight);
+
     }
     neighbours.clear ();
     distances.clear ();
@@ -606,8 +632,15 @@ MinCut::calculateBinaryPotential (int source, int target) const
   distance += (input_->points[source].x - input_->points[target].x) * (input_->points[source].x - input_->points[target].x);
   distance += (input_->points[source].y - input_->points[target].y) * (input_->points[source].y - input_->points[target].y);
   distance += (input_->points[source].z - input_->points[target].z) * (input_->points[source].z - input_->points[target].z);
+  //qDebug("Dist( %f )", distance);
   distance *= inverse_sigma_;
+  //qDebug("Dist*inv_sigma( %f ), inv_sigma = %f", distance, inverse_sigma_);
   weight = exp (-distance);
+  //qDebug("weight( %.9f )",  weight);
+
+  //qDebug("Source( %f, %f, %f ) @ %d, Target( %f, %f, %f ) @ %d", input_->points[source].x, input_->points[source].y, input_->points[source].z, source,
+  //       input_->points[target].x, input_->points[target].y, input_->points[target].z, target);
+
 
   return (weight);
 }

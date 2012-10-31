@@ -277,13 +277,12 @@ public:
     bool deinitCompute ();
 
 
-
-
-
-
 /////////////////////////
 
-
+    public:
+    std::vector<Eigen::Vector3f> polygon_;
+    Eigen::Vector3f polygon_centoid_;
+    Eigen::Vector3f cam_origin_;
 
     protected:
 
@@ -315,9 +314,7 @@ public:
     bool graph_is_valid_;
 
 
-    std::vector<Eigen::Vector3f> polygon_;
-    Eigen::Vector3f polygon_centoid_;
-    Eigen::Vector3f cam_origin_;
+
 
     /** \brief Stores the points that are known to be in the foreground. */
     std::vector<pcl::PointXYZI, Eigen::aligned_allocator<pcl::PointXYZI> > foreground_points_;

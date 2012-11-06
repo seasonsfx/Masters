@@ -511,17 +511,46 @@ inline Eigen::Vector3f proj(Eigen::Vector3f p, Eigen::Vector3f a, Eigen::Vector3
     return (v1.dot(v2)/v2.norm())*v2;
 }
 
-inline bool pointInTriangle(Eigen::Vector3f p, Eigen::Vector3f a, Eigen::Vector3f b, Eigen::Vector3f c){
+inline float cross(Eigen::Vector2f a, Eigen::Vector2f b){
+    return a.x()*b.y() - a.y*b.x();
+}
 
-    Eigen::Vector3f v1 = p-a;
-    Eigen::Vector3f v2 = b-a;
-
-    bool sign1 = (p-a).cross(b-a) < 0;
-    bool sign2 = (p-b).cross(c-b) < 0;
-    bool sign3 = (p-c).cross(a-c) < 0;
-
+inline bool pointInTriangle(Eigen::Vector2f p, Eigen::Vector2f a, Eigen::Vector2f b, Eigen::Vector2f c){
+    bool sign1 = cross(p-a, b-a) < 0;
+    bool sign2 = cross(p-b, c-b) < 0;
+    bool sign3 = cross(p-c, a-c) < 0;
     return sign1 == sign2 == sign3;
+}
 
+inline Eigen::Vector2f closestCoord(Eigen::Vector2f p, Eigen::Vector2f a, Eigen::Vector2f b, Eigen::Vector2f c){
+    vector<Vector2f> points = {a,b,c};
+    Eigen::Vector2f minCoord;
+    float min = FLT_MAX;
+    for(int i = 0; i < 3; i++){
+        i2 = (i+1)%3;
+        Vector2f v1 = p-points[i2];
+        Vector2f v2 = points[i] - points[i2];
+        //project v1 onto v2
+        float t = v1.dot(v2)/(v2.dot(v2));
+
+        if(t < 0)
+            t = 0;
+        if(t > 1)
+            t = 1;
+
+        Vector2f p2 = points[i] + v2*t;
+
+        float dist = (p2 - p).norm();
+        if(dist < min){
+            min = dist;
+            minCoord = p2;
+        }
+
+    }
+
+    assert(min != FLT_MAX);
+
+    return minCoord;
 }
 
 float distToPlane(Eigen::Vector3f point, Eigen::Vector3f p1, Eigen::Vector3f p2, Eigen::Vector3f p3){
@@ -537,15 +566,23 @@ float distToPlane(Eigen::Vector3f point, Eigen::Vector3f p1, Eigen::Vector3f p2,
     // rotate to xy plane
     point*=q; p1*=q; p2*=q;p3*=q;
 
-    // is point inside?
+    // make 2d
+    Eigen::Vector2f point_ = point.head<2>();
+    Eigen::Vector2f p1_ = p1.head<2>();
+    Eigen::Vector2f p2_ = p2.head<2>();
+    Eigen::Vector2f p3_ = p3.head<2>();
 
-    // calculate distance to each line and check bounds
+    // if in triangle
+    bool in_triangle = pointInTriangle(point_, p1_, p2_, p3_);
+    if(in_triangle){
+        return std::fabs(point.z - p1.z);
+    }
 
+    // if not in triangle find the closest point the line
+    Eigen::Vector2f coord = closestCoord(point_, p1_, p2_, p3_);
+    Eigen::Vector3f cpoint(coord.x(), coord.y(), p1.z());
 
-    Eigen::Vector3f normal = plane.head<3>();
-    Eigen::Vector3f vec_to_point = point - pointOnPlane(plane);
-    float dist = fabs(normal.dot(vec_to_point))/normal.norm();
-    return dist;
+    return (point-cpoint).norm();
 }
 
 // Finds and returns the distance to the closest plane defined by a line and

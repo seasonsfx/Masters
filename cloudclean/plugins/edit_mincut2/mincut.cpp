@@ -498,18 +498,54 @@ inline Eigen::Vector3f pointOnPlane(Eigen::Vector4f & plane){
     return point_on_plane;
 }
 
-float distToPlane(Eigen::Vector3f & point, Eigen::Vector4f & plane){
-    Eigen::Vector3f normal = plane.head<3>();
-    Eigen::Vector3f vec_to_point = point - pointOnPlane(plane);
-    float dist = fabs(normal.dot(vec_to_point))/normal.norm();
-    return dist;
-}
-
 Eigen::Vector4f getPlane(Eigen::Vector3f p1, Eigen::Vector3f p2, Eigen::Vector3f p3){
     Eigen::Vector3f normal = (p2 - p1).cross(p3 - p1);
     float d = -(normal.dot(p1));
     Eigen::Vector4f plane; plane << normal.x(), normal.y(), normal.z(), d;
     return plane;
+}
+
+inline Eigen::Vector3f proj(Eigen::Vector3f p, Eigen::Vector3f a, Eigen::Vector3f b){
+    Eigen::Vector3f v1 = p-a;
+    Eigen::Vector3f v2 = b-a;
+    return (v1.dot(v2)/v2.norm())*v2;
+}
+
+inline bool pointInTriangle(Eigen::Vector3f p, Eigen::Vector3f a, Eigen::Vector3f b, Eigen::Vector3f c){
+
+    Eigen::Vector3f v1 = p-a;
+    Eigen::Vector3f v2 = b-a;
+
+    bool sign1 = (p-a).cross(b-a) < 0;
+    bool sign2 = (p-b).cross(c-b) < 0;
+    bool sign3 = (p-c).cross(a-c) < 0;
+
+    return sign1 == sign2 == sign3;
+
+}
+
+float distToPlane(Eigen::Vector3f point, Eigen::Vector3f p1, Eigen::Vector3f p2, Eigen::Vector3f p3){
+    //Eigen::Vector4f plane = getPlane(p1, p2, p3);
+
+    // Calculate rotation quarterion
+    Eigen::Vector3f triangle_normal = ((p2 - p1).cross(p3 - p1)).normalized();
+    Eigen::Vector3f z_axis(0,0,1);
+    float angle = -acos(triangle_normal.dot(z_axis));
+    Eigen::Vector3f axis = triangle_normal.cross(z_axis).normalized();
+    Quaternion<float> q; q = AngleAxis<float>(angle, axis);
+
+    // rotate to xy plane
+    point*=q; p1*=q; p2*=q;p3*=q;
+
+    // is point inside?
+
+    // calculate distance to each line and check bounds
+
+
+    Eigen::Vector3f normal = plane.head<3>();
+    Eigen::Vector3f vec_to_point = point - pointOnPlane(plane);
+    float dist = fabs(normal.dot(vec_to_point))/normal.norm();
+    return dist;
 }
 
 // Finds and returns the distance to the closest plane defined by a line and
@@ -519,8 +555,7 @@ float MinCut::closestPolyLineDist(Eigen::Vector3f & point) const{
 
     for(int i = 0; i < polygon_.size(); i++){
         int p1 = i, p2 = (i+1)%polygon_.size();
-        Eigen::Vector4f plane = getPlane(polygon_[p1], polygon_[p2], cam_origin_);
-        float dist = distToPlane(point, plane);
+        float dist = distToPlane(point, polygon_[p1], polygon_[p2], cam_origin_);
         if(dist < min){
             min = dist;
         }

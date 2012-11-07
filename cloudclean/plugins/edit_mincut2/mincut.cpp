@@ -512,7 +512,7 @@ inline Eigen::Vector3f proj(Eigen::Vector3f p, Eigen::Vector3f a, Eigen::Vector3
 }
 
 inline float cross(Eigen::Vector2f a, Eigen::Vector2f b){
-    return a.x()*b.y() - a.y*b.x();
+    return a.x()*b.y() - a.y()*b.x();
 }
 
 inline bool pointInTriangle(Eigen::Vector2f p, Eigen::Vector2f a, Eigen::Vector2f b, Eigen::Vector2f c){
@@ -523,13 +523,13 @@ inline bool pointInTriangle(Eigen::Vector2f p, Eigen::Vector2f a, Eigen::Vector2
 }
 
 inline Eigen::Vector2f closestCoord(Eigen::Vector2f p, Eigen::Vector2f a, Eigen::Vector2f b, Eigen::Vector2f c){
-    vector<Vector2f> points = {a,b,c};
+    std::vector<Eigen::Vector2f> points = {a,b,c};
     Eigen::Vector2f minCoord;
     float min = FLT_MAX;
     for(int i = 0; i < 3; i++){
-        i2 = (i+1)%3;
-        Vector2f v1 = p-points[i2];
-        Vector2f v2 = points[i] - points[i2];
+        int i2 = (i+1)%3;
+        Eigen::Vector2f v1 = p-points[i2];
+        Eigen::Vector2f v2 = points[i] - points[i2];
         //project v1 onto v2
         float t = v1.dot(v2)/(v2.dot(v2));
 
@@ -538,7 +538,7 @@ inline Eigen::Vector2f closestCoord(Eigen::Vector2f p, Eigen::Vector2f a, Eigen:
         if(t > 1)
             t = 1;
 
-        Vector2f p2 = points[i] + v2*t;
+        Eigen::Vector2f p2 = points[i] + v2*t;
 
         float dist = (p2 - p).norm();
         if(dist < min){
@@ -561,10 +561,13 @@ float distToPlane(Eigen::Vector3f point, Eigen::Vector3f p1, Eigen::Vector3f p2,
     Eigen::Vector3f z_axis(0,0,1);
     float angle = -acos(triangle_normal.dot(z_axis));
     Eigen::Vector3f axis = triangle_normal.cross(z_axis).normalized();
-    Quaternion<float> q; q = AngleAxis<float>(angle, axis);
+    Eigen::Quaternion<float> q; q = Eigen::AngleAxis<float>(angle, axis);
 
     // rotate to xy plane
-    point*=q; p1*=q; p2*=q;p3*=q;
+    point=q*point;
+    p1=q*p1;
+    p2=q*p2;
+    p3=q*p3;
 
     // make 2d
     Eigen::Vector2f point_ = point.head<2>();
@@ -575,7 +578,7 @@ float distToPlane(Eigen::Vector3f point, Eigen::Vector3f p1, Eigen::Vector3f p2,
     // if in triangle
     bool in_triangle = pointInTriangle(point_, p1_, p2_, p3_);
     if(in_triangle){
-        return std::fabs(point.z - p1.z);
+        return fabs(point.z() - p1.z());
     }
 
     // if not in triangle find the closest point the line
@@ -620,9 +623,12 @@ MinCut::calculateUnaryPotential (int point, double& source_weight, double& sink_
 
      // Apply background penalty
      double dist_to_center = distFromCenter(p);
-     double dist_to_boudry = closestPolyLineDist(p);
+     double dist_to_boundry = closestPolyLineDist(p);
 
-     sink_weight = dist_to_center/(dist_to_center+dist_to_boudry);
+     sink_weight = dist_to_center/(dist_to_center+dist_to_boundry);
+
+     qDebug("To center %f, To poly %f, Total %f, c/t %f", dist_to_center, dist_to_boundry,
+            (dist_to_center+dist_to_boundry) ,sink_weight);
 
      // Apply forground penalty
      source_weight = source_weight_;

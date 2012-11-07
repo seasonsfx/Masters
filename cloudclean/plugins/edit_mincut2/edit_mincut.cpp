@@ -246,7 +246,7 @@ void EditPlugin::paintGL(CloudModel * cm, GLArea * glarea){
     sink_vertex_buffer.bind();
     glError("binding");
     assert(gdata->sink_vertices.size() == sink_vertex_buffer.size()/sizeof(int));
-    assert(gdata->sink_vertices.size() != 0);
+    //assert(gdata->sink_vertices.size() != 0);
     glDrawElements(GL_POINTS, gdata->sink_vertices.size(), GL_UNSIGNED_INT, 0);
     glError("draw");
     sink_vertex_buffer.release();

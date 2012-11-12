@@ -1,0 +1,1 @@
+/usr/bin/gcc      CMakeFiles/UnitTests.dir/main.c.o  -o UnitTests -rdynamic 

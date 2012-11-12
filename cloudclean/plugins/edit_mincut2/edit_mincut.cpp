@@ -47,7 +47,7 @@ inline void edgesToBuffer(std::vector<std::pair<int, int> > & edges,
     size_t edge_size = 2 * sizeof(int);
     size_t edge_buffer_size = edges.size() * edge_size;
     buff.allocate(edge_buffer_size);
-    for(int i = 0; i < edges.size(); i++){
+    for(unsigned int i = 0; i < edges.size(); i++){
         std::pair<int, int> & edge = edges [i];
         int data [] = {edge.first, edge.second};
         buff.write(i*edge_size, data, edge_size);
@@ -149,8 +149,8 @@ void EditPlugin::paintGL(CloudModel * cm, GLArea * glarea){
         qDebug("loading gdata");
         gdata = seg.getGraphData();
 
-        qDebug("Source edges: %d", gdata->source_edges.size());
-        qDebug("Sink edges: %d", gdata->sink_edges.size());
+        qDebug("Source edges: %lu", gdata->source_edges.size());
+        qDebug("Sink edges: %lu", gdata->sink_edges.size());
 
         edgesToBuffer(gdata->source_edges, source_edge_buffer);
         edgesToBuffer(gdata->sink_edges, sink_edge_buffer);
@@ -293,7 +293,7 @@ void EditPlugin::paintGL(CloudModel * cm, GLArea * glarea){
     //qDebug("Start draw fan");
 
     // for each pair of points
-    for(int i = 0 ; i < seg.polygon_.size() + 1; i ++){
+    for(unsigned int i = 0 ; i < seg.polygon_.size() + 1; i ++){
         int idx = i % seg.polygon_.size();
 
         Eigen::Vector3f & point = seg.polygon_[idx];
@@ -327,12 +327,12 @@ void EditPlugin::paintGL(CloudModel * cm, GLArea * glarea){
 
 }
 
-bool EditPlugin::mouseDoubleClickEvent  (QMouseEvent *event, CloudModel * cm, GLArea * glarea){
+bool EditPlugin::mouseDoubleClickEvent  (QMouseEvent *, CloudModel *, GLArea *){
     lasso_active = !lasso_active;
     return true;
 }
 
-bool EditPlugin::StartEdit(QAction *action, CloudModel *cm, GLArea *glarea){
+bool EditPlugin::StartEdit(QAction *, CloudModel * cm, GLArea * glarea){
     cm->layerList.setSelectMode(QAbstractItemView::SingleSelection);
     dest_layer = -1;
 
@@ -350,7 +350,7 @@ bool EditPlugin::EndEdit(CloudModel * cm, GLArea *){
 }
 
 
-bool EditPlugin::mousePressEvent  (QMouseEvent *event, CloudModel *, GLArea * glarea){
+bool EditPlugin::mousePressEvent  (QMouseEvent *, CloudModel *, GLArea *){
 
     return true;
 }
@@ -378,7 +378,7 @@ bool EditPlugin::mouseReleaseEvent(QMouseEvent *event, CloudModel * cm, GLArea *
             int source_layer = -1;
 
             // Sets source layer as the one selected
-            for(int i = 0; i < cm->layerList.layers.size(); i++){
+            for(unsigned int i = 0; i < cm->layerList.layers.size(); i++){
                 Layer & l = cm->layerList.layers[i];
                 if(l.active && l.visible){
                     source_layer = i;
@@ -388,7 +388,7 @@ bool EditPlugin::mouseReleaseEvent(QMouseEvent *event, CloudModel * cm, GLArea *
             }
 
             // If the destination layer does not exist or has been deleted, fix it
-            if(dest_layer == -1 || dest_layer >= cm->layerList.layers.size()){
+            if(dest_layer == -1 || dest_layer >= (int)cm->layerList.layers.size()){
                 cm->layerList.newLayer();
                 dest_layer = cm->layerList.layers.size()-1;
             }
@@ -454,7 +454,7 @@ Eigen::Vector2f centroid(const std::vector<Eigen::Vector2f> polygon){
 
     float signedArea = 0;
 
-    for(int i = 0; i < polygon.size(); i++){
+    for(unsigned int i = 0; i < polygon.size(); i++){
         Eigen::Vector2f p1 = polygon[i];
         Eigen::Vector2f p2 = polygon[(i+1)%polygon.size()];
 

@@ -35,7 +35,7 @@ public:
     bool StartEdit(QAction *action, CloudModel * cm, GLArea * glarea);
     bool EndEdit(CloudModel * cm, GLArea * glarea);
     void paintGL(CloudModel * cm, GLArea *glarea);
-    bool mouseDoubleClickEvent  (QMouseEvent *event, CloudModel * cm, GLArea * glarea);
+    bool mouseDoubleClickEvent  (QMouseEvent *, CloudModel *, GLArea * glarea);
     bool mousePressEvent  (QMouseEvent *event, CloudModel *, GLArea * glarea);
     bool mouseMoveEvent   (QMouseEvent *event, CloudModel *, GLArea * glarea);
     bool mouseReleaseEvent(QMouseEvent *event, CloudModel * cm, GLArea * glarea);

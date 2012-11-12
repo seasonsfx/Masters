@@ -5,7 +5,8 @@ HEADERS += \
     edit_mincut.h \
     settings.h \
     mincut.h \
-    lasso.h
+    lasso.h \
+    compgeom.h
 
 QMAKE_CXXFLAGS += -DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET
 
@@ -13,7 +14,8 @@ SOURCES += \
     edit_mincut.cpp \
     settings.cpp \
     mincut.cpp \
-    lasso.cpp
+    lasso.cpp \
+    compgeom.cpp
 
 INCLUDEPATH += \
         ../../cloudclean \

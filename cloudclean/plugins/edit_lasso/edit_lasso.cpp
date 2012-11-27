@@ -94,11 +94,11 @@ void EditLasso::lassoToLayerGPU(CloudModel * cm, GLArea * glarea){
     int result;
 
     // Create buffers from OpenGL
-    cl_mem cl_points = clCreateFromGLBuffer(glarea->context, CL_MEM_READ_WRITE, cm->point_buffer.bufferId(), &result);
+    cl_mem cl_points = clCreateFromGLBuffer(glarea->clcontext, CL_MEM_READ_WRITE, cm->point_buffer.bufferId(), &result);
     clError("CL 1", result);
-    cl_mem cl_sidx = clCreateFromGLBuffer(glarea->context, CL_MEM_READ_WRITE, source.bufferId(), &result);
+    cl_mem cl_sidx = clCreateFromGLBuffer(glarea->clcontext, CL_MEM_READ_WRITE, source.bufferId(), &result);
     clError("CL 2", result);
-    cl_mem cl_didx = clCreateFromGLBuffer(glarea->context, CL_MEM_READ_WRITE, dest.bufferId(), &result);
+    cl_mem cl_didx = clCreateFromGLBuffer(glarea->clcontext, CL_MEM_READ_WRITE, dest.bufferId(), &result);
     clError("CL 3", result);
 
     const cl_mem gl_objects[3] = {cl_points, cl_sidx, cl_didx};
@@ -117,7 +117,7 @@ void EditLasso::lassoToLayerGPU(CloudModel * cm, GLArea * glarea){
         lasso_data[i*2+1] = lasso[i].y();
     }
 
-    cl_mem cl_lasso = clCreateBuffer(glarea->context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(lasso_data), &lasso_data, &result);
+    cl_mem cl_lasso = clCreateBuffer(glarea->clcontext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(lasso_data), &lasso_data, &result);
 
     clError("CL 4", result);
 
@@ -294,7 +294,7 @@ bool EditLasso::StartEdit(QAction *action, CloudModel *cm, GLArea *glarea){
         const size_t kernelsize = qsource.size();
 
         int err;
-        program = clCreateProgramWithSource(glarea->context, 1, &source,
+        program = clCreateProgramWithSource(glarea->clcontext, 1, &source,
                                      &kernelsize, &err);
         clError("Create program failed: ", err);
 

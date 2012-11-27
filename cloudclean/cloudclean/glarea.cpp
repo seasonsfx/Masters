@@ -55,6 +55,8 @@ GLArea::GLArea(QWidget* parent, PluginManager *pm, CloudModel *cm)
 
     mouseDown = Qt::NoButton;
 
+    setAutoBufferSwap(false);
+
     srand (time(NULL));
 }
 
@@ -81,8 +83,11 @@ void GLArea::initializeGL()
     // Setup OpenCL
     cl_int result = clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 1, &device, NULL);
 
-    if(result != CL_SUCCESS)
-        exit(-1);
+    if(result != CL_SUCCESS){
+        qDebug("OpenCL failed!");
+        return;
+        //exit(-1);
+    }
 
     GLXContext glCtx = glXGetCurrentContext();
 
@@ -97,8 +102,8 @@ void GLArea::initializeGL()
             0
     };
 
-    context = clCreateContext(props, 1, &device, NULL, NULL, NULL);
-    cmd_queue = clCreateCommandQueue(context, device, 0, NULL);
+    clcontext = clCreateContext(props, 1, &device, NULL, NULL, NULL);
+    cmd_queue = clCreateCommandQueue(clcontext, device, 0, NULL);
 
     if(result != CL_SUCCESS)
         qWarning() << "CL object create failed:" << oclErrorString(result);
@@ -145,23 +150,6 @@ void GLArea::resizeGL( int w, int h )
 }
 
 void GLArea::paintGL(){
-
-    ////////////////////////////
-/*
-    std::cout << "Cam: " << std::endl;
-
-    Eigen::Matrix4f cam = camera.modelviewMatrix().matrix();
-
-    std::cout << cam  << std::endl;
-
-    Eigen::Matrix4f proj = camera.projectionMatrix().matrix();
-
-    std::cout << "Proj: " << std::endl;
-
-    std::cout << proj << std::endl;
-*/
-
-    ///////////////////////////
 
     QTime time;
     time.start();
@@ -272,6 +260,7 @@ void GLArea::paintGL(){
 
     painter.endNativePainting();
 
+    swapBuffers();
     updateFps(time.elapsed());
 
 }

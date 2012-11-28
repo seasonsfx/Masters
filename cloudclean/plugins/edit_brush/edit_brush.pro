@@ -10,6 +10,7 @@ SOURCES += edit_brush.cpp
 INCLUDEPATH += \
         ../../cloudclean \
         ../../common \
+        ../../external \
         "/usr/local/include/pcl-1.7/" \
         "/usr/include/flann/" \
         "/usr/include/eigen3/" \

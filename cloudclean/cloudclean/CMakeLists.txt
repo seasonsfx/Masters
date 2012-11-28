@@ -1,47 +1,84 @@
-project( CloudClean )
-cmake_minimum_required( VERSION 2.6 )
-set ( CMAKE_BUILD_TYPE Release )
-add_definitions ( -Wall )
-find_package ( Qt4 REQUIRED )
-include ( ${QT_USE_FILE} )
-include_directories (
-	${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}
-	${QT_QTCORE_INCLUDE_DIR} ${QT_QTGUI_INCLUDE_DIR} ${QT_QTCORE_INCLUDE_DIR} ${QT_QTGUI_INCLUDE_DIR} ${QT_QTOPENGL_INCLUDE_DIR}
-	interfaces
-	/usr/local/include/pcl-1.7/
-	/usr/include/flann/
-	/usr/include/eigen3/
-	/opt/AMDAPP/include
-	/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc)
-set ( CloudClean_HDRS
-	io.h
-	MousePoles.h
-	helpers.h
-	layer.h
-	layerview.h
-	interfaces/editplugininterface.h
-	)
+set(LINK_FLAGS -rdynamic)
 
-set ( CloudClean_SRCS
+add_definitions(
+        -rdynamic
+)
+
+include_directories(
+	${QT_QTCORE_INCLUDE_DIR}
+	${QT_QTGUI_INCLUDE_DIR}
+	${QT_QTCORE_INCLUDE_DIR}
+	${QT_QTGUI_INCLUDE_DIR}
+	${QT_QTOPENGL_INCLUDE_DIR}
+)
+
+set(cloudclean_SOURCES
 	main.cpp
-	MousePoles.cpp
 	layerlist.cpp
 	layer.cpp
 	mainwindow.cpp
 	cloudmodel.cpp
 	glarea.cpp
 	layerview.cpp
-	lassoselectplugin.cpp
-	)
+	pluginmanager.cpp
+	toolbox.cpp
+	camera.cpp
+	subsampledialog.cpp
+	pointpicker.cpp
+	../common/utilities.cpp
+)
 
-set ( CloudClean_MOCS
+set(cloudclean_HEADERS
+	io.h
 	layerlist.h
+	layer.h
 	mainwindow.h
 	cloudmodel.h
 	glarea.h
-	plugins/lassoselectplugin.h
-	)
-QT4_WRAP_CPP(MOCS ${CloudClean_MOCS})
+	layerview.h
+	pluginmanager.h
+	toolbox.h
+	camera.h
+	subsampledialog.h
+	pointpicker.h
+)
 
-add_executable ( CloudClean ${CloudClean_SRCS} ${UIS} ${RSCS} ${TRS} ${MOCS} )
-target_link_libraries ( CloudClean  ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY} ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY} ${QT_QTOPENGL_LIBRARY} )
+set(cloudclean_RESOURCES cloudclean.qrc)
+
+set(cloudclean_FORMS
+	layerview.ui
+	subsampledialog.ui
+	toolbox.ui
+)
+
+QT4_WRAP_CPP(cloudclean_HEADERS_MOC ${cloudclean_HEADERS})
+QT4_WRAP_UI(cloudclean_FORMS_HEADERS ${cloudclean_FORMS})
+QT4_ADD_RESOURCES(cloudclean_RESOURCES_RCC ${cloudclean_RESOURCES})
+
+MESSAGE("RCC stuff: " ${cloudclean_RESOURCES_RCC})
+
+add_executable(CloudClean
+	${cloudclean_SOURCES} 
+	${cloudclean_HEADERS_MOC} 
+	${cloudclean_FORMS_HEADERS} 
+	${cloudclean_RESOURCES_RCC}
+)
+
+target_link_libraries(CloudClean
+	${QT_QTCORE_LIBRARY}
+	${QT_QTGUI_LIBRARY}
+	${QT_QTCORE_LIBRARY}
+	${QT_QTGUI_LIBRARY}
+	${QT_QTOPENGL_LIBRARY}
+	pcl_io 
+	pcl_common  
+	pcl_features  
+	pcl_kdtree  
+	pcl_visualization 
+	pcl_octree  
+	pcl_filters 
+	pcl_search
+	GL 
+	GLU 
+	OpenCL 
+)

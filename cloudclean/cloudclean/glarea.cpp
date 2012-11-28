@@ -5,6 +5,8 @@
 #include <time.h>
 #include <stdlib.h>
 
+#include <QResource>
+
 #include <Eigen/Dense>
 #include <QTime>
 #include <QFont>
@@ -63,10 +65,11 @@ GLArea::GLArea(QWidget* parent, PluginManager *pm, CloudModel *cm)
 void GLArea::initializeGL()
 {
     glClearColor( 0.9f, 0.9f, 0.9f, 1.0f );
-    //glClearColor( 1.0f, 1.0f, 1.0f, 1.0f );
     glEnable(GL_DEPTH_TEST);
 
     assert(prepareShaderProgram(point_shader, ":/shaders/points.vert", ":/shaders/points.frag", "" ) );
+
+    qDebug("Is it linked? %s", point_shader.isLinked() ? "yes" : "no");
 
     if ( !point_shader.bind() )
     {
@@ -119,23 +122,31 @@ Eigen::Vector2f GLArea::normalized_mouse(int x, int y){
 bool GLArea::prepareShaderProgram(QGLShaderProgram & shader, const QString& vertexShaderPath, const QString& fragmentShaderPath,  const QString& geometryShaderPath)
 {
     bool result = shader.addShaderFromSourceFile( QGLShader::Vertex, vertexShaderPath );
-    if ( !result )
+    if ( !result ){
         qWarning() << shader.log();
+        qDebug("NOOO!!");
+    }
 
     result = shader.addShaderFromSourceFile( QGLShader::Fragment, fragmentShaderPath );
-    if ( !result )
+    if ( !result ){
         qWarning() << shader.log();
+        qDebug("NOOO!!");
+    }
 
     if (geometryShaderPath.length() > 0){
         result = shader.addShaderFromSourceFile( QGLShader::Geometry, geometryShaderPath );
-        if ( !result )
+        if ( !result ){
             qWarning() << shader.log();
+            qDebug("NOOO!!");
+        }
     }
 
     // Link them to resolve any references.
     result = shader.link();
-    if ( !result )
+    if ( !result ){
         qWarning() << "Could not link shader program:" << shader.log();
+        qDebug("NOOO!!");
+    }
 
     return result;
 }

@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+   <FileVersion major="1" minor="6" />
+   <Project>
+      <Option title="cloudclean" />
+      <Option makefile_is_custom="1" />
+      <Option compiler="gcc" />
+      <Option virtualFolders="CMake Files\;CMake Files\cmake\;CMake Files\cloudclean\;CMake Files\plugins\;CMake Files\plugins\edit_lasso\;" />
+      <Build>
+      <Target title="all">
+         <Option working_dir="/home/rickert/Masters/cloudclean" />
+         <Option type="4" />
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/Makefile&quot;  VERBOSE=1 all" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="rebuild_cache">
+         <Option working_dir="/home/rickert/Masters/cloudclean" />
+         <Option type="4" />
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/Makefile&quot;  VERBOSE=1 rebuild_cache" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="CloudClean">
+         <Option output="/home/rickert/Masters/cloudclean/build/CloudClean" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/rickert/Masters/cloudclean/build" />
+         <Option object_output="./" />
+         <Option type="1" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-DQT_GUI_LIB" />
+            <Add option="-DQT_CORE_LIB" />
+            <Add directory="/home/rickert/Masters/cloudclean/EIGEN3_INCLUDE_DIR" />
+            <Add directory="/home/rickert/Masters/cloudclean/common" />
+            <Add directory="/home/rickert/Masters/cloudclean/external" />
+            <Add directory="/opt/AMDAPP/include" />
+            <Add directory="/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc" />
+            <Add directory="/usr/include/eigen3" />
+            <Add directory="/usr/include/flann" />
+            <Add directory="/usr/include/qt4" />
+            <Add directory="/usr/include/qt4/QtCore" />
+            <Add directory="/usr/include/qt4/QtGui" />
+            <Add directory="/usr/include/qt4/QtOpenGL" />
+            <Add directory="/usr/local/include/pcl-1.7" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/cloudclean/Makefile&quot;  VERBOSE=1 CloudClean" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/cloudclean/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/cloudclean/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/cloudclean/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="CloudClean/fast">
+         <Option output="/home/rickert/Masters/cloudclean/build/CloudClean" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/rickert/Masters/cloudclean/build" />
+         <Option object_output="./" />
+         <Option type="1" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-DQT_GUI_LIB" />
+            <Add option="-DQT_CORE_LIB" />
+            <Add directory="/home/rickert/Masters/cloudclean/EIGEN3_INCLUDE_DIR" />
+            <Add directory="/home/rickert/Masters/cloudclean/common" />
+            <Add directory="/home/rickert/Masters/cloudclean/external" />
+            <Add directory="/opt/AMDAPP/include" />
+            <Add directory="/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc" />
+            <Add directory="/usr/include/eigen3" />
+            <Add directory="/usr/include/flann" />
+            <Add directory="/usr/include/qt4" />
+            <Add directory="/usr/include/qt4/QtCore" />
+            <Add directory="/usr/include/qt4/QtGui" />
+            <Add directory="/usr/include/qt4/QtOpenGL" />
+            <Add directory="/usr/local/include/pcl-1.7" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/cloudclean/Makefile&quot;  VERBOSE=1 CloudClean/fast" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/cloudclean/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/cloudclean/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/cloudclean/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="edit_lasso">
+         <Option output="/home/rickert/Masters/cloudclean/build/plugins/libedit_lasso.a" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/rickert/Masters/cloudclean/plugins/edit_lasso" />
+         <Option object_output="./" />
+         <Option type="2" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-DQT_GUI_LIB" />
+            <Add option="-DQT_CORE_LIB" />
+            <Add directory="/home/rickert/Masters/cloudclean/EIGEN3_INCLUDE_DIR" />
+            <Add directory="/home/rickert/Masters/cloudclean/cloudclean" />
+            <Add directory="/home/rickert/Masters/cloudclean/common" />
+            <Add directory="/home/rickert/Masters/cloudclean/external" />
+            <Add directory="/opt/AMDAPP/include" />
+            <Add directory="/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc" />
+            <Add directory="/usr/include/eigen3" />
+            <Add directory="/usr/include/flann" />
+            <Add directory="/usr/include/qt4" />
+            <Add directory="/usr/include/qt4/QtCore" />
+            <Add directory="/usr/include/qt4/QtGui" />
+            <Add directory="/usr/include/qt4/QtOpenGL" />
+            <Add directory="/usr/local/include/pcl-1.7" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_lasso/Makefile&quot;  VERBOSE=1 edit_lasso" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_lasso/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_lasso/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_lasso/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="edit_lasso/fast">
+         <Option output="/home/rickert/Masters/cloudclean/build/plugins/libedit_lasso.a" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/rickert/Masters/cloudclean/plugins/edit_lasso" />
+         <Option object_output="./" />
+         <Option type="2" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-DQT_GUI_LIB" />
+            <Add option="-DQT_CORE_LIB" />
+            <Add directory="/home/rickert/Masters/cloudclean/EIGEN3_INCLUDE_DIR" />
+            <Add directory="/home/rickert/Masters/cloudclean/cloudclean" />
+            <Add directory="/home/rickert/Masters/cloudclean/common" />
+            <Add directory="/home/rickert/Masters/cloudclean/external" />
+            <Add directory="/opt/AMDAPP/include" />
+            <Add directory="/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc" />
+            <Add directory="/usr/include/eigen3" />
+            <Add directory="/usr/include/flann" />
+            <Add directory="/usr/include/qt4" />
+            <Add directory="/usr/include/qt4/QtCore" />
+            <Add directory="/usr/include/qt4/QtGui" />
+            <Add directory="/usr/include/qt4/QtOpenGL" />
+            <Add directory="/usr/local/include/pcl-1.7" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_lasso/Makefile&quot;  VERBOSE=1 edit_lasso/fast" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_lasso/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_lasso/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_lasso/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      </Build>
+      <Unit filename="/home/rickert/Masters/cloudclean/cloudclean/camera.cpp">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/cloudclean/cloudmodel.cpp">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/cloudclean/glarea.cpp">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/cloudclean/layer.cpp">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/cloudclean/layerlist.cpp">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/cloudclean/layerview.cpp">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/cloudclean/main.cpp">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/cloudclean/mainwindow.cpp">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/cloudclean/pluginmanager.cpp">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/cloudclean/pointpicker.cpp">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/cloudclean/subsampledialog.cpp">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/cloudclean/toolbox.cpp">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/common/utilities.cpp">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_lasso/edit_lasso.cpp">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/cloudclean/camera.h">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/cloudclean/cloudclean.qrc">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/cloudclean/cloudmodel.h">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/cloudclean/glarea.h">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/cloudclean/layer.h">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/cloudclean/layerlist.h">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/cloudclean/layerview.h">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/cloudclean/layerview.ui">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/cloudclean/mainwindow.h">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/cloudclean/pluginmanager.h">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/cloudclean/pointpicker.h">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/cloudclean/subsampledialog.h">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/cloudclean/subsampledialog.ui">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/cloudclean/toolbox.h">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/cloudclean/toolbox.ui">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/common/utilities.h">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_lasso/edit_lasso.h">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/CMakeLists.txt">
+          <Option virtualFolder="CMake Files\" />
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/cmake/FindEigen3.cmake">
+          <Option virtualFolder="CMake Files\cmake\" />
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/cloudclean/CMakeLists.txt">
+          <Option virtualFolder="CMake Files\cloudclean\" />
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/cloudclean/cloudclean.qrc">
+          <Option virtualFolder="CMake Files\cloudclean\" />
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/CMakeLists.txt">
+          <Option virtualFolder="CMake Files\plugins\" />
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_lasso/CMakeLists.txt">
+          <Option virtualFolder="CMake Files\plugins\edit_lasso\" />
+      </Unit>
+   </Project>
+</CodeBlocks_project_file>

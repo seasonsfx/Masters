@@ -1,5 +1,5 @@
 #define GL3_PROTOTYPES
-#include <../../external/gl3.h>
+#include <gl3.h>
 #include "edit_brush.h"
 #include <QIcon>
 #include <QDebug>

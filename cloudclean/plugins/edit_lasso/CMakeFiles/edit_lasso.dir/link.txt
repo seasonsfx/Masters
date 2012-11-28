@@ -1,0 +1,1 @@
+/usr/bin/c++  -fPIC -O3 -DNDEBUG   -shared -Wl,-soname,libedit_lasso.so -o ../../build/plugins/libedit_lasso.so CMakeFiles/edit_lasso.dir/edit_lasso.cpp.o -L/usr/local/lib 

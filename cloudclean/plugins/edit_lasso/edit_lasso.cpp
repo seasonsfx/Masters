@@ -1,7 +1,7 @@
 #include <iostream>
 
 #define GL3_PROTOTYPES
-#include <../../external/gl3.h>
+#include <gl3.h>
 
 #include <QIcon>
 #include <QDebug>

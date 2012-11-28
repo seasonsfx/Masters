@@ -4,5 +4,5 @@
 # compile CXX with /usr/bin/c++
 CXX_FLAGS = -O3 -DNDEBUG -fPIC -I/usr/include/qt4 -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtCore -I/home/rickert/Masters/cloudclean/EIGEN3_INCLUDE_DIR -I/home/rickert/Masters/cloudclean/external -I/home/rickert/Masters/cloudclean/common -I/usr/local/include/pcl-1.7 -I/usr/include/flann -I/usr/include/eigen3 -I/opt/AMDAPP/include -I/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc -I/usr/include/qt4/QtOpenGL -I/home/rickert/Masters/cloudclean/cloudclean    -Wall -std=c++0x -fopenmp -Wno-deprecated-declarations -Wno-unknown-pragmas -fstack-protector-all
 
-CXX_DEFINES = -Dedit_lasso_EXPORTS -DQT_GUI_LIB -DQT_CORE_LIB -DQT_NO_DEBUG
+CXX_DEFINES = -Dedit_lasso_EXPORTS -DQT_GUI_LIB -DQT_CORE_LIB -DQT_PLUGIN -DQT_SHARED -DQT_NO_DEBUG
 

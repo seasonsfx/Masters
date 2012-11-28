@@ -785,10 +785,15 @@ build/CloudClean: cloudclean/CMakeFiles/CloudClean.dir/moc_camera.cxx.o
 build/CloudClean: cloudclean/CMakeFiles/CloudClean.dir/moc_subsampledialog.cxx.o
 build/CloudClean: cloudclean/CMakeFiles/CloudClean.dir/moc_pointpicker.cxx.o
 build/CloudClean: cloudclean/CMakeFiles/CloudClean.dir/qrc_cloudclean.cxx.o
+build/CloudClean: /usr/lib/x86_64-linux-gnu/libQtGui.so
+build/CloudClean: /usr/lib/x86_64-linux-gnu/libQtCore.so
 build/CloudClean: /usr/lib/x86_64-linux-gnu/libQtCore.so
 build/CloudClean: /usr/lib/x86_64-linux-gnu/libQtGui.so
 build/CloudClean: /usr/lib/x86_64-linux-gnu/libQtCore.so
 build/CloudClean: /usr/lib/x86_64-linux-gnu/libQtGui.so
+build/CloudClean: /usr/lib/x86_64-linux-gnu/libQtOpenGL.so
+build/CloudClean: /usr/lib/x86_64-linux-gnu/libQtGui.so
+build/CloudClean: /usr/lib/x86_64-linux-gnu/libQtCore.so
 build/CloudClean: /usr/lib/x86_64-linux-gnu/libQtOpenGL.so
 build/CloudClean: cloudclean/CMakeFiles/CloudClean.dir/build.make
 build/CloudClean: cloudclean/CMakeFiles/CloudClean.dir/link.txt

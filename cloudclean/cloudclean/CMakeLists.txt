@@ -65,6 +65,7 @@ add_executable(CloudClean
 )
 
 target_link_libraries(CloudClean
+        ${QT_LIBRARIES}
 	${QT_QTCORE_LIBRARY}
 	${QT_QTGUI_LIBRARY}
 	${QT_QTCORE_LIBRARY}

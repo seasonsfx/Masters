@@ -1,6 +1,11 @@
 # Code
 /cloudclean/CloudClean
 Makefile
+CMakeCache.txt
+CMakeFiles
+cmake_install.cmake
+*.cmake
+*.cxx
 *.webm
 *.run
 *.pgm

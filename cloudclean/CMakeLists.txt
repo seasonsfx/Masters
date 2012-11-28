@@ -5,11 +5,9 @@ set(PROJECT_BINARY_DIR ${PROJECT_SOURCE_DIR}/build)
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/build)
 set(LIBRARY_OUTPUT_PATH ${EXECUTABLE_OUTPUT_PATH}/plugins)
 
-MESSAGE("Building to " ${PROJECT_BINARY_DIR})
-MESSAGE("Building to plugins to " ${LIBRARY_OUTPUT_PATH})
-
-set (CMAKE_BUILD_TYPE Release)
+set(CMAKE_BUILD_TYPE Release)
 find_package(Qt4 REQUIRED)
+set(QT_USE_OPENGL TRUE)
 include(${QT_USE_FILE})
 
 add_definitions(
@@ -21,7 +19,7 @@ add_definitions(
 	#-stdlib=libc++
 )
 
-LINK_DIRECTORIES(/usr/local/lib)
+link_directories(/usr/local/lib)
 
 list(APPEND QMAKE_CXXFLAGS_RELEASE -O3)
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
@@ -29,7 +27,7 @@ list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 find_package(Eigen3 REQUIRED 3.0)
 include_directories(EIGEN3_INCLUDE_DIR)
 
-include_directories (
+include_directories(
 	external
 	common
 	/usr/local/include/pcl-1.7
@@ -39,5 +37,5 @@ include_directories (
 	/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc
 )
 
-add_subdirectory (cloudclean)
-add_subdirectory (plugins)
+add_subdirectory(cloudclean)
+add_subdirectory(plugins)

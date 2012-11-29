@@ -74,8 +74,8 @@ private:
 
     GLuint                                  textures[3];
 
-    QGLBuffer                               source_vertex_buffer;
     QGLBuffer                               sink_vertex_buffer;
+    QGLBuffer                               source_vertex_buffer;
     QGLShaderProgram                        viz_shader;
     QGLShaderProgram                        viz_shader2;
 

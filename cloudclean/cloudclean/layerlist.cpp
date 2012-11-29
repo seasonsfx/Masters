@@ -114,7 +114,7 @@ void LayerList::mergeLayers(std::vector<int> layersToMerge){
     for(int i : layersToMerge){
         qDebug("Merging layer %d into %d", i, dest_idx);
         // Copy each individual index
-        for(int j = 0; j < dest.size(); j++){
+        for(unsigned int j = 0; j < dest.size(); j++){
             // Dest must be -1 and source must not be -1
             if(dest[j] != -1 || layers[i].index[j] == -1){
                 continue;
@@ -146,7 +146,7 @@ void LayerList::reset (){
     layer.gl_index_buffer.bind();
     layer.gl_index_buffer.allocate(app_data->cloud->size()*sizeof(int));
 
-    for(int i = 1; i < app_data->cloud->size(); i++){
+    for(unsigned int i = 1; i < app_data->cloud->size(); i++){
         layer.index[i] = i;
     }
     layer.copyToGPU();

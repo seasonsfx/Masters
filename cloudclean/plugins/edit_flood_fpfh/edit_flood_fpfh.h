@@ -12,7 +12,7 @@
 #include <pcl/features/normal_3d.h>
 
 #include "../../common/interfaces.h"
-#include <settings.h>
+#include "settings.h"
 
 #ifdef __APPLE__
 #include <OpenCL/opencl.h>

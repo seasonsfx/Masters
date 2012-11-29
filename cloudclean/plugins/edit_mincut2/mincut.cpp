@@ -107,7 +107,7 @@ boost::shared_ptr<MinCut::gData> MinCut::getGraphData(){
     //qDebug("Viz!!");
 
     // for all the vertices
-    for(int i = 0; i < tmp_vertices.size(); i++){
+    for(unsigned int i = 0; i < tmp_vertices.size(); i++){
         int idx = tmp_vertices[i];
         // For every neighbour edge
         for ( boost::tie (edge_iter, edge_end) = boost::out_edges (idx, *graph_); edge_iter != edge_end; edge_iter++ ) {
@@ -165,11 +165,11 @@ boost::shared_ptr<MinCut::gData> MinCut::getGraphData(){
     }
 
     // normalise weights
-    for(int i = 0; i < data->source_edge_weights.size(); i++)
+    for(unsigned int i = 0; i < data->source_edge_weights.size(); i++)
         data->source_edge_weights[i] /= max_weight;
-    for(int i = 0; i < data->sink_edge_weights.size(); i++)
+    for(unsigned int i = 0; i < data->sink_edge_weights.size(); i++)
         data->sink_edge_weights[i] /= max_weight;
-    for(int i = 0; i < data->bridge_edge_weights.size(); i++)
+    for(unsigned int i = 0; i < data->bridge_edge_weights.size(); i++)
         data->bridge_edge_weights[i] /= max_weight;
 
 
@@ -490,7 +490,7 @@ MinCut::buildGraph ()
 float MinCut::closestPolyLineDist(Eigen::Vector3f & point) const{
     float min = FLT_MAX;
 
-    for(int i = 0; i < polygon_.size(); i++){
+    for(unsigned int i = 0; i < polygon_.size(); i++){
         int p1 = i, p2 = (i+1)%polygon_.size();
         float dist = distToPlane(point, polygon_[p1], polygon_[p2], cam_origin_);
         if(dist < min){

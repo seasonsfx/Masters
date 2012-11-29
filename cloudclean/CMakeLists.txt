@@ -16,6 +16,7 @@ add_definitions(
 	-Wno-deprecated-declarations
 	-Wno-unknown-pragmas
 	-fstack-protector-all
+        -DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET
 	#-stdlib=libc++
 )
 

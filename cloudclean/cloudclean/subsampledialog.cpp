@@ -26,5 +26,6 @@ int SubsampleDialog::getSubsample(){
 
 int SubsampleDialog::valueChanged(int val){
     subsample = val;
+    return val;
 }
 

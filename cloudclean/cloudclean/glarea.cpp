@@ -67,9 +67,9 @@ void GLArea::initializeGL()
     glClearColor( 0.9f, 0.9f, 0.9f, 1.0f );
     glEnable(GL_DEPTH_TEST);
 
-    assert(prepareShaderProgram(point_shader, ":/shaders/points.vert", ":/shaders/points.frag", "" ) );
-
-    qDebug("Is it linked? %s", point_shader.isLinked() ? "yes" : "no");
+    bool linked = prepareShaderProgram(point_shader, ":/shaders/points.vert", ":/shaders/points.frag", "" );
+    assert( linked );
+    (void) linked;
 
     if ( !point_shader.bind() )
     {
@@ -124,20 +124,17 @@ bool GLArea::prepareShaderProgram(QGLShaderProgram & shader, const QString& vert
     bool result = shader.addShaderFromSourceFile( QGLShader::Vertex, vertexShaderPath );
     if ( !result ){
         qWarning() << shader.log();
-        qDebug("NOOO!!");
     }
 
     result = shader.addShaderFromSourceFile( QGLShader::Fragment, fragmentShaderPath );
     if ( !result ){
         qWarning() << shader.log();
-        qDebug("NOOO!!");
     }
 
     if (geometryShaderPath.length() > 0){
         result = shader.addShaderFromSourceFile( QGLShader::Geometry, geometryShaderPath );
         if ( !result ){
             qWarning() << shader.log();
-            qDebug("NOOO!!");
         }
     }
 
@@ -145,7 +142,6 @@ bool GLArea::prepareShaderProgram(QGLShaderProgram & shader, const QString& vert
     result = shader.link();
     if ( !result ){
         qWarning() << "Could not link shader program:" << shader.log();
-        qDebug("NOOO!!");
     }
 
     return result;

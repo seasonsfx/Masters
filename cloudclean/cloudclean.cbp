@@ -5,7 +5,7 @@
       <Option title="cloudclean" />
       <Option makefile_is_custom="1" />
       <Option compiler="gcc" />
-      <Option virtualFolders="CMake Files\;CMake Files\cmake\;CMake Files\cloudclean\;CMake Files\plugins\;CMake Files\plugins\edit_lasso\;" />
+      <Option virtualFolders="CMake Files\;CMake Files\cmake\;CMake Files\cloudclean\;CMake Files\plugins\;CMake Files\plugins\edit_flood_fpfh\;CMake Files\plugins\edit_flood_normals\;CMake Files\plugins\edit_flood_pca\;CMake Files\plugins\edit_flood_smoothness\;CMake Files\plugins\edit_lasso\;CMake Files\plugins\edit_mincut\;CMake Files\plugins\edit_mincut2\;CMake Files\plugins\edit_mincut3\;CMake Files\plugins\viz_normals\;" />
       <Build>
       <Target title="all">
          <Option working_dir="/home/rickert/Masters/cloudclean" />
@@ -36,6 +36,7 @@
          <Compiler>
             <Add option="-DQT_GUI_LIB" />
             <Add option="-DQT_CORE_LIB" />
+            <Add option="-DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET" />
             <Add directory="/home/rickert/Masters/cloudclean/EIGEN3_INCLUDE_DIR" />
             <Add directory="/home/rickert/Masters/cloudclean/common" />
             <Add directory="/home/rickert/Masters/cloudclean/external" />
@@ -65,6 +66,7 @@
          <Compiler>
             <Add option="-DQT_GUI_LIB" />
             <Add option="-DQT_CORE_LIB" />
+            <Add option="-DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET" />
             <Add directory="/home/rickert/Masters/cloudclean/EIGEN3_INCLUDE_DIR" />
             <Add directory="/home/rickert/Masters/cloudclean/common" />
             <Add directory="/home/rickert/Masters/cloudclean/external" />
@@ -85,15 +87,282 @@
             <DistClean command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/cloudclean/Makefile&quot;  VERBOSE=1 clean" />
          </MakeCommands>
       </Target>
-      <Target title="edit_lasso">
-         <Option output="/home/rickert/Masters/cloudclean/build/plugins/libedit_lasso.a" prefix_auto="0" extension_auto="0" />
-         <Option working_dir="/home/rickert/Masters/cloudclean/plugins/edit_lasso" />
+      <Target title="edit_flood_fpfh">
+         <Option output="/home/rickert/Masters/cloudclean/build/plugins/libedit_flood_fpfh.so" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/rickert/Masters/cloudclean/plugins/edit_flood_fpfh" />
          <Option object_output="./" />
-         <Option type="2" />
+         <Option type="3" />
          <Option compiler="gcc" />
          <Compiler>
             <Add option="-DQT_GUI_LIB" />
             <Add option="-DQT_CORE_LIB" />
+            <Add option="-DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET" />
+            <Add option="-DQT_PLUGIN" />
+            <Add option="-DQT_SHARED" />
+            <Add directory="/home/rickert/Masters/cloudclean/EIGEN3_INCLUDE_DIR" />
+            <Add directory="/home/rickert/Masters/cloudclean/cloudclean" />
+            <Add directory="/home/rickert/Masters/cloudclean/common" />
+            <Add directory="/home/rickert/Masters/cloudclean/external" />
+            <Add directory="/opt/AMDAPP/include" />
+            <Add directory="/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc" />
+            <Add directory="/usr/include/eigen3" />
+            <Add directory="/usr/include/flann" />
+            <Add directory="/usr/include/qt4" />
+            <Add directory="/usr/include/qt4/QtCore" />
+            <Add directory="/usr/include/qt4/QtGui" />
+            <Add directory="/usr/include/qt4/QtOpenGL" />
+            <Add directory="/usr/local/include/pcl-1.7" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_flood_fpfh/Makefile&quot;  VERBOSE=1 edit_flood_fpfh" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_flood_fpfh/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_flood_fpfh/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_flood_fpfh/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="edit_flood_fpfh/fast">
+         <Option output="/home/rickert/Masters/cloudclean/build/plugins/libedit_flood_fpfh.so" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/rickert/Masters/cloudclean/plugins/edit_flood_fpfh" />
+         <Option object_output="./" />
+         <Option type="3" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-DQT_GUI_LIB" />
+            <Add option="-DQT_CORE_LIB" />
+            <Add option="-DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET" />
+            <Add option="-DQT_PLUGIN" />
+            <Add option="-DQT_SHARED" />
+            <Add directory="/home/rickert/Masters/cloudclean/EIGEN3_INCLUDE_DIR" />
+            <Add directory="/home/rickert/Masters/cloudclean/cloudclean" />
+            <Add directory="/home/rickert/Masters/cloudclean/common" />
+            <Add directory="/home/rickert/Masters/cloudclean/external" />
+            <Add directory="/opt/AMDAPP/include" />
+            <Add directory="/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc" />
+            <Add directory="/usr/include/eigen3" />
+            <Add directory="/usr/include/flann" />
+            <Add directory="/usr/include/qt4" />
+            <Add directory="/usr/include/qt4/QtCore" />
+            <Add directory="/usr/include/qt4/QtGui" />
+            <Add directory="/usr/include/qt4/QtOpenGL" />
+            <Add directory="/usr/local/include/pcl-1.7" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_flood_fpfh/Makefile&quot;  VERBOSE=1 edit_flood_fpfh/fast" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_flood_fpfh/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_flood_fpfh/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_flood_fpfh/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="edit_flood_normals">
+         <Option output="/home/rickert/Masters/cloudclean/build/plugins/libedit_flood_normals.so" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/rickert/Masters/cloudclean/plugins/edit_flood_normals" />
+         <Option object_output="./" />
+         <Option type="3" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-DQT_GUI_LIB" />
+            <Add option="-DQT_CORE_LIB" />
+            <Add option="-DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET" />
+            <Add option="-DQT_PLUGIN" />
+            <Add option="-DQT_SHARED" />
+            <Add directory="/home/rickert/Masters/cloudclean/EIGEN3_INCLUDE_DIR" />
+            <Add directory="/home/rickert/Masters/cloudclean/cloudclean" />
+            <Add directory="/home/rickert/Masters/cloudclean/common" />
+            <Add directory="/home/rickert/Masters/cloudclean/external" />
+            <Add directory="/opt/AMDAPP/include" />
+            <Add directory="/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc" />
+            <Add directory="/usr/include/eigen3" />
+            <Add directory="/usr/include/flann" />
+            <Add directory="/usr/include/qt4" />
+            <Add directory="/usr/include/qt4/QtCore" />
+            <Add directory="/usr/include/qt4/QtGui" />
+            <Add directory="/usr/include/qt4/QtOpenGL" />
+            <Add directory="/usr/local/include/pcl-1.7" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_flood_normals/Makefile&quot;  VERBOSE=1 edit_flood_normals" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_flood_normals/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_flood_normals/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_flood_normals/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="edit_flood_normals/fast">
+         <Option output="/home/rickert/Masters/cloudclean/build/plugins/libedit_flood_normals.so" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/rickert/Masters/cloudclean/plugins/edit_flood_normals" />
+         <Option object_output="./" />
+         <Option type="3" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-DQT_GUI_LIB" />
+            <Add option="-DQT_CORE_LIB" />
+            <Add option="-DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET" />
+            <Add option="-DQT_PLUGIN" />
+            <Add option="-DQT_SHARED" />
+            <Add directory="/home/rickert/Masters/cloudclean/EIGEN3_INCLUDE_DIR" />
+            <Add directory="/home/rickert/Masters/cloudclean/cloudclean" />
+            <Add directory="/home/rickert/Masters/cloudclean/common" />
+            <Add directory="/home/rickert/Masters/cloudclean/external" />
+            <Add directory="/opt/AMDAPP/include" />
+            <Add directory="/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc" />
+            <Add directory="/usr/include/eigen3" />
+            <Add directory="/usr/include/flann" />
+            <Add directory="/usr/include/qt4" />
+            <Add directory="/usr/include/qt4/QtCore" />
+            <Add directory="/usr/include/qt4/QtGui" />
+            <Add directory="/usr/include/qt4/QtOpenGL" />
+            <Add directory="/usr/local/include/pcl-1.7" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_flood_normals/Makefile&quot;  VERBOSE=1 edit_flood_normals/fast" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_flood_normals/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_flood_normals/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_flood_normals/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="edit_flood_pca">
+         <Option output="/home/rickert/Masters/cloudclean/build/plugins/libedit_flood_pca.so" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/rickert/Masters/cloudclean/plugins/edit_flood_pca" />
+         <Option object_output="./" />
+         <Option type="3" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-DQT_GUI_LIB" />
+            <Add option="-DQT_CORE_LIB" />
+            <Add option="-DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET" />
+            <Add option="-DQT_PLUGIN" />
+            <Add option="-DQT_SHARED" />
+            <Add directory="/home/rickert/Masters/cloudclean/EIGEN3_INCLUDE_DIR" />
+            <Add directory="/home/rickert/Masters/cloudclean/cloudclean" />
+            <Add directory="/home/rickert/Masters/cloudclean/common" />
+            <Add directory="/home/rickert/Masters/cloudclean/external" />
+            <Add directory="/opt/AMDAPP/include" />
+            <Add directory="/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc" />
+            <Add directory="/usr/include/eigen3" />
+            <Add directory="/usr/include/flann" />
+            <Add directory="/usr/include/qt4" />
+            <Add directory="/usr/include/qt4/QtCore" />
+            <Add directory="/usr/include/qt4/QtGui" />
+            <Add directory="/usr/include/qt4/QtOpenGL" />
+            <Add directory="/usr/local/include/pcl-1.7" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_flood_pca/Makefile&quot;  VERBOSE=1 edit_flood_pca" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_flood_pca/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_flood_pca/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_flood_pca/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="edit_flood_pca/fast">
+         <Option output="/home/rickert/Masters/cloudclean/build/plugins/libedit_flood_pca.so" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/rickert/Masters/cloudclean/plugins/edit_flood_pca" />
+         <Option object_output="./" />
+         <Option type="3" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-DQT_GUI_LIB" />
+            <Add option="-DQT_CORE_LIB" />
+            <Add option="-DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET" />
+            <Add option="-DQT_PLUGIN" />
+            <Add option="-DQT_SHARED" />
+            <Add directory="/home/rickert/Masters/cloudclean/EIGEN3_INCLUDE_DIR" />
+            <Add directory="/home/rickert/Masters/cloudclean/cloudclean" />
+            <Add directory="/home/rickert/Masters/cloudclean/common" />
+            <Add directory="/home/rickert/Masters/cloudclean/external" />
+            <Add directory="/opt/AMDAPP/include" />
+            <Add directory="/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc" />
+            <Add directory="/usr/include/eigen3" />
+            <Add directory="/usr/include/flann" />
+            <Add directory="/usr/include/qt4" />
+            <Add directory="/usr/include/qt4/QtCore" />
+            <Add directory="/usr/include/qt4/QtGui" />
+            <Add directory="/usr/include/qt4/QtOpenGL" />
+            <Add directory="/usr/local/include/pcl-1.7" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_flood_pca/Makefile&quot;  VERBOSE=1 edit_flood_pca/fast" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_flood_pca/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_flood_pca/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_flood_pca/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="edit_flood_smoothness">
+         <Option output="/home/rickert/Masters/cloudclean/build/plugins/libedit_flood_smoothness.so" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/rickert/Masters/cloudclean/plugins/edit_flood_smoothness" />
+         <Option object_output="./" />
+         <Option type="3" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-DQT_GUI_LIB" />
+            <Add option="-DQT_CORE_LIB" />
+            <Add option="-DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET" />
+            <Add option="-DQT_PLUGIN" />
+            <Add option="-DQT_SHARED" />
+            <Add directory="/home/rickert/Masters/cloudclean/EIGEN3_INCLUDE_DIR" />
+            <Add directory="/home/rickert/Masters/cloudclean/cloudclean" />
+            <Add directory="/home/rickert/Masters/cloudclean/common" />
+            <Add directory="/home/rickert/Masters/cloudclean/external" />
+            <Add directory="/opt/AMDAPP/include" />
+            <Add directory="/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc" />
+            <Add directory="/usr/include/eigen3" />
+            <Add directory="/usr/include/flann" />
+            <Add directory="/usr/include/qt4" />
+            <Add directory="/usr/include/qt4/QtCore" />
+            <Add directory="/usr/include/qt4/QtGui" />
+            <Add directory="/usr/include/qt4/QtOpenGL" />
+            <Add directory="/usr/local/include/pcl-1.7" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_flood_smoothness/Makefile&quot;  VERBOSE=1 edit_flood_smoothness" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_flood_smoothness/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_flood_smoothness/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_flood_smoothness/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="edit_flood_smoothness/fast">
+         <Option output="/home/rickert/Masters/cloudclean/build/plugins/libedit_flood_smoothness.so" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/rickert/Masters/cloudclean/plugins/edit_flood_smoothness" />
+         <Option object_output="./" />
+         <Option type="3" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-DQT_GUI_LIB" />
+            <Add option="-DQT_CORE_LIB" />
+            <Add option="-DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET" />
+            <Add option="-DQT_PLUGIN" />
+            <Add option="-DQT_SHARED" />
+            <Add directory="/home/rickert/Masters/cloudclean/EIGEN3_INCLUDE_DIR" />
+            <Add directory="/home/rickert/Masters/cloudclean/cloudclean" />
+            <Add directory="/home/rickert/Masters/cloudclean/common" />
+            <Add directory="/home/rickert/Masters/cloudclean/external" />
+            <Add directory="/opt/AMDAPP/include" />
+            <Add directory="/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc" />
+            <Add directory="/usr/include/eigen3" />
+            <Add directory="/usr/include/flann" />
+            <Add directory="/usr/include/qt4" />
+            <Add directory="/usr/include/qt4/QtCore" />
+            <Add directory="/usr/include/qt4/QtGui" />
+            <Add directory="/usr/include/qt4/QtOpenGL" />
+            <Add directory="/usr/local/include/pcl-1.7" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_flood_smoothness/Makefile&quot;  VERBOSE=1 edit_flood_smoothness/fast" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_flood_smoothness/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_flood_smoothness/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_flood_smoothness/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="edit_lasso">
+         <Option output="/home/rickert/Masters/cloudclean/build/plugins/libedit_lasso.so" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/rickert/Masters/cloudclean/plugins/edit_lasso" />
+         <Option object_output="./" />
+         <Option type="3" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-DQT_GUI_LIB" />
+            <Add option="-DQT_CORE_LIB" />
+            <Add option="-DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET" />
+            <Add option="-DQT_PLUGIN" />
+            <Add option="-DQT_SHARED" />
             <Add directory="/home/rickert/Masters/cloudclean/EIGEN3_INCLUDE_DIR" />
             <Add directory="/home/rickert/Masters/cloudclean/cloudclean" />
             <Add directory="/home/rickert/Masters/cloudclean/common" />
@@ -116,14 +385,17 @@
          </MakeCommands>
       </Target>
       <Target title="edit_lasso/fast">
-         <Option output="/home/rickert/Masters/cloudclean/build/plugins/libedit_lasso.a" prefix_auto="0" extension_auto="0" />
+         <Option output="/home/rickert/Masters/cloudclean/build/plugins/libedit_lasso.so" prefix_auto="0" extension_auto="0" />
          <Option working_dir="/home/rickert/Masters/cloudclean/plugins/edit_lasso" />
          <Option object_output="./" />
-         <Option type="2" />
+         <Option type="3" />
          <Option compiler="gcc" />
          <Compiler>
             <Add option="-DQT_GUI_LIB" />
             <Add option="-DQT_CORE_LIB" />
+            <Add option="-DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET" />
+            <Add option="-DQT_PLUGIN" />
+            <Add option="-DQT_SHARED" />
             <Add directory="/home/rickert/Masters/cloudclean/EIGEN3_INCLUDE_DIR" />
             <Add directory="/home/rickert/Masters/cloudclean/cloudclean" />
             <Add directory="/home/rickert/Masters/cloudclean/common" />
@@ -143,6 +415,270 @@
             <CompileFile command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_lasso/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
             <Clean command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_lasso/Makefile&quot;  VERBOSE=1 clean" />
             <DistClean command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_lasso/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="edit_mincut">
+         <Option output="/home/rickert/Masters/cloudclean/build/plugins/libedit_mincut.so" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/rickert/Masters/cloudclean/plugins/edit_mincut" />
+         <Option object_output="./" />
+         <Option type="3" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-DQT_GUI_LIB" />
+            <Add option="-DQT_CORE_LIB" />
+            <Add option="-DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET" />
+            <Add option="-DQT_PLUGIN" />
+            <Add option="-DQT_SHARED" />
+            <Add directory="/home/rickert/Masters/cloudclean/EIGEN3_INCLUDE_DIR" />
+            <Add directory="/home/rickert/Masters/cloudclean/cloudclean" />
+            <Add directory="/home/rickert/Masters/cloudclean/common" />
+            <Add directory="/home/rickert/Masters/cloudclean/external" />
+            <Add directory="/opt/AMDAPP/include" />
+            <Add directory="/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc" />
+            <Add directory="/usr/include/eigen3" />
+            <Add directory="/usr/include/flann" />
+            <Add directory="/usr/include/qt4" />
+            <Add directory="/usr/include/qt4/QtCore" />
+            <Add directory="/usr/include/qt4/QtGui" />
+            <Add directory="/usr/include/qt4/QtOpenGL" />
+            <Add directory="/usr/local/include/pcl-1.7" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_mincut/Makefile&quot;  VERBOSE=1 edit_mincut" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_mincut/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_mincut/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_mincut/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="edit_mincut/fast">
+         <Option output="/home/rickert/Masters/cloudclean/build/plugins/libedit_mincut.so" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/rickert/Masters/cloudclean/plugins/edit_mincut" />
+         <Option object_output="./" />
+         <Option type="3" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-DQT_GUI_LIB" />
+            <Add option="-DQT_CORE_LIB" />
+            <Add option="-DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET" />
+            <Add option="-DQT_PLUGIN" />
+            <Add option="-DQT_SHARED" />
+            <Add directory="/home/rickert/Masters/cloudclean/EIGEN3_INCLUDE_DIR" />
+            <Add directory="/home/rickert/Masters/cloudclean/cloudclean" />
+            <Add directory="/home/rickert/Masters/cloudclean/common" />
+            <Add directory="/home/rickert/Masters/cloudclean/external" />
+            <Add directory="/opt/AMDAPP/include" />
+            <Add directory="/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc" />
+            <Add directory="/usr/include/eigen3" />
+            <Add directory="/usr/include/flann" />
+            <Add directory="/usr/include/qt4" />
+            <Add directory="/usr/include/qt4/QtCore" />
+            <Add directory="/usr/include/qt4/QtGui" />
+            <Add directory="/usr/include/qt4/QtOpenGL" />
+            <Add directory="/usr/local/include/pcl-1.7" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_mincut/Makefile&quot;  VERBOSE=1 edit_mincut/fast" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_mincut/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_mincut/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_mincut/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="edit_mincut2">
+         <Option output="/home/rickert/Masters/cloudclean/build/plugins/libedit_mincut2.so" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/rickert/Masters/cloudclean/plugins/edit_mincut2" />
+         <Option object_output="./" />
+         <Option type="3" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-DQT_GUI_LIB" />
+            <Add option="-DQT_CORE_LIB" />
+            <Add option="-DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET" />
+            <Add option="-DQT_PLUGIN" />
+            <Add option="-DQT_SHARED" />
+            <Add directory="/home/rickert/Masters/cloudclean/EIGEN3_INCLUDE_DIR" />
+            <Add directory="/home/rickert/Masters/cloudclean/cloudclean" />
+            <Add directory="/home/rickert/Masters/cloudclean/common" />
+            <Add directory="/home/rickert/Masters/cloudclean/external" />
+            <Add directory="/opt/AMDAPP/include" />
+            <Add directory="/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc" />
+            <Add directory="/usr/include/eigen3" />
+            <Add directory="/usr/include/flann" />
+            <Add directory="/usr/include/qt4" />
+            <Add directory="/usr/include/qt4/QtCore" />
+            <Add directory="/usr/include/qt4/QtGui" />
+            <Add directory="/usr/include/qt4/QtOpenGL" />
+            <Add directory="/usr/local/include/pcl-1.7" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_mincut2/Makefile&quot;  VERBOSE=1 edit_mincut2" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_mincut2/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_mincut2/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_mincut2/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="edit_mincut2/fast">
+         <Option output="/home/rickert/Masters/cloudclean/build/plugins/libedit_mincut2.so" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/rickert/Masters/cloudclean/plugins/edit_mincut2" />
+         <Option object_output="./" />
+         <Option type="3" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-DQT_GUI_LIB" />
+            <Add option="-DQT_CORE_LIB" />
+            <Add option="-DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET" />
+            <Add option="-DQT_PLUGIN" />
+            <Add option="-DQT_SHARED" />
+            <Add directory="/home/rickert/Masters/cloudclean/EIGEN3_INCLUDE_DIR" />
+            <Add directory="/home/rickert/Masters/cloudclean/cloudclean" />
+            <Add directory="/home/rickert/Masters/cloudclean/common" />
+            <Add directory="/home/rickert/Masters/cloudclean/external" />
+            <Add directory="/opt/AMDAPP/include" />
+            <Add directory="/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc" />
+            <Add directory="/usr/include/eigen3" />
+            <Add directory="/usr/include/flann" />
+            <Add directory="/usr/include/qt4" />
+            <Add directory="/usr/include/qt4/QtCore" />
+            <Add directory="/usr/include/qt4/QtGui" />
+            <Add directory="/usr/include/qt4/QtOpenGL" />
+            <Add directory="/usr/local/include/pcl-1.7" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_mincut2/Makefile&quot;  VERBOSE=1 edit_mincut2/fast" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_mincut2/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_mincut2/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_mincut2/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="edit_mincut3">
+         <Option output="/home/rickert/Masters/cloudclean/build/plugins/libedit_mincut3.so" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/rickert/Masters/cloudclean/plugins/edit_mincut3" />
+         <Option object_output="./" />
+         <Option type="3" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-DQT_GUI_LIB" />
+            <Add option="-DQT_CORE_LIB" />
+            <Add option="-DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET" />
+            <Add option="-DQT_PLUGIN" />
+            <Add option="-DQT_SHARED" />
+            <Add directory="/home/rickert/Masters/cloudclean/EIGEN3_INCLUDE_DIR" />
+            <Add directory="/home/rickert/Masters/cloudclean/cloudclean" />
+            <Add directory="/home/rickert/Masters/cloudclean/common" />
+            <Add directory="/home/rickert/Masters/cloudclean/external" />
+            <Add directory="/opt/AMDAPP/include" />
+            <Add directory="/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc" />
+            <Add directory="/usr/include/eigen3" />
+            <Add directory="/usr/include/flann" />
+            <Add directory="/usr/include/qt4" />
+            <Add directory="/usr/include/qt4/QtCore" />
+            <Add directory="/usr/include/qt4/QtGui" />
+            <Add directory="/usr/include/qt4/QtOpenGL" />
+            <Add directory="/usr/local/include/pcl-1.7" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_mincut3/Makefile&quot;  VERBOSE=1 edit_mincut3" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_mincut3/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_mincut3/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_mincut3/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="edit_mincut3/fast">
+         <Option output="/home/rickert/Masters/cloudclean/build/plugins/libedit_mincut3.so" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/rickert/Masters/cloudclean/plugins/edit_mincut3" />
+         <Option object_output="./" />
+         <Option type="3" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-DQT_GUI_LIB" />
+            <Add option="-DQT_CORE_LIB" />
+            <Add option="-DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET" />
+            <Add option="-DQT_PLUGIN" />
+            <Add option="-DQT_SHARED" />
+            <Add directory="/home/rickert/Masters/cloudclean/EIGEN3_INCLUDE_DIR" />
+            <Add directory="/home/rickert/Masters/cloudclean/cloudclean" />
+            <Add directory="/home/rickert/Masters/cloudclean/common" />
+            <Add directory="/home/rickert/Masters/cloudclean/external" />
+            <Add directory="/opt/AMDAPP/include" />
+            <Add directory="/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc" />
+            <Add directory="/usr/include/eigen3" />
+            <Add directory="/usr/include/flann" />
+            <Add directory="/usr/include/qt4" />
+            <Add directory="/usr/include/qt4/QtCore" />
+            <Add directory="/usr/include/qt4/QtGui" />
+            <Add directory="/usr/include/qt4/QtOpenGL" />
+            <Add directory="/usr/local/include/pcl-1.7" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_mincut3/Makefile&quot;  VERBOSE=1 edit_mincut3/fast" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_mincut3/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_mincut3/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/edit_mincut3/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="viz_normals">
+         <Option output="/home/rickert/Masters/cloudclean/build/plugins/libviz_normals.so" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/rickert/Masters/cloudclean/plugins/viz_normals" />
+         <Option object_output="./" />
+         <Option type="3" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-DQT_GUI_LIB" />
+            <Add option="-DQT_CORE_LIB" />
+            <Add option="-DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET" />
+            <Add option="-DQT_PLUGIN" />
+            <Add option="-DQT_SHARED" />
+            <Add directory="/home/rickert/Masters/cloudclean/EIGEN3_INCLUDE_DIR" />
+            <Add directory="/home/rickert/Masters/cloudclean/cloudclean" />
+            <Add directory="/home/rickert/Masters/cloudclean/common" />
+            <Add directory="/home/rickert/Masters/cloudclean/external" />
+            <Add directory="/opt/AMDAPP/include" />
+            <Add directory="/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc" />
+            <Add directory="/usr/include/eigen3" />
+            <Add directory="/usr/include/flann" />
+            <Add directory="/usr/include/qt4" />
+            <Add directory="/usr/include/qt4/QtCore" />
+            <Add directory="/usr/include/qt4/QtGui" />
+            <Add directory="/usr/include/qt4/QtOpenGL" />
+            <Add directory="/usr/local/include/pcl-1.7" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/viz_normals/Makefile&quot;  VERBOSE=1 viz_normals" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/viz_normals/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/viz_normals/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/viz_normals/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="viz_normals/fast">
+         <Option output="/home/rickert/Masters/cloudclean/build/plugins/libviz_normals.so" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/rickert/Masters/cloudclean/plugins/viz_normals" />
+         <Option object_output="./" />
+         <Option type="3" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-DQT_GUI_LIB" />
+            <Add option="-DQT_CORE_LIB" />
+            <Add option="-DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET" />
+            <Add option="-DQT_PLUGIN" />
+            <Add option="-DQT_SHARED" />
+            <Add directory="/home/rickert/Masters/cloudclean/EIGEN3_INCLUDE_DIR" />
+            <Add directory="/home/rickert/Masters/cloudclean/cloudclean" />
+            <Add directory="/home/rickert/Masters/cloudclean/common" />
+            <Add directory="/home/rickert/Masters/cloudclean/external" />
+            <Add directory="/opt/AMDAPP/include" />
+            <Add directory="/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc" />
+            <Add directory="/usr/include/eigen3" />
+            <Add directory="/usr/include/flann" />
+            <Add directory="/usr/include/qt4" />
+            <Add directory="/usr/include/qt4/QtCore" />
+            <Add directory="/usr/include/qt4/QtGui" />
+            <Add directory="/usr/include/qt4/QtOpenGL" />
+            <Add directory="/usr/local/include/pcl-1.7" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/viz_normals/Makefile&quot;  VERBOSE=1 viz_normals/fast" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/viz_normals/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/viz_normals/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/rickert/Masters/cloudclean/plugins/viz_normals/Makefile&quot;  VERBOSE=1 clean" />
          </MakeCommands>
       </Target>
       </Build>
@@ -172,7 +708,45 @@
       </Unit>
       <Unit filename="/home/rickert/Masters/cloudclean/common/utilities.cpp">
       </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_flood_fpfh/edit_flood_fpfh.cpp">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_flood_fpfh/settings.cpp">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_flood_normals/edit_flood_normals.cpp">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_flood_normals/settings.cpp">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_flood_pca/edit_flood_pca.cpp">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_flood_pca/settings.cpp">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_flood_smoothness/edit_flood_smoothness.cpp">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_flood_smoothness/settings.cpp">
+      </Unit>
       <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_lasso/edit_lasso.cpp">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_lasso/settings.cpp">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_mincut/edit_mincut.cpp">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_mincut/settings.cpp">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_mincut2/compgeom.cpp">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_mincut2/edit_mincut2.cpp">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_mincut2/mincut.cpp">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_mincut2/settings.cpp">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_mincut3/edit_mincut3.cpp">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_mincut3/mincut.cpp">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_mincut3/settings.cpp">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/viz_normals/viz_normals.cpp">
       </Unit>
       <Unit filename="/home/rickert/Masters/cloudclean/cloudclean/camera.h">
       </Unit>
@@ -206,7 +780,79 @@
       </Unit>
       <Unit filename="/home/rickert/Masters/cloudclean/common/utilities.h">
       </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_flood_fpfh/edit_flood_fpfh.h">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_flood_fpfh/edit_flood_fpfh.qrc">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_flood_fpfh/settings.h">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_flood_fpfh/settings.ui">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_flood_normals/edit_flood_normals.h">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_flood_normals/edit_flood_normals.qrc">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_flood_normals/settings.h">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_flood_normals/settings.ui">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_flood_pca/edit_flood_pca.h">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_flood_pca/edit_flood_pca.qrc">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_flood_pca/settings.h">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_flood_pca/settings.ui">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_flood_smoothness/edit_flood_smoothness.h">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_flood_smoothness/edit_flood_smoothness.qrc">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_flood_smoothness/settings.h">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_flood_smoothness/settings.ui">
+      </Unit>
       <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_lasso/edit_lasso.h">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_lasso/edit_lasso.qrc">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_lasso/settings.h">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_lasso/settings.ui">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_mincut/edit_mincut.h">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_mincut/edit_mincut.qrc">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_mincut/settings.h">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_mincut/settings.ui">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_mincut2/compgeom.h">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_mincut2/edit_mincut2.h">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_mincut2/edit_mincut2.qrc">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_mincut2/mincut.h">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_mincut2/settings.h">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_mincut2/settings.ui">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_mincut3/edit_mincut3.h">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_mincut3/edit_mincut3.qrc">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_mincut3/mincut.h">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_mincut3/settings.h">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_mincut3/settings.ui">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/viz_normals/viz_normals.h">
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/viz_normals/viz_normals.qrc">
       </Unit>
       <Unit filename="/home/rickert/Masters/cloudclean/CMakeLists.txt">
           <Option virtualFolder="CMake Files\" />
@@ -223,8 +869,59 @@
       <Unit filename="/home/rickert/Masters/cloudclean/plugins/CMakeLists.txt">
           <Option virtualFolder="CMake Files\plugins\" />
       </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_flood_fpfh/CMakeLists.txt">
+          <Option virtualFolder="CMake Files\plugins\edit_flood_fpfh\" />
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_flood_fpfh/edit_flood_fpfh.qrc">
+          <Option virtualFolder="CMake Files\plugins\edit_flood_fpfh\" />
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_flood_normals/CMakeLists.txt">
+          <Option virtualFolder="CMake Files\plugins\edit_flood_normals\" />
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_flood_normals/edit_flood_normals.qrc">
+          <Option virtualFolder="CMake Files\plugins\edit_flood_normals\" />
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_flood_pca/CMakeLists.txt">
+          <Option virtualFolder="CMake Files\plugins\edit_flood_pca\" />
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_flood_pca/edit_flood_pca.qrc">
+          <Option virtualFolder="CMake Files\plugins\edit_flood_pca\" />
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_flood_smoothness/CMakeLists.txt">
+          <Option virtualFolder="CMake Files\plugins\edit_flood_smoothness\" />
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_flood_smoothness/edit_flood_smoothness.qrc">
+          <Option virtualFolder="CMake Files\plugins\edit_flood_smoothness\" />
+      </Unit>
       <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_lasso/CMakeLists.txt">
           <Option virtualFolder="CMake Files\plugins\edit_lasso\" />
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_lasso/edit_lasso.qrc">
+          <Option virtualFolder="CMake Files\plugins\edit_lasso\" />
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_mincut/CMakeLists.txt">
+          <Option virtualFolder="CMake Files\plugins\edit_mincut\" />
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_mincut/edit_mincut.qrc">
+          <Option virtualFolder="CMake Files\plugins\edit_mincut\" />
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_mincut2/CMakeLists.txt">
+          <Option virtualFolder="CMake Files\plugins\edit_mincut2\" />
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_mincut2/edit_mincut2.qrc">
+          <Option virtualFolder="CMake Files\plugins\edit_mincut2\" />
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_mincut3/CMakeLists.txt">
+          <Option virtualFolder="CMake Files\plugins\edit_mincut3\" />
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/edit_mincut3/edit_mincut3.qrc">
+          <Option virtualFolder="CMake Files\plugins\edit_mincut3\" />
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/viz_normals/CMakeLists.txt">
+          <Option virtualFolder="CMake Files\plugins\viz_normals\" />
+      </Unit>
+      <Unit filename="/home/rickert/Masters/cloudclean/plugins/viz_normals/viz_normals.qrc">
+          <Option virtualFolder="CMake Files\plugins\viz_normals\" />
       </Unit>
    </Project>
 </CodeBlocks_project_file>

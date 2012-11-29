@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/">
+        <file>images/mincut.svg</file>
+        <file>shader/graph.frag</file>
+        <file>shader/graph.geom</file>
+        <file>shader/graph.vert</file>
+        <file>shader/points.frag</file>
+        <file>shader/points.vert</file>
+    </qresource>
+</RCC>

@@ -10,7 +10,7 @@
 
 //#include <pcl/segmentation/min_cut_segmentation.h>
 
-#include "edit_mincut.h"
+#include "edit_mincut3.h"
 #include "utilities.h"
 #include "layer.h"
 #include "glarea.h"
@@ -83,7 +83,7 @@ void EditPlugin::fill(int x, int y, float radius, int source_idx, int dest_idx, 
     // Need to get rid of the -1 from the indices
     pcl::IndicesPtr source_indices(new std::vector<int>);
     for(int idx : cm->layerList.layers[source_idx].index){
-        if(idx = -1)
+        if(idx == -1)
             continue;
         source_indices->push_back(idx);
     }
@@ -110,7 +110,7 @@ void EditPlugin::fill(int x, int y, float radius, int source_idx, int dest_idx, 
     assert(clusters.size() != 0);
 
     // blank source & dest
-    for(int i = 0; i < cm->cloud->points.size(); i++){
+    for(unsigned int i = 0; i < cm->cloud->points.size(); i++){
         cm->layerList.layers[source_idx].index[i] = -1;
         cm->layerList.layers[dest_idx].index[i] = -1;
     }
@@ -153,7 +153,7 @@ bool EditPlugin::mouseReleaseEvent(QMouseEvent *event, CloudModel * cm, GLArea *
 
         int source_layer = -1;
 
-        for(int i = 0; i < cm->layerList.layers.size(); i++){
+        for(unsigned int i = 0; i < cm->layerList.layers.size(); i++){
             Layer & l = cm->layerList.layers[i];
             if(l.active && l.visible){
                 source_layer = i;
@@ -163,7 +163,7 @@ bool EditPlugin::mouseReleaseEvent(QMouseEvent *event, CloudModel * cm, GLArea *
         }
 
 
-        if(dest_layer == -1 || dest_layer >= cm->layerList.layers.size()){
+        if(dest_layer == -1 || (unsigned int)dest_layer >= cm->layerList.layers.size()){
             cm->layerList.newLayer();
             dest_layer = cm->layerList.layers.size()-1;
         }

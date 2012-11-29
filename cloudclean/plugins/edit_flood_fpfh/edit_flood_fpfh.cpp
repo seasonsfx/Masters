@@ -194,7 +194,7 @@ void EditPlugin::fill(int x, int y, int source_idx, int dest_idx,
 
         pcl::FPFHSignature33 & current_sig = fpfhs->at(current);
 
-        for (int i = 0; i < pointIdxNKNSearch.size (); ++i)
+        for (unsigned int i = 0; i < pointIdxNKNSearch.size (); ++i)
         {
             idx = pointIdxNKNSearch[i];
 
@@ -271,7 +271,7 @@ bool EditPlugin::mouseReleaseEvent(QMouseEvent *event, CloudModel * cm, GLArea *
         }
 
 
-        if(dest_layer == -1 || dest_layer > cm->layerList.layers.size()-1){
+        if(dest_layer == -1 || (unsigned int)dest_layer > cm->layerList.layers.size()-1){
             cm->layerList.newLayer();
             dest_layer = cm->layerList.layers.size()-1;
         }

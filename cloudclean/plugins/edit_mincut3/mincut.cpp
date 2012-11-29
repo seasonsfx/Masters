@@ -31,8 +31,8 @@ MinCut::MinCut () :
   edge_marker_ (0),
   source_ (),/////////////////////////////////
   sink_ (),///////////////////////////////////
-  max_flow_ (0.0),
-  horisonal_radius_(false)
+  horisonal_radius_(false),
+  max_flow_ (0.0)
 {
 }
 

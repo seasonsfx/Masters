@@ -192,30 +192,12 @@ void Camera::mouseMove(int x, int y){
 
     if(mouseButtonPressed == LEFT_BTN){
         Vector3f side = forward.cross(startUpAxis).normalized();
-        Vector3f up = side.cross(forward);
-
-        // look at point
-        // project that so its level
-
-
-        // angle bewteen up axis and forward
-        float angle = acos(startUpAxis.dot(forward)/(startUpAxis.squaredNorm()*forward.squaredNorm()));
-
-        float roty = -rot.y();
-
-        float troty = angle + roty;
-
-        //qDebug("Angle between up and forward: %f", angle);
-
 
         AngleAxis<float> rotX(-rot.x()*moveSensitivity, startUpAxis);
         AngleAxis<float> rotY(-rot.y()*moveSensitivity, side);
 
         forward = (rotX * rotY) * savedForward;
         forward.normalize();
-
-
-        //qDebug("Forward: (%f, %f, %f)", forward.x(), forward.y(), forward.z());
     }
     else if(mouseButtonPressed == RIGHT_BTN){
         Vector3f side = forward.cross(mUp).normalized();

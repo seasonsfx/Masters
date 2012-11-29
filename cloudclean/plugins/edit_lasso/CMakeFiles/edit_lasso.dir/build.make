@@ -69,14 +69,139 @@ plugins/edit_lasso/CMakeFiles/edit_lasso.dir/edit_lasso.cpp.o.provides: plugins/
 
 plugins/edit_lasso/CMakeFiles/edit_lasso.dir/edit_lasso.cpp.o.provides.build: plugins/edit_lasso/CMakeFiles/edit_lasso.dir/edit_lasso.cpp.o
 
+plugins/edit_lasso/CMakeFiles/edit_lasso.dir/settings.cpp.o: plugins/edit_lasso/CMakeFiles/edit_lasso.dir/flags.make
+plugins/edit_lasso/CMakeFiles/edit_lasso.dir/settings.cpp.o: plugins/edit_lasso/settings.cpp
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_2)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object plugins/edit_lasso/CMakeFiles/edit_lasso.dir/settings.cpp.o"
+	cd /home/rickert/Masters/cloudclean/plugins/edit_lasso && /usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/edit_lasso.dir/settings.cpp.o -c /home/rickert/Masters/cloudclean/plugins/edit_lasso/settings.cpp
+
+plugins/edit_lasso/CMakeFiles/edit_lasso.dir/settings.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/edit_lasso.dir/settings.cpp.i"
+	cd /home/rickert/Masters/cloudclean/plugins/edit_lasso && /usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -E /home/rickert/Masters/cloudclean/plugins/edit_lasso/settings.cpp > CMakeFiles/edit_lasso.dir/settings.cpp.i
+
+plugins/edit_lasso/CMakeFiles/edit_lasso.dir/settings.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/edit_lasso.dir/settings.cpp.s"
+	cd /home/rickert/Masters/cloudclean/plugins/edit_lasso && /usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -S /home/rickert/Masters/cloudclean/plugins/edit_lasso/settings.cpp -o CMakeFiles/edit_lasso.dir/settings.cpp.s
+
+plugins/edit_lasso/CMakeFiles/edit_lasso.dir/settings.cpp.o.requires:
+.PHONY : plugins/edit_lasso/CMakeFiles/edit_lasso.dir/settings.cpp.o.requires
+
+plugins/edit_lasso/CMakeFiles/edit_lasso.dir/settings.cpp.o.provides: plugins/edit_lasso/CMakeFiles/edit_lasso.dir/settings.cpp.o.requires
+	$(MAKE) -f plugins/edit_lasso/CMakeFiles/edit_lasso.dir/build.make plugins/edit_lasso/CMakeFiles/edit_lasso.dir/settings.cpp.o.provides.build
+.PHONY : plugins/edit_lasso/CMakeFiles/edit_lasso.dir/settings.cpp.o.provides
+
+plugins/edit_lasso/CMakeFiles/edit_lasso.dir/settings.cpp.o.provides.build: plugins/edit_lasso/CMakeFiles/edit_lasso.dir/settings.cpp.o
+
+plugins/edit_lasso/CMakeFiles/edit_lasso.dir/moc_edit_lasso.cxx.o: plugins/edit_lasso/CMakeFiles/edit_lasso.dir/flags.make
+plugins/edit_lasso/CMakeFiles/edit_lasso.dir/moc_edit_lasso.cxx.o: plugins/edit_lasso/moc_edit_lasso.cxx
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_3)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object plugins/edit_lasso/CMakeFiles/edit_lasso.dir/moc_edit_lasso.cxx.o"
+	cd /home/rickert/Masters/cloudclean/plugins/edit_lasso && /usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/edit_lasso.dir/moc_edit_lasso.cxx.o -c /home/rickert/Masters/cloudclean/plugins/edit_lasso/moc_edit_lasso.cxx
+
+plugins/edit_lasso/CMakeFiles/edit_lasso.dir/moc_edit_lasso.cxx.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/edit_lasso.dir/moc_edit_lasso.cxx.i"
+	cd /home/rickert/Masters/cloudclean/plugins/edit_lasso && /usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -E /home/rickert/Masters/cloudclean/plugins/edit_lasso/moc_edit_lasso.cxx > CMakeFiles/edit_lasso.dir/moc_edit_lasso.cxx.i
+
+plugins/edit_lasso/CMakeFiles/edit_lasso.dir/moc_edit_lasso.cxx.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/edit_lasso.dir/moc_edit_lasso.cxx.s"
+	cd /home/rickert/Masters/cloudclean/plugins/edit_lasso && /usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -S /home/rickert/Masters/cloudclean/plugins/edit_lasso/moc_edit_lasso.cxx -o CMakeFiles/edit_lasso.dir/moc_edit_lasso.cxx.s
+
+plugins/edit_lasso/CMakeFiles/edit_lasso.dir/moc_edit_lasso.cxx.o.requires:
+.PHONY : plugins/edit_lasso/CMakeFiles/edit_lasso.dir/moc_edit_lasso.cxx.o.requires
+
+plugins/edit_lasso/CMakeFiles/edit_lasso.dir/moc_edit_lasso.cxx.o.provides: plugins/edit_lasso/CMakeFiles/edit_lasso.dir/moc_edit_lasso.cxx.o.requires
+	$(MAKE) -f plugins/edit_lasso/CMakeFiles/edit_lasso.dir/build.make plugins/edit_lasso/CMakeFiles/edit_lasso.dir/moc_edit_lasso.cxx.o.provides.build
+.PHONY : plugins/edit_lasso/CMakeFiles/edit_lasso.dir/moc_edit_lasso.cxx.o.provides
+
+plugins/edit_lasso/CMakeFiles/edit_lasso.dir/moc_edit_lasso.cxx.o.provides.build: plugins/edit_lasso/CMakeFiles/edit_lasso.dir/moc_edit_lasso.cxx.o
+
+plugins/edit_lasso/CMakeFiles/edit_lasso.dir/moc_settings.cxx.o: plugins/edit_lasso/CMakeFiles/edit_lasso.dir/flags.make
+plugins/edit_lasso/CMakeFiles/edit_lasso.dir/moc_settings.cxx.o: plugins/edit_lasso/moc_settings.cxx
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_4)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object plugins/edit_lasso/CMakeFiles/edit_lasso.dir/moc_settings.cxx.o"
+	cd /home/rickert/Masters/cloudclean/plugins/edit_lasso && /usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/edit_lasso.dir/moc_settings.cxx.o -c /home/rickert/Masters/cloudclean/plugins/edit_lasso/moc_settings.cxx
+
+plugins/edit_lasso/CMakeFiles/edit_lasso.dir/moc_settings.cxx.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/edit_lasso.dir/moc_settings.cxx.i"
+	cd /home/rickert/Masters/cloudclean/plugins/edit_lasso && /usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -E /home/rickert/Masters/cloudclean/plugins/edit_lasso/moc_settings.cxx > CMakeFiles/edit_lasso.dir/moc_settings.cxx.i
+
+plugins/edit_lasso/CMakeFiles/edit_lasso.dir/moc_settings.cxx.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/edit_lasso.dir/moc_settings.cxx.s"
+	cd /home/rickert/Masters/cloudclean/plugins/edit_lasso && /usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -S /home/rickert/Masters/cloudclean/plugins/edit_lasso/moc_settings.cxx -o CMakeFiles/edit_lasso.dir/moc_settings.cxx.s
+
+plugins/edit_lasso/CMakeFiles/edit_lasso.dir/moc_settings.cxx.o.requires:
+.PHONY : plugins/edit_lasso/CMakeFiles/edit_lasso.dir/moc_settings.cxx.o.requires
+
+plugins/edit_lasso/CMakeFiles/edit_lasso.dir/moc_settings.cxx.o.provides: plugins/edit_lasso/CMakeFiles/edit_lasso.dir/moc_settings.cxx.o.requires
+	$(MAKE) -f plugins/edit_lasso/CMakeFiles/edit_lasso.dir/build.make plugins/edit_lasso/CMakeFiles/edit_lasso.dir/moc_settings.cxx.o.provides.build
+.PHONY : plugins/edit_lasso/CMakeFiles/edit_lasso.dir/moc_settings.cxx.o.provides
+
+plugins/edit_lasso/CMakeFiles/edit_lasso.dir/moc_settings.cxx.o.provides.build: plugins/edit_lasso/CMakeFiles/edit_lasso.dir/moc_settings.cxx.o
+
+plugins/edit_lasso/CMakeFiles/edit_lasso.dir/qrc_edit_lasso.cxx.o: plugins/edit_lasso/CMakeFiles/edit_lasso.dir/flags.make
+plugins/edit_lasso/CMakeFiles/edit_lasso.dir/qrc_edit_lasso.cxx.o: plugins/edit_lasso/qrc_edit_lasso.cxx
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_5)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object plugins/edit_lasso/CMakeFiles/edit_lasso.dir/qrc_edit_lasso.cxx.o"
+	cd /home/rickert/Masters/cloudclean/plugins/edit_lasso && /usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/edit_lasso.dir/qrc_edit_lasso.cxx.o -c /home/rickert/Masters/cloudclean/plugins/edit_lasso/qrc_edit_lasso.cxx
+
+plugins/edit_lasso/CMakeFiles/edit_lasso.dir/qrc_edit_lasso.cxx.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/edit_lasso.dir/qrc_edit_lasso.cxx.i"
+	cd /home/rickert/Masters/cloudclean/plugins/edit_lasso && /usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -E /home/rickert/Masters/cloudclean/plugins/edit_lasso/qrc_edit_lasso.cxx > CMakeFiles/edit_lasso.dir/qrc_edit_lasso.cxx.i
+
+plugins/edit_lasso/CMakeFiles/edit_lasso.dir/qrc_edit_lasso.cxx.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/edit_lasso.dir/qrc_edit_lasso.cxx.s"
+	cd /home/rickert/Masters/cloudclean/plugins/edit_lasso && /usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -S /home/rickert/Masters/cloudclean/plugins/edit_lasso/qrc_edit_lasso.cxx -o CMakeFiles/edit_lasso.dir/qrc_edit_lasso.cxx.s
+
+plugins/edit_lasso/CMakeFiles/edit_lasso.dir/qrc_edit_lasso.cxx.o.requires:
+.PHONY : plugins/edit_lasso/CMakeFiles/edit_lasso.dir/qrc_edit_lasso.cxx.o.requires
+
+plugins/edit_lasso/CMakeFiles/edit_lasso.dir/qrc_edit_lasso.cxx.o.provides: plugins/edit_lasso/CMakeFiles/edit_lasso.dir/qrc_edit_lasso.cxx.o.requires
+	$(MAKE) -f plugins/edit_lasso/CMakeFiles/edit_lasso.dir/build.make plugins/edit_lasso/CMakeFiles/edit_lasso.dir/qrc_edit_lasso.cxx.o.provides.build
+.PHONY : plugins/edit_lasso/CMakeFiles/edit_lasso.dir/qrc_edit_lasso.cxx.o.provides
+
+plugins/edit_lasso/CMakeFiles/edit_lasso.dir/qrc_edit_lasso.cxx.o.provides.build: plugins/edit_lasso/CMakeFiles/edit_lasso.dir/qrc_edit_lasso.cxx.o
+
+plugins/edit_lasso/moc_edit_lasso.cxx: plugins/edit_lasso/edit_lasso.h
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_6)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating moc_edit_lasso.cxx"
+	cd /home/rickert/Masters/cloudclean/plugins/edit_lasso && /usr/bin/moc-qt4 -I/usr/include/qt4 -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtCore -I/home/rickert/Masters/cloudclean/EIGEN3_INCLUDE_DIR -I/home/rickert/Masters/cloudclean/external -I/home/rickert/Masters/cloudclean/common -I/usr/local/include/pcl-1.7 -I/usr/include/flann -I/usr/include/eigen3 -I/opt/AMDAPP/include -I/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc -I/usr/include/qt4/QtOpenGL -I/home/rickert/Masters/cloudclean/cloudclean -DQT_GUI_LIB -DQT_CORE_LIB -DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET -DQT_PLUGIN -DQT_SHARED -o /home/rickert/Masters/cloudclean/plugins/edit_lasso/moc_edit_lasso.cxx /home/rickert/Masters/cloudclean/plugins/edit_lasso/edit_lasso.h
+
+plugins/edit_lasso/moc_settings.cxx: plugins/edit_lasso/settings.h
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_7)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating moc_settings.cxx"
+	cd /home/rickert/Masters/cloudclean/plugins/edit_lasso && /usr/bin/moc-qt4 -I/usr/include/qt4 -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtCore -I/home/rickert/Masters/cloudclean/EIGEN3_INCLUDE_DIR -I/home/rickert/Masters/cloudclean/external -I/home/rickert/Masters/cloudclean/common -I/usr/local/include/pcl-1.7 -I/usr/include/flann -I/usr/include/eigen3 -I/opt/AMDAPP/include -I/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc -I/usr/include/qt4/QtOpenGL -I/home/rickert/Masters/cloudclean/cloudclean -DQT_GUI_LIB -DQT_CORE_LIB -DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET -DQT_PLUGIN -DQT_SHARED -o /home/rickert/Masters/cloudclean/plugins/edit_lasso/moc_settings.cxx /home/rickert/Masters/cloudclean/plugins/edit_lasso/settings.h
+
+plugins/edit_lasso/qrc_edit_lasso.cxx: plugins/edit_lasso/images/lasso.png
+plugins/edit_lasso/qrc_edit_lasso.cxx: plugins/edit_lasso/kernels/lasso.cl
+plugins/edit_lasso/qrc_edit_lasso.cxx: plugins/edit_lasso/shaders/lasso.frag
+plugins/edit_lasso/qrc_edit_lasso.cxx: plugins/edit_lasso/shaders/lasso.vert
+plugins/edit_lasso/qrc_edit_lasso.cxx: plugins/edit_lasso/edit_lasso.qrc.depends
+plugins/edit_lasso/qrc_edit_lasso.cxx: plugins/edit_lasso/edit_lasso.qrc
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_8)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating qrc_edit_lasso.cxx"
+	cd /home/rickert/Masters/cloudclean/plugins/edit_lasso && /usr/bin/rcc -name edit_lasso -o /home/rickert/Masters/cloudclean/plugins/edit_lasso/qrc_edit_lasso.cxx /home/rickert/Masters/cloudclean/plugins/edit_lasso/edit_lasso.qrc
+
+plugins/edit_lasso/ui_settings.h: plugins/edit_lasso/settings.ui
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_9)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating ui_settings.h"
+	cd /home/rickert/Masters/cloudclean/plugins/edit_lasso && /usr/bin/uic-qt4 -o /home/rickert/Masters/cloudclean/plugins/edit_lasso/ui_settings.h /home/rickert/Masters/cloudclean/plugins/edit_lasso/settings.ui
+
 # Object files for target edit_lasso
 edit_lasso_OBJECTS = \
-"CMakeFiles/edit_lasso.dir/edit_lasso.cpp.o"
+"CMakeFiles/edit_lasso.dir/edit_lasso.cpp.o" \
+"CMakeFiles/edit_lasso.dir/settings.cpp.o" \
+"CMakeFiles/edit_lasso.dir/moc_edit_lasso.cxx.o" \
+"CMakeFiles/edit_lasso.dir/moc_settings.cxx.o" \
+"CMakeFiles/edit_lasso.dir/qrc_edit_lasso.cxx.o"
 
 # External object files for target edit_lasso
 edit_lasso_EXTERNAL_OBJECTS =
 
 build/plugins/libedit_lasso.so: plugins/edit_lasso/CMakeFiles/edit_lasso.dir/edit_lasso.cpp.o
+build/plugins/libedit_lasso.so: plugins/edit_lasso/CMakeFiles/edit_lasso.dir/settings.cpp.o
+build/plugins/libedit_lasso.so: plugins/edit_lasso/CMakeFiles/edit_lasso.dir/moc_edit_lasso.cxx.o
+build/plugins/libedit_lasso.so: plugins/edit_lasso/CMakeFiles/edit_lasso.dir/moc_settings.cxx.o
+build/plugins/libedit_lasso.so: plugins/edit_lasso/CMakeFiles/edit_lasso.dir/qrc_edit_lasso.cxx.o
 build/plugins/libedit_lasso.so: plugins/edit_lasso/CMakeFiles/edit_lasso.dir/build.make
 build/plugins/libedit_lasso.so: plugins/edit_lasso/CMakeFiles/edit_lasso.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --red --bold "Linking CXX shared library ../../build/plugins/libedit_lasso.so"
@@ -87,13 +212,20 @@ plugins/edit_lasso/CMakeFiles/edit_lasso.dir/build: build/plugins/libedit_lasso.
 .PHONY : plugins/edit_lasso/CMakeFiles/edit_lasso.dir/build
 
 plugins/edit_lasso/CMakeFiles/edit_lasso.dir/requires: plugins/edit_lasso/CMakeFiles/edit_lasso.dir/edit_lasso.cpp.o.requires
+plugins/edit_lasso/CMakeFiles/edit_lasso.dir/requires: plugins/edit_lasso/CMakeFiles/edit_lasso.dir/settings.cpp.o.requires
+plugins/edit_lasso/CMakeFiles/edit_lasso.dir/requires: plugins/edit_lasso/CMakeFiles/edit_lasso.dir/moc_edit_lasso.cxx.o.requires
+plugins/edit_lasso/CMakeFiles/edit_lasso.dir/requires: plugins/edit_lasso/CMakeFiles/edit_lasso.dir/moc_settings.cxx.o.requires
+plugins/edit_lasso/CMakeFiles/edit_lasso.dir/requires: plugins/edit_lasso/CMakeFiles/edit_lasso.dir/qrc_edit_lasso.cxx.o.requires
 .PHONY : plugins/edit_lasso/CMakeFiles/edit_lasso.dir/requires
 
 plugins/edit_lasso/CMakeFiles/edit_lasso.dir/clean:
 	cd /home/rickert/Masters/cloudclean/plugins/edit_lasso && $(CMAKE_COMMAND) -P CMakeFiles/edit_lasso.dir/cmake_clean.cmake
 .PHONY : plugins/edit_lasso/CMakeFiles/edit_lasso.dir/clean
 
-plugins/edit_lasso/CMakeFiles/edit_lasso.dir/depend:
+plugins/edit_lasso/CMakeFiles/edit_lasso.dir/depend: plugins/edit_lasso/moc_edit_lasso.cxx
+plugins/edit_lasso/CMakeFiles/edit_lasso.dir/depend: plugins/edit_lasso/moc_settings.cxx
+plugins/edit_lasso/CMakeFiles/edit_lasso.dir/depend: plugins/edit_lasso/qrc_edit_lasso.cxx
+plugins/edit_lasso/CMakeFiles/edit_lasso.dir/depend: plugins/edit_lasso/ui_settings.h
 	cd /home/rickert/Masters/cloudclean && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/rickert/Masters/cloudclean /home/rickert/Masters/cloudclean/plugins/edit_lasso /home/rickert/Masters/cloudclean /home/rickert/Masters/cloudclean/plugins/edit_lasso /home/rickert/Masters/cloudclean/plugins/edit_lasso/CMakeFiles/edit_lasso.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : plugins/edit_lasso/CMakeFiles/edit_lasso.dir/depend
 

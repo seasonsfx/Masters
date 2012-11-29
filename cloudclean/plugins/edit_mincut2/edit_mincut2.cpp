@@ -8,7 +8,7 @@
 #include <QAbstractItemView>
 #include <QTime>
 
-#include "edit_mincut.h"
+#include "edit_mincut2.h"
 #include "utilities.h"
 #include "layer.h"
 #include "glarea.h"

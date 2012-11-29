@@ -47,7 +47,7 @@ inline void edgesToBuffer(std::vector<std::pair<int, int> > & edges,
     size_t edge_size = 2 * sizeof(int);
     size_t edge_buffer_size = edges.size() * edge_size;
     buff.allocate(edge_buffer_size);
-    for(int i = 0; i < edges.size(); i++){
+    for(unsigned int i = 0; i < edges.size(); i++){
         std::pair<int, int> & edge = edges [i];
         int data [] = {edge.first, edge.second};
         buff.write(i*edge_size, data, edge_size);
@@ -266,7 +266,7 @@ void EditPlugin::fill(int x, int y, float radius, int source_idx, int dest_idx, 
     gdata_dirty = true;
 
     // blank source & dest
-    for(int i = 0; i < cm->cloud->points.size(); i++){
+    for(unsigned int i = 0; i < cm->cloud->points.size(); i++){
         cm->layerList.layers [source_idx].index [i] = -1;
         cm->layerList.layers [dest_idx].index [i] = -1;
     }
@@ -309,7 +309,7 @@ bool EditPlugin::mouseReleaseEvent(QMouseEvent *event, CloudModel * cm, GLArea *
 
         int source_layer = -1;
 
-        for(int i = 0; i < cm->layerList.layers.size(); i++){
+        for(unsigned int i = 0; i < cm->layerList.layers.size(); i++){
             Layer & l = cm->layerList.layers [i];
             if(l.active && l.visible){
                 source_layer = i;
@@ -319,7 +319,7 @@ bool EditPlugin::mouseReleaseEvent(QMouseEvent *event, CloudModel * cm, GLArea *
         }
 
 
-        if(dest_layer == -1 || dest_layer >= cm->layerList.layers.size()){
+        if(dest_layer == -1 || (unsigned int)dest_layer >= cm->layerList.layers.size()){
             cm->layerList.newLayer();
             dest_layer = cm->layerList.layers.size()-1;
         }

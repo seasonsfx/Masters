@@ -57,7 +57,7 @@ void EditPlugin::calcLocalNoise(CloudModel *cm){
     t.start();
 
     // For every value
-    for(int i = 0; i < cm->cloud->size(); i++){
+    for(unsigned int i = 0; i < cm->cloud->size(); i++){
 
         boost::shared_ptr <std::vector<int> > kIdxs;
         kIdxs = boost::shared_ptr <std::vector<int> >(new std::vector<int>);
@@ -196,7 +196,7 @@ void EditPlugin::fill(int x, int y, float radius, int source_idx, int dest_idx, 
         std::vector<float> pointNKNSquaredDistance(K);
         octree->nearestKSearch (cm->cloud->points[current], K, pointIdxNKNSearch, pointNKNSquaredDistance);
 
-        for (int i = 0; i < pointIdxNKNSearch.size (); ++i)
+        for (unsigned int i = 0; i < pointIdxNKNSearch.size (); ++i)
         {
             idx = pointIdxNKNSearch[i];
 
@@ -253,7 +253,7 @@ bool EditPlugin::mouseReleaseEvent(QMouseEvent *event, CloudModel * cm, GLArea *
 
         int source_layer = -1;
 
-        for(int i = 0; i < cm->layerList.layers.size(); i++){
+        for(unsigned int i = 0; i < cm->layerList.layers.size(); i++){
             Layer & l = cm->layerList.layers[i];
             if(l.active && l.visible){
                 source_layer = i;
@@ -263,7 +263,7 @@ bool EditPlugin::mouseReleaseEvent(QMouseEvent *event, CloudModel * cm, GLArea *
         }
 
 
-        if(dest_layer == -1 || dest_layer >= cm->layerList.layers.size()){
+        if(dest_layer == -1 || (unsigned int)dest_layer >= cm->layerList.layers.size()){
             cm->layerList.newLayer();
             dest_layer = cm->layerList.layers.size()-1;
         }

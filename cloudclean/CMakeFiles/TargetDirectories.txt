@@ -1,2 +1,10 @@
 /home/rickert/Masters/cloudclean/cloudclean/CMakeFiles/CloudClean.dir
+/home/rickert/Masters/cloudclean/plugins/edit_flood_fpfh/CMakeFiles/edit_flood_fpfh.dir
+/home/rickert/Masters/cloudclean/plugins/edit_flood_normals/CMakeFiles/edit_flood_normals.dir
+/home/rickert/Masters/cloudclean/plugins/edit_flood_pca/CMakeFiles/edit_flood_pca.dir
+/home/rickert/Masters/cloudclean/plugins/edit_flood_smoothness/CMakeFiles/edit_flood_smoothness.dir
 /home/rickert/Masters/cloudclean/plugins/edit_lasso/CMakeFiles/edit_lasso.dir
+/home/rickert/Masters/cloudclean/plugins/edit_mincut/CMakeFiles/edit_mincut.dir
+/home/rickert/Masters/cloudclean/plugins/edit_mincut2/CMakeFiles/edit_mincut2.dir
+/home/rickert/Masters/cloudclean/plugins/edit_mincut3/CMakeFiles/edit_mincut3.dir
+/home/rickert/Masters/cloudclean/plugins/viz_normals/CMakeFiles/viz_normals.dir

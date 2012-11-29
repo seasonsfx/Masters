@@ -767,7 +767,43 @@ cloudclean_BINARY_DIR:STATIC=/home/rickert/Masters/cloudclean
 cloudclean_SOURCE_DIR:STATIC=/home/rickert/Masters/cloudclean
 
 //Dependencies for target
+edit_flood_fpfh_LIB_DEPENDS:STATIC=
+
+//Dependencies for target
+edit_flood_mincut2_LIB_DEPENDS:STATIC=
+
+//Dependencies for target
+edit_flood_mincut3_LIB_DEPENDS:STATIC=
+
+//Dependencies for target
+edit_flood_mincut_LIB_DEPENDS:STATIC=
+
+//Dependencies for target
+edit_flood_normals_LIB_DEPENDS:STATIC=
+
+//Dependencies for target
+edit_flood_pca_LIB_DEPENDS:STATIC=
+
+//Dependencies for target
+edit_flood_smoothness_LIB_DEPENDS:STATIC=
+
+//Dependencies for target
 edit_lasso_LIB_DEPENDS:STATIC=
+
+//Dependencies for target
+edit_mincut2_LIB_DEPENDS:STATIC=
+
+//Dependencies for target
+edit_mincut3_LIB_DEPENDS:STATIC=
+
+//Dependencies for target
+edit_mincut_LIB_DEPENDS:STATIC=
+
+//Dependencies for target
+edit_sample_LIB_DEPENDS:STATIC=
+
+//Dependencies for target
+viz_normals_LIB_DEPENDS:STATIC=
 
 
 ########################
@@ -864,7 +900,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_LOCAL_GENERATORS:INTERNAL=4
+CMAKE_NUMBER_OF_LOCAL_GENERATORS:INTERNAL=12
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP

@@ -22,6 +22,7 @@ SET(CMAKE_C_INCLUDE_PATH
   "/opt/AMDAPP/include"
   "/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc"
   "/usr/include/qt4/QtOpenGL"
+  "cloudclean"
   )
 SET(CMAKE_CXX_INCLUDE_PATH ${CMAKE_C_INCLUDE_PATH})
 SET(CMAKE_Fortran_INCLUDE_PATH ${CMAKE_C_INCLUDE_PATH})

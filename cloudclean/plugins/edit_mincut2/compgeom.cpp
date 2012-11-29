@@ -38,7 +38,7 @@ bool pointInTriangle(Eigen::Vector2f p, Eigen::Vector2f a, Eigen::Vector2f b, Ei
     bool sign1 = cross(p-a, b-a) < 0;
     bool sign2 = cross(p-b, c-b) < 0;
     bool sign3 = cross(p-c, a-c) < 0;
-    return sign1 == sign2 == sign3;
+    return ((sign1 == sign2) == sign3);
 }
 
 Eigen::Vector2f closestCoord(Eigen::Vector2f p, Eigen::Vector2f a, Eigen::Vector2f b, Eigen::Vector2f c){

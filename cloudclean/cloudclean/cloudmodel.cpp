@@ -150,7 +150,7 @@ void filter(pcl::PointCloud<pcl::PointXYZI>& cloud, pcl::PointCloud<pcl::Normal>
     normals.is_dense = true;
 
     // Filter cloud
-    for(int i = 0; i < j; i++){
+    for(unsigned int i = 0; i < j; i++){
         cloud.points[i] = cloud.points[index[i]];
     }
     cloud.points.resize(j);
@@ -169,7 +169,7 @@ bool CloudModel::loadFile(const char * input_file, int subsample){
 
     cloud = read_ptx(input_file, subsample);
 
-    qDebug("File loaded in %d ms with %d points", t.elapsed(), cloud->size());
+    qDebug("File loaded in %d ms with %lu points", t.elapsed(), cloud->size());
 
     x_dim = cloud->width;
     y_dim = cloud->height;

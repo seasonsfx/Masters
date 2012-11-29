@@ -34,7 +34,15 @@ ENDIF(NOT DEFINED CMAKE_INSTALL_SO_NO_EXE)
 
 IF(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
+  INCLUDE("/home/rickert/Masters/cloudclean/plugins/edit_flood_fpfh/cmake_install.cmake")
+  INCLUDE("/home/rickert/Masters/cloudclean/plugins/edit_flood_normals/cmake_install.cmake")
+  INCLUDE("/home/rickert/Masters/cloudclean/plugins/edit_flood_pca/cmake_install.cmake")
+  INCLUDE("/home/rickert/Masters/cloudclean/plugins/edit_flood_smoothness/cmake_install.cmake")
   INCLUDE("/home/rickert/Masters/cloudclean/plugins/edit_lasso/cmake_install.cmake")
+  INCLUDE("/home/rickert/Masters/cloudclean/plugins/edit_mincut/cmake_install.cmake")
+  INCLUDE("/home/rickert/Masters/cloudclean/plugins/edit_mincut2/cmake_install.cmake")
+  INCLUDE("/home/rickert/Masters/cloudclean/plugins/edit_mincut3/cmake_install.cmake")
+  INCLUDE("/home/rickert/Masters/cloudclean/plugins/viz_normals/cmake_install.cmake")
 
 ENDIF(NOT CMAKE_INSTALL_LOCAL_ONLY)
 

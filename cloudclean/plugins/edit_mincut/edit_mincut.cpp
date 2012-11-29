@@ -84,10 +84,12 @@ void EditPlugin::paintGL(CloudModel * cm, GLArea * glarea){
 
     // Perpare shader
     if(!viz_shader.isLinked()){
-        assert(glarea->prepareShaderProgram(viz_shader,
+        bool succ = glarea->prepareShaderProgram(viz_shader,
                                             ":/shader/graph.vert",
                                             ":/shader/graph.frag",
-                                            ":/shader/graph.geom" ) );
+                                            ":/shader/graph.geom" );
+        assert(succ);
+
         if ( !viz_shader.bind() ) {
             qWarning() << "Could not bind shader program to context";
             assert(false);

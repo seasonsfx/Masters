@@ -7,9 +7,6 @@ plugins/edit_lasso/CMakeFiles/edit_lasso.dir/edit_lasso.cpp.o
  /home/rickert/Masters/cloudclean/plugins/edit_lasso/edit_lasso.cpp
  /home/rickert/Masters/cloudclean/plugins/edit_lasso/edit_lasso.h
  /home/rickert/Masters/cloudclean/plugins/edit_lasso/settings.h
- /opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc/CL/cl.h
- /opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc/CL/cl_gl.h
- /opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc/CL/cl_platform.h
  /usr/include/eigen3/Eigen/Cholesky
  /usr/include/eigen3/Eigen/Core
  /usr/include/eigen3/Eigen/Dense
@@ -146,7 +143,6 @@ plugins/edit_lasso/CMakeFiles/edit_lasso.dir/edit_lasso.cpp.o
  /usr/include/eigen3/Eigen/src/Eigen2Support/TriangularSolver.h
  /usr/include/eigen3/Eigen/src/Eigen2Support/VectorBlock.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./ComplexSchur.h
- /usr/include/eigen3/Eigen/src/Eigenvalues/./EigenvaluesCommon.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./HessenbergDecomposition.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./RealSchur.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./Tridiagonalization.h
@@ -438,8 +434,6 @@ plugins/edit_lasso/CMakeFiles/edit_lasso.dir/moc_edit_lasso.cxx.o
  /home/rickert/Masters/cloudclean/plugins/edit_lasso/edit_lasso.h
  /home/rickert/Masters/cloudclean/plugins/edit_lasso/moc_edit_lasso.cxx
  /home/rickert/Masters/cloudclean/plugins/edit_lasso/settings.h
- /opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc/CL/cl.h
- /opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc/CL/cl_platform.h
  /usr/include/eigen3/Eigen/Cholesky
  /usr/include/eigen3/Eigen/Core
  /usr/include/eigen3/Eigen/Dense
@@ -575,7 +569,6 @@ plugins/edit_lasso/CMakeFiles/edit_lasso.dir/moc_edit_lasso.cxx.o
  /usr/include/eigen3/Eigen/src/Eigen2Support/TriangularSolver.h
  /usr/include/eigen3/Eigen/src/Eigen2Support/VectorBlock.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./ComplexSchur.h
- /usr/include/eigen3/Eigen/src/Eigenvalues/./EigenvaluesCommon.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./HessenbergDecomposition.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./RealSchur.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./Tridiagonalization.h

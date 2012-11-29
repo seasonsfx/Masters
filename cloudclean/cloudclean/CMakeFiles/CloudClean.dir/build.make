@@ -31,6 +31,9 @@ CMAKE_COMMAND = /usr/bin/cmake
 # The command to remove a file.
 RM = /usr/bin/cmake -E remove -f
 
+# Escaping for special characters.
+EQUALS = =
+
 # The top-level source directory on which CMake was run.
 CMAKE_SOURCE_DIR = /home/rickert/Masters/cloudclean
 
@@ -46,9 +49,92 @@ include cloudclean/CMakeFiles/CloudClean.dir/progress.make
 # Include the compile flags for this target's objects.
 include cloudclean/CMakeFiles/CloudClean.dir/flags.make
 
+cloudclean/moc_io.cxx: cloudclean/io.h
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_1)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating moc_io.cxx"
+	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/moc-qt4 -I/usr/include/qt4 -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtCore -I/home/rickert/Masters/cloudclean/EIGEN3_INCLUDE_DIR -I/home/rickert/Masters/cloudclean/external -I/home/rickert/Masters/cloudclean/common -I/usr/local/include/pcl-1.7 -I/usr/include/flann -I/usr/include/eigen3 -I/opt/AMDAPP/include -I/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtOpenGL -DQT_GUI_LIB -DQT_CORE_LIB -DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET -o /home/rickert/Masters/cloudclean/cloudclean/moc_io.cxx /home/rickert/Masters/cloudclean/cloudclean/io.h
+
+cloudclean/moc_layerlist.cxx: cloudclean/layerlist.h
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_2)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating moc_layerlist.cxx"
+	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/moc-qt4 -I/usr/include/qt4 -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtCore -I/home/rickert/Masters/cloudclean/EIGEN3_INCLUDE_DIR -I/home/rickert/Masters/cloudclean/external -I/home/rickert/Masters/cloudclean/common -I/usr/local/include/pcl-1.7 -I/usr/include/flann -I/usr/include/eigen3 -I/opt/AMDAPP/include -I/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtOpenGL -DQT_GUI_LIB -DQT_CORE_LIB -DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET -o /home/rickert/Masters/cloudclean/cloudclean/moc_layerlist.cxx /home/rickert/Masters/cloudclean/cloudclean/layerlist.h
+
+cloudclean/moc_layer.cxx: cloudclean/layer.h
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_3)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating moc_layer.cxx"
+	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/moc-qt4 -I/usr/include/qt4 -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtCore -I/home/rickert/Masters/cloudclean/EIGEN3_INCLUDE_DIR -I/home/rickert/Masters/cloudclean/external -I/home/rickert/Masters/cloudclean/common -I/usr/local/include/pcl-1.7 -I/usr/include/flann -I/usr/include/eigen3 -I/opt/AMDAPP/include -I/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtOpenGL -DQT_GUI_LIB -DQT_CORE_LIB -DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET -o /home/rickert/Masters/cloudclean/cloudclean/moc_layer.cxx /home/rickert/Masters/cloudclean/cloudclean/layer.h
+
+cloudclean/moc_mainwindow.cxx: cloudclean/mainwindow.h
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_4)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating moc_mainwindow.cxx"
+	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/moc-qt4 -I/usr/include/qt4 -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtCore -I/home/rickert/Masters/cloudclean/EIGEN3_INCLUDE_DIR -I/home/rickert/Masters/cloudclean/external -I/home/rickert/Masters/cloudclean/common -I/usr/local/include/pcl-1.7 -I/usr/include/flann -I/usr/include/eigen3 -I/opt/AMDAPP/include -I/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtOpenGL -DQT_GUI_LIB -DQT_CORE_LIB -DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET -o /home/rickert/Masters/cloudclean/cloudclean/moc_mainwindow.cxx /home/rickert/Masters/cloudclean/cloudclean/mainwindow.h
+
+cloudclean/moc_cloudmodel.cxx: cloudclean/cloudmodel.h
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_5)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating moc_cloudmodel.cxx"
+	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/moc-qt4 -I/usr/include/qt4 -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtCore -I/home/rickert/Masters/cloudclean/EIGEN3_INCLUDE_DIR -I/home/rickert/Masters/cloudclean/external -I/home/rickert/Masters/cloudclean/common -I/usr/local/include/pcl-1.7 -I/usr/include/flann -I/usr/include/eigen3 -I/opt/AMDAPP/include -I/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtOpenGL -DQT_GUI_LIB -DQT_CORE_LIB -DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET -o /home/rickert/Masters/cloudclean/cloudclean/moc_cloudmodel.cxx /home/rickert/Masters/cloudclean/cloudclean/cloudmodel.h
+
+cloudclean/moc_glarea.cxx: cloudclean/glarea.h
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_6)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating moc_glarea.cxx"
+	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/moc-qt4 -I/usr/include/qt4 -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtCore -I/home/rickert/Masters/cloudclean/EIGEN3_INCLUDE_DIR -I/home/rickert/Masters/cloudclean/external -I/home/rickert/Masters/cloudclean/common -I/usr/local/include/pcl-1.7 -I/usr/include/flann -I/usr/include/eigen3 -I/opt/AMDAPP/include -I/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtOpenGL -DQT_GUI_LIB -DQT_CORE_LIB -DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET -o /home/rickert/Masters/cloudclean/cloudclean/moc_glarea.cxx /home/rickert/Masters/cloudclean/cloudclean/glarea.h
+
+cloudclean/moc_layerview.cxx: cloudclean/layerview.h
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_7)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating moc_layerview.cxx"
+	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/moc-qt4 -I/usr/include/qt4 -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtCore -I/home/rickert/Masters/cloudclean/EIGEN3_INCLUDE_DIR -I/home/rickert/Masters/cloudclean/external -I/home/rickert/Masters/cloudclean/common -I/usr/local/include/pcl-1.7 -I/usr/include/flann -I/usr/include/eigen3 -I/opt/AMDAPP/include -I/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtOpenGL -DQT_GUI_LIB -DQT_CORE_LIB -DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET -o /home/rickert/Masters/cloudclean/cloudclean/moc_layerview.cxx /home/rickert/Masters/cloudclean/cloudclean/layerview.h
+
+cloudclean/moc_pluginmanager.cxx: cloudclean/pluginmanager.h
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_8)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating moc_pluginmanager.cxx"
+	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/moc-qt4 -I/usr/include/qt4 -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtCore -I/home/rickert/Masters/cloudclean/EIGEN3_INCLUDE_DIR -I/home/rickert/Masters/cloudclean/external -I/home/rickert/Masters/cloudclean/common -I/usr/local/include/pcl-1.7 -I/usr/include/flann -I/usr/include/eigen3 -I/opt/AMDAPP/include -I/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtOpenGL -DQT_GUI_LIB -DQT_CORE_LIB -DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET -o /home/rickert/Masters/cloudclean/cloudclean/moc_pluginmanager.cxx /home/rickert/Masters/cloudclean/cloudclean/pluginmanager.h
+
+cloudclean/moc_toolbox.cxx: cloudclean/toolbox.h
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_9)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating moc_toolbox.cxx"
+	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/moc-qt4 -I/usr/include/qt4 -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtCore -I/home/rickert/Masters/cloudclean/EIGEN3_INCLUDE_DIR -I/home/rickert/Masters/cloudclean/external -I/home/rickert/Masters/cloudclean/common -I/usr/local/include/pcl-1.7 -I/usr/include/flann -I/usr/include/eigen3 -I/opt/AMDAPP/include -I/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtOpenGL -DQT_GUI_LIB -DQT_CORE_LIB -DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET -o /home/rickert/Masters/cloudclean/cloudclean/moc_toolbox.cxx /home/rickert/Masters/cloudclean/cloudclean/toolbox.h
+
+cloudclean/moc_camera.cxx: cloudclean/camera.h
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_10)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating moc_camera.cxx"
+	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/moc-qt4 -I/usr/include/qt4 -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtCore -I/home/rickert/Masters/cloudclean/EIGEN3_INCLUDE_DIR -I/home/rickert/Masters/cloudclean/external -I/home/rickert/Masters/cloudclean/common -I/usr/local/include/pcl-1.7 -I/usr/include/flann -I/usr/include/eigen3 -I/opt/AMDAPP/include -I/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtOpenGL -DQT_GUI_LIB -DQT_CORE_LIB -DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET -o /home/rickert/Masters/cloudclean/cloudclean/moc_camera.cxx /home/rickert/Masters/cloudclean/cloudclean/camera.h
+
+cloudclean/moc_subsampledialog.cxx: cloudclean/subsampledialog.h
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_11)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating moc_subsampledialog.cxx"
+	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/moc-qt4 -I/usr/include/qt4 -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtCore -I/home/rickert/Masters/cloudclean/EIGEN3_INCLUDE_DIR -I/home/rickert/Masters/cloudclean/external -I/home/rickert/Masters/cloudclean/common -I/usr/local/include/pcl-1.7 -I/usr/include/flann -I/usr/include/eigen3 -I/opt/AMDAPP/include -I/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtOpenGL -DQT_GUI_LIB -DQT_CORE_LIB -DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET -o /home/rickert/Masters/cloudclean/cloudclean/moc_subsampledialog.cxx /home/rickert/Masters/cloudclean/cloudclean/subsampledialog.h
+
+cloudclean/moc_pointpicker.cxx: cloudclean/pointpicker.h
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_12)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating moc_pointpicker.cxx"
+	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/moc-qt4 -I/usr/include/qt4 -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtCore -I/home/rickert/Masters/cloudclean/EIGEN3_INCLUDE_DIR -I/home/rickert/Masters/cloudclean/external -I/home/rickert/Masters/cloudclean/common -I/usr/local/include/pcl-1.7 -I/usr/include/flann -I/usr/include/eigen3 -I/opt/AMDAPP/include -I/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtOpenGL -DQT_GUI_LIB -DQT_CORE_LIB -DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET -o /home/rickert/Masters/cloudclean/cloudclean/moc_pointpicker.cxx /home/rickert/Masters/cloudclean/cloudclean/pointpicker.h
+
+cloudclean/ui_layerview.h: cloudclean/layerview.ui
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_13)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating ui_layerview.h"
+	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/uic-qt4 -o /home/rickert/Masters/cloudclean/cloudclean/ui_layerview.h /home/rickert/Masters/cloudclean/cloudclean/layerview.ui
+
+cloudclean/ui_subsampledialog.h: cloudclean/subsampledialog.ui
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_14)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating ui_subsampledialog.h"
+	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/uic-qt4 -o /home/rickert/Masters/cloudclean/cloudclean/ui_subsampledialog.h /home/rickert/Masters/cloudclean/cloudclean/subsampledialog.ui
+
+cloudclean/ui_toolbox.h: cloudclean/toolbox.ui
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_15)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating ui_toolbox.h"
+	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/uic-qt4 -o /home/rickert/Masters/cloudclean/cloudclean/ui_toolbox.h /home/rickert/Masters/cloudclean/cloudclean/toolbox.ui
+
+cloudclean/qrc_cloudclean.cxx: cloudclean/shaders/points.frag
+cloudclean/qrc_cloudclean.cxx: cloudclean/shaders/points.vert
+cloudclean/qrc_cloudclean.cxx: cloudclean/cloudclean.qrc.depends
+cloudclean/qrc_cloudclean.cxx: cloudclean/cloudclean.qrc
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_16)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating qrc_cloudclean.cxx"
+	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/rcc -name cloudclean -o /home/rickert/Masters/cloudclean/cloudclean/qrc_cloudclean.cxx /home/rickert/Masters/cloudclean/cloudclean/cloudclean.qrc
+
 cloudclean/CMakeFiles/CloudClean.dir/main.cpp.o: cloudclean/CMakeFiles/CloudClean.dir/flags.make
 cloudclean/CMakeFiles/CloudClean.dir/main.cpp.o: cloudclean/main.cpp
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_1)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_17)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object cloudclean/CMakeFiles/CloudClean.dir/main.cpp.o"
 	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/CloudClean.dir/main.cpp.o -c /home/rickert/Masters/cloudclean/cloudclean/main.cpp
 
@@ -71,7 +157,7 @@ cloudclean/CMakeFiles/CloudClean.dir/main.cpp.o.provides.build: cloudclean/CMake
 
 cloudclean/CMakeFiles/CloudClean.dir/layerlist.cpp.o: cloudclean/CMakeFiles/CloudClean.dir/flags.make
 cloudclean/CMakeFiles/CloudClean.dir/layerlist.cpp.o: cloudclean/layerlist.cpp
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_2)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_18)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object cloudclean/CMakeFiles/CloudClean.dir/layerlist.cpp.o"
 	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/CloudClean.dir/layerlist.cpp.o -c /home/rickert/Masters/cloudclean/cloudclean/layerlist.cpp
 
@@ -94,7 +180,7 @@ cloudclean/CMakeFiles/CloudClean.dir/layerlist.cpp.o.provides.build: cloudclean/
 
 cloudclean/CMakeFiles/CloudClean.dir/layer.cpp.o: cloudclean/CMakeFiles/CloudClean.dir/flags.make
 cloudclean/CMakeFiles/CloudClean.dir/layer.cpp.o: cloudclean/layer.cpp
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_3)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_19)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object cloudclean/CMakeFiles/CloudClean.dir/layer.cpp.o"
 	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/CloudClean.dir/layer.cpp.o -c /home/rickert/Masters/cloudclean/cloudclean/layer.cpp
 
@@ -117,7 +203,7 @@ cloudclean/CMakeFiles/CloudClean.dir/layer.cpp.o.provides.build: cloudclean/CMak
 
 cloudclean/CMakeFiles/CloudClean.dir/mainwindow.cpp.o: cloudclean/CMakeFiles/CloudClean.dir/flags.make
 cloudclean/CMakeFiles/CloudClean.dir/mainwindow.cpp.o: cloudclean/mainwindow.cpp
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_4)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_20)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object cloudclean/CMakeFiles/CloudClean.dir/mainwindow.cpp.o"
 	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/CloudClean.dir/mainwindow.cpp.o -c /home/rickert/Masters/cloudclean/cloudclean/mainwindow.cpp
 
@@ -140,7 +226,7 @@ cloudclean/CMakeFiles/CloudClean.dir/mainwindow.cpp.o.provides.build: cloudclean
 
 cloudclean/CMakeFiles/CloudClean.dir/cloudmodel.cpp.o: cloudclean/CMakeFiles/CloudClean.dir/flags.make
 cloudclean/CMakeFiles/CloudClean.dir/cloudmodel.cpp.o: cloudclean/cloudmodel.cpp
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_5)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_21)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object cloudclean/CMakeFiles/CloudClean.dir/cloudmodel.cpp.o"
 	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/CloudClean.dir/cloudmodel.cpp.o -c /home/rickert/Masters/cloudclean/cloudclean/cloudmodel.cpp
 
@@ -163,7 +249,7 @@ cloudclean/CMakeFiles/CloudClean.dir/cloudmodel.cpp.o.provides.build: cloudclean
 
 cloudclean/CMakeFiles/CloudClean.dir/glarea.cpp.o: cloudclean/CMakeFiles/CloudClean.dir/flags.make
 cloudclean/CMakeFiles/CloudClean.dir/glarea.cpp.o: cloudclean/glarea.cpp
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_6)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_22)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object cloudclean/CMakeFiles/CloudClean.dir/glarea.cpp.o"
 	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/CloudClean.dir/glarea.cpp.o -c /home/rickert/Masters/cloudclean/cloudclean/glarea.cpp
 
@@ -186,7 +272,7 @@ cloudclean/CMakeFiles/CloudClean.dir/glarea.cpp.o.provides.build: cloudclean/CMa
 
 cloudclean/CMakeFiles/CloudClean.dir/layerview.cpp.o: cloudclean/CMakeFiles/CloudClean.dir/flags.make
 cloudclean/CMakeFiles/CloudClean.dir/layerview.cpp.o: cloudclean/layerview.cpp
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_7)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_23)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object cloudclean/CMakeFiles/CloudClean.dir/layerview.cpp.o"
 	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/CloudClean.dir/layerview.cpp.o -c /home/rickert/Masters/cloudclean/cloudclean/layerview.cpp
 
@@ -209,7 +295,7 @@ cloudclean/CMakeFiles/CloudClean.dir/layerview.cpp.o.provides.build: cloudclean/
 
 cloudclean/CMakeFiles/CloudClean.dir/pluginmanager.cpp.o: cloudclean/CMakeFiles/CloudClean.dir/flags.make
 cloudclean/CMakeFiles/CloudClean.dir/pluginmanager.cpp.o: cloudclean/pluginmanager.cpp
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_8)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_24)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object cloudclean/CMakeFiles/CloudClean.dir/pluginmanager.cpp.o"
 	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/CloudClean.dir/pluginmanager.cpp.o -c /home/rickert/Masters/cloudclean/cloudclean/pluginmanager.cpp
 
@@ -232,7 +318,7 @@ cloudclean/CMakeFiles/CloudClean.dir/pluginmanager.cpp.o.provides.build: cloudcl
 
 cloudclean/CMakeFiles/CloudClean.dir/toolbox.cpp.o: cloudclean/CMakeFiles/CloudClean.dir/flags.make
 cloudclean/CMakeFiles/CloudClean.dir/toolbox.cpp.o: cloudclean/toolbox.cpp
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_9)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_25)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object cloudclean/CMakeFiles/CloudClean.dir/toolbox.cpp.o"
 	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/CloudClean.dir/toolbox.cpp.o -c /home/rickert/Masters/cloudclean/cloudclean/toolbox.cpp
 
@@ -255,7 +341,7 @@ cloudclean/CMakeFiles/CloudClean.dir/toolbox.cpp.o.provides.build: cloudclean/CM
 
 cloudclean/CMakeFiles/CloudClean.dir/camera.cpp.o: cloudclean/CMakeFiles/CloudClean.dir/flags.make
 cloudclean/CMakeFiles/CloudClean.dir/camera.cpp.o: cloudclean/camera.cpp
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_10)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_26)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object cloudclean/CMakeFiles/CloudClean.dir/camera.cpp.o"
 	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/CloudClean.dir/camera.cpp.o -c /home/rickert/Masters/cloudclean/cloudclean/camera.cpp
 
@@ -278,7 +364,7 @@ cloudclean/CMakeFiles/CloudClean.dir/camera.cpp.o.provides.build: cloudclean/CMa
 
 cloudclean/CMakeFiles/CloudClean.dir/subsampledialog.cpp.o: cloudclean/CMakeFiles/CloudClean.dir/flags.make
 cloudclean/CMakeFiles/CloudClean.dir/subsampledialog.cpp.o: cloudclean/subsampledialog.cpp
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_11)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_27)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object cloudclean/CMakeFiles/CloudClean.dir/subsampledialog.cpp.o"
 	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/CloudClean.dir/subsampledialog.cpp.o -c /home/rickert/Masters/cloudclean/cloudclean/subsampledialog.cpp
 
@@ -301,7 +387,7 @@ cloudclean/CMakeFiles/CloudClean.dir/subsampledialog.cpp.o.provides.build: cloud
 
 cloudclean/CMakeFiles/CloudClean.dir/pointpicker.cpp.o: cloudclean/CMakeFiles/CloudClean.dir/flags.make
 cloudclean/CMakeFiles/CloudClean.dir/pointpicker.cpp.o: cloudclean/pointpicker.cpp
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_12)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_28)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object cloudclean/CMakeFiles/CloudClean.dir/pointpicker.cpp.o"
 	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/CloudClean.dir/pointpicker.cpp.o -c /home/rickert/Masters/cloudclean/cloudclean/pointpicker.cpp
 
@@ -324,7 +410,7 @@ cloudclean/CMakeFiles/CloudClean.dir/pointpicker.cpp.o.provides.build: cloudclea
 
 cloudclean/CMakeFiles/CloudClean.dir/__/common/utilities.cpp.o: cloudclean/CMakeFiles/CloudClean.dir/flags.make
 cloudclean/CMakeFiles/CloudClean.dir/__/common/utilities.cpp.o: common/utilities.cpp
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_13)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_29)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object cloudclean/CMakeFiles/CloudClean.dir/__/common/utilities.cpp.o"
 	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/CloudClean.dir/__/common/utilities.cpp.o -c /home/rickert/Masters/cloudclean/common/utilities.cpp
 
@@ -347,7 +433,7 @@ cloudclean/CMakeFiles/CloudClean.dir/__/common/utilities.cpp.o.provides.build: c
 
 cloudclean/CMakeFiles/CloudClean.dir/moc_io.cxx.o: cloudclean/CMakeFiles/CloudClean.dir/flags.make
 cloudclean/CMakeFiles/CloudClean.dir/moc_io.cxx.o: cloudclean/moc_io.cxx
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_14)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_30)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object cloudclean/CMakeFiles/CloudClean.dir/moc_io.cxx.o"
 	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/CloudClean.dir/moc_io.cxx.o -c /home/rickert/Masters/cloudclean/cloudclean/moc_io.cxx
 
@@ -370,7 +456,7 @@ cloudclean/CMakeFiles/CloudClean.dir/moc_io.cxx.o.provides.build: cloudclean/CMa
 
 cloudclean/CMakeFiles/CloudClean.dir/moc_layerlist.cxx.o: cloudclean/CMakeFiles/CloudClean.dir/flags.make
 cloudclean/CMakeFiles/CloudClean.dir/moc_layerlist.cxx.o: cloudclean/moc_layerlist.cxx
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_15)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_31)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object cloudclean/CMakeFiles/CloudClean.dir/moc_layerlist.cxx.o"
 	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/CloudClean.dir/moc_layerlist.cxx.o -c /home/rickert/Masters/cloudclean/cloudclean/moc_layerlist.cxx
 
@@ -393,7 +479,7 @@ cloudclean/CMakeFiles/CloudClean.dir/moc_layerlist.cxx.o.provides.build: cloudcl
 
 cloudclean/CMakeFiles/CloudClean.dir/moc_layer.cxx.o: cloudclean/CMakeFiles/CloudClean.dir/flags.make
 cloudclean/CMakeFiles/CloudClean.dir/moc_layer.cxx.o: cloudclean/moc_layer.cxx
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_16)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_32)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object cloudclean/CMakeFiles/CloudClean.dir/moc_layer.cxx.o"
 	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/CloudClean.dir/moc_layer.cxx.o -c /home/rickert/Masters/cloudclean/cloudclean/moc_layer.cxx
 
@@ -416,7 +502,7 @@ cloudclean/CMakeFiles/CloudClean.dir/moc_layer.cxx.o.provides.build: cloudclean/
 
 cloudclean/CMakeFiles/CloudClean.dir/moc_mainwindow.cxx.o: cloudclean/CMakeFiles/CloudClean.dir/flags.make
 cloudclean/CMakeFiles/CloudClean.dir/moc_mainwindow.cxx.o: cloudclean/moc_mainwindow.cxx
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_17)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_33)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object cloudclean/CMakeFiles/CloudClean.dir/moc_mainwindow.cxx.o"
 	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/CloudClean.dir/moc_mainwindow.cxx.o -c /home/rickert/Masters/cloudclean/cloudclean/moc_mainwindow.cxx
 
@@ -439,7 +525,7 @@ cloudclean/CMakeFiles/CloudClean.dir/moc_mainwindow.cxx.o.provides.build: cloudc
 
 cloudclean/CMakeFiles/CloudClean.dir/moc_cloudmodel.cxx.o: cloudclean/CMakeFiles/CloudClean.dir/flags.make
 cloudclean/CMakeFiles/CloudClean.dir/moc_cloudmodel.cxx.o: cloudclean/moc_cloudmodel.cxx
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_18)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_34)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object cloudclean/CMakeFiles/CloudClean.dir/moc_cloudmodel.cxx.o"
 	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/CloudClean.dir/moc_cloudmodel.cxx.o -c /home/rickert/Masters/cloudclean/cloudclean/moc_cloudmodel.cxx
 
@@ -462,7 +548,7 @@ cloudclean/CMakeFiles/CloudClean.dir/moc_cloudmodel.cxx.o.provides.build: cloudc
 
 cloudclean/CMakeFiles/CloudClean.dir/moc_glarea.cxx.o: cloudclean/CMakeFiles/CloudClean.dir/flags.make
 cloudclean/CMakeFiles/CloudClean.dir/moc_glarea.cxx.o: cloudclean/moc_glarea.cxx
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_19)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_35)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object cloudclean/CMakeFiles/CloudClean.dir/moc_glarea.cxx.o"
 	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/CloudClean.dir/moc_glarea.cxx.o -c /home/rickert/Masters/cloudclean/cloudclean/moc_glarea.cxx
 
@@ -485,7 +571,7 @@ cloudclean/CMakeFiles/CloudClean.dir/moc_glarea.cxx.o.provides.build: cloudclean
 
 cloudclean/CMakeFiles/CloudClean.dir/moc_layerview.cxx.o: cloudclean/CMakeFiles/CloudClean.dir/flags.make
 cloudclean/CMakeFiles/CloudClean.dir/moc_layerview.cxx.o: cloudclean/moc_layerview.cxx
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_20)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_36)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object cloudclean/CMakeFiles/CloudClean.dir/moc_layerview.cxx.o"
 	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/CloudClean.dir/moc_layerview.cxx.o -c /home/rickert/Masters/cloudclean/cloudclean/moc_layerview.cxx
 
@@ -508,7 +594,7 @@ cloudclean/CMakeFiles/CloudClean.dir/moc_layerview.cxx.o.provides.build: cloudcl
 
 cloudclean/CMakeFiles/CloudClean.dir/moc_pluginmanager.cxx.o: cloudclean/CMakeFiles/CloudClean.dir/flags.make
 cloudclean/CMakeFiles/CloudClean.dir/moc_pluginmanager.cxx.o: cloudclean/moc_pluginmanager.cxx
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_21)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_37)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object cloudclean/CMakeFiles/CloudClean.dir/moc_pluginmanager.cxx.o"
 	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/CloudClean.dir/moc_pluginmanager.cxx.o -c /home/rickert/Masters/cloudclean/cloudclean/moc_pluginmanager.cxx
 
@@ -531,7 +617,7 @@ cloudclean/CMakeFiles/CloudClean.dir/moc_pluginmanager.cxx.o.provides.build: clo
 
 cloudclean/CMakeFiles/CloudClean.dir/moc_toolbox.cxx.o: cloudclean/CMakeFiles/CloudClean.dir/flags.make
 cloudclean/CMakeFiles/CloudClean.dir/moc_toolbox.cxx.o: cloudclean/moc_toolbox.cxx
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_22)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_38)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object cloudclean/CMakeFiles/CloudClean.dir/moc_toolbox.cxx.o"
 	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/CloudClean.dir/moc_toolbox.cxx.o -c /home/rickert/Masters/cloudclean/cloudclean/moc_toolbox.cxx
 
@@ -554,7 +640,7 @@ cloudclean/CMakeFiles/CloudClean.dir/moc_toolbox.cxx.o.provides.build: cloudclea
 
 cloudclean/CMakeFiles/CloudClean.dir/moc_camera.cxx.o: cloudclean/CMakeFiles/CloudClean.dir/flags.make
 cloudclean/CMakeFiles/CloudClean.dir/moc_camera.cxx.o: cloudclean/moc_camera.cxx
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_23)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_39)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object cloudclean/CMakeFiles/CloudClean.dir/moc_camera.cxx.o"
 	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/CloudClean.dir/moc_camera.cxx.o -c /home/rickert/Masters/cloudclean/cloudclean/moc_camera.cxx
 
@@ -577,7 +663,7 @@ cloudclean/CMakeFiles/CloudClean.dir/moc_camera.cxx.o.provides.build: cloudclean
 
 cloudclean/CMakeFiles/CloudClean.dir/moc_subsampledialog.cxx.o: cloudclean/CMakeFiles/CloudClean.dir/flags.make
 cloudclean/CMakeFiles/CloudClean.dir/moc_subsampledialog.cxx.o: cloudclean/moc_subsampledialog.cxx
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_24)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_40)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object cloudclean/CMakeFiles/CloudClean.dir/moc_subsampledialog.cxx.o"
 	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/CloudClean.dir/moc_subsampledialog.cxx.o -c /home/rickert/Masters/cloudclean/cloudclean/moc_subsampledialog.cxx
 
@@ -600,7 +686,7 @@ cloudclean/CMakeFiles/CloudClean.dir/moc_subsampledialog.cxx.o.provides.build: c
 
 cloudclean/CMakeFiles/CloudClean.dir/moc_pointpicker.cxx.o: cloudclean/CMakeFiles/CloudClean.dir/flags.make
 cloudclean/CMakeFiles/CloudClean.dir/moc_pointpicker.cxx.o: cloudclean/moc_pointpicker.cxx
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_25)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_41)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object cloudclean/CMakeFiles/CloudClean.dir/moc_pointpicker.cxx.o"
 	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/CloudClean.dir/moc_pointpicker.cxx.o -c /home/rickert/Masters/cloudclean/cloudclean/moc_pointpicker.cxx
 
@@ -623,7 +709,7 @@ cloudclean/CMakeFiles/CloudClean.dir/moc_pointpicker.cxx.o.provides.build: cloud
 
 cloudclean/CMakeFiles/CloudClean.dir/qrc_cloudclean.cxx.o: cloudclean/CMakeFiles/CloudClean.dir/flags.make
 cloudclean/CMakeFiles/CloudClean.dir/qrc_cloudclean.cxx.o: cloudclean/qrc_cloudclean.cxx
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_26)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_42)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object cloudclean/CMakeFiles/CloudClean.dir/qrc_cloudclean.cxx.o"
 	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/CloudClean.dir/qrc_cloudclean.cxx.o -c /home/rickert/Masters/cloudclean/cloudclean/qrc_cloudclean.cxx
 
@@ -643,89 +729,6 @@ cloudclean/CMakeFiles/CloudClean.dir/qrc_cloudclean.cxx.o.provides: cloudclean/C
 .PHONY : cloudclean/CMakeFiles/CloudClean.dir/qrc_cloudclean.cxx.o.provides
 
 cloudclean/CMakeFiles/CloudClean.dir/qrc_cloudclean.cxx.o.provides.build: cloudclean/CMakeFiles/CloudClean.dir/qrc_cloudclean.cxx.o
-
-cloudclean/moc_io.cxx: cloudclean/io.h
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_27)
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating moc_io.cxx"
-	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/moc-qt4 -I/usr/include/qt4 -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtCore -I/home/rickert/Masters/cloudclean/EIGEN3_INCLUDE_DIR -I/home/rickert/Masters/cloudclean/external -I/home/rickert/Masters/cloudclean/common -I/usr/local/include/pcl-1.7 -I/usr/include/flann -I/usr/include/eigen3 -I/opt/AMDAPP/include -I/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc -I/usr/include/qt4/QtOpenGL -DQT_GUI_LIB -DQT_CORE_LIB -DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET -o /home/rickert/Masters/cloudclean/cloudclean/moc_io.cxx /home/rickert/Masters/cloudclean/cloudclean/io.h
-
-cloudclean/moc_layerlist.cxx: cloudclean/layerlist.h
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_28)
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating moc_layerlist.cxx"
-	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/moc-qt4 -I/usr/include/qt4 -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtCore -I/home/rickert/Masters/cloudclean/EIGEN3_INCLUDE_DIR -I/home/rickert/Masters/cloudclean/external -I/home/rickert/Masters/cloudclean/common -I/usr/local/include/pcl-1.7 -I/usr/include/flann -I/usr/include/eigen3 -I/opt/AMDAPP/include -I/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc -I/usr/include/qt4/QtOpenGL -DQT_GUI_LIB -DQT_CORE_LIB -DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET -o /home/rickert/Masters/cloudclean/cloudclean/moc_layerlist.cxx /home/rickert/Masters/cloudclean/cloudclean/layerlist.h
-
-cloudclean/moc_layer.cxx: cloudclean/layer.h
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_29)
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating moc_layer.cxx"
-	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/moc-qt4 -I/usr/include/qt4 -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtCore -I/home/rickert/Masters/cloudclean/EIGEN3_INCLUDE_DIR -I/home/rickert/Masters/cloudclean/external -I/home/rickert/Masters/cloudclean/common -I/usr/local/include/pcl-1.7 -I/usr/include/flann -I/usr/include/eigen3 -I/opt/AMDAPP/include -I/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc -I/usr/include/qt4/QtOpenGL -DQT_GUI_LIB -DQT_CORE_LIB -DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET -o /home/rickert/Masters/cloudclean/cloudclean/moc_layer.cxx /home/rickert/Masters/cloudclean/cloudclean/layer.h
-
-cloudclean/moc_mainwindow.cxx: cloudclean/mainwindow.h
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_30)
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating moc_mainwindow.cxx"
-	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/moc-qt4 -I/usr/include/qt4 -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtCore -I/home/rickert/Masters/cloudclean/EIGEN3_INCLUDE_DIR -I/home/rickert/Masters/cloudclean/external -I/home/rickert/Masters/cloudclean/common -I/usr/local/include/pcl-1.7 -I/usr/include/flann -I/usr/include/eigen3 -I/opt/AMDAPP/include -I/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc -I/usr/include/qt4/QtOpenGL -DQT_GUI_LIB -DQT_CORE_LIB -DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET -o /home/rickert/Masters/cloudclean/cloudclean/moc_mainwindow.cxx /home/rickert/Masters/cloudclean/cloudclean/mainwindow.h
-
-cloudclean/moc_cloudmodel.cxx: cloudclean/cloudmodel.h
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_31)
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating moc_cloudmodel.cxx"
-	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/moc-qt4 -I/usr/include/qt4 -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtCore -I/home/rickert/Masters/cloudclean/EIGEN3_INCLUDE_DIR -I/home/rickert/Masters/cloudclean/external -I/home/rickert/Masters/cloudclean/common -I/usr/local/include/pcl-1.7 -I/usr/include/flann -I/usr/include/eigen3 -I/opt/AMDAPP/include -I/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc -I/usr/include/qt4/QtOpenGL -DQT_GUI_LIB -DQT_CORE_LIB -DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET -o /home/rickert/Masters/cloudclean/cloudclean/moc_cloudmodel.cxx /home/rickert/Masters/cloudclean/cloudclean/cloudmodel.h
-
-cloudclean/moc_glarea.cxx: cloudclean/glarea.h
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_32)
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating moc_glarea.cxx"
-	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/moc-qt4 -I/usr/include/qt4 -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtCore -I/home/rickert/Masters/cloudclean/EIGEN3_INCLUDE_DIR -I/home/rickert/Masters/cloudclean/external -I/home/rickert/Masters/cloudclean/common -I/usr/local/include/pcl-1.7 -I/usr/include/flann -I/usr/include/eigen3 -I/opt/AMDAPP/include -I/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc -I/usr/include/qt4/QtOpenGL -DQT_GUI_LIB -DQT_CORE_LIB -DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET -o /home/rickert/Masters/cloudclean/cloudclean/moc_glarea.cxx /home/rickert/Masters/cloudclean/cloudclean/glarea.h
-
-cloudclean/moc_layerview.cxx: cloudclean/layerview.h
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_33)
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating moc_layerview.cxx"
-	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/moc-qt4 -I/usr/include/qt4 -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtCore -I/home/rickert/Masters/cloudclean/EIGEN3_INCLUDE_DIR -I/home/rickert/Masters/cloudclean/external -I/home/rickert/Masters/cloudclean/common -I/usr/local/include/pcl-1.7 -I/usr/include/flann -I/usr/include/eigen3 -I/opt/AMDAPP/include -I/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc -I/usr/include/qt4/QtOpenGL -DQT_GUI_LIB -DQT_CORE_LIB -DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET -o /home/rickert/Masters/cloudclean/cloudclean/moc_layerview.cxx /home/rickert/Masters/cloudclean/cloudclean/layerview.h
-
-cloudclean/moc_pluginmanager.cxx: cloudclean/pluginmanager.h
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_34)
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating moc_pluginmanager.cxx"
-	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/moc-qt4 -I/usr/include/qt4 -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtCore -I/home/rickert/Masters/cloudclean/EIGEN3_INCLUDE_DIR -I/home/rickert/Masters/cloudclean/external -I/home/rickert/Masters/cloudclean/common -I/usr/local/include/pcl-1.7 -I/usr/include/flann -I/usr/include/eigen3 -I/opt/AMDAPP/include -I/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc -I/usr/include/qt4/QtOpenGL -DQT_GUI_LIB -DQT_CORE_LIB -DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET -o /home/rickert/Masters/cloudclean/cloudclean/moc_pluginmanager.cxx /home/rickert/Masters/cloudclean/cloudclean/pluginmanager.h
-
-cloudclean/moc_toolbox.cxx: cloudclean/toolbox.h
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_35)
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating moc_toolbox.cxx"
-	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/moc-qt4 -I/usr/include/qt4 -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtCore -I/home/rickert/Masters/cloudclean/EIGEN3_INCLUDE_DIR -I/home/rickert/Masters/cloudclean/external -I/home/rickert/Masters/cloudclean/common -I/usr/local/include/pcl-1.7 -I/usr/include/flann -I/usr/include/eigen3 -I/opt/AMDAPP/include -I/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc -I/usr/include/qt4/QtOpenGL -DQT_GUI_LIB -DQT_CORE_LIB -DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET -o /home/rickert/Masters/cloudclean/cloudclean/moc_toolbox.cxx /home/rickert/Masters/cloudclean/cloudclean/toolbox.h
-
-cloudclean/moc_camera.cxx: cloudclean/camera.h
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_36)
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating moc_camera.cxx"
-	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/moc-qt4 -I/usr/include/qt4 -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtCore -I/home/rickert/Masters/cloudclean/EIGEN3_INCLUDE_DIR -I/home/rickert/Masters/cloudclean/external -I/home/rickert/Masters/cloudclean/common -I/usr/local/include/pcl-1.7 -I/usr/include/flann -I/usr/include/eigen3 -I/opt/AMDAPP/include -I/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc -I/usr/include/qt4/QtOpenGL -DQT_GUI_LIB -DQT_CORE_LIB -DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET -o /home/rickert/Masters/cloudclean/cloudclean/moc_camera.cxx /home/rickert/Masters/cloudclean/cloudclean/camera.h
-
-cloudclean/moc_subsampledialog.cxx: cloudclean/subsampledialog.h
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_37)
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating moc_subsampledialog.cxx"
-	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/moc-qt4 -I/usr/include/qt4 -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtCore -I/home/rickert/Masters/cloudclean/EIGEN3_INCLUDE_DIR -I/home/rickert/Masters/cloudclean/external -I/home/rickert/Masters/cloudclean/common -I/usr/local/include/pcl-1.7 -I/usr/include/flann -I/usr/include/eigen3 -I/opt/AMDAPP/include -I/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc -I/usr/include/qt4/QtOpenGL -DQT_GUI_LIB -DQT_CORE_LIB -DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET -o /home/rickert/Masters/cloudclean/cloudclean/moc_subsampledialog.cxx /home/rickert/Masters/cloudclean/cloudclean/subsampledialog.h
-
-cloudclean/moc_pointpicker.cxx: cloudclean/pointpicker.h
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_38)
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating moc_pointpicker.cxx"
-	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/moc-qt4 -I/usr/include/qt4 -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtCore -I/home/rickert/Masters/cloudclean/EIGEN3_INCLUDE_DIR -I/home/rickert/Masters/cloudclean/external -I/home/rickert/Masters/cloudclean/common -I/usr/local/include/pcl-1.7 -I/usr/include/flann -I/usr/include/eigen3 -I/opt/AMDAPP/include -I/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc -I/usr/include/qt4/QtOpenGL -DQT_GUI_LIB -DQT_CORE_LIB -DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET -o /home/rickert/Masters/cloudclean/cloudclean/moc_pointpicker.cxx /home/rickert/Masters/cloudclean/cloudclean/pointpicker.h
-
-cloudclean/ui_layerview.h: cloudclean/layerview.ui
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_39)
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating ui_layerview.h"
-	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/uic-qt4 -o /home/rickert/Masters/cloudclean/cloudclean/ui_layerview.h /home/rickert/Masters/cloudclean/cloudclean/layerview.ui
-
-cloudclean/ui_subsampledialog.h: cloudclean/subsampledialog.ui
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_40)
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating ui_subsampledialog.h"
-	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/uic-qt4 -o /home/rickert/Masters/cloudclean/cloudclean/ui_subsampledialog.h /home/rickert/Masters/cloudclean/cloudclean/subsampledialog.ui
-
-cloudclean/ui_toolbox.h: cloudclean/toolbox.ui
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_41)
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating ui_toolbox.h"
-	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/uic-qt4 -o /home/rickert/Masters/cloudclean/cloudclean/ui_toolbox.h /home/rickert/Masters/cloudclean/cloudclean/toolbox.ui
-
-cloudclean/qrc_cloudclean.cxx: cloudclean/shaders/points.frag
-cloudclean/qrc_cloudclean.cxx: cloudclean/shaders/points.vert
-cloudclean/qrc_cloudclean.cxx: cloudclean/cloudclean.qrc.depends
-cloudclean/qrc_cloudclean.cxx: cloudclean/cloudclean.qrc
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/rickert/Masters/cloudclean/CMakeFiles $(CMAKE_PROGRESS_42)
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating qrc_cloudclean.cxx"
-	cd /home/rickert/Masters/cloudclean/cloudclean && /usr/bin/rcc -name cloudclean -o /home/rickert/Masters/cloudclean/cloudclean/qrc_cloudclean.cxx /home/rickert/Masters/cloudclean/cloudclean/cloudclean.qrc
 
 # Object files for target CloudClean
 CloudClean_OBJECTS = \
@@ -785,17 +788,17 @@ build/CloudClean: cloudclean/CMakeFiles/CloudClean.dir/moc_camera.cxx.o
 build/CloudClean: cloudclean/CMakeFiles/CloudClean.dir/moc_subsampledialog.cxx.o
 build/CloudClean: cloudclean/CMakeFiles/CloudClean.dir/moc_pointpicker.cxx.o
 build/CloudClean: cloudclean/CMakeFiles/CloudClean.dir/qrc_cloudclean.cxx.o
-build/CloudClean: /usr/lib/x86_64-linux-gnu/libQtGui.so
-build/CloudClean: /usr/lib/x86_64-linux-gnu/libQtCore.so
-build/CloudClean: /usr/lib/x86_64-linux-gnu/libQtCore.so
-build/CloudClean: /usr/lib/x86_64-linux-gnu/libQtGui.so
-build/CloudClean: /usr/lib/x86_64-linux-gnu/libQtCore.so
-build/CloudClean: /usr/lib/x86_64-linux-gnu/libQtGui.so
-build/CloudClean: /usr/lib/x86_64-linux-gnu/libQtOpenGL.so
-build/CloudClean: /usr/lib/x86_64-linux-gnu/libQtGui.so
-build/CloudClean: /usr/lib/x86_64-linux-gnu/libQtCore.so
-build/CloudClean: /usr/lib/x86_64-linux-gnu/libQtOpenGL.so
 build/CloudClean: cloudclean/CMakeFiles/CloudClean.dir/build.make
+build/CloudClean: /usr/lib/x86_64-linux-gnu/libQtGui.so
+build/CloudClean: /usr/lib/x86_64-linux-gnu/libQtCore.so
+build/CloudClean: /usr/lib/x86_64-linux-gnu/libQtCore.so
+build/CloudClean: /usr/lib/x86_64-linux-gnu/libQtGui.so
+build/CloudClean: /usr/lib/x86_64-linux-gnu/libQtCore.so
+build/CloudClean: /usr/lib/x86_64-linux-gnu/libQtGui.so
+build/CloudClean: /usr/lib/x86_64-linux-gnu/libQtOpenGL.so
+build/CloudClean: /usr/lib/x86_64-linux-gnu/libQtGui.so
+build/CloudClean: /usr/lib/x86_64-linux-gnu/libQtCore.so
+build/CloudClean: /usr/lib/x86_64-linux-gnu/libQtOpenGL.so
 build/CloudClean: cloudclean/CMakeFiles/CloudClean.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --red --bold "Linking CXX executable ../build/CloudClean"
 	cd /home/rickert/Masters/cloudclean/cloudclean && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/CloudClean.dir/link.txt --verbose=$(VERBOSE)

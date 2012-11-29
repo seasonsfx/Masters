@@ -4,8 +4,6 @@
 cloudclean/CMakeFiles/CloudClean.dir/__/common/utilities.cpp.o
  /home/rickert/Masters/cloudclean/common/utilities.cpp
  /home/rickert/Masters/cloudclean/common/utilities.h
- /opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc/CL/cl.h
- /opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc/CL/cl_platform.h
  /usr/include/qt4/Qt3Support/q3cstring.h
  /usr/include/qt4/QtCore/QDebug
  /usr/include/qt4/QtCore/QPoint
@@ -205,7 +203,6 @@ cloudclean/CMakeFiles/CloudClean.dir/camera.cpp.o
  /usr/include/eigen3/Eigen/src/Eigen2Support/TriangularSolver.h
  /usr/include/eigen3/Eigen/src/Eigen2Support/VectorBlock.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./ComplexSchur.h
- /usr/include/eigen3/Eigen/src/Eigenvalues/./EigenvaluesCommon.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./HessenbergDecomposition.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./RealSchur.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./Tridiagonalization.h
@@ -454,7 +451,6 @@ cloudclean/CMakeFiles/CloudClean.dir/cloudmodel.cpp.o
  /usr/include/eigen3/Eigen/src/Eigen2Support/TriangularSolver.h
  /usr/include/eigen3/Eigen/src/Eigen2Support/VectorBlock.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./ComplexSchur.h
- /usr/include/eigen3/Eigen/src/Eigenvalues/./EigenvaluesCommon.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./HessenbergDecomposition.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./RealSchur.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./Tridiagonalization.h
@@ -713,9 +709,6 @@ cloudclean/CMakeFiles/CloudClean.dir/glarea.cpp.o
  /home/rickert/Masters/cloudclean/cloudclean/layerlist.h
  /home/rickert/Masters/cloudclean/cloudclean/pluginmanager.h
  /home/rickert/Masters/cloudclean/cloudclean/pointpicker.h
- /opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc/CL/cl.h
- /opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc/CL/cl_gl.h
- /opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc/CL/cl_platform.h
  /usr/include/eigen3/Eigen/Cholesky
  /usr/include/eigen3/Eigen/Core
  /usr/include/eigen3/Eigen/Dense
@@ -852,7 +845,6 @@ cloudclean/CMakeFiles/CloudClean.dir/glarea.cpp.o
  /usr/include/eigen3/Eigen/src/Eigen2Support/TriangularSolver.h
  /usr/include/eigen3/Eigen/src/Eigen2Support/VectorBlock.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./ComplexSchur.h
- /usr/include/eigen3/Eigen/src/Eigenvalues/./EigenvaluesCommon.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./HessenbergDecomposition.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./RealSchur.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./Tridiagonalization.h
@@ -1274,7 +1266,6 @@ cloudclean/CMakeFiles/CloudClean.dir/layer.cpp.o
  /usr/include/eigen3/Eigen/src/Eigen2Support/TriangularSolver.h
  /usr/include/eigen3/Eigen/src/Eigen2Support/VectorBlock.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./ComplexSchur.h
- /usr/include/eigen3/Eigen/src/Eigenvalues/./EigenvaluesCommon.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./HessenbergDecomposition.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./RealSchur.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./Tridiagonalization.h
@@ -1654,7 +1645,6 @@ cloudclean/CMakeFiles/CloudClean.dir/layerlist.cpp.o
  /usr/include/eigen3/Eigen/src/Eigen2Support/TriangularSolver.h
  /usr/include/eigen3/Eigen/src/Eigen2Support/VectorBlock.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./ComplexSchur.h
- /usr/include/eigen3/Eigen/src/Eigenvalues/./EigenvaluesCommon.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./HessenbergDecomposition.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./RealSchur.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./Tridiagonalization.h
@@ -2040,7 +2030,6 @@ cloudclean/CMakeFiles/CloudClean.dir/layerview.cpp.o
  /usr/include/eigen3/Eigen/src/Eigen2Support/TriangularSolver.h
  /usr/include/eigen3/Eigen/src/Eigen2Support/VectorBlock.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./ComplexSchur.h
- /usr/include/eigen3/Eigen/src/Eigenvalues/./EigenvaluesCommon.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./HessenbergDecomposition.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./RealSchur.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./Tridiagonalization.h
@@ -2329,9 +2318,6 @@ cloudclean/CMakeFiles/CloudClean.dir/main.cpp.o
  /home/rickert/Masters/cloudclean/cloudclean/pluginmanager.h
  /home/rickert/Masters/cloudclean/cloudclean/pointpicker.h
  /home/rickert/Masters/cloudclean/cloudclean/toolbox.h
- /opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc/CL/cl.h
- /opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc/CL/cl_gl.h
- /opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc/CL/cl_platform.h
  /usr/include/eigen3/Eigen/Cholesky
  /usr/include/eigen3/Eigen/Core
  /usr/include/eigen3/Eigen/Dense
@@ -2468,7 +2454,6 @@ cloudclean/CMakeFiles/CloudClean.dir/main.cpp.o
  /usr/include/eigen3/Eigen/src/Eigen2Support/TriangularSolver.h
  /usr/include/eigen3/Eigen/src/Eigen2Support/VectorBlock.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./ComplexSchur.h
- /usr/include/eigen3/Eigen/src/Eigenvalues/./EigenvaluesCommon.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./HessenbergDecomposition.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./RealSchur.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./Tridiagonalization.h
@@ -2778,9 +2763,6 @@ cloudclean/CMakeFiles/CloudClean.dir/mainwindow.cpp.o
  /home/rickert/Masters/cloudclean/cloudclean/pointpicker.h
  /home/rickert/Masters/cloudclean/cloudclean/subsampledialog.h
  /home/rickert/Masters/cloudclean/cloudclean/toolbox.h
- /opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc/CL/cl.h
- /opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc/CL/cl_gl.h
- /opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc/CL/cl_platform.h
  /usr/include/eigen3/Eigen/Cholesky
  /usr/include/eigen3/Eigen/Core
  /usr/include/eigen3/Eigen/Dense
@@ -2917,7 +2899,6 @@ cloudclean/CMakeFiles/CloudClean.dir/mainwindow.cpp.o
  /usr/include/eigen3/Eigen/src/Eigen2Support/TriangularSolver.h
  /usr/include/eigen3/Eigen/src/Eigen2Support/VectorBlock.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./ComplexSchur.h
- /usr/include/eigen3/Eigen/src/Eigenvalues/./EigenvaluesCommon.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./HessenbergDecomposition.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./RealSchur.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./Tridiagonalization.h
@@ -3350,7 +3331,6 @@ cloudclean/CMakeFiles/CloudClean.dir/moc_cloudmodel.cxx.o
  /usr/include/eigen3/Eigen/src/Eigen2Support/TriangularSolver.h
  /usr/include/eigen3/Eigen/src/Eigen2Support/VectorBlock.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./ComplexSchur.h
- /usr/include/eigen3/Eigen/src/Eigenvalues/./EigenvaluesCommon.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./HessenbergDecomposition.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./RealSchur.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./Tridiagonalization.h
@@ -3597,9 +3577,6 @@ cloudclean/CMakeFiles/CloudClean.dir/moc_glarea.cxx.o
  /home/rickert/Masters/cloudclean/cloudclean/layerlist.h
  /home/rickert/Masters/cloudclean/cloudclean/moc_glarea.cxx
  /home/rickert/Masters/cloudclean/cloudclean/pointpicker.h
- /opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc/CL/cl.h
- /opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc/CL/cl_gl.h
- /opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc/CL/cl_platform.h
  /usr/include/eigen3/Eigen/Cholesky
  /usr/include/eigen3/Eigen/Core
  /usr/include/eigen3/Eigen/Dense
@@ -3736,7 +3713,6 @@ cloudclean/CMakeFiles/CloudClean.dir/moc_glarea.cxx.o
  /usr/include/eigen3/Eigen/src/Eigen2Support/TriangularSolver.h
  /usr/include/eigen3/Eigen/src/Eigen2Support/VectorBlock.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./ComplexSchur.h
- /usr/include/eigen3/Eigen/src/Eigenvalues/./EigenvaluesCommon.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./HessenbergDecomposition.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./RealSchur.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./Tridiagonalization.h
@@ -4144,7 +4120,6 @@ cloudclean/CMakeFiles/CloudClean.dir/moc_layerlist.cxx.o
  /usr/include/eigen3/Eigen/src/Eigen2Support/TriangularSolver.h
  /usr/include/eigen3/Eigen/src/Eigen2Support/VectorBlock.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./ComplexSchur.h
- /usr/include/eigen3/Eigen/src/Eigenvalues/./EigenvaluesCommon.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./HessenbergDecomposition.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./RealSchur.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./Tridiagonalization.h
@@ -4455,9 +4430,6 @@ cloudclean/CMakeFiles/CloudClean.dir/moc_mainwindow.cxx.o
  /home/rickert/Masters/cloudclean/cloudclean/pluginmanager.h
  /home/rickert/Masters/cloudclean/cloudclean/pointpicker.h
  /home/rickert/Masters/cloudclean/cloudclean/toolbox.h
- /opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc/CL/cl.h
- /opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc/CL/cl_gl.h
- /opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc/CL/cl_platform.h
  /usr/include/eigen3/Eigen/Cholesky
  /usr/include/eigen3/Eigen/Core
  /usr/include/eigen3/Eigen/Dense
@@ -4594,7 +4566,6 @@ cloudclean/CMakeFiles/CloudClean.dir/moc_mainwindow.cxx.o
  /usr/include/eigen3/Eigen/src/Eigen2Support/TriangularSolver.h
  /usr/include/eigen3/Eigen/src/Eigen2Support/VectorBlock.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./ComplexSchur.h
- /usr/include/eigen3/Eigen/src/Eigenvalues/./EigenvaluesCommon.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./HessenbergDecomposition.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./RealSchur.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./Tridiagonalization.h
@@ -5229,9 +5200,6 @@ cloudclean/CMakeFiles/CloudClean.dir/pointpicker.cpp.o
  /home/rickert/Masters/cloudclean/cloudclean/layerlist.h
  /home/rickert/Masters/cloudclean/cloudclean/pointpicker.cpp
  /home/rickert/Masters/cloudclean/cloudclean/pointpicker.h
- /opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc/CL/cl.h
- /opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc/CL/cl_gl.h
- /opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc/CL/cl_platform.h
  /usr/include/eigen3/Eigen/Cholesky
  /usr/include/eigen3/Eigen/Core
  /usr/include/eigen3/Eigen/Dense
@@ -5368,7 +5336,6 @@ cloudclean/CMakeFiles/CloudClean.dir/pointpicker.cpp.o
  /usr/include/eigen3/Eigen/src/Eigen2Support/TriangularSolver.h
  /usr/include/eigen3/Eigen/src/Eigen2Support/VectorBlock.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./ComplexSchur.h
- /usr/include/eigen3/Eigen/src/Eigenvalues/./EigenvaluesCommon.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./HessenbergDecomposition.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./RealSchur.h
  /usr/include/eigen3/Eigen/src/Eigenvalues/./Tridiagonalization.h

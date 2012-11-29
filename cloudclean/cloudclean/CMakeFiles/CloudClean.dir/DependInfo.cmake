@@ -44,3 +44,22 @@ SET(CMAKE_TARGET_DEFINITIONS
 # Targets to which this target links.
 SET(CMAKE_TARGET_LINKED_INFO_FILES
   )
+
+# The include file search paths:
+SET(CMAKE_C_TARGET_INCLUDE_PATH
+  "/usr/include/qt4"
+  "/usr/include/qt4/QtGui"
+  "/usr/include/qt4/QtCore"
+  "EIGEN3_INCLUDE_DIR"
+  "external"
+  "common"
+  "/usr/local/include/pcl-1.7"
+  "/usr/include/flann"
+  "/usr/include/eigen3"
+  "/opt/AMDAPP/include"
+  "/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc"
+  "/usr/include/qt4/QtOpenGL"
+  )
+SET(CMAKE_CXX_TARGET_INCLUDE_PATH ${CMAKE_C_TARGET_INCLUDE_PATH})
+SET(CMAKE_Fortran_TARGET_INCLUDE_PATH ${CMAKE_C_TARGET_INCLUDE_PATH})
+SET(CMAKE_ASM_TARGET_INCLUDE_PATH ${CMAKE_C_TARGET_INCLUDE_PATH})

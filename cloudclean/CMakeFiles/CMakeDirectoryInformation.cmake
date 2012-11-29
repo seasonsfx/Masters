@@ -8,23 +8,6 @@ SET(CMAKE_RELATIVE_PATH_TOP_BINARY "/home/rickert/Masters/cloudclean")
 # Force unix paths in dependencies.
 SET(CMAKE_FORCE_UNIX_PATHS 1)
 
-# The C and CXX include file search paths:
-SET(CMAKE_C_INCLUDE_PATH
-  "/usr/include/qt4"
-  "/usr/include/qt4/QtGui"
-  "/usr/include/qt4/QtCore"
-  "EIGEN3_INCLUDE_DIR"
-  "external"
-  "common"
-  "/usr/local/include/pcl-1.7"
-  "/usr/include/flann"
-  "/usr/include/eigen3"
-  "/opt/AMDAPP/include"
-  "/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc"
-  )
-SET(CMAKE_CXX_INCLUDE_PATH ${CMAKE_C_INCLUDE_PATH})
-SET(CMAKE_Fortran_INCLUDE_PATH ${CMAKE_C_INCLUDE_PATH})
-SET(CMAKE_ASM_INCLUDE_PATH ${CMAKE_C_INCLUDE_PATH})
 
 # The C and CXX include file regular expressions for this directory.
 SET(CMAKE_C_INCLUDE_REGEX_SCAN "^.*$")

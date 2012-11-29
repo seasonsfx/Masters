@@ -1,5 +1,5 @@
-SET(edit_mincut2_SOURCES edit_mincut2.cpp settings.cpp mincut.cpp compgeom.cpp)
-SET(edit_mincut2_HEADERS edit_mincut2.h settings.h mincut.h compgeom.h)
+SET(edit_mincut2_SOURCES edit_mincut2.cpp settings.cpp mincut.cpp compgeom.cpp lasso.cpp)
+SET(edit_mincut2_HEADERS edit_mincut2.h settings.h mincut.h compgeom.h lasso.h)
 SET(edit_mincut2_RESOURCES edit_mincut2.qrc)
 SET(edit_mincut2_FORMS settings.ui)
 

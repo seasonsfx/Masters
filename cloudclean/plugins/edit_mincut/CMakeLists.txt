@@ -1,5 +1,5 @@
-SET(edit_mincut_SOURCES edit_mincut.cpp settings.cpp)
-SET(edit_mincut_HEADERS edit_mincut.h settings.h)
+SET(edit_mincut_SOURCES edit_mincut.cpp mincut.cpp settings.cpp)
+SET(edit_mincut_HEADERS edit_mincut.h settings.h mincut.h)
 SET(edit_mincut_RESOURCES edit_mincut.qrc)
 SET(edit_mincut_FORMS settings.ui)
 

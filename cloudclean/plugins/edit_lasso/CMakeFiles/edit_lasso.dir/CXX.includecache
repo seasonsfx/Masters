@@ -44,36 +44,6 @@ settings.h
 QWidget
 -
 
-/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc/CL/cl.h
-OpenCL/cl_platform.h
--
-CL/cl_platform.h
--
-
-/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc/CL/cl_platform.h
-AvailabilityMacros.h
--
-stdint.h
--
-stddef.h
--
-altivec.h
--
-intrin.h
--
-xmmintrin.h
--
-intrin.h
--
-emmintrin.h
--
-mmintrin.h
--
-intrin.h
--
-immintrin.h
--
-
 /usr/include/eigen3/Eigen/Cholesky
 Core
 /usr/include/eigen3/Eigen/Core
@@ -863,8 +833,6 @@ ParametrizedLine.h
 /usr/include/eigen3/Eigen/src/Eigenvalues/././EigenvaluesCommon.h
 ./HessenbergDecomposition.h
 /usr/include/eigen3/Eigen/src/Eigenvalues/././HessenbergDecomposition.h
-
-/usr/include/eigen3/Eigen/src/Eigenvalues/./EigenvaluesCommon.h
 
 /usr/include/eigen3/Eigen/src/Eigenvalues/./HessenbergDecomposition.h
 

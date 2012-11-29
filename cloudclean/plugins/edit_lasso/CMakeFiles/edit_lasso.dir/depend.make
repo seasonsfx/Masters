@@ -6,9 +6,6 @@ plugins/edit_lasso/CMakeFiles/edit_lasso.dir/edit_lasso.cpp.o: plugins/edit_lass
 plugins/edit_lasso/CMakeFiles/edit_lasso.dir/edit_lasso.cpp.o: plugins/edit_lasso/edit_lasso.cpp
 plugins/edit_lasso/CMakeFiles/edit_lasso.dir/edit_lasso.cpp.o: plugins/edit_lasso/edit_lasso.h
 plugins/edit_lasso/CMakeFiles/edit_lasso.dir/edit_lasso.cpp.o: plugins/edit_lasso/settings.h
-plugins/edit_lasso/CMakeFiles/edit_lasso.dir/edit_lasso.cpp.o: /opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc/CL/cl.h
-plugins/edit_lasso/CMakeFiles/edit_lasso.dir/edit_lasso.cpp.o: /opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc/CL/cl_gl.h
-plugins/edit_lasso/CMakeFiles/edit_lasso.dir/edit_lasso.cpp.o: /opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc/CL/cl_platform.h
 plugins/edit_lasso/CMakeFiles/edit_lasso.dir/edit_lasso.cpp.o: /usr/include/eigen3/Eigen/Cholesky
 plugins/edit_lasso/CMakeFiles/edit_lasso.dir/edit_lasso.cpp.o: /usr/include/eigen3/Eigen/Core
 plugins/edit_lasso/CMakeFiles/edit_lasso.dir/edit_lasso.cpp.o: /usr/include/eigen3/Eigen/Dense
@@ -145,7 +142,6 @@ plugins/edit_lasso/CMakeFiles/edit_lasso.dir/edit_lasso.cpp.o: /usr/include/eige
 plugins/edit_lasso/CMakeFiles/edit_lasso.dir/edit_lasso.cpp.o: /usr/include/eigen3/Eigen/src/Eigen2Support/TriangularSolver.h
 plugins/edit_lasso/CMakeFiles/edit_lasso.dir/edit_lasso.cpp.o: /usr/include/eigen3/Eigen/src/Eigen2Support/VectorBlock.h
 plugins/edit_lasso/CMakeFiles/edit_lasso.dir/edit_lasso.cpp.o: /usr/include/eigen3/Eigen/src/Eigenvalues/./ComplexSchur.h
-plugins/edit_lasso/CMakeFiles/edit_lasso.dir/edit_lasso.cpp.o: /usr/include/eigen3/Eigen/src/Eigenvalues/./EigenvaluesCommon.h
 plugins/edit_lasso/CMakeFiles/edit_lasso.dir/edit_lasso.cpp.o: /usr/include/eigen3/Eigen/src/Eigenvalues/./HessenbergDecomposition.h
 plugins/edit_lasso/CMakeFiles/edit_lasso.dir/edit_lasso.cpp.o: /usr/include/eigen3/Eigen/src/Eigenvalues/./RealSchur.h
 plugins/edit_lasso/CMakeFiles/edit_lasso.dir/edit_lasso.cpp.o: /usr/include/eigen3/Eigen/src/Eigenvalues/./Tridiagonalization.h
@@ -437,8 +433,6 @@ plugins/edit_lasso/CMakeFiles/edit_lasso.dir/moc_edit_lasso.cxx.o: plugins/edit_
 plugins/edit_lasso/CMakeFiles/edit_lasso.dir/moc_edit_lasso.cxx.o: plugins/edit_lasso/edit_lasso.h
 plugins/edit_lasso/CMakeFiles/edit_lasso.dir/moc_edit_lasso.cxx.o: plugins/edit_lasso/moc_edit_lasso.cxx
 plugins/edit_lasso/CMakeFiles/edit_lasso.dir/moc_edit_lasso.cxx.o: plugins/edit_lasso/settings.h
-plugins/edit_lasso/CMakeFiles/edit_lasso.dir/moc_edit_lasso.cxx.o: /opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc/CL/cl.h
-plugins/edit_lasso/CMakeFiles/edit_lasso.dir/moc_edit_lasso.cxx.o: /opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc/CL/cl_platform.h
 plugins/edit_lasso/CMakeFiles/edit_lasso.dir/moc_edit_lasso.cxx.o: /usr/include/eigen3/Eigen/Cholesky
 plugins/edit_lasso/CMakeFiles/edit_lasso.dir/moc_edit_lasso.cxx.o: /usr/include/eigen3/Eigen/Core
 plugins/edit_lasso/CMakeFiles/edit_lasso.dir/moc_edit_lasso.cxx.o: /usr/include/eigen3/Eigen/Dense
@@ -574,7 +568,6 @@ plugins/edit_lasso/CMakeFiles/edit_lasso.dir/moc_edit_lasso.cxx.o: /usr/include/
 plugins/edit_lasso/CMakeFiles/edit_lasso.dir/moc_edit_lasso.cxx.o: /usr/include/eigen3/Eigen/src/Eigen2Support/TriangularSolver.h
 plugins/edit_lasso/CMakeFiles/edit_lasso.dir/moc_edit_lasso.cxx.o: /usr/include/eigen3/Eigen/src/Eigen2Support/VectorBlock.h
 plugins/edit_lasso/CMakeFiles/edit_lasso.dir/moc_edit_lasso.cxx.o: /usr/include/eigen3/Eigen/src/Eigenvalues/./ComplexSchur.h
-plugins/edit_lasso/CMakeFiles/edit_lasso.dir/moc_edit_lasso.cxx.o: /usr/include/eigen3/Eigen/src/Eigenvalues/./EigenvaluesCommon.h
 plugins/edit_lasso/CMakeFiles/edit_lasso.dir/moc_edit_lasso.cxx.o: /usr/include/eigen3/Eigen/src/Eigenvalues/./HessenbergDecomposition.h
 plugins/edit_lasso/CMakeFiles/edit_lasso.dir/moc_edit_lasso.cxx.o: /usr/include/eigen3/Eigen/src/Eigenvalues/./RealSchur.h
 plugins/edit_lasso/CMakeFiles/edit_lasso.dir/moc_edit_lasso.cxx.o: /usr/include/eigen3/Eigen/src/Eigenvalues/./Tridiagonalization.h

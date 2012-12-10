@@ -25,8 +25,10 @@
 #include "camera.h"
 #include "pointpicker.h"
 
+#ifdef Q_WS_X11
 #include <GL/glx.h>
 #undef KeyPress // Defined in X11/X.h, interferes with QEvent::KeyPress
+#endif
 
 class EditPluginInterface;
 class PluginManager;

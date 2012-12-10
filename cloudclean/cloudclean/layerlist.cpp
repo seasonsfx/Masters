@@ -1,7 +1,7 @@
 #include "layerlist.h"
 #include <QTextStream>
 #include "cloudmodel.h"
- #include <QColor>
+#include <QColor>
 
 LayerList::LayerList(QObject *parent) :
     QAbstractListModel(parent)

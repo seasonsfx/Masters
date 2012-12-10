@@ -36,7 +36,7 @@ public:
 private:
     static CloudModel* only_instance;
     explicit CloudModel(QObject *parent = 0);
-    CloudModel(CloudModel const&) = delete;
+    CloudModel(CloudModel const&);
     CloudModel& operator=(CloudModel const&) { return *this; }
 
 signals:

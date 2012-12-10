@@ -10,6 +10,7 @@ include_directories(
 	${QT_QTCORE_INCLUDE_DIR}
 	${QT_QTGUI_INCLUDE_DIR}
 	${QT_QTOPENGL_INCLUDE_DIR}
+	${PCL_INCLUDE_DIRS}
 )
 
 set(cloudclean_SOURCES
@@ -55,7 +56,7 @@ QT4_WRAP_CPP(cloudclean_HEADERS_MOC ${cloudclean_HEADERS})
 QT4_WRAP_UI(cloudclean_FORMS_HEADERS ${cloudclean_FORMS})
 QT4_ADD_RESOURCES(cloudclean_RESOURCES_RCC ${cloudclean_RESOURCES})
 
-MESSAGE("RCC stuff: " ${cloudclean_RESOURCES_RCC})
+INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_BINARY_DIR} )
 
 add_executable(CloudClean
 	${cloudclean_SOURCES} 
@@ -65,20 +66,14 @@ add_executable(CloudClean
 )
 
 target_link_libraries(CloudClean
-        ${QT_LIBRARIES}
+    ${QT_LIBRARIES}
 	${QT_QTCORE_LIBRARY}
 	${QT_QTGUI_LIBRARY}
 	${QT_QTCORE_LIBRARY}
 	${QT_QTGUI_LIBRARY}
 	${QT_QTOPENGL_LIBRARY}
-	pcl_io 
-	pcl_common  
-	pcl_features  
-	pcl_kdtree  
-	pcl_visualization 
-	pcl_octree  
-	pcl_filters 
-	pcl_search
+	${PCL_LIBRARIES}
+	${OPENCL_LIBRARIES}
 	GL 
 	GLU 
 	OpenCL 

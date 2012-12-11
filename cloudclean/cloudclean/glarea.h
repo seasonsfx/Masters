@@ -2,24 +2,24 @@
 #define GLWIDGET_H
 
 #include <ctime>
+#include <QtGlobal>
 
+#if defined(Q_OS_WIN32) || defined(Q_OS_WIN64)
+#include <windows.h>
+//#define GLEW_STATIC
+#include <GL/glew.h>
+#else
 #define GL3_PROTOTYPES
 #include <gl3.h>
-#include <GL/glu.h>
-
-#ifdef __APPLE__
-#include <OpenCL/opencl.h>
-#else
-#include <CL/cl.h>
 #endif
-
-#include <CL/cl_gl.h>
 
 #include <QGLWidget>
 #include <QGLBuffer>
 #include <QGLShaderProgram>
 #include <QMouseEvent>
 #include <QMutex>
+
+#include <GL/glu.h>
 
 #include "cloudmodel.h"
 #include "camera.h"
@@ -29,6 +29,14 @@
     #include <GL/glx.h>
     #undef KeyPress // Defined in X11/X.h, interferes with QEvent::KeyPress
 #endif
+
+#ifdef __APPLE__
+#include <OpenCL/opencl.h>
+#else
+#include <CL/cl.h>
+#endif
+
+#include <CL/cl_gl.h>
 
 class EditPluginInterface;
 class PluginManager;

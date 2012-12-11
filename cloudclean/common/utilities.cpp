@@ -1,5 +1,4 @@
 #include "utilities.h"
-#include <GL/glu.h>
 #include "QDebug"
 #include <cstdlib>
 

@@ -7,7 +7,9 @@
 #include <pcl/features/integral_image_normal.h>
 #include <pcl/features/normal_3d.h>
 #include <pcl/point_types.h>
-#include "layerlist.h"
+
+#include "layerlist.h" // includes gl stuff
+#include <GL/glu.h>
 
 // TODO: a cloud model should probably own a GL context?
 class CloudModel : public QObject

@@ -64,6 +64,17 @@ GLArea::GLArea(QWidget* parent, PluginManager *pm, CloudModel *cm)
 
 void GLArea::initializeGL()
 {
+#if defined(Q_OS_WIN32)
+    glewExperimental = true;
+    GLint GlewInitResult = glewInit();
+    if (GlewInitResult != GLEW_OK) {
+        const GLubyte* errorStr = glewGetErrorString(GlewInitResult);
+        int size = strlen(reinterpret_cast<const char*>(errorStr));
+        qDebug() <<"Glew error "<<QString::fromUtf8(reinterpret_cast<const char*>(errorStr), size);
+
+    }
+#endif
+
     glClearColor( 0.9f, 0.9f, 0.9f, 1.0f );
     glEnable(GL_DEPTH_TEST);
 
@@ -92,18 +103,23 @@ void GLArea::initializeGL()
         //exit(-1);
     }
 
+#ifdef _WIN32
+    HGLRC glCtx = wglGetCurrentContext();
+#else //!_WIN32
     GLXContext glCtx = glXGetCurrentContext();
+#endif //!_WIN32
 
-    //http://www.codeproject.com/Articles/201263/Part-6-Primitive-Restart-and-OpenGL-Interoperabili
-    cl_context_properties props[] = {
-            CL_CONTEXT_PLATFORM, 
-            (cl_context_properties)platform,
-            CL_GLX_DISPLAY_KHR,
-            (intptr_t) glXGetCurrentDisplay(),
-            CL_GL_CONTEXT_KHR,
-            (intptr_t) glCtx,
-            0
-    };
+// http://www.codeproject.com/Articles/201263/Part-6-Primitive-Restart-and-OpenGL-Interoperabili
+    cl_context_properties props[] = { CL_CONTEXT_PLATFORM,
+                      (cl_context_properties)platform,
+    #ifdef _WIN32
+                      CL_WGL_HDC_KHR, (intptr_t) wglGetCurrentDC(),
+    #else //!_WIN32
+                      CL_GLX_DISPLAY_KHR, (intptr_t) glXGetCurrentDisplay(),
+    #endif //!_WIN32
+                      CL_GL_CONTEXT_KHR, (intptr_t) glCtx, 0};
+
+
 
     clcontext = clCreateContext(props, 1, &device, NULL, NULL, NULL);
     cmd_queue = clCreateCommandQueue(clcontext, device, 0, NULL);

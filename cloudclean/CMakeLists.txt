@@ -60,12 +60,15 @@ add_definitions(${PCL_DEFINITIONS})
 
 #target_link_libraries(pcd_write_test ${PCL_COMMON_LIBRARIES} ${PCL_IO_LIBRARIES})
 
+
+find_package(OpenGL REQUIRED)
 find_package(OpenCL REQUIRED)
 
 include_directories(
 	external
 	common
 	${OPENCL_INCLUDE_DIRS}
+        ${OPENGL_INCLUDE_DIR}
 	#/usr/local/include/pcl-1.7
 	#/usr/include/flann
 	#/usr/include/eigen3

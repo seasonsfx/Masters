@@ -2,12 +2,11 @@
 #include <cfloat>
 #include <vector>
 
-#include <GL/glu.h>
-
+#include "glarea.h"
+#include "cloudmodel.h"
 #include "pointpicker.h"
 
-#include "cloudmodel.h"
-#include "glarea.h"
+#include <GL/glu.h>
 
 PointPicker::PointPicker(GLArea *glarea, CloudModel *cm, float max_dist):
         glarea(glarea), cm(cm), max_dist(max_dist){

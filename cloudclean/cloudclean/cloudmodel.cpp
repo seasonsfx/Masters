@@ -4,7 +4,6 @@
 #include <QTime>
 #include <pcl/filters/filter.h>
 #include <pcl/features/integral_image_normal.h>
-#include <GL/glu.h>
 
 #include "cloudmodel.h"
 #include "io.h"

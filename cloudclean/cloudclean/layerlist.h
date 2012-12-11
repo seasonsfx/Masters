@@ -3,7 +3,7 @@
 
 #include <QAbstractListModel>
 #include <QAbstractItemView>
-#include "layer.h"
+#include "layer.h" // includes gl stuff
 #include <vector>
 
 class LayerList : public QAbstractListModel

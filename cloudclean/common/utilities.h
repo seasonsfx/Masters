@@ -7,6 +7,9 @@
 #include <CL/cl.h>
 #endif
 
+#include "../cloudclean/glarea.h"
+#include <GL/glu.h>
+
 // Helper function to get error string
 // *********************************************************************
 const char* oclErrorString(cl_int error);

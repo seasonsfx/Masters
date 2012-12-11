@@ -65,16 +65,23 @@ add_executable(CloudClean
 	${cloudclean_RESOURCES_RCC}
 )
 
+if(WIN32)
+    find_package(GLEW REQUIRED)
+    include_directories( ${GLEW_INCLUDE_DIR} )
+    target_link_libraries(CloudClean ${GLEW_LIBRARIES})
+    message("---------------------------")
+    message("${GLEW_LIBRARIES}")
+
+endif()
+
 target_link_libraries(CloudClean
     ${QT_LIBRARIES}
-	${QT_QTCORE_LIBRARY}
-	${QT_QTGUI_LIBRARY}
-	${QT_QTCORE_LIBRARY}
-	${QT_QTGUI_LIBRARY}
-	${QT_QTOPENGL_LIBRARY}
-	${PCL_LIBRARIES}
-	${OPENCL_LIBRARIES}
-	GL 
-	GLU 
-	OpenCL 
+    ${QT_QTCORE_LIBRARY}
+    ${QT_QTGUI_LIBRARY}
+    ${QT_QTCORE_LIBRARY}
+    ${QT_QTGUI_LIBRARY}
+    ${QT_QTOPENGL_LIBRARY}
+    ${PCL_LIBRARIES}
+    ${OPENCL_LIBRARIES}
+    ${OPENGL_LIBRARIES}
 )

@@ -4,8 +4,8 @@
 
 #include <QtGui/QApplication>
 
-#include "cloudmodel.h"
 #include "mainwindow.h"
+#include "cloudmodel.h"
 
 int main(int argc, char *argv[])
 { 

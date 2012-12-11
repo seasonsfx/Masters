@@ -13,10 +13,6 @@ include_directories(
 	${PCL_INCLUDE_DIRS}
 )
 
-add_definitions(
-	-DNOMINMAX
-)
-
 set(cloudclean_SOURCES
 	main.cpp
 	layerlist.cpp

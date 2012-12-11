@@ -13,17 +13,25 @@ include(${QT_USE_FILE})
 add_definitions(
 	-Wall -std=c++0x
 	-fopenmp
-#	-Wno-deprecated-declarations
-#	-Wno-unknown-pragmas
-	-fstack-protector-all
-    -DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET
-    -DBOOST_TT_HAS_OPERATOR_HPP_INCLUDED # Hack
-	#-stdlib=libc++
+        -DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET
+        -DBOOST_TT_HAS_OPERATOR_HPP_INCLUDED # Hack
 )
 
-# Mute warnings in ms
+
 if(CMAKE_BUILD_TOOL MATCHES "(msdev|devenv|nmake)")
-    add_definitions(/W2)
+    add_definitions(
+        /W2 # Mute warnings in ms
+        -DNOMINMAX # Workaround for windows.h bug
+    )
+else()
+    add_definitions(
+        -Wall -std=c++0x
+        -fopenmp
+        -Wno-deprecated-declarations
+        -Wno-unknown-pragmas
+        -fstack-protector-all
+        #-stdlib=libc++
+    )
 endif()
 
 #link_directories(/usr/local/lib)

@@ -3,8 +3,8 @@
 
 #include <ctime>
 
-//#define GL3_PROTOTYPES
-//#include <gl3.h>
+#define GL3_PROTOTYPES
+#include <gl3.h>
 #include <GL/glu.h>
 
 #ifdef __APPLE__
@@ -26,8 +26,8 @@
 #include "pointpicker.h"
 
 #ifdef Q_WS_X11
-#include <GL/glx.h>
-#undef KeyPress // Defined in X11/X.h, interferes with QEvent::KeyPress
+    #include <GL/glx.h>
+    #undef KeyPress // Defined in X11/X.h, interferes with QEvent::KeyPress
 #endif
 
 class EditPluginInterface;

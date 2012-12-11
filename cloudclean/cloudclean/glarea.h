@@ -3,8 +3,8 @@
 
 #include <ctime>
 
-#define GL3_PROTOTYPES
-#include <gl3.h>
+//#define GL3_PROTOTYPES
+//#include <gl3.h>
 #include <GL/glu.h>
 
 #ifdef __APPLE__

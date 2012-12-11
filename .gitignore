@@ -1,5 +1,6 @@
 # Code
 /cloudclean/CloudClean
+build
 Makefile
 CMakeCache.txt
 CMakeFiles

@@ -11,8 +11,13 @@
 #include <assert.h>
 #include <pcl/io/io.h>
 #include <pcl/point_types.h>
-#include </usr/include/eigen3/Eigen/Core>
-#include </usr/include/eigen3/Eigen/Geometry>
+#include <Eigen/Core>
+#include <Eigen/Geometry>
+
+#ifdef _WIN32
+#   define INFINITY (DBL_MAX+DBL_MAX)
+#   define NAN (INFINITY-INFINITY)
+#endif
 
 inline bool isNaN(float val){
     return (val != val);

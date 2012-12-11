@@ -1,3 +1,4 @@
+#include <limits>
 #include "layerview.h"
 #include "ui_layerview.h"
 #include "cloudmodel.h"

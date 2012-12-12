@@ -78,7 +78,7 @@ pcl::PointCloud<pcl::PointXYZI>::Ptr read_ptx(const char* filename, int subsampl
     // Makes things faster apparently
     std::cin.sync_with_stdio(false);
 
-	std::ifstream ptx_file(filename);
+	std::ifstream ptx_file(filename, std::ios::binary);
 
     assert(ptx_file.is_open());
 

@@ -95,7 +95,7 @@ void GLArea::initializeGL()
 
 
     // Setup OpenCL
-    cl_int result = clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 1, &device, NULL);
+/*    cl_int result = clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 1, &device, NULL);
 
     if(result != CL_SUCCESS){
         qDebug("OpenCL failed!");
@@ -126,7 +126,7 @@ void GLArea::initializeGL()
 
     if(result != CL_SUCCESS)
         qWarning() << "CL object create failed:" << oclErrorString(result);
-
+*/
 }
 
 // Puts mouse in NDC

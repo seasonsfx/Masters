@@ -65,12 +65,13 @@ bool MainWindow::loadScan(){
     if(subsample == -1)
         return false;
 
-    const char *ptr = filename.toAscii().data();
-    char* f = new char[filename.length()];
-    strcpy(f,ptr); // invalid read of size 1
+	qDebug() << "Filename: " << filename;
 
-    CloudModel::Instance()->loadFile(f, subsample);
-    delete[] f; // Mismatched free() / delete / delete []
+	QByteArray ba = filename.toLatin1();
+	const char *c_str = ba.data();
+
+    CloudModel::Instance()->loadFile(c_str, subsample);
+
     glarea->modelReloaded();
     return true;
 }

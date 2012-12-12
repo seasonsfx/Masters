@@ -33,7 +33,8 @@ bool VizNormals::StartViz(QAction *action, CloudModel *cm, GLArea *glarea){
     if(!normal_buffer.isCreated()){
 
         // Setup normal shader
-        assert(glarea->prepareShaderProgram(normal_shader, ":/shaders/normals.vert", ":/shaders/normals.frag", ":/shaders/normals.geom" ) );
+        bool succ = glarea->prepareShaderProgram(normal_shader, ":/shaders/normals.vert", ":/shaders/normals.frag", ":/shaders/normals.geom" );
+        assert( succ );
 
         if ( !normal_shader.bind() )
         {
@@ -49,7 +50,8 @@ bool VizNormals::StartViz(QAction *action, CloudModel *cm, GLArea *glarea){
         // Create buffer
         normal_buffer.create();
         normal_buffer.setUsagePattern( QGLBuffer::DynamicDraw );
-        assert(normal_buffer.bind());
+        succ = normal_buffer.bind();
+        assert(succ);
         normal_buffer.allocate(cm->cloud->points.size() * sizeof(float) * 3);
 
         for (int i = 0; i < (int)cm->cloud->size(); i++)
@@ -84,7 +86,9 @@ void VizNormals::paintGL(CloudModel * cm, GLArea * glarea){
 
     if(normal_buffer.isCreated()){
 
-        assert(normal_shader.bind());
+        bool succ = normal_shader.bind();
+        assert(succ);
+
         float colour[4] = {1,0,0,1};
         glUniformMatrix4fv(normal_shader.uniformLocation("cameraToClipMatrix"), 1, GL_FALSE, glarea->camera.projectionMatrix().data());
         glUniformMatrix4fv(normal_shader.uniformLocation("modelToCameraMatrix"), 1, GL_FALSE, glarea->camera.modelviewMatrix().data());
@@ -92,12 +96,14 @@ void VizNormals::paintGL(CloudModel * cm, GLArea * glarea){
         glEnable(GL_LINE_SMOOTH);
         glHint(GL_LINE_SMOOTH_HINT,  GL_NICEST);
 
-        assert(normal_buffer.bind());
+        succ = normal_buffer.bind();
+        assert(succ);
         normal_shader.enableAttributeArray("pointnormal");
         normal_shader.setAttributeBuffer("pointnormal", GL_FLOAT, 0, 3 );
         normal_buffer.release();
 
-        assert(cm->point_buffer.bind());
+        succ = cm->point_buffer.bind();
+        assert(succ);
         normal_shader.enableAttributeArray( "vertex" );
         normal_shader.setAttributeBuffer( "vertex", GL_FLOAT, 0, 4 );
         cm->point_buffer.release();

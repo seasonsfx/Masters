@@ -1,13 +1,13 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QFileDialog> // I don't know why this has to go before other things!
 #include "glarea.h"
 #include <QListView>
 #include <QMainWindow>
 #include <QMdiArea>
 #include <QMenu>
 #include <QMenuBar>
-#include <QFileDialog>
 #include "layerview.h"
 #include "toolbox.h"
 #include "pluginmanager.h"

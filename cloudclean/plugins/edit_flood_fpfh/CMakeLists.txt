@@ -7,4 +7,5 @@ QT4_WRAP_CPP(edit_flood_fpfh_HEADERS_MOC ${edit_flood_fpfh_HEADERS})
 QT4_ADD_RESOURCES(edit_flood_fpfh_RESOURCES_RCC ${edit_flood_fpfh_RESOURCES})
 QT4_WRAP_UI(edit_flood_fpfh_FORMS_HEADERS ${edit_flood_fpfh_FORMS})
 
+include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 add_library (edit_flood_fpfh SHARED ${edit_flood_fpfh_SOURCES} ${edit_flood_fpfh_HEADERS_MOC} ${edit_flood_fpfh_RESOURCES_RCC} ${edit_flood_fpfh_FORMS_HEADERS})

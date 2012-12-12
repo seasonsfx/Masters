@@ -1,17 +1,14 @@
 include_directories (
 	${QT_QTCORE_INCLUDE_DIR}
 	${QT_QTGUI_INCLUDE_DIR}
-	${QT_QTCORE_INCLUDE_DIR}
-	${QT_QTGUI_INCLUDE_DIR}
 	${QT_QTOPENGL_INCLUDE_DIR}
+        ${PROJECT_SOURCE_DIR}/cloudclean
 )
 
-include_directories(${PROJECT_SOURCE_DIR}/cloudclean)
-
-ADD_DEFINITIONS(${QT_DEFINITIONS})
-ADD_DEFINITIONS(-DQT_PLUGIN)
-#ADD_DEFINITIONS(-DQT_NO_DEBUG)
-ADD_DEFINITIONS(-DQT_SHARED)
+add_definitions(${QT_DEFINITIONS})
+add_definitions(-DQT_PLUGIN)
+add_definitions(-DQT_SHARED)
+add_definitions(-rdynamic)
 
 add_subdirectory (edit_flood_fpfh)
 add_subdirectory (edit_flood_normals)

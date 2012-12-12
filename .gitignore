@@ -2,6 +2,7 @@
 /cloudclean/CloudClean
 build
 build2
+cloudclean-build
 Makefile
 CMakeCache.txt
 CMakeLists.txt.user

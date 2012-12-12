@@ -11,6 +11,7 @@ include_directories(
 	${QT_QTGUI_INCLUDE_DIR}
 	${QT_QTOPENGL_INCLUDE_DIR}
 	${PCL_INCLUDE_DIRS}
+        ${FLANN_INCLUDE_DIRS}
 )
 
 set(cloudclean_SOURCES
@@ -69,10 +70,11 @@ if(WIN32)
     find_package(GLEW REQUIRED)
     include_directories( ${GLEW_INCLUDE_DIR} )
     target_link_libraries(CloudClean ${GLEW_LIBRARIES})
-    message("---------------------------")
-    message("${GLEW_LIBRARIES}")
-
 endif()
+
+message("------------------------------")
+message("${FLANN_LIBRARY}")
+message("------------------------------")
 
 target_link_libraries(CloudClean
     ${QT_LIBRARIES}
@@ -82,6 +84,7 @@ target_link_libraries(CloudClean
     ${QT_QTGUI_LIBRARY}
     ${QT_QTOPENGL_LIBRARY}
     ${PCL_LIBRARIES}
+    ${FLANN_LIBRARY}
     ${OPENCL_LIBRARIES}
     ${OPENGL_LIBRARIES}
 )

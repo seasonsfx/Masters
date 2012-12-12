@@ -1,9 +1,0 @@
-*~
-*.a
-*.dll
-*.so
-*.o
-*.log
-*.run
-CloudClean
-moc_*.cpp

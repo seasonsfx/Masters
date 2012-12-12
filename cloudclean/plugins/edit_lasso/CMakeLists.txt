@@ -7,4 +7,5 @@ QT4_WRAP_CPP(edit_lasso_HEADERS_MOC ${edit_lasso_HEADERS})
 QT4_ADD_RESOURCES(edit_lasso_RESOURCES_RCC ${edit_lasso_RESOURCES})
 QT4_WRAP_UI(edit_lasso_FORMS_HEADERS ${edit_lasso_FORMS})
 
+include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 add_library (edit_lasso SHARED ${edit_lasso_SOURCES} ${edit_lasso_HEADERS_MOC} ${edit_lasso_RESOURCES_RCC} ${edit_lasso_FORMS_HEADERS})

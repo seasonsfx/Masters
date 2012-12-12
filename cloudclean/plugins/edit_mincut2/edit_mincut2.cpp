@@ -125,10 +125,11 @@ void EditPlugin::paintGL(CloudModel * cm, GLArea * glarea){
 
     // Perpare vertex shader
     if(!viz_shader2.isLinked()){
-        assert(glarea->prepareShaderProgram(viz_shader2,
-                                            ":/shader/points.vert",
-                                            ":/shader/points.frag",
-                                            "" ) );
+        bool succ = glarea->prepareShaderProgram(viz_shader2,
+                                                    ":/shader/points.vert",
+                                                    ":/shader/points.frag",
+                                                    "" );
+        assert( succ );
         if ( !viz_shader2.bind() ) {
             qWarning() << "Could not bind shader program to context";
             assert(false);
@@ -180,6 +181,8 @@ void EditPlugin::paintGL(CloudModel * cm, GLArea * glarea){
                        1, GL_FALSE, glarea->camera.projectionMatrix().data());
     glUniform1f(viz_shader.uniformLocation("max_line_width"), settings->edgeWidth());
 
+    glError("edit cut 2 - 1");
+
     // enable attribur in shader
     viz_shader.enableAttributeArray( "vertex" );
     // bind the buffer to be used with this attribute
@@ -187,6 +190,8 @@ void EditPlugin::paintGL(CloudModel * cm, GLArea * glarea){
     // specify how to interpret buffer
     viz_shader.setAttributeBuffer( "vertex", GL_FLOAT, 0, 4 );
     // this should be done for all attributes
+
+    glError("edit cut 2 - 2");
 
     float colour [4] = {1,0,0,1}; // Red
     glUniform3fv(viz_shader.uniformLocation("elColour"), 1, colour);
@@ -196,6 +201,8 @@ void EditPlugin::paintGL(CloudModel * cm, GLArea * glarea){
     glDrawElements(GL_LINES, gdata->source_edges.size()*2, GL_UNSIGNED_INT, 0);
     glBindTexture(GL_TEXTURE_BUFFER, 0);
 
+    glError("edit cut 2 - 3");
+
     colour [0] = 0; colour [2] = 1; // Blue
     glUniform3fv(viz_shader.uniformLocation("elColour"), 1, colour);
     sink_edge_buffer.bind();
@@ -203,6 +210,8 @@ void EditPlugin::paintGL(CloudModel * cm, GLArea * glarea){
     glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, sink_edge_weight_buffer.bufferId());
     glDrawElements(GL_LINES, gdata->sink_edges.size()*2, GL_UNSIGNED_INT, 0);
     glBindTexture(GL_TEXTURE_BUFFER, 0);
+
+    glError("edit cut 2 - 4");
 
     colour [2] = 0; colour [1] = 1; // Green
     glUniform3fv(viz_shader.uniformLocation("elColour"), 1, colour);
@@ -212,11 +221,13 @@ void EditPlugin::paintGL(CloudModel * cm, GLArea * glarea){
     glDrawElements(GL_LINES, gdata->bridge_edges.size()*2, GL_UNSIGNED_INT, 0);
     glBindTexture(GL_TEXTURE_BUFFER, 0);
 
+    glError("edit cut 2 - 5");
+
     bridge_edge_buffer.release();
     cm->point_buffer.release();
     viz_shader.release();
-    glError("edit cut 5");
 
+    glError("edit cut 2 - 6");
 
     ////////////////// Draw vertices //////////////////////////////
 

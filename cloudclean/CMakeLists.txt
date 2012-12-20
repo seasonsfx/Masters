@@ -1,8 +1,8 @@
 project (cloudclean)
-cmake_minimum_required (VERSION 2.8)
+cmake_minimum_required (VERSION 2.8.6)
 
-SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
-set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/plugins)
+SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
+set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 
 set(CMAKE_BUILD_TYPE Release)
 
@@ -13,7 +13,6 @@ include(${QT_USE_FILE})
 add_definitions(
         -DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET
         -DBOOST_TT_HAS_OPERATOR_HPP_INCLUDED # Hack
-        -g
 )
 
 if(CMAKE_BUILD_TOOL MATCHES "(msdev|devenv|nmake)")
@@ -46,7 +45,7 @@ find_package(PCL 1.7 REQUIRED COMPONENTS
 	search
 	features
 	filters
-        segmentation
+    segmentation
 )
 include_directories(${PCL_INCLUDE_DIRS})
 link_directories(${PCL_LIBRARY_DIRS})
@@ -56,11 +55,13 @@ find_package(OpenGL REQUIRED)
 find_package(OpenCL REQUIRED)
 
 include_directories(
-	external
-	common
+	ext
+	src/common
+    src/cloudclean
 	${OPENCL_INCLUDE_DIRS}
         ${OPENGL_INCLUDE_DIR}
 )
 
-add_subdirectory(cloudclean)
-add_subdirectory(plugins)
+add_subdirectory(src/cloudclean)
+add_subdirectory(src/main)
+add_subdirectory(src/plugins)

@@ -23,3 +23,5 @@ target_link_libraries(cloudclean_bin
     ${QT_QTCORE_LIBRARY}
     ${QT_QTGUI_LIBRARY}
 )
+
+INSTALL(TARGETS cloudclean_bin DESTINATION bin)

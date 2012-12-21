@@ -33,10 +33,16 @@ PluginManager::~PluginManager(){
 }
 
 void PluginManager::loadPlugins(){
-    //qApp->addLibraryPath(qApp->applicationDirPath());
     QDir pluginsDir(qApp->applicationDirPath());
-    pluginsDir.cd("plugins");
-    qApp->addLibraryPath(qApp->applicationDirPath());
+    bool succ = false;
+    if(!succ)
+        succ = pluginsDir.cd("plugins");
+    if(!succ)
+        succ = pluginsDir.cd("../lib/plugins");
+    if(!succ)
+        succ = pluginsDir.cd("/usr/lib/cloudclean/plugins");
+    if(!succ)
+        qDebug("Plugins directory not found!");
 
     QStringList pluginfilters("*." + DLLExtension());
     pluginsDir.setNameFilters(pluginfilters);

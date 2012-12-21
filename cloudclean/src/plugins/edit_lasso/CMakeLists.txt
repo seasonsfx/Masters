@@ -13,3 +13,5 @@ target_link_libraries(edit_lasso
     ${QT_LIBRARIES}
     cloudclean
 )
+
+INSTALL(TARGETS edit_lasso DESTINATION lib/cloudclean/plugins)

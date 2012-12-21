@@ -12,3 +12,5 @@ add_library (edit_flood_smoothness SHARED ${edit_flood_smoothness_SOURCES} ${edi
 target_link_libraries(edit_flood_smoothness
     cloudclean
 )
+
+INSTALL(TARGETS edit_flood_smoothness DESTINATION lib/cloudclean/plugins)

@@ -12,3 +12,5 @@ add_library(edit_flood_fpfh SHARED ${edit_flood_fpfh_SOURCES} ${edit_flood_fpfh_
 target_link_libraries(edit_flood_fpfh
     cloudclean
 )
+
+INSTALL(TARGETS edit_flood_fpfh DESTINATION lib/cloudclean/plugins)

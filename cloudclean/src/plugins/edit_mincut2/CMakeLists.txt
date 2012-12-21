@@ -13,3 +13,5 @@ target_link_libraries(edit_mincut2
     ${PCL_LIBRARIES}
     cloudclean
 )
+
+INSTALL(TARGETS edit_mincut2 DESTINATION lib/cloudclean/plugins)

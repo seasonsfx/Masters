@@ -79,6 +79,8 @@ FIND_LIBRARY (OPENCL_LIBRARY
 SET (OPENCL_INCLUDE_DIRS ${OPENCL_INCLUDE_DIR} CACHE INTERNAL "OpenCL Include Directory")
 SET (OPENCL_LIBRARIES ${OPENCL_LIBRARY} CACHE INTERNAL "OpenCL Libraries")
 
+# sudo ln -s /usr/share/nvidia-current/nvidia.icd /etc/OpenCL/vendors/nvidia.icd
+
 IF (OPENCL_INCLUDE_DIR AND OPENCL_LIBRARY)
   SET (_OPENCL_VERSION_TEST_SOURCE
 "
@@ -113,8 +115,6 @@ int main()
                 printf(\"%s\", version);
                 fflush(stdout);
             }
-
-            free(version);
         }
     }
 

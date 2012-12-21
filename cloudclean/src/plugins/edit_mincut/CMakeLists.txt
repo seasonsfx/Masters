@@ -11,6 +11,7 @@ include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 add_library (edit_mincut SHARED ${edit_mincut_SOURCES} ${edit_mincut_HEADERS_MOC} ${edit_mincut_RESOURCES_RCC} ${edit_mincut_FORMS_HEADERS})
 
 target_link_libraries(edit_mincut
-    #${PCL_LIBRARIES}
     cloudclean
 )
+
+INSTALL(TARGETS edit_mincut DESTINATION lib/cloudclean/plugins)

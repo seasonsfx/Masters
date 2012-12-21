@@ -9,6 +9,7 @@ QT4_WRAP_UI(viz_normals_FORMS_HEADERS ${viz_normals_FORMS})
 include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 add_library (viz_normals SHARED ${viz_normals_SOURCES} ${viz_normals_HEADERS_MOC} ${viz_normals_RESOURCES_RCC})
 target_link_libraries(viz_normals
-    ${PCL_LIBRARIES}
     cloudclean
 )
+
+INSTALL(TARGETS viz_normals DESTINATION lib/cloudclean/plugins)

@@ -12,3 +12,4 @@ add_library (edit_flood_pca SHARED ${edit_flood_pca_SOURCES} ${edit_flood_pca_HE
 target_link_libraries(edit_flood_pca
     cloudclean
 )
+INSTALL(TARGETS edit_flood_pca DESTINATION lib/cloudclean/plugins)

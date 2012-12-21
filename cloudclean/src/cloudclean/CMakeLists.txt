@@ -2,14 +2,15 @@ add_definitions(-DQT_SHARED)
 add_definitions(-DCloudClean_EXPORTS)
 
 
-if(CMAKE_BUILD_TOOL MATCHES "(msdev|devenv|nmake)")
+#if(CMAKE_BUILD_TOOL MATCHES "(msdev|devenv|nmake)")
 
-else()
-    set(LINK_FLAGS -rdynamic)
-    add_definitions(
-            -rdynamic
-    )
-endif()
+#else()
+#    set(LINK_FLAGS -rdynamic)
+#    add_definitions(
+#            #-rdynamic
+#            #-rpath /usr/lib/meshlab
+#    )
+#endif()
 
 include_directories(
 	${QT_QTCORE_INCLUDE_DIR}
@@ -78,6 +79,7 @@ if(WIN32)
     target_link_libraries(cloudclean ${GLEW_LIBRARIES})
 endif()
 
+
 target_link_libraries(cloudclean
     ${QT_LIBRARIES}
     ${QT_QTCORE_LIBRARY}
@@ -89,17 +91,4 @@ target_link_libraries(cloudclean
     ${OPENGL_LIBRARIES}
 )
 
-#add_executable(run_cloudclean main.cpp)
-#target_link_libraries(run_cloudclean
-#    cloudclean
-#    ${QT_LIBRARIES}
-#    ${QT_QTCORE_LIBRARY}
-#    ${QT_QTGUI_LIBRARY}
-#    ${QT_QTCORE_LIBRARY}
-#    ${QT_QTGUI_LIBRARY}
-#    ${QT_QTOPENGL_LIBRARY}
-#    ${PCL_LIBRARIES}
-#    ${FLANN_LIBRARY}
-#    ${OPENCL_LIBRARIES}
-#    ${OPENGL_LIBRARIES}
-#)
+INSTALL(TARGETS cloudclean DESTINATION lib/cloudclean)

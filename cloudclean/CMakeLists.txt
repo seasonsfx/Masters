@@ -5,16 +5,16 @@ set(CMAKE_BUILD_TYPE Release)
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
 if(CMAKE_BUILD_TOOL MATCHES "(msdev|devenv|nmake)")
-    LIST(APPEND CMAKE_CXX_FLAGS "/W2") # Mute warnings in ms
+    SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} /W2") # Mute warnings in ms
     add_definitions(-DNOMINMAX) # Workaround for windows.h bug
 else()
-    LIST(APPEND CMAKE_CXX_FLAGS "-Wall")
-    LIST(APPEND CMAKE_CXX_FLAGS "-std=c++0x")
-    LIST(APPEND CMAKE_CXX_FLAGS "-fopenmp")
-    LIST(APPEND CMAKE_CXX_FLAGS "-Wno-deprecated-declarations")
-    LIST(APPEND CMAKE_CXX_FLAGS "-Wno-unknown-pragmas")
-    LIST(APPEND CMAKE_CXX_FLAGS "-fstack-protector-all")
-    #LIST(APPEND CMAKE_CXX_FLAGS "-stdlib=libc++")
+    SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -Wall")
+    SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -std=c++0x")
+    SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -fopenmp")
+    SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations")
+    SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -Wno-unknown-pragmas")
+    SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -fstack-protector-all")
+    #SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -stdlib=libc++")
 endif()
 
 list(APPEND CMAKE_CXXFLAGS_RELEASE -O3)
@@ -124,6 +124,15 @@ function(find_dlls lib_files dll_dir dll_files)
     set(${dll_files} ${dll_file_list} PARENT_SCOPE)
 endfunction()
 
+function(followsym _files real_files)
+    set (_resolvedFiles "")
+    foreach (_file ${_files})
+        get_filename_component(_resolvedFile "${_file}" REALPATH)
+        list (APPEND _resolvedFiles "${_resolvedFile}")
+    endforeach()
+    set(${real_files} ${_resolvedFiles} PARENT_SCOPE)
+endfunction()
+
 if(WIN32)
 
     find_dlls("${QT_LIBRARIES} ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY} ${QT_QTOPENGL_LIBRARY}" ${QT_BINARY_DIR} qt_dll_files)
@@ -138,6 +147,13 @@ if(WIN32)
 else()
     install(FILES debian/cloudclean.png DESTINATION share/pixmaps/)
     install(FILES debian/cloudclean.desktop DESTINATION share/applications/)
+
+    list( REMOVE_ITEM PCL_LIBRARIES debug optimized)
+    followsym("${PCL_LIBRARIES}" PCL_LIBRARIES)
+    followsym("${QT_LIBRARIES};${QT_QTCORE_LIBRARY};${QT_QTGUI_LIBRARY};${QT_QTOPENGL_LIBRARY}" QT_LIBRARIES)
+    install(FILES ${PCL_LIBRARIES} DESTINATION ${LIB_INSTALL_DIR_SUFFIX} COMPONENT PCL)
+    install(FILES ${QT_LIBRARIES} ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY} ${QT_QTOPENGL_LIBRARY} DESTINATION ${LIB_INSTALL_DIR_SUFFIX} COMPONENT QT)
+
 endif()
 
 
@@ -183,8 +199,10 @@ else()
     set(CPACK_GENERATOR "DEB")
     set(CPACK_DEBIAN_PACKAGE_NAME, "cloudclean")
     set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "amd64")
-    set(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6 (>= 2.3.1-6), libgcc1 (>= 1:3.4.2-12), libqt4-opengl (>=4.8.0), libqt4-core (>=4.8.0), libqt4-gui (>=4.8.0), libglu1-mesa" )
+    #set(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6 (>= 2.3.1-6), libgcc1 (>= 1:3.4.2-12), libqt4-opengl (>=4.8.0), libqt4-core (>=4.8.0), libqt4-gui (>=4.8.0), libglu1-mesa" )
+    set(CPACK_DEBIAN_PACKAGE_DEPENDS "libglu1-mesa" )
     set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_CURRENT_SOURCE_DIR}/debian/postinst")
+    set( CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_CURRENT_SOURCE_DIR}/debian/postinst;${CMAKE_CURRENT_SOURCE_DIR}/debian/prerm;" )
 endif()
 
 include(CPack)

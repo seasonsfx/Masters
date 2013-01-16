@@ -79,7 +79,6 @@ if(WIN32)
     target_link_libraries(cloudclean ${GLEW_LIBRARIES})
 endif()
 
-
 target_link_libraries(cloudclean
     ${QT_LIBRARIES}
     ${QT_QTCORE_LIBRARY}

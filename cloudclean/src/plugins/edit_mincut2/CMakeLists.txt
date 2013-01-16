@@ -14,4 +14,4 @@ target_link_libraries(edit_mincut2
     cloudclean
 )
 
-INSTALL(TARGETS edit_mincut2 DESTINATION lib/cloudclean/plugins)
+INSTALL(TARGETS edit_mincut2 DESTINATION ${PLUGIN_INSTALL_DIR_SUFFIX} COMPONENT CloudClean)

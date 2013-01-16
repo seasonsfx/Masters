@@ -12,4 +12,4 @@ add_library (edit_flood_normals SHARED ${edit_flood_normals_SOURCES} ${edit_floo
 target_link_libraries(edit_flood_normals
     cloudclean
 )
-INSTALL(TARGETS edit_flood_normals DESTINATION lib/cloudclean/plugins)
+INSTALL(TARGETS edit_flood_normals DESTINATION ${PLUGIN_INSTALL_DIR_SUFFIX} COMPONENT CloudClean)

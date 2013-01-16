@@ -13,4 +13,4 @@ target_link_libraries(edit_flood_fpfh
     cloudclean
 )
 
-INSTALL(TARGETS edit_flood_fpfh DESTINATION lib/cloudclean/plugins)
+INSTALL(TARGETS edit_flood_fpfh DESTINATION ${PLUGIN_INSTALL_DIR_SUFFIX} COMPONENT CloudClean)

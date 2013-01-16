@@ -19,7 +19,7 @@ include_directories(
 	${QT_QTGUI_INCLUDE_DIR}
 	${QT_QTOPENGL_INCLUDE_DIR}
 	${PCL_INCLUDE_DIRS}
-        ${FLANN_INCLUDE_DIRS}
+    ${FLANN_INCLUDE_DIRS}
 )
 
 set(cloudclean_SOURCES
@@ -91,4 +91,4 @@ target_link_libraries(cloudclean
     ${OPENGL_LIBRARIES}
 )
 
-INSTALL(TARGETS cloudclean DESTINATION lib/cloudclean)
+INSTALL(TARGETS cloudclean DESTINATION ${LIB_INSTALL_DIR_SUFFIX} COMPONENT CloudClean)

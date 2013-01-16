@@ -1,10 +1,13 @@
 #include "mainwindow.h"
 #include "cloudmodel.h"
 #include "subsampledialog.h"
+#include <QApplication>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
 {
+
+   setWindowTitle(qApp->applicationName());
 
    // Create objects
    cm = CloudModel::Instance();
@@ -13,8 +16,8 @@ MainWindow::MainWindow(QWidget *parent) :
    toolbox = new Toolbox(this);
 
    fileMenu = menuBar()->addMenu(tr("&File"));
-   openFile = new QAction("Open", fileMenu);
-   saveFile = new QAction("Save As", fileMenu);
+   openFile = new QAction(tr("Open"), fileMenu);
+   saveFile = new QAction(tr("Save As"), fileMenu);
 
    toolsMenu = menuBar()->addMenu(tr("&Tools"));
    vizMenu = menuBar()->addMenu(tr("&Visualization"));

@@ -12,4 +12,4 @@ target_link_libraries(viz_normals
     cloudclean
 )
 
-INSTALL(TARGETS viz_normals DESTINATION lib/cloudclean/plugins)
+INSTALL(TARGETS viz_normals DESTINATION ${PLUGIN_INSTALL_DIR_SUFFIX} COMPONENT CloudClean)

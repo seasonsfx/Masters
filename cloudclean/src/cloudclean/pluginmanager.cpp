@@ -33,10 +33,15 @@ PluginManager::~PluginManager(){
 }
 
 void PluginManager::loadPlugins(){
+
+    qApp->addLibraryPath(qApp->applicationDirPath());
+
     QDir pluginsDir(qApp->applicationDirPath());
     bool succ = false;
     if(!succ)
         succ = pluginsDir.cd("plugins");
+    if(!succ)
+        succ = pluginsDir.cd("../plugins");
     if(!succ)
         succ = pluginsDir.cd("../lib/plugins");
     if(!succ)
@@ -50,12 +55,29 @@ void PluginManager::loadPlugins(){
     foreach (QString fileName, pluginsDir.entryList(QDir::Files)){
         QString absfilepath = pluginsDir.absoluteFilePath(fileName);
         QPluginLoader loader;
+        //loader.setLoadHints ( QLibrary::ResolveAllSymbolsHint );
         loader.setFileName(absfilepath);
-        loader.load();
-        qDebug() << loader.fileName();
+        bool loaded = loader.load();
+        if(!loaded){
+            qDebug() << "Could not load: " << absfilepath;
+            qDebug() << "ERROR: " << loader.errorString();
+
+            QFile test_file(absfilepath);
+            if(test_file.exists()){
+                qDebug() << "File exists!";
+            }
+            else{
+                qDebug() << "File does not exists!";
+            }
+
+            continue;
+        }
+
         QObject *plugin = loader.instance();
+
         if (!loader.isLoaded()){
-            qDebug() << loader.errorString();
+            qDebug() << "Could not instantiate: " << absfilepath;
+            qDebug() << "ERROR: " << loader.errorString();
             continue;
         }
 
@@ -63,7 +85,7 @@ void PluginManager::loadPlugins(){
 
             EditPluginInterface * editPlugin = qobject_cast<EditPluginInterface *>(plugin);
             if(editPlugin){
-                qDebug("Plugin loaded!\n");
+                qDebug() << "Plugin loaded: " << loader.fileName();
                 editPlugins.push_back(editPlugin);
 
                 foreach(QAction* editAction, editPlugin->actions())

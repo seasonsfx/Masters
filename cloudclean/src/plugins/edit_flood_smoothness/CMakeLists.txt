@@ -13,4 +13,4 @@ target_link_libraries(edit_flood_smoothness
     cloudclean
 )
 
-INSTALL(TARGETS edit_flood_smoothness DESTINATION lib/cloudclean/plugins)
+INSTALL(TARGETS edit_flood_smoothness DESTINATION ${PLUGIN_INSTALL_DIR_SUFFIX} COMPONENT CloudClean)

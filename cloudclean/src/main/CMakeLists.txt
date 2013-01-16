@@ -15,13 +15,19 @@ include_directories(
 )
 include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 
-add_executable(cloudclean_bin main.cpp)
+if(WIN32)
+    set(WIN_RESOURCE_FILE cloudclean.rc)
+    add_executable(run_cloudclean WIN32 main.cpp ${WIN_RESOURCE_FILE})
+else()
+    add_executable(run_cloudclean main.cpp)
+endif()
 
-target_link_libraries(cloudclean_bin
+target_link_libraries(run_cloudclean
     cloudclean
+    ${QT_QTMAIN_LIBRARY}
     ${QT_LIBRARIES}
     ${QT_QTCORE_LIBRARY}
     ${QT_QTGUI_LIBRARY}
 )
 
-INSTALL(TARGETS cloudclean_bin DESTINATION bin)
+INSTALL(TARGETS run_cloudclean DESTINATION ${BIN_INSTALL_DIR_SUFFIX} COMPONENT CloudClean)

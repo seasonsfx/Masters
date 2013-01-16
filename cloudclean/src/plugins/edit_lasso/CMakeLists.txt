@@ -14,4 +14,4 @@ target_link_libraries(edit_lasso
     cloudclean
 )
 
-INSTALL(TARGETS edit_lasso DESTINATION lib/cloudclean/plugins)
+INSTALL(TARGETS edit_lasso DESTINATION ${PLUGIN_INSTALL_DIR_SUFFIX} COMPONENT CloudClean)

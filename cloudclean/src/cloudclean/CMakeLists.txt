@@ -1,25 +1,15 @@
 add_definitions(-DQT_SHARED)
 add_definitions(-DCloudClean_EXPORTS)
 
-
-#if(CMAKE_BUILD_TOOL MATCHES "(msdev|devenv|nmake)")
-
-#else()
-#    set(LINK_FLAGS -rdynamic)
-#    add_definitions(
-#            #-rdynamic
-#            #-rpath /usr/lib/meshlab
-#    )
-#endif()
-
 include_directories(
+        ${PROJECT_SOURCE_DIR}/src
 	${QT_QTCORE_INCLUDE_DIR}
 	${QT_QTGUI_INCLUDE_DIR}
 	${QT_QTCORE_INCLUDE_DIR}
 	${QT_QTGUI_INCLUDE_DIR}
 	${QT_QTOPENGL_INCLUDE_DIR}
 	${PCL_INCLUDE_DIRS}
-    ${FLANN_INCLUDE_DIRS}
+        ${FLANN_INCLUDE_DIRS}
 )
 
 set(cloudclean_SOURCES

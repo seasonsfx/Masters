@@ -1,14 +1,50 @@
-#ifndef CAMERA_H
-#define CAMERA_H
+/*
+ * Software License Agreement (BSD License)
+ *
+ *  CloudClean
+ *  Copyright (c) 2013, Rickert Mulder
+ *
+ *  All rights reserved.
+ *
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
+ *  are met:
+ *
+ *   * Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above
+ *     copyright notice, this list of conditions and the following
+ *     disclaimer in the documentation and/or other materials provided
+ *     with the distribution.
+ *   * Neither the name of Rickert Mulder nor the names of its
+ *     contributors may be used to endorse or promote products derived
+ *     from this software without specific prior written permission.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ *  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ *  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ *  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ *  POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
 
-#include "cloudclean_global.h"
+#ifndef CLOUDCLEAN_SRC_CLOUDCLEAN_CAMERA_H_
+#define CLOUDCLEAN_SRC_CLOUDCLEAN_CAMERA_H_
+
 #include <Eigen/Geometry>
+#include "cloudclean/cloudclean_global.h"
 
 // Contains code from kgllib
 
-class DLLSPEC Camera
-{
-public:
+class DLLSPEC Camera {
+ public:
     Camera();
 
     ~Camera();
@@ -22,23 +58,27 @@ public:
     void setDepthRange(float near, float far);
 
     void setPosition(const Eigen::Vector3f& pos);
-    void setPosition(float x, float y, float z)  { setPosition(Eigen::Vector3f(x, y, z)); }
+    void setPosition(float x, float y, float z)  {
+        setPosition(Eigen::Vector3f(x, y, z));
+    }
 
     void adjustPosition(const Eigen::Vector3f& pos);
-    void adjustPosition(float x, float y, float z)  { adjustPosition(Eigen::Vector3f(x, y, z)); }
+    void adjustPosition(float x, float y, float z)  {
+        adjustPosition(Eigen::Vector3f(x, y, z));
+    }
 
     void setLookAt(const Eigen::Vector3f& lookat);
-    void setLookAt(float x, float y, float z)  { setLookAt(Eigen::Vector3f(x, y, z)); }
+    void setLookAt(float x, float y, float z)  {
+        setLookAt(Eigen::Vector3f(x, y, z));
+    }
 
     void setUp(const Eigen::Vector3f& up);
     void setUp(float x, float y, float z)  { setUp(Eigen::Vector3f(x, y, z)); }
-    /**
-     * Sets the viewing direction of the camera to @p dir.
-     * This method sets lookat point to @ref position() + dir, thus
-     *  you will need to set camera's position before using this method.
-     **/
+
     void setDirection(const Eigen::Vector3f& dir);
-    void setDirection(float x, float y, float z)  { setDirection(Eigen::Vector3f(x, y, z)); }
+    void setDirection(float x, float y, float z)  {
+        setDirection(Eigen::Vector3f(x, y, z));
+    }
 
     Eigen::Vector3f position() const  { return mPosition; }
     Eigen::Vector3f lookAt() const  { return mLookAt; }
@@ -57,15 +97,15 @@ public:
     void mouseMove(int x, int y);
     void mouseWheel(int val);
 
-private:
+ private:
     void recalculateModelviewMatrix();
     void recalculateProjectionMatrix();
 
-public:
+ public:
     static const int LEFT_BTN = 1;
     static const int RIGHT_BTN = 2;
 
-private:
+ private:
     int mouseButtonPressed;
     Eigen::Vector2f mouseStart;
     bool mMouseDown;
@@ -95,4 +135,4 @@ private:
     bool mProjectionMatrixDirty;
 };
 
-#endif // CAMERA_H
+#endif  // CLOUDCLEAN_SRC_CLOUDCLEAN_CAMERA_H_

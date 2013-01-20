@@ -35,17 +35,16 @@
  *
  */
 
-#ifndef LAYER_H
-#define LAYER_H
+#ifndef CLOUDCLEAN_SRC_CLOUDCLEAN_LAYER_H_
+#define CLOUDCLEAN_SRC_CLOUDCLEAN_LAYER_H_
 
 #include <vector>
 #include <Eigen/Dense>
 #include <QGLBuffer>
-#include "cloudclean_global.h"
+#include "cloudclean/cloudclean_global.h"
 
-class DLLSPEC Layer
-{
-public:
+class DLLSPEC Layer {
+ public:
     Layer();
     void toggleActive();
     void toggleVisible();
@@ -63,7 +62,7 @@ public:
 
     bool gpu_dirty;
     bool cpu_dirty;
-private:
+ private:
 };
 
-#endif // LAYER_H
+#endif  // CLOUDCLEAN_SRC_CLOUDCLEAN_LAYER_H_

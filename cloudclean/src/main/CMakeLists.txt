@@ -5,6 +5,7 @@ include_directories(
 
 
 include_directories(
+        ${PROJECT_SOURCE_DIR}/src
         ${QT_QTCORE_INCLUDE_DIR}
         ${QT_QTGUI_INCLUDE_DIR}
         ${QT_QTCORE_INCLUDE_DIR}

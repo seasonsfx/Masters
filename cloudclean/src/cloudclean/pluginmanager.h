@@ -35,16 +35,16 @@
  *
  */
 
-#ifndef PLUGINMANAGER_H
-#define PLUGINMANAGER_H
-#include "../common/interfaces.h"
+#ifndef CLOUDCLEAN_SRC_CLOUDCLEAN_PLUGINMANAGER_H_
+#define CLOUDCLEAN_SRC_CLOUDCLEAN_PLUGINMANAGER_H_
+
 #include <vector>
+#include <QVector>
+#include "common/interfaces.h"
+#include "cloudclean/cloudclean_global.h"
 
-#include "cloudclean_global.h"
-
-class DLLSPEC PluginManager
-{
-public:
+class DLLSPEC PluginManager {
+ public:
     PluginManager();
     void loadPlugins();
     ~PluginManager();
@@ -58,4 +58,4 @@ public:
     VizPluginInterface* activeVizPlugin;
 };
 
-#endif // PLUGINMANAGER_H
+#endif  // CLOUDCLEAN_SRC_CLOUDCLEAN_PLUGINMANAGER_H_

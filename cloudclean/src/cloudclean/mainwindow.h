@@ -35,38 +35,39 @@
  *
  */
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef CLOUDCLEAN_SRC_CLOUDCLEAN_MAINWINDOW_H_
+#define CLOUDCLEAN_SRC_CLOUDCLEAN_MAINWINDOW_H_
 
 #include <QFileDialog> // I don't know why this has to go before other things!
-#include "glarea.h"
+#include "cloudclean/glarea.h"
 #include <QListView>
 #include <QMainWindow>
 #include <QMdiArea>
 #include <QMenu>
 #include <QMenuBar>
-#include "layerview.h"
-#include "toolbox.h"
-#include "pluginmanager.h"
-#include "cloudclean_global.h"
+#include "cloudclean/layerview.h"
+#include "cloudclean/toolbox.h"
+#include "cloudclean/pluginmanager.h"
+#include "cloudclean/cloudclean_global.h"
 
-class DLLSPEC MainWindow : public QMainWindow
-{
+class DLLSPEC MainWindow : public QMainWindow {
     Q_OBJECT
-public:
+
+ public:
     explicit MainWindow(QWidget *parent = 0);
     bool loadScan(char * filename, int subsample);
     
-signals:
+ signals:
     void reloadCloud();
     void setSettingsWidget(QWidget *);
-public slots:
+
+ public slots:
     bool loadScan();
     bool saveScan();
     void applyEditMode();
     void applyVizMode();
 
-private:
+ private:
     QMenu *fileMenu;
     QMenu *toolsMenu;
     QMenu *vizMenu;
@@ -77,8 +78,8 @@ private:
     CloudModel * cm;
     PluginManager pm;
 
-public:
+ public:
     GLArea * glarea;
 };
 
-#endif // MAINWINDOW_H
+#endif  // CLOUDCLEAN_SRC_CLOUDCLEAN_MAINWINDOW_H_

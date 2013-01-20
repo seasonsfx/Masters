@@ -35,30 +35,27 @@
  *
  */
 
-#ifndef TOOLBOX_H
-#define TOOLBOX_H
+#ifndef CLOUDCLEAN_SRC_CLOUDCLEAN_TOOLBOX_H_
+#define CLOUDCLEAN_SRC_CLOUDCLEAN_TOOLBOX_H_
 
 #include <QDockWidget>
-#include "cloudclean_global.h"
+#include "cloudclean/cloudclean_global.h"
 
 
 namespace Ui {
-class Toolbox;
+    class Toolbox;
 }
 
-class DLLSPEC Toolbox : public QDockWidget
-{
+class DLLSPEC Toolbox : public QDockWidget {
     Q_OBJECT
-    
-public:
+
+ public:
     explicit Toolbox(QWidget *parent = 0);
     ~Toolbox();
-
-public slots:
+ public slots:
     void setSettingsWidget(QWidget * widget);
-    
-private:
+
+ private:
     Ui::Toolbox *ui;
 };
-
-#endif // TOOLBOX_H
+#endif  // CLOUDCLEAN_SRC_CLOUDCLEAN_TOOLBOX_H_

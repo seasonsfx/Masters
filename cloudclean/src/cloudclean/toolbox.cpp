@@ -35,23 +35,19 @@
  *
  */
 
-#include "toolbox.h"
+#include "cloudclean/toolbox.h"
 #include "ui_toolbox.h"
 
-Toolbox::Toolbox(QWidget *parent) :
-    QDockWidget(parent),
-    ui(new Ui::Toolbox)
-{
+Toolbox::Toolbox(QWidget *parent)
+    : QDockWidget(parent), ui(new Ui::Toolbox) {
     ui->setupUi(this);
 }
 
-Toolbox::~Toolbox()
-{
+Toolbox::~Toolbox() {
     delete ui;
 }
 
-void Toolbox::setSettingsWidget(QWidget * widget){
-    //ui->settingsArea->setWidget(widget);
+void Toolbox::setSettingsWidget(QWidget * widget) {
     ui->content->addWidget(widget);
     this->show();
 }

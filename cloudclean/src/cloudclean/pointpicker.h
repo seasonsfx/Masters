@@ -35,31 +35,30 @@
  *
  */
 
-#ifndef POINTPICKER_H
-#define POINTPICKER_H
+#ifndef CLOUDCLEAN_SRC_CLOUDCLEAN_POINTPICKER_H_
+#define CLOUDCLEAN_SRC_CLOUDCLEAN_POINTPICKER_H_
 
 #include <Eigen/Dense>
 #include <pcl/octree/octree.h>
-#include "cloudclean_global.h"
+#include "cloudclean/cloudclean_global.h"
 
 class GLArea;
 class CloudModel;
 
-class DLLSPEC PointPicker
-{
-public:
+class DLLSPEC PointPicker {
+ public:
     PointPicker(GLArea * glarea = nullptr, CloudModel *cm = nullptr,
                 float max_dist = 0);
     int pick(int x, int y, int source_layer);
 
-private:
+ private:
     void getClickRay(int x, int y, Eigen::Vector3f& p1, Eigen::Vector3f& p2);
 
-private:
+ private:
     GLArea * glarea;
     CloudModel *cm;
     float max_dist;
     pcl::octree::OctreePointCloudSearch<pcl::PointXYZI>::Ptr  octree;
 };
 
-#endif // POINTPICKER_H
+#endif  // CLOUDCLEAN_SRC_CLOUDCLEAN_POINTPICKER_H_

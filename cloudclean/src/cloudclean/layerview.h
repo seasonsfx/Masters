@@ -38,41 +38,41 @@
 #ifndef LAYERVIEW_H
 #define LAYERVIEW_H
 
+#include <vector>
+
 #include <QDockWidget>
 #include <QModelIndex>
-#include <vector>
 #include <QItemSelection>
 #include <QAbstractItemView>
 
-#include "cloudclean_global.h"
+#include "cloudclean/cloudclean_global.h"
 
 class CloudModel;
 
 namespace Ui {
-class LayerView;
+    class LayerView;
 }
 
-class DLLSPEC LayerView : public QDockWidget
-{
+class DLLSPEC LayerView : public QDockWidget {
     Q_OBJECT
     
-public:
+ public:
     explicit LayerView(QWidget *parent = 0);
     ~LayerView();
     
-private:
+ private:
     CloudModel * cm;
     Ui::LayerView *ui;
     std::vector<int> getSelection();
 
-public slots:
+ public slots:
     void setSelectionMode(QAbstractItemView::SelectionMode mode);
     void selectionChanged(const QItemSelection & sel, const QItemSelection & des);
     void selectLayer(int i);
     void deleteLayers();
     void mergeLayers();
 
-signals:
+ signals:
     void updateView();
 };
 

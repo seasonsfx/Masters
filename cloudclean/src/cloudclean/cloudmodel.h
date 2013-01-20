@@ -35,11 +35,12 @@
  *
  */
 
-#ifndef APPDATA_H
-#define APPDATA_H
+#ifndef CLOUDCLEAN_SRC_CLOUDCLEAN_CLOUDMODEL_H_
+#define CLOUDCLEAN_SRC_CLOUDCLEAN_CLOUDMODEL_H_
 
-#include "cloudclean_global.h"
+#include "cloudclean/cloudclean_global.h"
 
+#include <vector>
 #include <QObject>
 #include <pcl/kdtree/kdtree_flann.h>
 #include <pcl/features/fpfh.h>
@@ -47,14 +48,14 @@
 #include <pcl/features/normal_3d.h>
 #include <pcl/point_types.h>
 
-#include "layerlist.h" // includes gl stuff
+#include "cloudclean/layerlist.h"  // includes gl stuff
 #include <GL/glu.h>
 
-// TODO: a cloud model should probably own a GL context?
-class DLLSPEC CloudModel : public QObject
-{
+// TODO(Rickert): a cloud model should probably own a GL context?
+class DLLSPEC CloudModel : public QObject {
     Q_OBJECT
-public:
+
+ public:
     std::vector< int >                              cloud_to_grid_map;
     int                                             x_dim;
     int                                             y_dim;
@@ -67,23 +68,17 @@ public:
     LayerList                                       layerList;
     pcl::PointCloud<pcl::Normal>::Ptr               normals;
 
-public:
     static CloudModel* Instance();
     bool createBuffers();
     bool loadFile(const char * input_file, int subsample);
     bool saveFile(const char * output_file);
     bool isLoaded();
 
-private:
+ private:
     static CloudModel* only_instance;
     explicit CloudModel(QObject *parent = 0);
-    CloudModel(CloudModel const&);
+    explicit CloudModel(CloudModel const&);
     CloudModel& operator=(CloudModel const&) { return *this; }
-
-signals:
-
-public slots:
-
 };
 
-#endif // APPDATA_H
+#endif  // CLOUDCLEAN_SRC_CLOUDCLEAN_CLOUDMODEL_H_

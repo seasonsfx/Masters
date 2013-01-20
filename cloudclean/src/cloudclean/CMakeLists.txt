@@ -2,7 +2,6 @@ add_definitions(-DQT_SHARED)
 add_definitions(-DCloudClean_EXPORTS)
 
 include_directories(
-        ${PROJECT_SOURCE_DIR}/src
 	${QT_QTCORE_INCLUDE_DIR}
 	${QT_QTGUI_INCLUDE_DIR}
 	${QT_QTCORE_INCLUDE_DIR}
@@ -24,7 +23,7 @@ set(cloudclean_SOURCES
 	camera.cpp
 	subsampledialog.cpp
 	pointpicker.cpp
-	../common/utilities.cpp
+        ../common/utilities.cpp
 )
 
 set(cloudclean_HEADERS
@@ -40,6 +39,7 @@ set(cloudclean_HEADERS
 	camera.h
 	subsampledialog.h
 	pointpicker.h
+        cloudclean_global.h
 )
 
 set(cloudclean_RESOURCES cloudclean.qrc)

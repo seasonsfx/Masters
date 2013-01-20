@@ -35,31 +35,29 @@
  *
  */
 
-#ifndef SUBSAMPLEDIALOG_H
-#define SUBSAMPLEDIALOG_H
+#ifndef CLOUDCLEAN_SRC_CLOUDCLEAN_SUBSAMPLEDIALOG_H_
+#define CLOUDCLEAN_SRC_CLOUDCLEAN_SUBSAMPLEDIALOG_H_
 
 #include <QDialog>
-#include "cloudclean_global.h"
+#include "cloudclean/cloudclean_global.h"
 
 namespace Ui {
-class SubsampleDialog;
+    class SubsampleDialog;
 }
 
-class DLLSPEC SubsampleDialog : public QDialog
-{
+class DLLSPEC SubsampleDialog : public QDialog {
     Q_OBJECT
-    
-public:
+ public:
     explicit SubsampleDialog(QWidget *parent = 0);
     ~SubsampleDialog();
     static int getSubsample();
 
-public slots:
+ public slots:
     int valueChanged(int val);
 
-private:
+ private:
     Ui::SubsampleDialog *ui;
     int subsample;
 };
 
-#endif // SUBSAMPLEDIALOG_H
+#endif  // CLOUDCLEAN_SRC_CLOUDCLEAN_SUBSAMPLEDIALOG_H_

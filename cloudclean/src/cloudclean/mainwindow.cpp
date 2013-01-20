@@ -10,15 +10,15 @@
  *  modification, are permitted provided that the following conditions
  *  are met:
  *
- *   * Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above
- *     copyright notice, this list of conditions and the following
- *     disclaimer in the documentation and/or other materials provided
- *     with the distribution.
- *   * Neither the name of Rickert Mulder nor the names of its
- *     contributors may be used to endorse or promote products derived
- *     from this software without specific prior written permission.
+ *    * Redistributions of source code must retain the above copyright
+ *      notice, this list of conditions and the following disclaimer.
+ *    * Redistributions in binary form must reproduce the above
+ *      copyright notice, this list of conditions and the following
+ *      disclaimer in the documentation and/or other materials provided
+ *      with the distribution.
+ *    * Neither the name of Rickert Mulder nor the names of its
+ *      contributors may be used to endorse or promote products derived
+ *      from this software without specific prior written permission.
  *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -35,80 +35,83 @@
  *
  */
 
-#include "mainwindow.h"
-#include "cloudmodel.h"
-#include "subsampledialog.h"
+#include "cloudclean/mainwindow.h"
 #include <QApplication>
+#include "cloudclean/cloudmodel.h"
+#include "cloudclean/subsampledialog.h"
 
-MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent)
-{
+MainWindow::MainWindow(QWidget *parent)
+     : QMainWindow(parent) {
+     setWindowTitle(qApp->applicationName());
 
-   setWindowTitle(qApp->applicationName());
+    // Create objects
+    cm = CloudModel::Instance();
+    glarea = new GLArea(this, &pm, cm);
+    layerView = new LayerView(this);
+    toolbox = new Toolbox(this);
 
-   // Create objects
-   cm = CloudModel::Instance();
-   glarea = new GLArea(this, &pm, cm);
-   layerView = new LayerView(this);
-   toolbox = new Toolbox(this);
+    fileMenu = menuBar()->addMenu(tr("&File"));
+    openFile = new QAction(tr("Open"), fileMenu);
+    saveFile = new QAction(tr("Save As"), fileMenu);
 
-   fileMenu = menuBar()->addMenu(tr("&File"));
-   openFile = new QAction(tr("Open"), fileMenu);
-   saveFile = new QAction(tr("Save As"), fileMenu);
+    toolsMenu = menuBar()->addMenu(tr("&Tools"));
+    vizMenu = menuBar()->addMenu(tr("&Visualization"));
 
-   toolsMenu = menuBar()->addMenu(tr("&Tools"));
-   vizMenu = menuBar()->addMenu(tr("&Visualization"));
+    // Config
+    layerView->setAllowedAreas(Qt::LeftDockWidgetArea
+                                | Qt::RightDockWidgetArea);
+    toolbox->setAllowedAreas(Qt::LeftDockWidgetArea
+                              | Qt::RightDockWidgetArea);
+    toolbox->hide();
+    glarea->setMinimumSize(900, 600);
 
-   // Config
-   layerView->setAllowedAreas (Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-   toolbox->setAllowedAreas (Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-   toolbox->hide();
-   glarea->setMinimumSize(900, 600);
+    // Layout
+    fileMenu->addAction(openFile);
+    fileMenu->addAction(saveFile);
 
-   // Layout
-   fileMenu->addAction(openFile);
-   fileMenu->addAction(saveFile);
+    addDockWidget(Qt::RightDockWidgetArea, layerView);
+    addDockWidget(Qt::RightDockWidgetArea, toolbox);
+    setCentralWidget(glarea);
 
-   addDockWidget(Qt::RightDockWidgetArea,layerView);
-   addDockWidget(Qt::RightDockWidgetArea,toolbox);
-   setCentralWidget(glarea);
+    // Load plugins
+    pm.loadPlugins();
+    for (QAction* editAction : pm.editActionList){
+         toolsMenu->addAction(editAction);
+         connect(editAction, SIGNAL(triggered()), this, SLOT(applyEditMode()));
+    }
+    for (QAction* vizAction : pm.vizActionList){
+         vizMenu->addAction(vizAction);
+         connect(vizAction, SIGNAL(triggered()), this, SLOT(applyVizMode()));
+    }
 
-   // Load plugins
-   pm.loadPlugins();
-   foreach(QAction* editAction, pm.editActionList){
-       toolsMenu->addAction(editAction);
-       connect(editAction, SIGNAL(triggered()), this, SLOT(applyEditMode()));
-   }
-   foreach(QAction* vizAction, pm.vizActionList){
-       vizMenu->addAction(vizAction);
-       connect(vizAction, SIGNAL(triggered()), this, SLOT(applyVizMode()));
-   }
-
-   // Wire signals and slots
-   connect(this, SIGNAL(setSettingsWidget(QWidget *)), toolbox, SLOT(setSettingsWidget(QWidget *)));
-   connect(openFile, SIGNAL(triggered()), this, SLOT(loadScan()));
-   connect(saveFile, SIGNAL(triggered()), this, SLOT(saveScan()));
-   connect(&CloudModel::Instance()->layerList, SIGNAL(selectLayer(int)), layerView, SLOT(selectLayer(int)));
-   connect(layerView, SIGNAL(updateView()), glarea, SLOT(updateGL()));
-   connect(&CloudModel::Instance()->layerList, SIGNAL(updateView()), glarea, SLOT(updateGL()));
-
+    // Wire signals and slots
+    connect(this, SIGNAL(setSettingsWidget(QWidget *)),
+              toolbox, SLOT(setSettingsWidget(QWidget *)));
+    connect(openFile, SIGNAL(triggered()), this, SLOT(loadScan()));
+    connect(saveFile, SIGNAL(triggered()), this, SLOT(saveScan()));
+    connect(&CloudModel::Instance()->layerList,
+              SIGNAL(selectLayer(int)), layerView, SLOT(selectLayer(int)));
+    connect(layerView, SIGNAL(updateView()),
+              glarea, SLOT(updateGL()));
+    connect(&CloudModel::Instance()->layerList,
+              SIGNAL(updateView()), glarea, SLOT(updateGL()));
 }
 
-bool MainWindow::loadScan(){
-    QString filename = QFileDialog::getOpenFileName(this, tr("Open Scan"), "~", tr("PTX Files (*.ptx)"));
-
-    if(filename.length() == 0)
+bool MainWindow::loadScan() {
+    QString filename = QFileDialog::getOpenFileName(
+                 this, tr("Open Scan"), "~", tr("PTX Files (*.ptx)"));
+    if (filename.length() == 0)
         return false;
 
     int subsample = SubsampleDialog::getSubsample();
 
-    if(subsample == -1)
+    if (subsample == -1)
         return false;
 
-	qDebug() << "Filename: " << filename;
+    qDebug() << "Filename: " << filename;
 
-	QByteArray ba = filename.toLatin1();
-	const char *c_str = ba.data();
+    QByteArray ba = filename.toLatin1();
+    const char *c_str = ba.data();
 
     CloudModel::Instance()->loadFile(c_str, subsample);
 
@@ -116,86 +119,80 @@ bool MainWindow::loadScan(){
     return true;
 }
 
-bool MainWindow::loadScan(char * filename, int subsample){
-    CloudModel::Instance()->loadFile(filename, subsample);
-    glarea->modelReloaded();
-    return true;
+bool MainWindow::loadScan(char * filename, int subsample) {
+     CloudModel::Instance()->loadFile(filename, subsample);
+     glarea->modelReloaded();
+     return true;
 }
 
-bool MainWindow::saveScan(){
-    QString filename = QFileDialog::getSaveFileName(this, tr("Save Scan"), "~", tr("PTX Files (*.ptx)"));
+bool MainWindow::saveScan() {
+     QString filename = QFileDialog::getSaveFileName(
+                     this, tr("Save Scan"), "~", tr("PTX Files (*.ptx)"));
 
-    if(filename.length() == 0)
-        return false;
+     if (filename.length() == 0)
+          return false;
 
-    const char *ptr = filename.toAscii().data();
-    CloudModel::Instance()->saveFile(ptr);
-    return true;
+     const char *ptr = filename.toAscii().data();
+     CloudModel::Instance()->saveFile(ptr);
+     return true;
 }
 
-void MainWindow::applyEditMode(){
+void MainWindow::applyEditMode() {
+     QAction *action = qobject_cast<QAction *>(sender());
 
-    QAction *action = qobject_cast<QAction *>(sender());
+     if (!CloudModel::Instance()->isLoaded()) {  // prevents crash without cloud
+          action->setChecked(false);
+          return;
+     }
 
-    if(!CloudModel::Instance()->isLoaded()) { //prevents crash without cloud
-        action->setChecked(false);
-        return;
-    }
+     EditPluginInterface * plugin =
+             qobject_cast<EditPluginInterface *>(action->parent());
 
-    EditPluginInterface * plugin = qobject_cast<EditPluginInterface *>(action->parent());
+     if (pm.activeEditPlugin) {
+          pm.activeEditPlugin->EndEdit(CloudModel::Instance(), glarea);
+          pm.activeEditPlugin->getSettingsWidget(this)->hide();
+          // Deactivate current plugin if clicked again
+          if (pm.activeEditPlugin == plugin) {
+                plugin->EndEdit(CloudModel::Instance(), glarea);
+                pm.activeEditPlugin = NULL;
+                return;
+          }
+          pm.activeEditPlugin = NULL;
+     }
 
-    if(pm.activeEditPlugin){
-        pm.activeEditPlugin->EndEdit(CloudModel::Instance(), glarea);
-        pm.activeEditPlugin->getSettingsWidget(this)->hide();
-        // Deactivate current plugin if clicked again
-        if(pm.activeEditPlugin == plugin){
-            plugin->EndEdit(CloudModel::Instance(), glarea);
-            pm.activeEditPlugin = NULL;
-            //emit setSettingsWidget(new QWidget(this));
-            return;
-        }
-        pm.activeEditPlugin = NULL;
-    }
+     pm.activeEditPlugin = plugin;
 
-    pm.activeEditPlugin = plugin;
+     QWidget * settings = pm.activeEditPlugin->getSettingsWidget(this);
+     pm.activeEditPlugin->getSettingsWidget(this)->show();
+     emit setSettingsWidget(settings);
 
-    QWidget * settings = pm.activeEditPlugin->getSettingsWidget(this);
-    pm.activeEditPlugin->getSettingsWidget(this)->show();
-    emit setSettingsWidget(settings);
-
-    plugin->StartEdit(action, CloudModel::Instance(), glarea);
-
+     plugin->StartEdit(action, CloudModel::Instance(), glarea);
 }
 
-void MainWindow::applyVizMode(){
+void MainWindow::applyVizMode() {
+     QAction *action = qobject_cast<QAction *>(sender());
 
-    QAction *action = qobject_cast<QAction *>(sender());
+     if (!CloudModel::Instance()->isLoaded()) {  // prevents crash without cloud
+          action->setChecked(false);
+          return;
+     }
 
-    if(!CloudModel::Instance()->isLoaded()) { //prevents crash without cloud
-        action->setChecked(false);
-        return;
-    }
+     VizPluginInterface * plugin =
+             qobject_cast<VizPluginInterface *>(action->parent());
 
-    VizPluginInterface * plugin = qobject_cast<VizPluginInterface *>(action->parent());
+     if (pm.activeVizPlugin) {
+          pm.activeVizPlugin->EndViz(CloudModel::Instance(), glarea);
 
-    if(pm.activeVizPlugin){
-        pm.activeVizPlugin->EndViz(CloudModel::Instance(), glarea);
+          // Deactivate current plugin if clicked again
+          if (pm.activeVizPlugin == plugin) {
+                plugin->EndViz(CloudModel::Instance(), glarea);
+                pm.activeVizPlugin = NULL;
+                emit setSettingsWidget(new QWidget(this));
+                return;
+          }
+          pm.activeVizPlugin = NULL;
+     }
 
-        // Deactivate current plugin if clicked again
-        if(pm.activeVizPlugin == plugin){
-            plugin->EndViz(CloudModel::Instance(), glarea);
-            pm.activeVizPlugin = NULL;
-            emit setSettingsWidget(new QWidget(this));
-            return;
-        }
-        pm.activeVizPlugin = NULL;
-    }
-
-    pm.activeVizPlugin = plugin;
-
-    //QWidget * settings = pm.activeVizPlugin->getSettingsWidget(this);
-    //emit setSettingsWidget(settings);
-
-    plugin->StartViz(action, CloudModel::Instance(), glarea);
-
+     pm.activeVizPlugin = plugin;
+     plugin->StartViz(action, CloudModel::Instance(), glarea);
 }

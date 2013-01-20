@@ -23,6 +23,10 @@ add_definitions(
     -DBOOST_TT_HAS_OPERATOR_HPP_INCLUDED # Hack
 )
 
+include_directories(
+        ${PROJECT_SOURCE_DIR}/src
+)
+
 if(WIN32)
     set(BIN_DIR_SUFFIX bin)
     set(LIB_DIR_SUFFIX bin)

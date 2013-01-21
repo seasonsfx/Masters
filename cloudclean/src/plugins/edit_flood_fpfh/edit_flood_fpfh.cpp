@@ -9,40 +9,37 @@
 #include <pcl/common/pca.h>
 #include <omp.h>
 
-#include "edit_flood_fpfh.h"
-#include "utilities.h"
-#include "layer.h"
-#include "glarea.h"
-#include "cloudmodel.h"
+#include "plugins/edit_flood_fpfh/edit_flood_fpfh.h"
+#include "common/utilities.h"
+#include "cloudclean/layer.h"
+#include "cloudclean/glarea.h"
+#include "cloudclean/cloudmodel.h"
 
-EditPlugin::EditPlugin()
-{
+EditPlugin::EditPlugin() {
     settings = new Settings();
     editSample = new QAction(QIcon(":/images/brush.png"), "Flood fill (FPFH)", this);
     actionList << editSample;
-    foreach(QAction *editAction, actionList)
+    for(QAction *editAction : actionList)
         editAction->setCheckable(true);
-
 }
 
-EditPlugin::~EditPlugin()
-{
+EditPlugin::~EditPlugin() {
     delete settings;
 }
 
-void EditPlugin::paintGL(CloudModel *, GLArea * glarea){
+void EditPlugin::paintGL(CloudModel *, GLArea * glarea) {
 
 }
 
-bool EditPlugin::mouseDoubleClickEvent  (QMouseEvent *event, CloudModel * cm, GLArea * glarea){
-
+bool EditPlugin::mouseDoubleClickEvent(QMouseEvent *event,
+                                       CloudModel * cm, GLArea * glarea) {
     return true;
 }
 
-bool EditPlugin::StartEdit(QAction *action, CloudModel *cm, GLArea *glarea){
+bool EditPlugin::StartEdit(QAction *action, CloudModel *cm, GLArea *glarea) {
     // Set up kdtree and octree if not set up yet
 
-    if(octree.get() == NULL){
+    if (octree.get() == NULL) {
         QTime t;
         t.start();
 

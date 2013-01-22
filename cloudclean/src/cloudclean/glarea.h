@@ -53,9 +53,9 @@
 
 #include <GL/glu.h>
 
-#include "cloudclean/cloudmodel.h"
 #include "cloudclean/camera.h"
 #include "cloudclean/pointpicker.h"
+#include "cloudclean/cloudmodel.h"
 
 #ifdef Q_WS_X11
     #include <GL/glx.h>
@@ -70,6 +70,7 @@
 
 #include <CL/cl_gl.h>
 
+class CloudModel;
 class EditPluginInterface;
 class PluginManager;
 

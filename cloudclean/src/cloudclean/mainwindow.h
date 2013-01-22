@@ -38,17 +38,18 @@
 #ifndef CLOUDCLEAN_SRC_CLOUDCLEAN_MAINWINDOW_H_
 #define CLOUDCLEAN_SRC_CLOUDCLEAN_MAINWINDOW_H_
 
-#include <QFileDialog> // I don't know why this has to go before other things!
-#include "cloudclean/glarea.h"
-#include <QListView>
 #include <QMainWindow>
-#include <QMdiArea>
-#include <QMenu>
-#include <QMenuBar>
-#include "cloudclean/layerview.h"
+
 #include "cloudclean/toolbox.h"
 #include "cloudclean/pluginmanager.h"
 #include "cloudclean/cloudclean_global.h"
+
+class LayerView;
+class QListListLiew;
+class QMenu;
+class QMenuBar;
+class QFileDialog;
+class GLArea;
 
 class DLLSPEC MainWindow : public QMainWindow {
     Q_OBJECT

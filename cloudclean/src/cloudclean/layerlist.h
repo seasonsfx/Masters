@@ -38,12 +38,14 @@
 #ifndef CLOUDCLEAN_SRC_CLOUDCLEAN_LAYERLIST_H_
 #define CLOUDCLEAN_SRC_CLOUDCLEAN_LAYERLIST_H_
 
+#include <vector>
 #include <QAbstractListModel>
 #include <QAbstractItemView>
-#include "layer.h"  // includes gl stuff
-#include <vector>
 
+#include "cloudclean/layer.h"  // includes gl stuff
 #include "cloudclean/cloudclean_global.h"
+
+class CloudModel;
 
 class DLLSPEC LayerList : public QAbstractListModel {
     Q_OBJECT
@@ -53,9 +55,10 @@ class DLLSPEC LayerList : public QAbstractListModel {
     static const int ADD_TO_ACTIVE_LAYER = 1;
     static const int REMOVE_POINTS = 2;
 
+    CloudModel * cm;
     int newLayerMode;
 
-    explicit LayerList(QObject *parent = 0);
+    explicit LayerList(CloudModel * cm);
     int rowCount(const QModelIndex & parent = QModelIndex()) const;
     int columnCount(const QModelIndex & parent) const;
     Qt::ItemFlags flags(const QModelIndex & index) const;

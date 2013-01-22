@@ -14,6 +14,15 @@ else()
     SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations")
     SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -Wno-unknown-pragmas")
     SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -fstack-protector-all")
+
+    #SET(CMAKE_C_COMPILER             "clang")
+    #SET(CMAKE_CXX_COMPILER             "clang++")
+    #SET(CMAKE_AR      "llvm-ar")
+    #SET(CMAKE_LINKER  "llvm-ld")
+    #SET(CMAKE_NM      "llvm-nm")
+    #SET(CMAKE_OBJDUMP "llvm-objdump")
+    #SET(CMAKE_RANLIB  "llvm-ranlib")
+
 endif()
 
 list(APPEND CMAKE_CXXFLAGS_RELEASE -O3)

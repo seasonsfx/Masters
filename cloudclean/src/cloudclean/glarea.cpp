@@ -35,6 +35,8 @@
  *
  */
 
+#include "cloudclean/glarea.h"
+
 #include <time.h>
 #include <stdlib.h>
 
@@ -50,10 +52,11 @@
 #include <QTime>
 #include <QFont>
 
-#include "cloudclean/glarea.h"
 #include "common/interfaces.h"
 #include "common/utilities.h"
 #include "cloudclean/pluginmanager.h"
+
+class CloudModel;
 
 GLArea::GLArea(QWidget* parent, PluginManager *pm, CloudModel *cm)
     : QGLWidget(parent) {

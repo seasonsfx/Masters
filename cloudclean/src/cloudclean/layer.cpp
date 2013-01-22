@@ -40,12 +40,13 @@
 #include <vector>
 #include <stdexcept>
 
-#include "layer.h"
-#include "cloudmodel.h"
+#include "cloudclean/layer.h"
 
 inline float rand_range(float from, float to) {
     return (rand()/static_cast<float>(RAND_MAX)) * (to-from) + from;
 }
+
+int Layer::cloud_size = -1;
 
 Layer::Layer(): gl_index_buffer(QGLBuffer::IndexBuffer) {
     srand(time(NULL));
@@ -66,11 +67,11 @@ Layer::Layer(): gl_index_buffer(QGLBuffer::IndexBuffer) {
 
     gl_index_buffer.setUsagePattern(QGLBuffer::DynamicDraw);
     gl_index_buffer.bind();
-    gl_index_buffer.allocate(CloudModel::Instance()->cloud->size()
+    gl_index_buffer.allocate(cloud_size
                              * sizeof(int));
     gl_index_buffer.release();
 
-    index.resize(CloudModel::Instance()->cloud->size(), -1);
+    index.resize(cloud_size, -1);
 
     // blank index
     for (int & i : index)

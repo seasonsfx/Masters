@@ -62,6 +62,8 @@ class DLLSPEC Layer {
 
     bool gpu_dirty;
     bool cpu_dirty;
+
+    static int cloud_size;
  private:
 };
 

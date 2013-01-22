@@ -48,6 +48,8 @@
 
 #include "cloudclean/io.h"
 
+#include "cloudclean/layerlist.h"  // includes gl stuff
+
 void inline  glError(const char * msg) {
     int err = glGetError();
     if (err) {
@@ -205,6 +207,8 @@ bool CloudModel::loadFile(const char * input_file, int subsample) {
 
     x_dim = cloud->width;
     y_dim = cloud->height;
+
+    Layer::cloud_size = cloud->size();
 
     t.start();
     normals = pcl::PointCloud<pcl::Normal>

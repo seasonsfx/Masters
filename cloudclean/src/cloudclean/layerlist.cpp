@@ -35,15 +35,16 @@
  *
  */
 
-#include "layerlist.h"
+#include "cloudclean/layerlist.h"
 
 #include <vector>
 #include <QTextStream>
 #include "cloudclean/cloudmodel.h"
 #include <QColor>
 
-LayerList::LayerList(QObject *parent) :
-    QAbstractListModel(parent) {
+LayerList::LayerList(CloudModel *cm)
+    : QAbstractListModel(nullptr) {
+    this->cm = cm;
     newLayerMode = 0;
 }
 
@@ -166,7 +167,7 @@ void LayerList::reset () {
     layers.erase(layers.begin()+1, layers.end());
     Layer & layer = layers[0];
 
-    CloudModel * app_data = CloudModel::Instance();
+    CloudModel * app_data = cm;
 
     layer.gl_index_buffer.bind();
     layer.gl_index_buffer.allocate(app_data->cloud->size()*sizeof(int));

@@ -35,18 +35,18 @@
  *
  */
 
-#ifndef LAYERVIEW_H
-#define LAYERVIEW_H
+#ifndef CLOUDCLEAN_SRC_CLOUDCLEAN_LAYERVIEW_H_
+#define CLOUDCLEAN_SRC_CLOUDCLEAN_LAYERVIEW_H_
 
 #include <vector>
 
 #include <QDockWidget>
 #include <QModelIndex>
-#include <QItemSelection>
 #include <QAbstractItemView>
 
 #include "cloudclean/cloudclean_global.h"
 
+class QItemSelection;
 class CloudModel;
 
 namespace Ui {
@@ -57,7 +57,7 @@ class DLLSPEC LayerView : public QDockWidget {
     Q_OBJECT
     
  public:
-    explicit LayerView(QWidget *parent = 0);
+    explicit LayerView(QWidget *parent, CloudModel * cm);
     ~LayerView();
     
  private:
@@ -76,4 +76,4 @@ class DLLSPEC LayerView : public QDockWidget {
     void updateView();
 };
 
-#endif // LAYERVIEW_H
+#endif  // CLOUDCLEAN_SRC_CLOUDCLEAN_LAYERVIEW_H_

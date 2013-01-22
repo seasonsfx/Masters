@@ -48,8 +48,8 @@
 #include <pcl/features/normal_3d.h>
 #include <pcl/point_types.h>
 
-#include "cloudclean/layerlist.h"  // includes gl stuff
 #include <GL/glu.h>
+#include <cloudclean/layerlist.h>
 
 // TODO(Rickert): a cloud model should probably own a GL context?
 class DLLSPEC CloudModel : public QObject {

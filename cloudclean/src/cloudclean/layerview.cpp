@@ -39,19 +39,21 @@
 #include <limits>
 #include <vector>
 #include <QItemSelectionModel>
+#include <QItemSelection>
+
 #include "ui_layerview.h"
-#include "cloudmodel.h"
+#include "cloudclean/cloudmodel.h"
 
 
-LayerView::LayerView(QWidget *parent)
+LayerView::LayerView(QWidget *parent, CloudModel * cm)
     : QDockWidget(parent), ui(new Ui::LayerView) {
-    cm = CloudModel::Instance();
+    this->cm = cm;
     ui->setupUi(this);
     ui->listView->horizontalHeader()->hide();
     ui->listView->verticalHeader()->hide();
     ui->listView->horizontalHeader()->setStretchLastSection(true);
     ui->listView->setGridStyle(Qt::NoPen);
-    ui->listView->setModel(&CloudModel::Instance()->layerList);
+    ui->listView->setModel(&cm->layerList);
     ui->listView->setSelectionMode(QAbstractItemView::MultiSelection);
     ui->listView->setColumnWidth(0, 30);
     ui->listView->setSelectionBehavior(QAbstractItemView::SelectRows);

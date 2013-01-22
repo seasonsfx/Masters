@@ -35,8 +35,17 @@
  *
  */
 
+#include <QFileDialog>
+#include <QListView>  // TODO(rick): Why do these need to be included before mainwindow?
+                        // Crazy name clash? Macro?
 #include "cloudclean/mainwindow.h"
+
+#include <QMenu>
+#include <QMenuBar>
 #include <QApplication>
+
+#include "cloudclean/layerview.h"
+#include "cloudclean/glarea.h"
 #include "cloudclean/cloudmodel.h"
 #include "cloudclean/subsampledialog.h"
 
@@ -45,9 +54,9 @@ MainWindow::MainWindow(QWidget *parent)
      setWindowTitle(qApp->applicationName());
 
     // Create objects
-    cm = CloudModel::Instance();
+    cm = new CloudModel();
     glarea = new GLArea(this, &pm, cm);
-    layerView = new LayerView(this);
+    layerView = new LayerView(this, cm);
     toolbox = new Toolbox(this);
 
     fileMenu = menuBar()->addMenu(tr("&File"));
@@ -89,11 +98,11 @@ MainWindow::MainWindow(QWidget *parent)
               toolbox, SLOT(setSettingsWidget(QWidget *)));
     connect(openFile, SIGNAL(triggered()), this, SLOT(loadScan()));
     connect(saveFile, SIGNAL(triggered()), this, SLOT(saveScan()));
-    connect(&CloudModel::Instance()->layerList,
+    connect(&cm->layerList,
               SIGNAL(selectLayer(int)), layerView, SLOT(selectLayer(int)));
     connect(layerView, SIGNAL(updateView()),
               glarea, SLOT(updateGL()));
-    connect(&CloudModel::Instance()->layerList,
+    connect(&cm->layerList,
               SIGNAL(updateView()), glarea, SLOT(updateGL()));
 }
 
@@ -113,14 +122,14 @@ bool MainWindow::loadScan() {
     QByteArray ba = filename.toLatin1();
     const char *c_str = ba.data();
 
-    CloudModel::Instance()->loadFile(c_str, subsample);
+    cm->loadFile(c_str, subsample);
 
     glarea->modelReloaded();
     return true;
 }
 
 bool MainWindow::loadScan(char * filename, int subsample) {
-     CloudModel::Instance()->loadFile(filename, subsample);
+     cm->loadFile(filename, subsample);
      glarea->modelReloaded();
      return true;
 }
@@ -133,14 +142,14 @@ bool MainWindow::saveScan() {
           return false;
 
      const char *ptr = filename.toAscii().data();
-     CloudModel::Instance()->saveFile(ptr);
+     cm->saveFile(ptr);
      return true;
 }
 
 void MainWindow::applyEditMode() {
      QAction *action = qobject_cast<QAction *>(sender());
 
-     if (!CloudModel::Instance()->isLoaded()) {  // prevents crash without cloud
+     if (!cm->isLoaded()) {  // prevents crash without cloud
           action->setChecked(false);
           return;
      }
@@ -149,11 +158,11 @@ void MainWindow::applyEditMode() {
              qobject_cast<EditPluginInterface *>(action->parent());
 
      if (pm.activeEditPlugin) {
-          pm.activeEditPlugin->EndEdit(CloudModel::Instance(), glarea);
+          pm.activeEditPlugin->EndEdit(cm, glarea);
           pm.activeEditPlugin->getSettingsWidget(this)->hide();
           // Deactivate current plugin if clicked again
           if (pm.activeEditPlugin == plugin) {
-                plugin->EndEdit(CloudModel::Instance(), glarea);
+                plugin->EndEdit(cm, glarea);
                 pm.activeEditPlugin = NULL;
                 return;
           }
@@ -166,13 +175,13 @@ void MainWindow::applyEditMode() {
      pm.activeEditPlugin->getSettingsWidget(this)->show();
      emit setSettingsWidget(settings);
 
-     plugin->StartEdit(action, CloudModel::Instance(), glarea);
+     plugin->StartEdit(action, cm, glarea);
 }
 
 void MainWindow::applyVizMode() {
      QAction *action = qobject_cast<QAction *>(sender());
 
-     if (!CloudModel::Instance()->isLoaded()) {  // prevents crash without cloud
+     if (!cm->isLoaded()) {  // prevents crash without cloud
           action->setChecked(false);
           return;
      }
@@ -181,11 +190,11 @@ void MainWindow::applyVizMode() {
              qobject_cast<VizPluginInterface *>(action->parent());
 
      if (pm.activeVizPlugin) {
-          pm.activeVizPlugin->EndViz(CloudModel::Instance(), glarea);
+          pm.activeVizPlugin->EndViz(cm, glarea);
 
           // Deactivate current plugin if clicked again
           if (pm.activeVizPlugin == plugin) {
-                plugin->EndViz(CloudModel::Instance(), glarea);
+                plugin->EndViz(cm, glarea);
                 pm.activeVizPlugin = NULL;
                 emit setSettingsWidget(new QWidget(this));
                 return;
@@ -194,5 +203,5 @@ void MainWindow::applyVizMode() {
      }
 
      pm.activeVizPlugin = plugin;
-     plugin->StartViz(action, CloudModel::Instance(), glarea);
+     plugin->StartViz(action, cm, glarea);
 }

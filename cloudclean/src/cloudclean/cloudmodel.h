@@ -68,15 +68,18 @@ class DLLSPEC CloudModel : public QObject {
     LayerList                                       layerList;
     pcl::PointCloud<pcl::Normal>::Ptr               normals;
 
-    static CloudModel* Instance();
+    // static CloudModel* Instance();
     bool createBuffers();
     bool loadFile(const char * input_file, int subsample);
     bool saveFile(const char * output_file);
     bool isLoaded();
 
- private:
-    static CloudModel* only_instance;
     explicit CloudModel(QObject *parent = 0);
+
+ private:
+    // static CloudModel* only_instance;
+
+    // Disable copy constructor and assignment operator
     explicit CloudModel(CloudModel const&);
     CloudModel& operator=(CloudModel const&) { return *this; }
 };

@@ -39,7 +39,7 @@
 
 #include <vector>
 #include <QTextStream>
-#include "cloudmodel.h"
+#include "cloudclean/cloudmodel.h"
 #include <QColor>
 
 LayerList::LayerList(QObject *parent) :

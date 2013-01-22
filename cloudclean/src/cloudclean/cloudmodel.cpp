@@ -55,10 +55,10 @@ void inline  glError(const char * msg) {
     }
 }
 
-CloudModel* CloudModel::only_instance = NULL;
+// CloudModel* CloudModel::only_instance = NULL;
 
 CloudModel::CloudModel(QObject *parent)
-    : QObject(parent), point_buffer(QGLBuffer::VertexBuffer) {
+    : QObject(parent), point_buffer(QGLBuffer::VertexBuffer), layerList(this) {
     cloud = pcl::PointCloud<pcl::PointXYZI>
             ::Ptr(new pcl::PointCloud<pcl::PointXYZI>);
     x_dim = 0;
@@ -66,11 +66,11 @@ CloudModel::CloudModel(QObject *parent)
     loaded = false;
 }
 
-CloudModel * CloudModel::Instance() {
+/*CloudModel * CloudModel::Instance() {
     if (!only_instance)
         only_instance = new CloudModel();
     return only_instance;
-}
+}*/
 
 bool CloudModel::saveFile(const char * output_file) {
     // Reconstruct original cloud

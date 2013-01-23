@@ -47,17 +47,8 @@
 #include <vector>
 
 #include "cloudclean/io.h"
-
 #include "cloudclean/layerlist.h"  // includes gl stuff
-
-void inline  glError(const char * msg) {
-    int err = glGetError();
-    if (err) {
-        printf("%s : %s\n", msg , gluErrorString(err));
-    }
-}
-
-// CloudModel* CloudModel::only_instance = NULL;
+#include "common/utilities.h"
 
 CloudModel::CloudModel(QObject *parent)
     : QObject(parent), point_buffer(QGLBuffer::VertexBuffer), layerList(this) {
@@ -67,12 +58,6 @@ CloudModel::CloudModel(QObject *parent)
     y_dim = 0;
     loaded = false;
 }
-
-/*CloudModel * CloudModel::Instance() {
-    if (!only_instance)
-        only_instance = new CloudModel();
-    return only_instance;
-}*/
 
 bool CloudModel::saveFile(const char * output_file) {
     // Reconstruct original cloud

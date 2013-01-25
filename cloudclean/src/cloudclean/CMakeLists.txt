@@ -23,6 +23,10 @@ set(cloudclean_SOURCES
 	camera.cpp
 	subsampledialog.cpp
 	pointpicker.cpp
+        cpointcloud.cpp
+        cselection.cpp
+        clayer.cpp
+        cdatamodel.cpp
         ../common/utilities.cpp
 )
 
@@ -39,6 +43,10 @@ set(cloudclean_HEADERS
 	camera.h
 	subsampledialog.h
 	pointpicker.h
+        cpointcloud.h
+        cselection.h
+        clayer.h
+        cdatamodel.h
         cloudclean_global.h
 )
 

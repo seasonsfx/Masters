@@ -71,7 +71,7 @@ find_package(PCL 1.7 REQUIRED COMPONENTS
 	search
 	features
 	filters
-    segmentation
+        segmentation
 )
 include_directories(${PCL_INCLUDE_DIRS})
 link_directories(${PCL_LIBRARY_DIRS})
@@ -83,7 +83,7 @@ find_package(OpenCL REQUIRED)
 include_directories(
 	ext
 	src/common
-    src/cloudclean
+        src/cloudclean
 	${OPENCL_INCLUDE_DIRS}
         ${OPENGL_INCLUDE_DIR}
 )

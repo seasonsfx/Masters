@@ -56,7 +56,7 @@ class DLLSPEC CloudModel : public QObject {
     Q_OBJECT
 
  public:
-    std::vector< int >                              cloud_to_grid_map;
+    std::vector<int>                                cloud_to_grid_map;
     int                                             x_dim;
     int                                             y_dim;
     bool                                            loaded;

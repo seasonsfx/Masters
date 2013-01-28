@@ -53,8 +53,8 @@ static QString DLLExtension() {
 #else
     return QString("so");
 #endif
-    assert(0 && "Unknown Operative System." + \
-           "Please Define the appropriate dynamic library extension");
+    assert(0 && "Unknown Operative System. \
+           Please Define the appropriate dynamic library extension");
     return QString();
 }
 

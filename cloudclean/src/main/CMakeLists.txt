@@ -5,12 +5,10 @@ include_directories(
 
 
 include_directories(
-        ${PROJECT_SOURCE_DIR}/src
-        ${QT_QTCORE_INCLUDE_DIR}
-        ${QT_QTGUI_INCLUDE_DIR}
-        ${QT_QTCORE_INCLUDE_DIR}
-        ${QT_QTGUI_INCLUDE_DIR}
-        ${QT_QTOPENGL_INCLUDE_DIR}
+        ${Qt5Widgets_INCLUDE_DIRS}
+        ${Qt5Core_INCLUDE_DIRS}
+        ${Qt5Gui_INCLUDE_DIRS}
+        ${Qt5OpenGL_INCLUDE_DIRS} # for legacy code
         ${PCL_INCLUDE_DIRS}
         ${FLANN_INCLUDE_DIRS}
 )
@@ -25,10 +23,8 @@ endif()
 
 target_link_libraries(run_cloudclean
     cloudclean
-    ${QT_QTMAIN_LIBRARY}
-    ${QT_LIBRARIES}
-    ${QT_QTCORE_LIBRARY}
-    ${QT_QTGUI_LIBRARY}
 )
+
+qt5_use_modules(run_cloudclean Widgets Gui OpenGL)
 
 INSTALL(TARGETS run_cloudclean DESTINATION ${BIN_INSTALL_DIR_SUFFIX} COMPONENT CloudClean)

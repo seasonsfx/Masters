@@ -2,7 +2,7 @@
 #include <cstdlib>
 #include <assert.h>
 
-#include <QtGui/QApplication>
+#include <QApplication>
 
 #include "cloudclean/mainwindow.h"
 #include "cloudclean/cloudmodel.h"

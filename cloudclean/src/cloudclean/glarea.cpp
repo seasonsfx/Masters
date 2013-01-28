@@ -75,7 +75,7 @@ GLArea::GLArea(QWidget* parent, PluginManager *pm, CloudModel *cm)
     start_move_y = 0;
     point_size = 2;
 
-    glFormat.setVersion(3, 3);
+    glFormat.setVersion(3, 2);
     glFormat.setProfile(QGLFormat::CoreProfile);
     glFormat.setSampleBuffers(true);
     glFormat.setDoubleBuffer(true);
@@ -87,7 +87,7 @@ GLArea::GLArea(QWidget* parent, PluginManager *pm, CloudModel *cm)
 
     QGLWidget(glFormat, parent);
 
-    setAutoBufferSwap(true);
+    //setAutoBufferSwap(true);
     setMouseTracking(true);
 
 
@@ -223,12 +223,16 @@ void GLArea::paintGL() {
     time.start();
 
     // This is reset by qpainter
+    glError("174");
     glEnable(GL_DEPTH_TEST);
+    glError("175");
     glEnable(GL_BLEND);
+    glError("176");
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDepthFunc(GL_LEQUAL);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    glError("177");
 
     point_shader.bind();
 
@@ -242,9 +246,12 @@ void GLArea::paintGL() {
     point_shader.enableAttributeArray("vertex");
     point_shader.setAttributeBuffer("vertex", GL_FLOAT, 0, 4);
 
-    glEnable(GL_PRIMITIVE_RESTART);
+    glError("549");
+    //glEnable(GL_PRIMITIVE_RESTART);
+    glError("550");
     glPrimitiveRestartIndex((unsigned int)-1);
     glPointSize(point_size);
+    glError("551");
 
     std::vector<Layer> & layers = cm->layerList.layers;
 
@@ -270,6 +277,7 @@ void GLArea::paintGL() {
 
     cm->point_buffer.release();
     point_shader.release();
+    glError("552");
 
     if (pm->activeEditPlugin)
         pm->activeEditPlugin->paintGL(cm, this);
@@ -277,6 +285,7 @@ void GLArea::paintGL() {
     if (pm->activeVizPlugin)
         pm->activeVizPlugin->paintGL(cm, this);
 
+    glError("553");
     //////////////////////////////////////
 
     QPainter painter(this);
@@ -304,7 +313,7 @@ void GLArea::paintGL() {
                            this->height()), logAreaColor);
 
     QString col1Text, col0Text;
-
+    glError("554");
     if (cm->isLoaded()) {
         if ((cfps > 0) && (cfps < 999))
             col1Text += QString("FPS: %1\n").arg(cfps, 7, 'f', 1);
@@ -332,6 +341,7 @@ void GLArea::paintGL() {
 
     swapBuffers();
     updateFps(time.elapsed());
+    glError("555");
 }
 
 void GLArea::modelReloaded() {

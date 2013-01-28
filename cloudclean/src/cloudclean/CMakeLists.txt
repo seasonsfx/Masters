@@ -2,11 +2,10 @@ add_definitions(-DQT_SHARED)
 add_definitions(-DCloudClean_EXPORTS)
 
 include_directories(
-	${QT_QTCORE_INCLUDE_DIR}
-	${QT_QTGUI_INCLUDE_DIR}
-	${QT_QTCORE_INCLUDE_DIR}
-	${QT_QTGUI_INCLUDE_DIR}
-	${QT_QTOPENGL_INCLUDE_DIR}
+        ${Qt5Widgets_INCLUDE_DIRS}
+        ${Qt5Core_INCLUDE_DIRS}
+        ${Qt5Gui_INCLUDE_DIRS}
+        ${Qt5OpenGL_INCLUDE_DIRS} # for legacy code
 	${PCL_INCLUDE_DIRS}
         ${FLANN_INCLUDE_DIRS}
 )
@@ -58,15 +57,16 @@ set(cloudclean_FORMS
 	toolbox.ui
 )
 
-QT4_WRAP_CPP(cloudclean_HEADERS_MOC ${cloudclean_HEADERS})
-QT4_WRAP_UI(cloudclean_FORMS_HEADERS ${cloudclean_FORMS})
-QT4_ADD_RESOURCES(cloudclean_RESOURCES_RCC ${cloudclean_RESOURCES})
+#QT5_WRAP_CPP(cloudclean_HEADERS_MOC ${cloudclean_HEADERS})
+QT5_WRAP_UI(cloudclean_FORMS_HEADERS ${cloudclean_FORMS})
+QT5_ADD_RESOURCES(cloudclean_RESOURCES_RCC ${cloudclean_RESOURCES})
 
 include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 
 add_library(cloudclean SHARED
 	${cloudclean_SOURCES} 
-	${cloudclean_HEADERS_MOC} 
+        #${cloudclean_HEADERS_MOC}
+        ${cloudclean_HEADERS}
 	${cloudclean_FORMS_HEADERS} 
 	${cloudclean_RESOURCES_RCC}
 )
@@ -78,14 +78,12 @@ if(WIN32)
 endif()
 
 target_link_libraries(cloudclean
-    ${QT_LIBRARIES}
-    ${QT_QTCORE_LIBRARY}
-    ${QT_QTGUI_LIBRARY}
-    ${QT_QTOPENGL_LIBRARY}
     ${PCL_LIBRARIES}
     ${FLANN_LIBRARY}
     ${OPENCL_LIBRARIES}
     ${OPENGL_LIBRARIES}
 )
+
+qt5_use_modules(cloudclean Widgets Gui OpenGL)
 
 INSTALL(TARGETS cloudclean DESTINATION ${LIB_INSTALL_DIR_SUFFIX} COMPONENT CloudClean)

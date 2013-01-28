@@ -1,7 +1,9 @@
 project (CloudClean)
 cmake_minimum_required (VERSION 2.8.6)
-set(CMAKE_BUILD_TYPE Release)
 
+set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
 if(CMAKE_BUILD_TOOL MATCHES "(msdev|devenv|nmake)")
@@ -14,6 +16,8 @@ else()
     SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations")
     SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -Wno-unknown-pragmas")
     SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -fstack-protector-all")
+    SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -fPIC")
+
 
     #SET(CMAKE_C_COMPILER             "clang")
     #SET(CMAKE_CXX_COMPILER             "clang++")
@@ -58,10 +62,21 @@ endif()
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/${BIN_DIR_SUFFIX})
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/${LIB_DIR_SUFFIX})
 
-find_package(Qt4 REQUIRED)
-set(QT_USE_OPENGL TRUE)
+find_package(Qt5Core REQUIRED)
+find_package(Qt5Widgets REQUIRED)
+find_package(Qt5Gui REQUIRED)
+find_package(Qt5OpenGL REQUIRED)
 
-include(${QT_USE_FILE})
+get_target_property(QtCore_location ${Qt5Core_LIBRARIES} LOCATION)
+get_target_property(QtWidgets_location ${Qt5Widgets_LIBRARIES} LOCATION)
+get_target_property(QtGui_location ${Qt5Gui_LIBRARIES} LOCATION)
+get_target_property(QtOpenGL_location ${Qt5OpenGL_LIBRARIES} LOCATION)
+
+set(QT_LIBRARIES ${QtCore_location}
+    ${QtWidgets_location}
+    ${QtGui_location}
+    ${QtOpenGL_location}
+)
 
 find_package(PCL 1.7 REQUIRED COMPONENTS
 	common
@@ -95,7 +110,7 @@ SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH FALSE)
 
 add_subdirectory(src/cloudclean)
 add_subdirectory(src/main)
-add_subdirectory(src/plugins)
+#add_subdirectory(src/plugins)
 
 # INSTALL
 function(find_dlls lib_files dll_dir dll_files)

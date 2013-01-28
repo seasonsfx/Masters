@@ -141,8 +141,8 @@ bool MainWindow::saveScan() {
      if (filename.length() == 0)
           return false;
 
-     const char *ptr = filename.toAscii().data();
-     cm->saveFile(ptr);
+     string str = filename.toStdString();
+     cm->saveFile(str.c_str());
      return true;
 }
 

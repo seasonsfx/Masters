@@ -1,8 +1,0 @@
-<RCC>
-    <qresource prefix="/">
-        <file>images/normal.png</file>
-        <file>shaders/normals.frag</file>
-        <file>shaders/normals.geom</file>
-        <file>shaders/normals.vert</file>
-    </qresource>
-</RCC>

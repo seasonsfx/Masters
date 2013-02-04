@@ -3,7 +3,7 @@ cloudclean/bin
 cloudclean/build
 cloudclean_bin
 build
-Makefile
+#Makefile
 CMakeCache.txt
 CMakeLists.txt.user*
 CMakeFiles

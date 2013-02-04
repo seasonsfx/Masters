@@ -1,5 +1,6 @@
 #include "glwidget.h"
 #include <QtOpenGL>
+#include <QResource>
 #include <cmath>
 #include <cstdlib>
 
@@ -30,15 +31,25 @@ void GLWidget::initializeGL()
     glEnable(GL_MULTISAMPLE);
     
     //
+    // Check resources
+    //
+
+    //qDebug() << QString(reinterpret_cast<const char*>(QResource(":/points.vert").data()));
+
+    //
     // Load shader
     //
     bool succ = program_.addShaderFromSourceFile(
                 QGLShader::Vertex, ":/points.vert");
+    CE();
+    qWarning() << program_.log();
     if (!succ) qWarning() << program_.log();
     succ = program_.addShaderFromSourceFile(
                 QGLShader::Fragment, ":/points.frag");
+    CE();
     if (!succ) qWarning() << program_.log();
     succ = program_.link();
+    CE();
     if (!succ) {
         qWarning() << "Could not link shader program_:" << program_.log();
         qWarning() << "Exiting...";
@@ -46,12 +57,14 @@ void GLWidget::initializeGL()
     }
 
     succ = program_.bind();
+    CE();
     if(!succ)
         qDebug() << "Program not bound to context ";
 
     //
     // Resolve attributes & uniforms
     //
+    //attr_vertex_ = glGetAttribLocation(program_.programId(), "vertex"); CE(); RC(attr_vertex_);
     attr_vertex_ = program_.attributeLocation("vertex"); RC(attr_vertex_);
     attr_color_index_ = program_.attributeLocation("color_index"); RC(attr_color_index_);
     uni_sampler_ = program_.uniformLocation("sampler"); RC(uni_sampler_);
@@ -124,6 +137,25 @@ void GLWidget::initializeGL()
     index_buffer_->release(); CE();
 
     glGenTextures(1, &texture_id_); CE();
+
+    //
+    // Set up VAO
+    //
+
+    glGenVertexArrays(1, &vao_);
+    glBindVertexArray(vao_);
+
+    vertex_buffer_->bind(); CE();
+    program_.enableAttributeArray(attr_vertex_); CE();
+    program_.setAttributeBuffer(attr_vertex_, GL_FLOAT, 0, 4); CE();
+    vertex_buffer_->release(); CE();
+
+    index_buffer_->bind();CE();
+    program_.enableAttributeArray(attr_color_index_);CE();
+    program_.setAttributeBuffer(attr_color_index_, GL_INT, 0, 1);CE();
+    index_buffer_->release();CE();
+
+    glBindVertexArray(0);
 }
 
 void GLWidget::paintGL() {
@@ -134,27 +166,21 @@ void GLWidget::paintGL() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     program_.bind();CE();
-
-    vertex_buffer_->bind();CE();
-    program_.enableAttributeArray(attr_vertex_);CE();
-    program_.setAttributeBuffer(attr_vertex_, GL_FLOAT, 0, 4);CE();
-    vertex_buffer_->release();CE();
-
-    index_buffer_->bind();CE();
-    program_.enableAttributeArray(attr_color_index_);CE();
-    program_.setAttributeBuffer(attr_color_index_, GL_INT, 0, 1);CE();
-    index_buffer_->release();CE();
+    glBindVertexArray(vao_);
 
     glUniformMatrix4fv(uni_modelview_, 1, GL_FALSE,
                        camera_.modelviewMatrix().data());CE();
 
-    //glUniform1i(uni_sampler_, 0);CE();
-    //glBindTexture(GL_TEXTURE_BUFFER, texture_id_);CE();
-    //glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, label_colours_->bufferId());CE();
+    glUniform1i(uni_sampler_, 0); CE();
+    glBindTexture(GL_TEXTURE_BUFFER, texture_id_); CE();
+    glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, label_colours_->bufferId()); CE();
 
-    glDrawArrays(GL_POINTS, 0, vertices_.size());CE();
-    //glDrawElements(GL_TRIANGLE_STRIP, indices.size(), GL_UNSIGNED_SHORT, indices.constData());
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glDrawArrays(GL_POINTS, 0, vertices_.size()); CE();
     glBindTexture(GL_TEXTURE_BUFFER, 0);CE();
+
+    glBindVertexArray(0);
     program_.release();
 
 }

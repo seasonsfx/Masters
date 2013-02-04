@@ -44,6 +44,7 @@ private:
     int uni_modelview_;
 
     GLuint texture_id_;
+    GLuint vao_;
 
     // So basically here we need qt datastructures that repreent the model state
     // On every draw the data should the model should be checked for modifications

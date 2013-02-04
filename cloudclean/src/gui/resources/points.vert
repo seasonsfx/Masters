@@ -11,9 +11,9 @@ void main( void )
 {
     vec4 layer_colour = texelFetch(sampler, color_index);
     vec4 vertex_out = vec4(vertex.x, vertex.y, vertex.z, 1.0f);
-    //colour = vec4(vertex.w, vertex.w, vertex.w, 1.0f) * layer_colour;
-    colour = vec4(0, 0, 0, 1.0f);
-    gl_Position = vec4(0, 0, 0.5, 1);
+    colour = vec4(vertex.w, vertex.w, vertex.w, 1.0f) * layer_colour;
+    //colour = vec4(0, 0, 0, 1.0f);
+    //gl_Position = vec4(0, 0, 0.5, 1);
     //gl_Position = vertex_out;
-    //gl_Position = projection * modelview * vertex_out;
+    gl_Position = projection * modelview * vertex_out;
 }

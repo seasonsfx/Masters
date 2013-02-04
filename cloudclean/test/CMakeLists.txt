@@ -3,6 +3,8 @@ SET (test_LIBS gtest)
 
 SET (test_BIN ${PROJECT_NAME}-unittests)
 
+INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/thirdparty/gtest/include)
+
 ADD_EXECUTABLE(${test_BIN} ${test_SRCS})
 ADD_DEPENDENCIES(${test_BIN} googletest)
 TARGET_LINK_LIBRARIES(${test_BIN} ${test_LIBS})

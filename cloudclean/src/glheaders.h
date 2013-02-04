@@ -15,5 +15,6 @@ if (gl_err != GL_NO_ERROR) {\
     abort();\
 }
 
-#define RC(CODE) if(CODE == -1)\
-    qDebug() << "Function call failed on line" << __LINE__ << "of" << __FILE__; abort();
+#define RC(CODE) if(CODE == -1){\
+    qDebug() << "Function call failed on line" << __LINE__ << "of" << __FILE__;\
+    abort();}

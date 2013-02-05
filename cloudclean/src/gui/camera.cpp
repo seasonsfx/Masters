@@ -235,4 +235,5 @@ void Camera::mouseWheel(int val) {
     val = -val/60.0f;
     if (mFoV + val < 170.0f && mFoV + val > 2.0f)
         setFoV(mFoV + val);
+    //mModelviewMatrixDirty = true;
 }

@@ -53,16 +53,12 @@ protected:
 private:
     std::shared_ptr<DataModel> dm;
 
-    QVector<QVector4D> vertices_;
-    QVector<QVector4D> colours_;
-    QVector<int> color_index_;
-
     Camera camera_;
 
     QGLShaderProgram program_;
-    std::shared_ptr<QGLBuffer> label_colours_;
-    std::shared_ptr<QGLBuffer> index_buffer_;  // Used for masking?
-    std::shared_ptr<QGLBuffer> vertex_buffer_;
+    std::shared_ptr<QGLBuffer> color_lookup_buffer_;
+    std::shared_ptr<QGLBuffer> label_buffer_;  // Used for masking?
+    std::shared_ptr<QGLBuffer> point_buffer_;
 
     int attr_vertex_;
     int attr_intensity_;

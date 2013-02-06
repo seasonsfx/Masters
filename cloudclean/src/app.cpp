@@ -154,11 +154,48 @@ void App::initApp() {
     // initialise model
     model_.reset(new DataModel);
 
-    model_->addCloud("/home/rickert/testdata/bentplane4x5.ptx");
-    //model_->addCloud("/home/rickert/trees.ptx");
-    //model_->addCloud("/home/rickert/Masters/utilities/ptxmaker/out.ptx");
+    // load cloud
+    model_->addCloud("/home/rickert/trees.ptx");
 
+    // make five labels
+    for(int i = 0; i < 5; i++)
+        model_->genLabelId();
 
+    // label the cloud
+    std::vector<int16_t> & labels = model_->clouds_[0].labels_;
+    for(int i = 0; i < labels.size(); i++){
+        labels[i] = i%5;
+    }
+
+    // create layers with colors
+    model_->addLayer("Test1", QColor(255, 0, 0));
+    model_->addLayer("Test2", QColor(0, 255, 0));
+    model_->addLayer("Test3", QColor(0, 0, 255));
+
+    // map the labels to layers/colors
+    model_->layer_lookup_table_[0] = 2;
+    model_->layer_lookup_table_[1] = 2;
+    model_->layer_lookup_table_[2] = 1;
+    model_->layer_lookup_table_[3] = 0;
+    model_->layer_lookup_table_[4] = 0;
+
+    // So whats next?
+    // So before drawing i need to set up a buffer for each cloud
+    // There needs to be a dirt bit on the cloud i think
+    // There needs to be a dirt bit for each layer?
+    // Either that or each layer nees to be copied on draw
+    // So drawing will happen for each cloud
+    // The should be a map with each cloud's buffer
+    // update color buffer
+    // for(cloud in clouds){
+    //      if(cloud = dirty)
+    //            reallocate cloud buffer
+    //      allocate and draw layer via mapping
+    //      or
+    //      check dirty bit on layer
+    //
+
+    // Set up gui
     mainwindow_.reset(new MainWindow);
     glwidget_.reset(new GLWidget(model_, mainwindow_.get()));
     QGLFormat base_format = glwidget_->format();

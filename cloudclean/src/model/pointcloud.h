@@ -18,11 +18,11 @@ class PointCloud : public pcl::PointCloud<pcl::PointXYZI> {
     bool load_ptx(const char* filename, int subsample = 1);
 
  public:
-    std::vector<int> cloud_to_grid_map;
-    int scan_width;
-    int scan_height;
+    std::vector<int> cloud_to_grid_map_;
+    int scan_width_;
+    int scan_height_;
 
-    std::vector<int16_t> labels;
+    std::vector<int16_t> labels_;
     // std::vector<int8_t> attribute_flags;
 
 

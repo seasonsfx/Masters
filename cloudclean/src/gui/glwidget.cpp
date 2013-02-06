@@ -27,7 +27,7 @@ QSize GLWidget::minimumSizeHint() const
 QSize GLWidget::sizeHint() const
 
 {
-    return QSize(500, 500);
+    return QSize(700, 500);
 }
 
 void GLWidget::initializeGL()
@@ -37,12 +37,6 @@ void GLWidget::initializeGL()
     glEnable(GL_CULL_FACE);
     glEnable(GL_MULTISAMPLE);
     
-    //
-    // Check resources
-    //
-
-    //qDebug() << QString(reinterpret_cast<const char*>(QResource(":/points.vert").data()));
-
     //
     // Load shader
     //
@@ -80,29 +74,7 @@ void GLWidget::initializeGL()
 
     program_.release();
 
-    //
-    // Create bs data for testing...
-    //
-
-    PointCloud & pc = dm->clouds[0];
-
-    /*vertices_.clear();
-    vertices_ << QVector4D(0.0f, 0.0f, 1.0f, 1.0f);
-    vertices_ << QVector4D(0.5f, 0.0f, 1.0f, 1.0f);
-    vertices_ << QVector4D(0.0f, -0.5f, 1.0f, 1.0f);
-    vertices_ << QVector4D(0.5f, -0.5f, 1.0f, 1.0f);
-    */
-    color_index_.clear();
-    for(int i = 0; i < pc.size(); i++){
-        color_index_ << i%3;
-        //qDebug() << pc[i].x << pc[i].y << pc[i].z << pc[i].intensity;
-    }
-
-    colours_.clear();
-    colours_ << QVector4D(1.0f, 0.0f, 0.0f, 1.0f);
-    colours_ << QVector4D(0.0f, 1.0f, 0.0f, 1.0f);
-    colours_ << QVector4D(0.0f, 0.0f, 1.0f, 1.0f);
-
+    PointCloud & pc = dm->clouds_[0];
 
     //
     // Set camera
@@ -121,44 +93,92 @@ void GLWidget::initializeGL()
     glBindVertexArray(vao_);
 
     //
-    // Set up buffers
+    // Set up buffers...
     //
 
-    label_colours_.reset(new QGLBuffer(QGLBuffer::VertexBuffer)); CE();
-    index_buffer_.reset(new QGLBuffer(QGLBuffer::VertexBuffer)); CE();
-    vertex_buffer_.reset(new QGLBuffer(QGLBuffer::VertexBuffer)); CE();
+    //
+    // "Global" color lookup buffer
+    //
 
-    label_colours_->create(); CE();
-    label_colours_->bind(); CE();
-    label_colours_->allocate(colours_.size()*sizeof(QVector4D)); CE();
-    label_colours_->write(0, colours_.constData(),
-                          colours_.size()*sizeof(QVector4D)); CE();
-    label_colours_->release(); CE();
+    color_lookup_buffer_.reset(new QGLBuffer(QGLBuffer::VertexBuffer)); CE();
+    label_buffer_.reset(new QGLBuffer(QGLBuffer::VertexBuffer)); CE();
+    point_buffer_.reset(new QGLBuffer(QGLBuffer::VertexBuffer)); CE();
 
-    vertex_buffer_->create(); CE();
-    vertex_buffer_->bind(); CE();
-    size_t vb_size = sizeof(float)*4*pc.size();
-    vertex_buffer_->allocate(vb_size); CE();
-    vertex_buffer_->write(0, &pc.points[0], vb_size); CE();
+    color_lookup_buffer_->create(); CE();
+    color_lookup_buffer_->bind(); CE();
+    assert(dm->last_label_id_ != -1);
+    size_t label_buff_size = (dm->last_label_id_+1)*sizeof(float)*4;
+    color_lookup_buffer_->allocate(label_buff_size); CE();
+    float * color_lookup_buffer =
+            static_cast<float *>(glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY));
+    for(int i = 0; i <= dm->last_label_id_; i++) {
+        bool exists = dm->layer_lookup_table_.find(i)
+                != dm->layer_lookup_table_.end();
+
+        QColor color;
+        if(exists) {
+            int layer_id = dm->layer_lookup_table_[i];
+            color = dm->layers_[layer_id].color_;
+        }
+        else {
+            qWarning() << "Warning, no label associated with this layer";
+            color = QColor(255, 0, 0, 255);
+        }
+        color_lookup_buffer[i*4] = color.red()/255.0f;
+        color_lookup_buffer[i*4+1] = color.green()/255.0f;
+        color_lookup_buffer[i*4+2] = color.blue()/255.0f;
+        color_lookup_buffer[i*4+3] = color.alpha()/255.0f;
+    }
+    glUnmapBuffer(GL_ARRAY_BUFFER);
+    dm->layer_lookup_table_dirty_ = false;
+    color_lookup_buffer_->release(); CE();
+
+    //
+    // Point buffer setup
+    //
+
+    point_buffer_->create(); CE();
+    point_buffer_->bind(); CE();
+    size_t vb_size = sizeof(pcl::PointXYZI)*pc.size();
+    point_buffer_->allocate(vb_size); CE();
+    float * pointbuff =
+            static_cast<float *>(glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY));
+    for(int i = 0; i < pc.size(); i++) {
+        pointbuff[i*4] = pc[i].x;
+        pointbuff[i*4+1] = pc[i].y;
+        pointbuff[i*4+2] = pc[i].z;
+        pointbuff[i*4+3] = pc[i].intensity;
+    }
+    glUnmapBuffer(GL_ARRAY_BUFFER);
     program_.enableAttributeArray(attr_vertex_); CE();
     program_.enableAttributeArray(attr_intensity_); CE();
     program_.setAttributeBuffer(attr_vertex_, GL_FLOAT, 0, 3, sizeof(float)*4); CE();
     program_.setAttributeBuffer(attr_intensity_, GL_FLOAT, sizeof(float)*3, 1, sizeof(float)*4); CE();
-    vertex_buffer_->release(); CE();
+    point_buffer_->release(); CE();
 
-    index_buffer_->create(); CE();
-    index_buffer_->bind(); CE();
-    index_buffer_->allocate(color_index_.size()*sizeof(int));  CE();
-    index_buffer_->write(0, color_index_.constData(),
-                         color_index_.size()*sizeof(int)); CE();
+    //
+    // Label buffer setup
+    //
+
+    label_buffer_->create(); CE();
+    label_buffer_->bind(); CE();
+    label_buffer_->allocate(pc.size()*sizeof(int16_t));  CE();
+    int16_t * layerbuff =
+            static_cast<int16_t *>(glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY));
+    for(int i = 0; i < pc.labels_.size(); i++){
+        layerbuff[i] = pc.labels_[i];
+    }
+    glUnmapBuffer(GL_ARRAY_BUFFER);
     program_.enableAttributeArray(attr_color_index_);CE();
-    glVertexAttribIPointer(attr_color_index_, 1, GL_INT, 0, 0);
-    index_buffer_->release(); CE();
+    glVertexAttribIPointer(attr_color_index_, 1, GL_SHORT, 0, 0);
+    label_buffer_->release(); CE();
+
+    //
+    // Set up textures
+    //
 
     glGenTextures(1, &texture_id_); CE();
-
     glPointSize(5);
-
     glBindVertexArray(0);
     program_.release();
 }
@@ -180,9 +200,9 @@ void GLWidget::paintGL() {
 
     glUniform1i(uni_sampler_, 0); CE();
     glBindTexture(GL_TEXTURE_BUFFER, texture_id_); CE();
-    glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, label_colours_->bufferId()); CE();
+    glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, color_lookup_buffer_->bufferId()); CE();
 
-    glDrawArrays(GL_POINTS, 0, vertices_.size()); CE();
+    glDrawArrays(GL_POINTS, 0, dm->clouds_[0].size()); CE();
     glBindTexture(GL_TEXTURE_BUFFER, 0);CE();
 
     glBindVertexArray(0);

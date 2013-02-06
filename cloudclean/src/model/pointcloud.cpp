@@ -28,7 +28,8 @@ bool PointCloud::save_ptx(const char* filename){
     std::ofstream ptx_file(filename);
     ptx_file << this->width << std::endl;
     ptx_file << this->height << std::endl;
-    ptx_file << this->sensor_origin_[0] << " " << this->sensor_origin_[1] << " "<< this->sensor_origin_[2] << std::endl;
+    ptx_file << this->sensor_origin_[0] << " " << this->sensor_origin_[1]
+             << " "<< this->sensor_origin_[2] << std::endl;
 
     // File is column major
     Eigen::Matrix3f rmat(this->sensor_orientation_);
@@ -61,11 +62,15 @@ bool PointCloud::save_ptx(const char* filename){
 
     // Write points
     for(unsigned int i = 0; i < this->points.size(); i++) {
-        if(isNaN(this->points[i].x) || isNaN(this->points[i].y) || isNaN(this->points[i].z || isNaN(this->points[i].intensity))){
+        if(isNaN(this->points[i].x) || isNaN(this->points[i].y)
+                || isNaN(this->points[i].z
+                || isNaN(this->points[i].intensity))){
             ptx_file << "0 0 0 0.5" << std::endl;
         }
         else{
-            ptx_file << this->points[i].x << " " << this->points[i].y << " " << this->points[i].z << " " << this->points[i].intensity << std::endl;
+            ptx_file << this->points[i].x << " " << this->points[i].y
+                     << " " << this->points[i].z << " "
+                     << this->points[i].intensity << std::endl;
         }
     }
 
@@ -95,10 +100,12 @@ bool PointCloud::load_ptx(const char* filename, int subsample) {
     this->width =  width/subsample;
     this->height = height/subsample;
 
-	this->points.resize (this->width * this->height);
+    this->points.resize (this->width * this->height);
+    labels_.resize(this->width * this->height, 0);
 
-    this->scan_width = width;
-    this->scan_height = height;
+    // original dimensions saved
+    this->scan_width_ = width;
+    this->scan_height_ = height;
 
 	// Camera offset
 	ptx_file >> this->sensor_origin_[0];
@@ -125,7 +132,7 @@ bool PointCloud::load_ptx(const char* filename, int subsample) {
 	ptx_file >> std::ws;
 
     ///////////// Start processing points ////////////////
-	std::string line;
+    // std::string line;
 	float x, y, z, intensity;
 
     // Determine format
@@ -141,7 +148,8 @@ bool PointCloud::load_ptx(const char* filename, int subsample) {
     ss << line;
     ss >> x >> y >> z >> intensity;
 
-    if((x == 0) && (y == 0) && (z == 0) && ( fabs(intensity - 0.5f) < 0.0001 )) {
+    if((x == 0) && (y == 0) && (z == 0)
+            && ( fabs(intensity - 0.5f) < 0.0001 )) {
                     x = y = z = intensity = NAN;
     }
 

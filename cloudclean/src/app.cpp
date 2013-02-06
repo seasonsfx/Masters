@@ -150,8 +150,23 @@ App* App::INSTANCE() {
 }
 
 void App::initApp() {
-    _mainwindow.reset(new MainWindow);
-    _mainwindow->setVisible(true);
+
+    // initialise model
+    model_.reset(new DataModel);
+
+    model_->addCloud("/home/rickert/testdata/bentplane4x5.ptx");
+    //model_->addCloud("/home/rickert/trees.ptx");
+    //model_->addCloud("/home/rickert/Masters/utilities/ptxmaker/out.ptx");
+
+
+    mainwindow_.reset(new MainWindow);
+    glwidget_.reset(new GLWidget(model_, mainwindow_.get()));
+    QGLFormat base_format = glwidget_->format();
+    base_format.setVersion(3, 3);
+    base_format.setProfile(QGLFormat::CompatibilityProfile);
+    glwidget_->setFormat(base_format);
+    mainwindow_->setCentralWidget(glwidget_.get());
+    mainwindow_->setVisible(true);
 }
 
 void App::printHelpMessage() {

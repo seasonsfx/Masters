@@ -4,13 +4,13 @@
 #include <cmath>
 #include <cstdlib>
 
-GLWidget::GLWidget(QWidget *parent)
+GLWidget::GLWidget(std::shared_ptr<DataModel> & dm, QWidget *parent)
     : QGLWidget(QGLFormat(QGL::SampleBuffers), parent) {
     //qApp->installEventFilter(this);
     setFocusPolicy(Qt::StrongFocus);
     camera_move_unit = 0.4;
     point_render_size = 1.0f;
-
+    this->dm = dm;
     // Mouse move events get tracked even if mouse not down
     setMouseTracking(true);
 }
@@ -84,17 +84,19 @@ void GLWidget::initializeGL()
     // Create bs data for testing...
     //
 
-    vertices_.clear();
+    PointCloud & pc = dm->clouds[0];
+
+    /*vertices_.clear();
     vertices_ << QVector4D(0.0f, 0.0f, 1.0f, 1.0f);
     vertices_ << QVector4D(0.5f, 0.0f, 1.0f, 1.0f);
     vertices_ << QVector4D(0.0f, -0.5f, 1.0f, 1.0f);
     vertices_ << QVector4D(0.5f, -0.5f, 1.0f, 1.0f);
-
+    */
     color_index_.clear();
-    color_index_ << 0;
-    color_index_ << 1;
-    color_index_ << 2;
-    color_index_ << 0;
+    for(int i = 0; i < pc.size(); i++){
+        color_index_ << i%3;
+        //qDebug() << pc[i].x << pc[i].y << pc[i].z << pc[i].intensity;
+    }
 
     colours_.clear();
     colours_ << QVector4D(1.0f, 0.0f, 0.0f, 1.0f);
@@ -135,9 +137,9 @@ void GLWidget::initializeGL()
 
     vertex_buffer_->create(); CE();
     vertex_buffer_->bind(); CE();
-    vertex_buffer_->allocate(vertices_.size()*sizeof(QVector4D)); CE();
-    vertex_buffer_->write(0, vertices_.constData(),
-                          vertices_.size()*sizeof(QVector4D));
+    size_t vb_size = sizeof(float)*4*pc.size();
+    vertex_buffer_->allocate(vb_size); CE();
+    vertex_buffer_->write(0, &pc.points[0], vb_size); CE();
     program_.enableAttributeArray(attr_vertex_); CE();
     program_.enableAttributeArray(attr_intensity_); CE();
     program_.setAttributeBuffer(attr_vertex_, GL_FLOAT, 0, 3, sizeof(float)*4); CE();

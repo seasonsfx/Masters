@@ -97,6 +97,9 @@ bool PointCloud::load_ptx(const char* filename, int subsample) {
 
 	this->points.resize (this->width * this->height);
 
+    this->scan_width = width;
+    this->scan_height = height;
+
 	// Camera offset
 	ptx_file >> this->sensor_origin_[0];
 	ptx_file >> this->sensor_origin_[1];

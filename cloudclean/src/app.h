@@ -7,6 +7,7 @@
 #include <QApplication>
 #include <boost/shared_ptr.hpp>
 #include "gui/mainwindow.h"
+#include "gui/glwidget.h"
 #include "model/datamodel.h"
 
 class App : public QApplication
@@ -47,8 +48,9 @@ class App : public QApplication
         
         static App* _instance;
         QString _invocation;
-        boost::shared_ptr<MainWindow> _mainwindow;
-        boost::shared_ptr<DataModel> model;
+        std::shared_ptr<MainWindow> mainwindow_;
+        std::shared_ptr<DataModel> model_;
+        std::shared_ptr<GLWidget> glwidget_;
 };
 
 #endif

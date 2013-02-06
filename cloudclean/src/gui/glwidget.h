@@ -6,13 +6,14 @@
 #include <QGLBuffer>
 #include <QGLShaderProgram>
 #include "gui/camera.h"
+#include "model/datamodel.h"
 
 class GLWidget : public QGLWidget
 {
     Q_OBJECT
 
 public:
-    GLWidget(QWidget *parent = 0);
+    GLWidget(std::shared_ptr<DataModel> & dm, QWidget *parent = 0);
     ~GLWidget();
 
     QSize minimumSizeHint() const;
@@ -50,6 +51,8 @@ protected:
    bool eventFilter(QObject *object, QEvent *event);
 
 private:
+    std::shared_ptr<DataModel> dm;
+
     QVector<QVector4D> vertices_;
     QVector<QVector4D> colours_;
     QVector<int> color_index_;

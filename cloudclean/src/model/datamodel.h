@@ -10,7 +10,8 @@
 class DataModel {
  public:
     DataModel();
-
+    int addCloud();
+    int addCloud(const char* filename);
     // save everything as a flat cloud?
 
  public:

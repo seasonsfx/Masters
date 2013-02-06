@@ -13,7 +13,7 @@ class MainWindow : public QMainWindow {
     ~MainWindow();
 
  private:
-  	GLWidget *glWidget;
+
 
 };
 

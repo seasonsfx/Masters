@@ -8,12 +8,25 @@
 #include "gui/camera.h"
 #include "model/datamodel.h"
 
+class CloudGLData{
+ public:
+    CloudGLData(PointCloud *);
+    ~CloudGLData();
+    void draw();
+
+ public:
+    PointCloud * pc_;
+    GLuint vao_;
+    std::shared_ptr<QGLBuffer> label_buffer_;
+    std::shared_ptr<QGLBuffer> point_buffer_;
+};
+
 class GLWidget : public QGLWidget
 {
     Q_OBJECT
 
 public:
-    GLWidget(std::shared_ptr<DataModel> & dm, QWidget *parent = 0);
+    GLWidget(std::shared_ptr<DataModel> & dm_, QWidget *parent = 0);
     ~GLWidget();
 
     QSize minimumSizeHint() const;
@@ -51,28 +64,24 @@ protected:
    bool eventFilter(QObject *object, QEvent *event);
 
 private:
-    std::shared_ptr<DataModel> dm;
+    std::shared_ptr<DataModel> dm_;
 
     Camera camera_;
 
     QGLShaderProgram program_;
     std::shared_ptr<QGLBuffer> color_lookup_buffer_;
-    std::shared_ptr<QGLBuffer> label_buffer_;  // Used for masking?
-    std::shared_ptr<QGLBuffer> point_buffer_;
 
-    int attr_vertex_;
-    int attr_intensity_;
-    int attr_color_index_;
+    std::map<int, std::shared_ptr<CloudGLData> > cloudgldata_;
+
     int uni_sampler_;
     int uni_projection_;
     int uni_modelview_;
 
-    float camera_move_unit;
-    QVector2D mouse_drag_start;
-    float point_render_size;
+    float camera_move_unit_;
+    QVector2D mouse_drag_start_;
+    float point_render_size_;
 
     GLuint texture_id_;
-    GLuint vao_;
 
     // So basically here we need qt datastructures that repreent the model state
     // On every draw the data should the model should be checked for modifications

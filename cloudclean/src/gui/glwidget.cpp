@@ -4,19 +4,82 @@
 #include <cmath>
 #include <cstdlib>
 
+CloudGLData::CloudGLData(PointCloud * pc) {
+    pc_ = pc;
+
+    //
+    // Point buffer setup
+    //
+    glGenVertexArrays(1, &vao_);
+    glBindVertexArray(vao_);
+
+    point_buffer_.reset(new QGLBuffer(QGLBuffer::VertexBuffer)); CE();
+    point_buffer_->create(); CE();
+    point_buffer_->bind(); CE();
+    size_t vb_size = sizeof(pcl::PointXYZI)*pc->size();
+    point_buffer_->allocate(vb_size); CE();
+    float * pointbuff =
+            static_cast<float *>(glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY));
+    for(int i = 0; i < pc->size(); i++) {
+        pointbuff[i*4] = (*pc)[i].x;
+        pointbuff[i*4+1] = (*pc)[i].y;
+        pointbuff[i*4+2] = (*pc)[i].z;
+        pointbuff[i*4+3] = (*pc)[i].intensity;
+    }
+    glUnmapBuffer(GL_ARRAY_BUFFER);
+    glEnableVertexAttribArray(0); CE();
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float)*4, 0); CE();
+    glEnableVertexAttribArray(1); CE();
+    int offset = sizeof(float)*3;
+    glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(float)*4, reinterpret_cast<const void *>(offset)); CE();
+    point_buffer_->release(); CE();
+
+    //
+    // Label buffer setup
+    //
+    label_buffer_.reset(new QGLBuffer(QGLBuffer::VertexBuffer)); CE();
+    label_buffer_->create(); CE();
+    label_buffer_->bind(); CE();
+    label_buffer_->allocate(pc->size()*sizeof(int16_t)); CE();
+    int16_t * layerbuff =
+            static_cast<int16_t *>(glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY));
+    for(int i = 0; i < pc->labels_.size(); i++){
+        layerbuff[i] = pc->labels_[i];
+    }
+    glUnmapBuffer(GL_ARRAY_BUFFER);
+    glEnableVertexAttribArray(2); CE();; CE();
+    glVertexAttribIPointer(2, 1, GL_SHORT, 0, 0);
+    label_buffer_->release(); CE();
+    glBindVertexArray(0);
+}
+
+CloudGLData::~CloudGLData() {
+    glDeleteVertexArrays(1, &vao_);
+}
+
+void CloudGLData::draw(){
+    glBindVertexArray(vao_);
+    // Assumptions:
+    // - shader is loaded
+    // - buffertexure is loaded
+
+    // check dirty flag
+    // load new data if dirty
+
+    glDrawArrays(GL_POINTS, 0, pc_->size()); CE();
+    glBindVertexArray(vao_);
+}
+
 GLWidget::GLWidget(std::shared_ptr<DataModel> & dm, QWidget *parent)
     : QGLWidget(QGLFormat(QGL::SampleBuffers), parent) {
-    //qApp->installEventFilter(this);
     setFocusPolicy(Qt::StrongFocus);
-    camera_move_unit = 0.4;
-    point_render_size = 1.0f;
-    this->dm = dm;
-    // Mouse move events get tracked even if mouse not down
+    camera_move_unit_ = 0.4;
+    point_render_size_ = 1.0f;
+    this->dm_ = dm;
     setMouseTracking(true);
 }
 
-GLWidget::~GLWidget()
-{
+GLWidget::~GLWidget() {
 }
 
 QSize GLWidget::minimumSizeHint() const
@@ -38,43 +101,30 @@ void GLWidget::initializeGL()
     glEnable(GL_MULTISAMPLE);
     
     //
-    // Load shader
+    // Load shader program
     //
     bool succ = program_.addShaderFromSourceFile(
-                QGLShader::Vertex, ":/points.vert");
-    CE();
+                QGLShader::Vertex, ":/points.vert"); CE();
     qWarning() << program_.log();
     if (!succ) qWarning() << "Shader compile log:" << program_.log();
     succ = program_.addShaderFromSourceFile(
-                QGLShader::Fragment, ":/points.frag");
-    CE();
+                QGLShader::Fragment, ":/points.frag"); CE();
     if (!succ) qWarning() << "Shader compile log:" << program_.log();
-    succ = program_.link();
-    CE();
+    succ = program_.link(); CE();
     if (!succ) {
         qWarning() << "Could not link shader program_:" << program_.log();
         qWarning() << "Exiting...";
         abort();
     }
 
-    succ = program_.bind();
-    CE();
-    if(!succ)
-        qDebug() << "Program not bound to context ";
-
     //
-    // Resolve attributes & uniforms
+    // Resolve uniforms (Does the program need to be bound for this?)
     //
-    attr_vertex_ = program_.attributeLocation("vertex"); RC(attr_vertex_);
-    attr_intensity_ = program_.attributeLocation("intensity"); RC(attr_color_index_);
-    attr_color_index_ = program_.attributeLocation("color_index"); RC(attr_color_index_);
+    program_.bind(); CE();
     uni_sampler_ = program_.uniformLocation("sampler"); RC(uni_sampler_);
     uni_projection_ = program_.uniformLocation("projection"); RC(uni_projection_);
     uni_modelview_ = program_.uniformLocation("modelview"); RC( uni_modelview_);
-
     program_.release();
-
-    PointCloud & pc = dm->clouds_[0];
 
     //
     // Set camera
@@ -85,40 +135,26 @@ void GLWidget::initializeGL()
     glUniformMatrix4fv(uni_projection_, 1, GL_FALSE,
                        camera_.projectionMatrix().data());
     program_.release();
-    //
-    // Set up VAO
-    //
-    program_.bind();
-    glGenVertexArrays(1, &vao_);
-    glBindVertexArray(vao_);
 
     //
-    // Set up buffers...
+    // Set up "Global" color lookup buffer
     //
-
-    //
-    // "Global" color lookup buffer
-    //
-
     color_lookup_buffer_.reset(new QGLBuffer(QGLBuffer::VertexBuffer)); CE();
-    label_buffer_.reset(new QGLBuffer(QGLBuffer::VertexBuffer)); CE();
-    point_buffer_.reset(new QGLBuffer(QGLBuffer::VertexBuffer)); CE();
-
     color_lookup_buffer_->create(); CE();
     color_lookup_buffer_->bind(); CE();
-    assert(dm->last_label_id_ != -1);
-    size_t label_buff_size = (dm->last_label_id_+1)*sizeof(float)*4;
+    assert(dm_->last_label_id_ != -1);
+    size_t label_buff_size = (dm_->last_label_id_+1)*sizeof(float)*4;
     color_lookup_buffer_->allocate(label_buff_size); CE();
     float * color_lookup_buffer =
             static_cast<float *>(glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY));
-    for(int i = 0; i <= dm->last_label_id_; i++) {
-        bool exists = dm->layer_lookup_table_.find(i)
-                != dm->layer_lookup_table_.end();
+    for(int i = 0; i <= dm_->last_label_id_; i++) {
+        bool exists = dm_->layer_lookup_table_.find(i)
+                != dm_->layer_lookup_table_.end();
 
         QColor color;
         if(exists) {
-            int layer_id = dm->layer_lookup_table_[i];
-            color = dm->layers_[layer_id].color_;
+            int layer_id = dm_->layer_lookup_table_[i];
+            color = dm_->layers_[layer_id].color_;
         }
         else {
             qWarning() << "Warning, no label associated with this layer";
@@ -130,57 +166,24 @@ void GLWidget::initializeGL()
         color_lookup_buffer[i*4+3] = color.alpha()/255.0f;
     }
     glUnmapBuffer(GL_ARRAY_BUFFER);
-    dm->layer_lookup_table_dirty_ = false;
+    dm_->layer_lookup_table_dirty_ = false;
     color_lookup_buffer_->release(); CE();
-
-    //
-    // Point buffer setup
-    //
-
-    point_buffer_->create(); CE();
-    point_buffer_->bind(); CE();
-    size_t vb_size = sizeof(pcl::PointXYZI)*pc.size();
-    point_buffer_->allocate(vb_size); CE();
-    float * pointbuff =
-            static_cast<float *>(glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY));
-    for(int i = 0; i < pc.size(); i++) {
-        pointbuff[i*4] = pc[i].x;
-        pointbuff[i*4+1] = pc[i].y;
-        pointbuff[i*4+2] = pc[i].z;
-        pointbuff[i*4+3] = pc[i].intensity;
-    }
-    glUnmapBuffer(GL_ARRAY_BUFFER);
-    program_.enableAttributeArray(attr_vertex_); CE();
-    program_.enableAttributeArray(attr_intensity_); CE();
-    program_.setAttributeBuffer(attr_vertex_, GL_FLOAT, 0, 3, sizeof(float)*4); CE();
-    program_.setAttributeBuffer(attr_intensity_, GL_FLOAT, sizeof(float)*3, 1, sizeof(float)*4); CE();
-    point_buffer_->release(); CE();
-
-    //
-    // Label buffer setup
-    //
-
-    label_buffer_->create(); CE();
-    label_buffer_->bind(); CE();
-    label_buffer_->allocate(pc.size()*sizeof(int16_t));  CE();
-    int16_t * layerbuff =
-            static_cast<int16_t *>(glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY));
-    for(int i = 0; i < pc.labels_.size(); i++){
-        layerbuff[i] = pc.labels_[i];
-    }
-    glUnmapBuffer(GL_ARRAY_BUFFER);
-    program_.enableAttributeArray(attr_color_index_);CE();
-    glVertexAttribIPointer(attr_color_index_, 1, GL_SHORT, 0, 0);
-    label_buffer_->release(); CE();
 
     //
     // Set up textures
     //
-
     glGenTextures(1, &texture_id_); CE();
     glPointSize(5);
-    glBindVertexArray(0);
-    program_.release();
+
+
+    // Set ogl state for each cloud
+    std::map<int, PointCloud>::iterator iter;
+    for (iter = dm_->clouds_.begin(); iter != dm_->clouds_.end(); iter++) {
+        PointCloud & pc = iter->second;
+        int idx = iter->first;
+        cloudgldata_[idx].reset(new CloudGLData(&pc));
+    }
+
 }
 
 void GLWidget::paintGL() {
@@ -190,8 +193,7 @@ void GLWidget::paintGL() {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    program_.bind();CE();
-    glBindVertexArray(vao_);
+    program_.bind(); CE();
 
     glUniformMatrix4fv(uni_modelview_, 1, GL_FALSE,
                        camera_.modelviewMatrix().data());CE();
@@ -202,12 +204,18 @@ void GLWidget::paintGL() {
     glBindTexture(GL_TEXTURE_BUFFER, texture_id_); CE();
     glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, color_lookup_buffer_->bufferId()); CE();
 
-    glDrawArrays(GL_POINTS, 0, dm->clouds_[0].size()); CE();
-    glBindTexture(GL_TEXTURE_BUFFER, 0);CE();
+    // TODO(Rickert): Check for new clouds here
+    // TODO(Rickert): Cloud position in world space
 
-    glBindVertexArray(0);
+    // Draw all clouds
+    for(std::pair<const int, std::shared_ptr<CloudGLData> > pair: cloudgldata_) {
+        pair.second->draw();
+    }
+
+    glDrawArrays(GL_POINTS, 0, dm_->clouds_[0].size()); CE();
+    glBindTexture(GL_TEXTURE_BUFFER, 0); CE();
+
     program_.release();
-
 }
 
 void GLWidget::resizeGL(int width, int height) {
@@ -230,7 +238,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent * event) {
 }
 
 void GLWidget::mousePressEvent(QMouseEvent * event) {
-    mouse_drag_start = QVector2D(0.0f, 0.0f);
+    mouse_drag_start_ = QVector2D(0.0f, 0.0f);
 
     camera_.mouseDown(event->x(), event->y(), event->button());
 }
@@ -249,45 +257,45 @@ void GLWidget::wheelEvent(QWheelEvent * event) {
 }
 
 void GLWidget::keyPressEvent(QKeyEvent * event) {
-
-
     switch (event->key()) {
     case Qt::Key_Escape:
             QCoreApplication::instance()->quit();
             break;
     case Qt::Key_D:
     case Qt::Key_Right:
-            camera_.adjustPosition(camera_move_unit, 0, 0);
+            camera_.adjustPosition(camera_move_unit_, 0, 0);
             break;
     case Qt::Key_A:
     case Qt::Key_Left:
-            camera_.adjustPosition(-camera_move_unit, 0, 0);
+            camera_.adjustPosition(-camera_move_unit_, 0, 0);
             break;
     case Qt::Key_W:
     case Qt::Key_Up:
-            camera_.adjustPosition(0, 0, camera_move_unit);
+            camera_.adjustPosition(0, 0, camera_move_unit_);
             break;
     case Qt::Key_S:
     case Qt::Key_Down:
-            camera_.adjustPosition(0, 0, -camera_move_unit);
+            camera_.adjustPosition(0, 0, -camera_move_unit_);
             break;
     case Qt::Key_Q:
-            camera_.adjustPosition(0, +camera_move_unit, 0);
+            camera_.adjustPosition(0, +camera_move_unit_, 0);
             break;
     case Qt::Key_E:
-            camera_.adjustPosition(0, -camera_move_unit, 0);
+            camera_.adjustPosition(0, -camera_move_unit_, 0);
             break;
     case Qt::Key_R:
             if (event->modifiers() == Qt::ControlModifier)
                 camera_.setPosition(0, 0, 0);
             break;
     case Qt::Key_Plus:
-            if (point_render_size < 30)
-                point_render_size++;
+            if (point_render_size_ < 30)
+                point_render_size_++;
+            glPointSize(point_render_size_);
             break;
     case Qt::Key_Minus:
-            if ( point_render_size > 1 )
-                point_render_size--;
+            if ( point_render_size_ > 1 )
+                point_render_size_--;
+            glPointSize(point_render_size_);
             break;
     }
     updateGL();

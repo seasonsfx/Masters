@@ -155,6 +155,7 @@ void App::initApp() {
     model_.reset(new DataModel);
 
     // load cloud
+    // Perhaps this should be theaded for performance
     model_->addCloud("/home/rickert/trees.ptx");
 
     // make five labels

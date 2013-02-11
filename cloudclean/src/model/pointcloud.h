@@ -2,9 +2,19 @@
 #define MODEL_CPOINTCLOUD_H_
 
 #include <mutex>
+#include <QObject>
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
 
+
+class EventDispatcher : public QObject{
+    Q_OBJECT
+ public:
+    void updateProgress(int value);
+
+ signals:
+   void progress(int percentage);
+};
 
 enum class PointFlags : int8_t {
     selected = 0x001,
@@ -23,6 +33,7 @@ class PointCloud : public pcl::PointCloud<pcl::PointXYZI> {
     bool load_ptx(const char* filename, int subsample = 1);
 
  public:
+    std::shared_ptr<EventDispatcher> ed_;
     std::shared_ptr<std::mutex> pc_mutex;
     std::vector<int> cloud_to_grid_map_;
     int scan_width_;

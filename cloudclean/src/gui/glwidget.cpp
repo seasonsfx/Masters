@@ -4,7 +4,7 @@
 #include <cmath>
 #include <cstdlib>
 
-CloudGLData::CloudGLData(PointCloud * pc) {
+CloudGLData::CloudGLData(std::shared_ptr<PointCloud> pc) {
     // Assumption: cloud size does not change
     pc_ = pc;
     pc_->pc_mutex->lock();
@@ -205,12 +205,14 @@ void GLWidget::initializeGL() {
 
 
     // Set ogl state for each cloud
+    /*
     std::map<int, PointCloud>::iterator iter;
     for (iter = dm_->clouds_.begin(); iter != dm_->clouds_.end(); iter++) {
         PointCloud & pc = iter->second;
         int idx = iter->first;
         cloudgldata_[idx].reset(new CloudGLData(&pc));
     }
+    */
 
 }
 
@@ -220,12 +222,12 @@ void GLWidget::syncDataModel() {
 
     // Look for new clouds
     if(dm_->clouds_dirty_){
-        std::map<int, PointCloud>::iterator iter;
+        std::map<int, std::shared_ptr<PointCloud> >::iterator iter;
         for (iter = dm_->clouds_.begin(); iter != dm_->clouds_.end(); iter++) {
             int idx = iter->first;
-            PointCloud & pc = iter->second;
+            std::shared_ptr<PointCloud> pc = iter->second;
             //if(dm_->)
-                cloudgldata_[idx].reset(new CloudGLData(&pc));
+                cloudgldata_[idx].reset(new CloudGLData(pc));
             //}
         }
         qDebug() << "Clouds synced";
@@ -294,7 +296,6 @@ void GLWidget::paintGL() {
         pair.second->draw();
     }
 
-    glDrawArrays(GL_POINTS, 0, dm_->clouds_[0].size()); CE();
     glBindTexture(GL_TEXTURE_BUFFER, 0); CE();
 
     program_.release();

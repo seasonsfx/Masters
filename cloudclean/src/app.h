@@ -34,7 +34,7 @@ class App : public QApplication
         QString getProjectInvocation();
 
     private:
-        void initApp();
+        void initGUI();
         void printHelpMessage();
         void printVersionMessage();
         void printVersionTripletMessage();
@@ -54,6 +54,7 @@ class App : public QApplication
         std::shared_ptr<DataModel> model_;
         GLWidget * glwidget_;
         QStatusBar * statusbar_;
+        QProgressBar *progressbar;
 };
 
 #endif

@@ -10,14 +10,20 @@ DataModel::DataModel() {
 }
 
 int DataModel::addCloud() {
-    clouds_[++last_cloud_id_] = PointCloud();
+    clouds_[++last_cloud_id_].reset(new PointCloud());
     clouds_dirty_ = true;
     return last_cloud_id_;
 }
 
 int DataModel::addCloud(const char* filename) {
-    clouds_[++last_cloud_id_] = PointCloud();
-    clouds_[last_cloud_id_].load_ptx(filename);
+    clouds_[++last_cloud_id_].reset(new PointCloud());
+    clouds_[last_cloud_id_]->load_ptx(filename);
+    clouds_dirty_ = true;
+    return last_cloud_id_;
+}
+
+int DataModel::addCloud(std::shared_ptr<PointCloud> pc){
+    clouds_[++last_cloud_id_] = pc;
     clouds_dirty_ = true;
     return last_cloud_id_;
 }

@@ -4,7 +4,7 @@
 #include <exception>
 #include <stdexcept>
 #include <memory>
-#include <future>
+#include <thread>
 #include "app.h"
 #include "appinfo.h"
 
@@ -140,38 +140,35 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
         std::exit(0);
     }
     
-    initApp();
-}
-
-App::~App() {
-}
-
-App* App::INSTANCE() {
-    return _instance;
-}
-
-void App::initApp() {
-
-    // initialise model
+    // initialise data model
     model_.reset(new DataModel);
 
+    initGUI();
+
     // load a cloud
+    std::thread([&] () {
 
-    std::future<void> f = std::async(std::launch::async, [&model_] () {
         // Perhaps this should be theaded for performance
-        model_->addCloud("/home/rickert/trees.ptx");
 
+        std::shared_ptr<PointCloud> pc;
+        pc.reset(new PointCloud());
 
-        PointCloud & pc = model_->clouds_[0];
+        connect(pc->ed_.get(), SIGNAL(progress(int)), progressbar, SLOT(setValue(int)));
+        pc->load_ptx("/home/rickert/trees.ptx");
+        disconnect(pc->ed_.get(), SIGNAL(progress(int)), progressbar, SLOT(setValue(int)));
+
+        QMetaObject::invokeMethod(progressbar, "setRange", Q_ARG(int, 0), Q_ARG(int, 0));
+
+        model_->addCloud(pc);
 
         // make a selection
-        std::vector<PointFlags> & flags = pc.flags_;
+        std::vector<PointFlags> & flags = pc->flags_;
         for(int i = 0; i < flags.size()/5; i++){
             flags[i] = PointFlags::selected;
         }
 
         // label the cloud
-        std::vector<int16_t> & labels = pc.labels_;
+        std::vector<int16_t> & labels = pc->labels_;
         for(int i = 0; i < labels.size(); i++){
             labels[i] = i%5;
         }
@@ -184,8 +181,12 @@ void App::initApp() {
         // make five labels
         for(int i = 0; i < 5; i++)
             model_->genLabelId(i%3);
+
+        glwidget_->update();
+        QMetaObject::invokeMethod(progressbar, "setRange", Q_ARG(int, 0), Q_ARG(int, 100));
+        QMetaObject::invokeMethod(progressbar, "reset");
         qDebug() << "Loaded";
-    });
+    }).detach();
 
     qDebug() << "Hello";
     // So whats next?
@@ -204,11 +205,21 @@ void App::initApp() {
     //      check dirty bit on layer
     //
 
+}
+
+App::~App() {
+}
+
+App* App::INSTANCE() {
+    return _instance;
+}
+
+void App::initGUI() {
     // Set up gui
     mainwindow_.reset(new MainWindow);
     statusbar_ = mainwindow_->statusBar();
 
-    QProgressBar *progressbar = new QProgressBar();
+    progressbar = new QProgressBar();
     QLabel *size = new QLabel( tr("  999999kB  ") );
 
     size->setMinimumSize( size->sizeHint() );
@@ -217,7 +228,7 @@ void App::initApp() {
     size->setToolTip( tr("The memory used for the current document.") );
 
     progressbar->setTextVisible( false );
-    progressbar->setRange( 0, 0 );
+    progressbar->setRange( 0, 100 );
 
     statusbar_->addWidget( progressbar, 1 );
     statusbar_->addWidget( size );

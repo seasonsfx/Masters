@@ -10,13 +10,13 @@
 
 class CloudGLData{
  public:
-    CloudGLData(PointCloud *);
+    CloudGLData(std::shared_ptr<PointCloud> pc);
     ~CloudGLData();
     void sync();
     void draw();
 
  public:
-    PointCloud * pc_;
+    std::shared_ptr<PointCloud> pc_;
     GLuint vao_;
     std::shared_ptr<QGLBuffer> label_buffer_;
     std::shared_ptr<QGLBuffer> point_buffer_;

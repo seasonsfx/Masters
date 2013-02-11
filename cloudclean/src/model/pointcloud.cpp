@@ -20,12 +20,17 @@ inline bool isNaN(float val){
     return (val != val);
 }
 
+void EventDispatcher::updateProgress(int value){
+    emit progress(value);
+}
+
 PointCloud::PointCloud()
     : pcl::PointCloud<pcl::PointXYZI>() {
     cloud_dirty_ = true;
     labels_dirty_ = true;
     flags_dirty_ = true;
     pc_mutex.reset(new std::mutex());
+    ed_.reset(new EventDispatcher());
 }
 
 bool PointCloud::save_ptx(const char* filename){
@@ -86,6 +91,7 @@ bool PointCloud::save_ptx(const char* filename){
 
 bool PointCloud::load_ptx(const char* filename, int subsample) {
     pc_mutex->lock();
+    ed_->updateProgress(0);
 	assert(subsample%2 == 0 || subsample == 1);
 
     // Makes things faster apparently
@@ -170,7 +176,13 @@ bool PointCloud::load_ptx(const char* filename, int subsample) {
     int sample = 0;
     int row = 0, col = 0;
 
-    while(sample < width*height){
+    int line_count = width*height;
+    int update_interval = line_count/100;
+
+    while(sample < line_count){
+        if(sample % update_interval == 0)
+            ed_->updateProgress(100*sample/static_cast<float>(line_count));
+
         row = sample / width;
         col = sample % width;
 
@@ -197,6 +209,7 @@ bool PointCloud::load_ptx(const char* filename, int subsample) {
 
         i++;
 	}
+    ed_->updateProgress(100);
     pc_mutex->unlock();
 	return this;
 }

@@ -11,6 +11,7 @@ class DataModel {
     DataModel();
     int addCloud();
     int addCloud(const char* filename);
+    int addCloud(std::shared_ptr<PointCloud> pc);
     int addLayer();
     int addLayer(QString name, QColor color = QColor(255, 255, 255));
     int16_t genLabelId(int layer_id);
@@ -27,7 +28,7 @@ class DataModel {
 
     std::map<int, Layer> layers_; // a layer is a group of labels
     std::map<int, int> layer_lookup_table_; // layer associated with color
-    std::map<int, PointCloud> clouds_;
+    std::map<int, std::shared_ptr<PointCloud> > clouds_;
     std::map<int, std::vector<unsigned int> > selection_table_;
 };
 

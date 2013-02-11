@@ -25,9 +25,11 @@ PointCloud::PointCloud()
     cloud_dirty_ = true;
     labels_dirty_ = true;
     flags_dirty_ = true;
+    pc_mutex.reset(new std::mutex());
 }
 
 bool PointCloud::save_ptx(const char* filename){
+    pc_mutex->lock();
     std::ofstream ptx_file(filename);
     ptx_file << this->width << std::endl;
     ptx_file << this->height << std::endl;
@@ -78,10 +80,12 @@ bool PointCloud::save_ptx(const char* filename){
     }
 
     ptx_file.close();
+    pc_mutex->unlock();
     return true;
 }
 
 bool PointCloud::load_ptx(const char* filename, int subsample) {
+    pc_mutex->lock();
 	assert(subsample%2 == 0 || subsample == 1);
 
     // Makes things faster apparently
@@ -193,5 +197,6 @@ bool PointCloud::load_ptx(const char* filename, int subsample) {
 
         i++;
 	}
+    pc_mutex->unlock();
 	return this;
 }

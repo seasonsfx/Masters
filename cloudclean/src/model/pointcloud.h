@@ -1,6 +1,7 @@
 #ifndef MODEL_CPOINTCLOUD_H_
 #define MODEL_CPOINTCLOUD_H_
 
+#include <mutex>
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
 
@@ -22,6 +23,7 @@ class PointCloud : public pcl::PointCloud<pcl::PointXYZI> {
     bool load_ptx(const char* filename, int subsample = 1);
 
  public:
+    std::shared_ptr<std::mutex> pc_mutex;
     std::vector<int> cloud_to_grid_map_;
     int scan_width_;
     int scan_height_;
@@ -30,7 +32,6 @@ class PointCloud : public pcl::PointCloud<pcl::PointXYZI> {
     bool flags_dirty_;
     std::vector<int16_t> labels_;
     std::vector<PointFlags> flags_;
-
 
     // What needs to be in here?
     // Should normals be a default requirement

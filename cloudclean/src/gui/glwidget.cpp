@@ -7,6 +7,7 @@
 CloudGLData::CloudGLData(PointCloud * pc) {
     // Assumption: cloud size does not change
     pc_ = pc;
+    pc_->pc_mutex->lock();
 
     glGenVertexArrays(1, &vao_);
     glBindVertexArray(vao_);
@@ -32,7 +33,7 @@ CloudGLData::CloudGLData(PointCloud * pc) {
     label_buffer_->create(); CE();
     label_buffer_->bind(); CE();
     label_buffer_->allocate(pc->size()*sizeof(int16_t)); CE();
-    glEnableVertexAttribArray(2); CE();; CE();
+    glEnableVertexAttribArray(2); CE(); CE();
     glVertexAttribIPointer(2, 1, GL_SHORT, 0, 0);
     label_buffer_->release(); CE();
     //
@@ -44,10 +45,11 @@ CloudGLData::CloudGLData(PointCloud * pc) {
     size_t sb_size = sizeof(uint8_t)*pc->size();
     flag_buffer_->allocate(sb_size); CE();
     glEnableVertexAttribArray(3); CE();
-    glVertexAttribIPointer(3, 1, GL_SHORT, 0, 0); CE();
+    glVertexAttribIPointer(3, 1, GL_BYTE, 0, 0); CE();
     flag_buffer_->release(); CE();
 
     glBindVertexArray(0);
+    pc_->pc_mutex->unlock();
 }
 
 CloudGLData::~CloudGLData() {
@@ -55,12 +57,15 @@ CloudGLData::~CloudGLData() {
 }
 
 void CloudGLData::sync(){
+    if(!pc_->pc_mutex->try_lock())
+        return;
+
     if(pc_->cloud_dirty_){
         point_buffer_->bind(); CE();
         size_t vb_size = sizeof(pcl::PointXYZI)*pc_->size();
         point_buffer_->allocate(vb_size); CE();
         float * pointbuff =
-                static_cast<float *>(glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY));
+                static_cast<float *>(glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY)); CE();
         for(int i = 0; i < pc_->size(); i++) {
             pointbuff[i*4] = (*pc_)[i].x;
             pointbuff[i*4+1] = (*pc_)[i].y;
@@ -76,7 +81,7 @@ void CloudGLData::sync(){
         label_buffer_->bind(); CE();
         label_buffer_->allocate(pc_->size()*sizeof(int16_t)); CE();
         int16_t * layerbuff =
-                static_cast<int16_t *>(glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY));
+                static_cast<int16_t *>(glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY)); CE();
         for(int i = 0; i < pc_->labels_.size(); i++){
             layerbuff[i] = pc_->labels_[i];
         }
@@ -88,7 +93,7 @@ void CloudGLData::sync(){
     if(pc_->flags_dirty_){
         flag_buffer_->bind(); CE();
         uint8_t * flag_buffer =
-                static_cast<uint8_t *>(glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY));
+                static_cast<uint8_t *>(glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY)); CE();
         for(int i = 0; i < pc_->size(); i++) {
             flag_buffer[i] = static_cast<uint8_t>(pc_->flags_[i]);
         }
@@ -97,6 +102,7 @@ void CloudGLData::sync(){
         flag_buffer_->release(); CE();
         qDebug() << "Synced flags";
     }
+    pc_->pc_mutex->unlock();
 }
 
 void CloudGLData::draw(){
@@ -175,7 +181,7 @@ void GLWidget::initializeGL() {
     camera_.setAspect(width() / static_cast<float>(height()));
 
     //
-    // Selectin color
+    // Selection color
     //
     program_.bind(); CE();
     glUniform4fv(uni_select_color_, 1, selection_color_); CE();
@@ -187,31 +193,8 @@ void GLWidget::initializeGL() {
     color_lookup_buffer_.reset(new QGLBuffer(QGLBuffer::VertexBuffer)); CE();
     color_lookup_buffer_->create(); CE();
     color_lookup_buffer_->bind(); CE();
-    assert(dm_->last_label_id_ != -1);
-    size_t label_buff_size = (dm_->last_label_id_+1)*sizeof(float)*4;
-    color_lookup_buffer_->allocate(label_buff_size); CE();
-    float * color_lookup_buffer =
-            static_cast<float *>(glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY));
-    for(int i = 0; i <= dm_->last_label_id_; i++) {
-        bool exists = dm_->layer_lookup_table_.find(i)
-                != dm_->layer_lookup_table_.end();
-
-        QColor color;
-        if(exists) {
-            int layer_id = dm_->layer_lookup_table_[i];
-            color = dm_->layers_[layer_id].color_;
-        }
-        else {
-            qWarning() << "Warning, no label associated with this layer";
-            color = QColor(255, 0, 0, 255);
-        }
-        color_lookup_buffer[i*4] = color.red()/255.0f;
-        color_lookup_buffer[i*4+1] = color.green()/255.0f;
-        color_lookup_buffer[i*4+2] = color.blue()/255.0f;
-        color_lookup_buffer[i*4+3] = color.alpha()/255.0f;
-    }
-    glUnmapBuffer(GL_ARRAY_BUFFER);
-    dm_->layer_lookup_table_dirty_ = false;
+    // allocate space for one color
+    color_lookup_buffer_->allocate(sizeof(float)*4); CE();
     color_lookup_buffer_->release(); CE();
 
     //
@@ -232,23 +215,54 @@ void GLWidget::initializeGL() {
 }
 
 void GLWidget::syncDataModel() {
-    // Look for new clouds
+    // What about layers dirty
+    // Is it the same as lookup table dirty?
 
-    // Check for new layers
-    if(dm_->layers_dirty_){
+    // Look for new clouds
+    if(dm_->clouds_dirty_){
         std::map<int, PointCloud>::iterator iter;
         for (iter = dm_->clouds_.begin(); iter != dm_->clouds_.end(); iter++) {
             int idx = iter->first;
-            //if(dm_->)
             PointCloud & pc = iter->second;
-
-            cloudgldata_[idx].reset(new CloudGLData(&pc));
+            //if(dm_->)
+                cloudgldata_[idx].reset(new CloudGLData(&pc));
+            //}
         }
+        qDebug() << "Clouds synced";
+        dm_->clouds_dirty_ = false;
     }
 
     // Check for label changes
     if(dm_->layer_lookup_table_dirty_){
+        color_lookup_buffer_->bind(); CE();
+        //assert(dm_->last_label_id_ != -1);
+        size_t label_buff_size = (dm_->last_label_id_+1)*sizeof(float)*4;
+        color_lookup_buffer_->allocate(label_buff_size); CE();
 
+        float * color_lookup_buffer =
+                static_cast<float *>(glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY)); CE();
+        for(int i = 0; i <= dm_->last_label_id_; i++) {
+            bool exists = dm_->layer_lookup_table_.find(i)
+                    != dm_->layer_lookup_table_.end();
+
+            QColor color;
+            if(exists) {
+                int layer_id = dm_->layer_lookup_table_[i];
+                color = dm_->layers_[layer_id].color_;
+            }
+            else {
+                qWarning() << "Warning, no label associated with this layer";
+                color = QColor(255, 0, 0, 255);
+            }
+            color_lookup_buffer[i*4] = color.red()/255.0f;
+            color_lookup_buffer[i*4+1] = color.green()/255.0f;
+            color_lookup_buffer[i*4+2] = color.blue()/255.0f;
+            color_lookup_buffer[i*4+3] = color.alpha()/255.0f;
+        }
+        glUnmapBuffer(GL_ARRAY_BUFFER);
+        dm_->layer_lookup_table_dirty_ = false;
+        color_lookup_buffer_->release(); CE();
+        qDebug() << "Color lookup buffer synced";
     }
 }
 
@@ -272,6 +286,8 @@ void GLWidget::paintGL() {
 
     // TODO(Rickert): Check for new clouds here
     // TODO(Rickert): Cloud position in world space
+
+    syncDataModel();
 
     // Draw all clouds
     for(std::pair<const int, std::shared_ptr<CloudGLData> > pair: cloudgldata_) {

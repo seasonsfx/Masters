@@ -5,6 +5,8 @@
 #include <QtCore>
 #include <QtGui>
 #include <QApplication>
+#include <QProgressBar>
+#include <QStatusBar>
 #include <boost/shared_ptr.hpp>
 #include "gui/mainwindow.h"
 #include "gui/glwidget.h"
@@ -50,7 +52,8 @@ class App : public QApplication
         QString _invocation;
         std::shared_ptr<MainWindow> mainwindow_;
         std::shared_ptr<DataModel> model_;
-        std::shared_ptr<GLWidget> glwidget_;
+        GLWidget * glwidget_;
+        QStatusBar * statusbar_;
 };
 
 #endif

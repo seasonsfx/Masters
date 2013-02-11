@@ -4,6 +4,7 @@
 #include <exception>
 #include <stdexcept>
 #include <memory>
+#include <future>
 #include "app.h"
 #include "appinfo.h"
 
@@ -154,34 +155,39 @@ void App::initApp() {
     // initialise model
     model_.reset(new DataModel);
 
-    // load cloud
-    // Perhaps this should be theaded for performance
-    model_->addCloud("/home/rickert/trees.ptx");
+    // load a cloud
+
+    std::future<void> f = std::async(std::launch::async, [&model_] () {
+        // Perhaps this should be theaded for performance
+        model_->addCloud("/home/rickert/trees.ptx");
 
 
-    PointCloud & pc = model_->clouds_[0];
+        PointCloud & pc = model_->clouds_[0];
 
-    // make a selection
-    std::vector<PointFlags> & flags = pc.flags_;
-    for(int i = 0; i < flags.size()/2; i++){
-        flags[i] = PointFlags::selected;
-    }
+        // make a selection
+        std::vector<PointFlags> & flags = pc.flags_;
+        for(int i = 0; i < flags.size()/5; i++){
+            flags[i] = PointFlags::selected;
+        }
 
-    // label the cloud
-    std::vector<int16_t> & labels = pc.labels_;
-    for(int i = 0; i < labels.size(); i++){
-        labels[i] = i%5;
-    }
+        // label the cloud
+        std::vector<int16_t> & labels = pc.labels_;
+        for(int i = 0; i < labels.size(); i++){
+            labels[i] = i%5;
+        }
 
-    // create layers with colors
-    model_->addLayer("Test1", QColor(255, 0, 0));
-    model_->addLayer("Test2", QColor(0, 255, 0));
-    model_->addLayer("Test3", QColor(0, 0, 255));
+        // create layers with colors
+        model_->addLayer("Test1", QColor(255, 0, 0));
+        model_->addLayer("Test2", QColor(0, 255, 0));
+        model_->addLayer("Test3", QColor(0, 0, 255));
 
-    // make five labels
-    for(int i = 0; i < 5; i++)
-        model_->genLabelId(i%3);
+        // make five labels
+        for(int i = 0; i < 5; i++)
+            model_->genLabelId(i%3);
+        qDebug() << "Loaded";
+    });
 
+    qDebug() << "Hello";
     // So whats next?
     // So before drawing i need to set up a buffer for each cloud
     // There needs to be a dirt bit on the cloud i think
@@ -200,12 +206,31 @@ void App::initApp() {
 
     // Set up gui
     mainwindow_.reset(new MainWindow);
-    glwidget_.reset(new GLWidget(model_, mainwindow_.get()));
+    statusbar_ = mainwindow_->statusBar();
+
+    QProgressBar *progressbar = new QProgressBar();
+    QLabel *size = new QLabel( tr("  999999kB  ") );
+
+    size->setMinimumSize( size->sizeHint() );
+    size->setAlignment( Qt::AlignRight | Qt::AlignVCenter );
+    size->setText( tr("%1kB ").arg(0) );
+    size->setToolTip( tr("The memory used for the current document.") );
+
+    progressbar->setTextVisible( false );
+    progressbar->setRange( 0, 0 );
+
+    statusbar_->addWidget( progressbar, 1 );
+    statusbar_->addWidget( size );
+
+    statusbar_->showMessage( tr("Ready"), 2000 );
+
+
+    glwidget_ = new GLWidget(model_, mainwindow_.get());
     QGLFormat base_format = glwidget_->format();
     base_format.setVersion(3, 3);
     base_format.setProfile(QGLFormat::CompatibilityProfile);
     glwidget_->setFormat(base_format);
-    mainwindow_->setCentralWidget(glwidget_.get());
+    mainwindow_->setCentralWidget(glwidget_);
     mainwindow_->setVisible(true);
 }
 

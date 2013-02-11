@@ -158,12 +158,17 @@ void App::initApp() {
     // Perhaps this should be theaded for performance
     model_->addCloud("/home/rickert/trees.ptx");
 
-    // make five labels
-    for(int i = 0; i < 5; i++)
-        model_->genLabelId();
+
+    PointCloud & pc = model_->clouds_[0];
+
+    // make a selection
+    std::vector<PointFlags> & flags = pc.flags_;
+    for(int i = 0; i < flags.size()/2; i++){
+        flags[i] = PointFlags::selected;
+    }
 
     // label the cloud
-    std::vector<int16_t> & labels = model_->clouds_[0].labels_;
+    std::vector<int16_t> & labels = pc.labels_;
     for(int i = 0; i < labels.size(); i++){
         labels[i] = i%5;
     }
@@ -173,12 +178,9 @@ void App::initApp() {
     model_->addLayer("Test2", QColor(0, 255, 0));
     model_->addLayer("Test3", QColor(0, 0, 255));
 
-    // map the labels to layers/colors
-    model_->layer_lookup_table_[0] = 2;
-    model_->layer_lookup_table_[1] = 2;
-    model_->layer_lookup_table_[2] = 1;
-    model_->layer_lookup_table_[3] = 0;
-    model_->layer_lookup_table_[4] = 0;
+    // make five labels
+    for(int i = 0; i < 5; i++)
+        model_->genLabelId(i%3);
 
     // So whats next?
     // So before drawing i need to set up a buffer for each cloud

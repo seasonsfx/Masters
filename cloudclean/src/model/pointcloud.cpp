@@ -22,6 +22,9 @@ inline bool isNaN(float val){
 
 PointCloud::PointCloud()
     : pcl::PointCloud<pcl::PointXYZI>() {
+    cloud_dirty_ = true;
+    labels_dirty_ = true;
+    flags_dirty_ = true;
 }
 
 bool PointCloud::save_ptx(const char* filename){
@@ -102,6 +105,7 @@ bool PointCloud::load_ptx(const char* filename, int subsample) {
 
     this->points.resize (this->width * this->height);
     labels_.resize(this->width * this->height, 0);
+    flags_.resize(this->width * this->height);
 
     // original dimensions saved
     this->scan_width_ = width;

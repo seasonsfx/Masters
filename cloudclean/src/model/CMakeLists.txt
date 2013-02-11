@@ -6,20 +6,8 @@ include_directories(
 
 message("PCL INCLUDE" ${PCL_INCLUDE_DIRS})
 
-set(model_HEADERS
-    datamodel.h
-    layer.h
-    pointcloud.h
-    selection.cpp
-)
+FILE (GLOB model_SOURCE *.cpp *.cxx *.cc *.C *.c *.h *.hpp)
 
-set(model_SOURCE
-    datamodel.cpp
-    layer.cpp
-    pointcloud.cpp
-    selection.cpp
-)
-
-add_library(cloudclean_model STATIC ${model_HEADERS} ${model_SOURCE})
+add_library(cloudclean_model STATIC ${model_SOURCE})
 target_link_libraries(cloudclean_model ${QT_LIBRARIES})
 #qt5_use_modules(cloudclean_model Core)

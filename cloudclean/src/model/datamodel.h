@@ -4,7 +4,6 @@
 #include <map>
 #include <vector>
 #include "model/layer.h"
-#include "model/selection.h"
 #include "model/pointcloud.h"
 
 class DataModel {
@@ -14,18 +13,22 @@ class DataModel {
     int addCloud(const char* filename);
     int addLayer();
     int addLayer(QString name, QColor color = QColor(255, 255, 255));
-    int16_t genLabelId();
+    int16_t genLabelId(int layer_id);
     // save everything as a flat cloud?
 
  public:
     int last_cloud_id_;
     int last_layer_id_;
     int16_t last_label_id_;
-    std::map<int, Layer> layers_;
-    std::map<int, int> layer_lookup_table_; // layer associated with color
-    Selection selection_;
-    std::map<int, PointCloud> clouds_;
+
     bool layer_lookup_table_dirty_;
+    bool layers_dirty_;
+    bool clouds_dirty_;
+
+    std::map<int, Layer> layers_; // a layer is a group of labels
+    std::map<int, int> layer_lookup_table_; // layer associated with color
+    std::map<int, PointCloud> clouds_;
+    std::map<int, std::vector<unsigned int> > selection_table_;
 };
 
 #endif  // MODEL_CDATAMODEL_H_

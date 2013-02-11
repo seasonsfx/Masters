@@ -4,12 +4,16 @@
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
 
-/*
-enum PointAttributes{
-    visible = 0x001,
-    selected = 0x002
+
+enum class PointFlags : int8_t {
+    selected = 0x001,
+    reserved1 = 0x002,
+    reserved2 = 0x006,
+    reserved3 = 0x008,
+    reserved4 = 0x010,
+    reserved5 = 0x020,
+    reserved6 = 0x040,
 };
-*/
 
 class PointCloud : public pcl::PointCloud<pcl::PointXYZI> {
  public:
@@ -21,9 +25,11 @@ class PointCloud : public pcl::PointCloud<pcl::PointXYZI> {
     std::vector<int> cloud_to_grid_map_;
     int scan_width_;
     int scan_height_;
-
+    bool cloud_dirty_;
+    bool labels_dirty_;
+    bool flags_dirty_;
     std::vector<int16_t> labels_;
-    // std::vector<int8_t> attribute_flags;
+    std::vector<PointFlags> flags_;
 
 
     // What needs to be in here?

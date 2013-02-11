@@ -12,6 +12,7 @@ class CloudGLData{
  public:
     CloudGLData(PointCloud *);
     ~CloudGLData();
+    void sync();
     void draw();
 
  public:
@@ -19,6 +20,7 @@ class CloudGLData{
     GLuint vao_;
     std::shared_ptr<QGLBuffer> label_buffer_;
     std::shared_ptr<QGLBuffer> point_buffer_;
+    std::shared_ptr<QGLBuffer> flag_buffer_;
 };
 
 class GLWidget : public QGLWidget
@@ -36,6 +38,7 @@ public:
 
 protected:
     void initializeGL();
+    void syncDataModel();
     void paintGL();
     void resizeGL(int width, int height);
 
@@ -76,6 +79,9 @@ private:
     int uni_sampler_;
     int uni_projection_;
     int uni_modelview_;
+    int uni_select_color_;
+
+    float selection_color_[4];
 
     float camera_move_unit_;
     QVector2D mouse_drag_start_;

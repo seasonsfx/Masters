@@ -193,8 +193,11 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
 
 
         // Write 2d image
-        QImage image(pc->width, pc->height, QImage::Format_RGB32);
-        QRgb value;
+        QImage image(pc->width, pc->height, QImage::Format_Indexed8);
+
+        for(int i = 0; i < 255; i++){
+            image.setColor(i, qRgb(i, i, i));
+        }
 
         // find max intensity
         float max_i = 0;
@@ -222,8 +225,7 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
                     intensity = 0;
                 }
 
-                value = qRgb(intensity, intensity, intensity);
-                image.setPixel(w, pc->height-h-1, value);
+                image.setPixel(w, pc->height-h-1, intensity);
 
                 // Scan reads from bottom to top, left to right
                 // cooridinates are swapped, then vertically upside down

@@ -90,6 +90,7 @@ else()
     SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -Wno-unknown-pragmas")
     SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -fstack-protector-all")
     SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -fPIC")
+    SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -pipe") # makes things faster
 
     #SET(CMAKE_C_COMPILER "clang")
     #SET(CMAKE_CXX_COMPILER "clang++")

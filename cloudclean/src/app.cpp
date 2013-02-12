@@ -12,6 +12,15 @@
 #include <QLabel>
 #include <QGridLayout>
 
+#ifdef _WIN32
+#   define INFINITY (DBL_MAX+DBL_MAX)
+#   define NAN (INFINITY-INFINITY)
+#endif
+
+inline bool isNaN(float val){
+    return (val != val);
+}
+
 namespace {
     bool matches_option(const QString& givenoption, const QString& expectedoption, int mindashes=1, int maxdashes=2) {
         int dashes = 0;
@@ -153,11 +162,11 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
         std::shared_ptr<PointCloud> pc;
         pc.reset(new PointCloud());
 
-        connect(pc->ed_.get(), SIGNAL(progress(int)), progressbar, SLOT(setValue(int)));
+        connect(pc->ed_.get(), SIGNAL(progress(int)), progressbar_, SLOT(setValue(int)));
         pc->load_ptx("/home/rickert/trees.ptx");
-        disconnect(pc->ed_.get(), SIGNAL(progress(int)), progressbar, SLOT(setValue(int)));
+        disconnect(pc->ed_.get(), SIGNAL(progress(int)), progressbar_, SLOT(setValue(int)));
 
-        QMetaObject::invokeMethod(progressbar, "setRange", Q_ARG(int, 0), Q_ARG(int, 0));
+        QMetaObject::invokeMethod(progressbar_, "setRange", Q_ARG(int, 0), Q_ARG(int, 0));
 
         model_->addCloud(pc);
 
@@ -182,9 +191,52 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
         for(int i = 0; i < 5; i++)
             model_->genLabelId(i%3);
 
+
+        // Write 2d image
+        QImage image(pc->width, pc->height, QImage::Format_RGB32);
+        QRgb value;
+
+        // find max intensity
+        float max_i = 0;
+
+        for(int i = 0; i < pc->height * pc->width; i++){
+            pcl::PointXYZI & point = pc->at(i);
+            if(point.intensity != point.intensity)
+                continue;
+            if(point.intensity > max_i)
+                max_i = point.intensity;
+        }
+
+        for(int w = 0; w < pc->width; w++){
+            for(int h = 0; h < pc->height; h++){
+                //int idx = h*pc->width + w;
+                int idx = w*pc->height + h;
+                pcl::PointXYZI & point = pc->at(idx);
+                //float dist = point.x*point.x + point.z*point.y + point.z*point.z;
+                int intensity;
+                if(!isNaN(point.intensity)){
+                    intensity = 255*(point.intensity/max_i);
+                    //qDebug() << point.intensity << "/" << max_i << "=" << intensity;
+                }
+                else {
+                    intensity = 0;
+                }
+
+                value = qRgb(intensity, intensity, intensity);
+                image.setPixel(w, pc->height-h-1, value);
+
+                // Scan reads from bottom to top, left to right
+                // cooridinates are swapped, then vertically upside down
+                // scan(x, y) = image((h-1)-y, x)
+                // image(x, y) = scan((h-1)-y, x)
+            }
+        }
+
+        QMetaObject::invokeMethod(this, "loadImage", Q_ARG(QImage, image));
+
         glwidget_->update();
-        QMetaObject::invokeMethod(progressbar, "setRange", Q_ARG(int, 0), Q_ARG(int, 100));
-        QMetaObject::invokeMethod(progressbar, "reset");
+        QMetaObject::invokeMethod(progressbar_, "setRange", Q_ARG(int, 0), Q_ARG(int, 100));
+        QMetaObject::invokeMethod(progressbar_, "reset");
         qDebug() << "Loaded";
     }).detach();
 
@@ -207,6 +259,12 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
 
 }
 
+void App::loadImage(QImage image){
+    imageLabel->setPixmap(QPixmap::fromImage(image));
+    imageLabel->adjustSize();
+    //imageLabel->updateGeometry();
+}
+
 App::~App() {
 }
 
@@ -216,10 +274,10 @@ App* App::INSTANCE() {
 
 void App::initGUI() {
     // Set up gui
-    mainwindow_.reset(new MainWindow);
+    mainwindow_.reset(new MainWindow());
     statusbar_ = mainwindow_->statusBar();
 
-    progressbar = new QProgressBar();
+    progressbar_ = new QProgressBar();
     QLabel *size = new QLabel( tr("  999999kB  ") );
 
     size->setMinimumSize( size->sizeHint() );
@@ -227,21 +285,34 @@ void App::initGUI() {
     size->setText( tr("%1kB ").arg(0) );
     size->setToolTip( tr("The memory used for the current document.") );
 
-    progressbar->setTextVisible( false );
-    progressbar->setRange( 0, 100 );
-
-    statusbar_->addWidget( progressbar, 1 );
+    progressbar_->setTextVisible( false );
+    progressbar_->setRange( 0, 100 );
+    statusbar_->addWidget( progressbar_, 1 );
     statusbar_->addWidget( size );
-
     statusbar_->showMessage( tr("Ready"), 2000 );
 
+    tabs_ = new QTabWidget(mainwindow_.get());
 
-    glwidget_ = new GLWidget(model_, mainwindow_.get());
+    glwidget_ = new GLWidget(model_, tabs_);
     QGLFormat base_format = glwidget_->format();
     base_format.setVersion(3, 3);
     base_format.setProfile(QGLFormat::CompatibilityProfile);
     glwidget_->setFormat(base_format);
-    mainwindow_->setCentralWidget(glwidget_);
+
+
+    imageLabel = new QLabel;
+    imageLabel->setBackgroundRole(QPalette::Base);
+    imageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+    imageLabel->setScaledContents(true);
+
+    QScrollArea * scrollArea = new QScrollArea;
+    scrollArea->setBackgroundRole(QPalette::Dark);
+    scrollArea->setWidget(imageLabel);
+
+
+    tabs_->addTab(glwidget_, "3D View");
+    tabs_->addTab(scrollArea, "2D View");
+    mainwindow_->setCentralWidget(tabs_);
     mainwindow_->setVisible(true);
 }
 

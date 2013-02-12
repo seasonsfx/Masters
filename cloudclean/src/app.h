@@ -7,6 +7,7 @@
 #include <QApplication>
 #include <QProgressBar>
 #include <QStatusBar>
+#include <QTabWidget>
 #include <boost/shared_ptr.hpp>
 #include "gui/mainwindow.h"
 #include "gui/glwidget.h"
@@ -33,6 +34,9 @@ class App : public QApplication
         QString getProjectCopyrightYears();
         QString getProjectInvocation();
 
+    public slots:
+        void loadImage(QImage image);
+
     private:
         void initGUI();
         void printHelpMessage();
@@ -52,9 +56,12 @@ class App : public QApplication
         QString _invocation;
         std::shared_ptr<MainWindow> mainwindow_;
         std::shared_ptr<DataModel> model_;
+
         GLWidget * glwidget_;
         QStatusBar * statusbar_;
-        QProgressBar *progressbar;
+        QProgressBar *progressbar_;
+        QTabWidget * tabs_;
+        QLabel * imageLabel;
 };
 
 #endif

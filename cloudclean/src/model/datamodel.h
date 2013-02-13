@@ -6,7 +6,8 @@
 #include "model/layer.h"
 #include "model/pointcloud.h"
 
-class DataModel {
+class DataModel: public QObject {
+    Q_OBJECT
  public:
     DataModel();
     int addCloud();
@@ -17,14 +18,15 @@ class DataModel {
     int16_t genLabelId(int layer_id);
     // save everything as a flat cloud?
 
+ signals:
+    void layerUpdate(int id);
+    void cloudUpdate(int id);
+    void lookupTableUpdate();
+
  public:
     int last_cloud_id_;
     int last_layer_id_;
     int16_t last_label_id_;
-
-    bool layer_lookup_table_dirty_;
-    bool layers_dirty_;
-    bool clouds_dirty_;
 
     std::map<int, Layer> layers_; // a layer is a group of labels
     std::map<int, int> layer_lookup_table_; // layer associated with label

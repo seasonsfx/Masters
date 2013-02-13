@@ -26,9 +26,6 @@ void EventDispatcher::updateProgress(int value){
 
 PointCloud::PointCloud()
     : pcl::PointCloud<pcl::PointXYZI>() {
-    cloud_dirty_ = true;
-    labels_dirty_ = true;
-    flags_dirty_ = true;
     pc_mutex.reset(new std::mutex());
     ed_.reset(new EventDispatcher());
 }
@@ -145,33 +142,8 @@ bool PointCloud::load_ptx(const char* filename, int subsample) {
 
 	ptx_file >> std::ws;
 
-    ///////////// Start processing points ////////////////
-    // std::string line;
 	float x, y, z, intensity;
 
-    // Determine format
-    /*
-    getline( ptx_file, line);
-    int tokens = 1;
-    for(int i = 0; i< line.length(); i++)
-        if(line[i] == ' ') tokens++;
-    assert(tokens == 4);
-
-    // Read first line to out sniff format
-    std::stringstream ss(std::stringstream::in | std::stringstream::out);
-    ss << line;
-    ss >> x >> y >> z >> intensity;
-
-    if((x == 0) && (y == 0) && (z == 0)
-            && ( fabs(intensity - 0.5f) < 0.0001 )) {
-                    x = y = z = intensity = NAN;
-    }
-
-    this->points[0].x = x;
-    this->points[0].y = y;
-    this->points[0].z = z;
-    this->points[0].intensity = intensity;
-*/
     unsigned int i = 0;
     int sample = 0;
     int row = 0, col = 0;

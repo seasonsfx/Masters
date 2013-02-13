@@ -8,12 +8,17 @@
 #include "gui/camera.h"
 #include "model/datamodel.h"
 
-class CloudGLData{
+class CloudGLData : public QObject{
+    Q_OBJECT
  public:
     CloudGLData(std::shared_ptr<PointCloud> pc);
     ~CloudGLData();
-    void sync();
     void draw();
+
+ public slots:
+    void syncCloud();
+    void syncLabels();
+    void syncFlags();
 
  public:
     std::shared_ptr<PointCloud> pc_;
@@ -66,7 +71,11 @@ protected:
    void keyPressEvent(QKeyEvent * event);
    bool eventFilter(QObject *object, QEvent *event);
 
-private:
+ public slots:
+   void reloadCloud(int id);
+   void reloadColorLookupBuffer();
+
+ private:
     std::shared_ptr<DataModel> dm_;
 
     Camera camera_;
@@ -88,11 +97,6 @@ private:
     float point_render_size_;
 
     GLuint texture_id_;
-
-    // So basically here we need qt datastructures that repreent the model state
-    // On every draw the data should the model should be checked for modifications
-    // Should modifications happen these structure need to be updated
-
 };
 
 #endif

@@ -154,6 +154,11 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
 
     initGUI();
 
+    // link up signals to model
+    connect(model_.get(), SIGNAL(layerUpdate(int)), glwidget_, SLOT(reloadColorLookupBuffer()));
+    connect(model_.get(), SIGNAL(cloudUpdate(int)), glwidget_, SLOT(reloadCloud(int)));
+    connect(model_.get(), SIGNAL(lookupTableUpdate()), glwidget_, SLOT(reloadColorLookupBuffer()));
+
     // load a cloud
     std::thread([&] () {
 
@@ -193,51 +198,6 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
 
         QMetaObject::invokeMethod(flatview_, "setCloud", Q_ARG(int, cloud_id));
 
-/*
-        // Write 2d image
-        QImage image(pc->width, pc->height, QImage::Format_Indexed8);
-
-        for(int i = 0; i < 255; i++){
-            image.setColor(i, qRgb(i, i, i));
-        }
-
-        // find max intensity
-        float max_i = 0;
-
-        for(int i = 0; i < pc->height * pc->width; i++){
-            pcl::PointXYZI & point = pc->at(i);
-            if(point.intensity != point.intensity)
-                continue;
-            if(point.intensity > max_i)
-                max_i = point.intensity;
-        }
-
-        for(int w = 0; w < pc->width; w++){
-            for(int h = 0; h < pc->height; h++){
-                //int idx = h*pc->width + w;
-                int idx = w*pc->height + h;
-                pcl::PointXYZI & point = pc->at(idx);
-                //float dist = point.x*point.x + point.z*point.y + point.z*point.z;
-                int intensity;
-                if(!isNaN(point.intensity)){
-                    intensity = 255*(point.intensity/max_i);
-                    //qDebug() << point.intensity << "/" << max_i << "=" << intensity;
-                }
-                else {
-                    intensity = 0;
-                }
-
-                image.setPixel(w, pc->height-h-1, intensity);
-
-                // Scan reads from bottom to top, left to right
-                // cooridinates are swapped, then vertically upside down
-                // scan(x, y) = image((h-1)-y, x)
-                // image(x, y) = scan((h-1)-y, x)
-            }
-        }
-
-        QMetaObject::invokeMethod(this, "loadImage", Q_ARG(QImage, image));
-*/
         glwidget_->update();
         QMetaObject::invokeMethod(progressbar_, "setRange", Q_ARG(int, 0), Q_ARG(int, 100));
         QMetaObject::invokeMethod(progressbar_, "reset");

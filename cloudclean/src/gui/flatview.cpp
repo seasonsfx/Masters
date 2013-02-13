@@ -13,11 +13,11 @@ void FlatView::paintEvent(QPaintEvent*) {
 }
 
 inline QPoint FlatView::imageToScanCoord(int x, int y){
-    return QPoint(img_.height()-1+y, x);
+    return QPoint(x, img_.height()-1-y);
 }
 
 inline QPoint FlatView::scanToImageCoord(int x, int y){
-    return QPoint(pc_->height-1+y, x);
+    return QPoint(x, img_.height()-1-y);
 }
 
 void FlatView::updateImage(){
@@ -41,11 +41,6 @@ void FlatView::updateImage(){
             else
                 intensity = 255*(point.intensity/max_i);
 
-            //QPoint p = scanToImageCoord(x, y);
-            //img_.setPixel(p.x(), p.y(), intensity);
-            //QPoint p2 = imageToScanCoord(p.x(), p.y());
-            //img_.setPixel(p2.x(), p2.y(), intensity);
-
             QColor col(intensity, intensity, intensity);
             QColor sel(0, 0, 255);
 
@@ -58,7 +53,6 @@ void FlatView::updateImage(){
             col.setGreen(col.green()/255.0f*label_col.green());
             col.setBlue(col.blue()/255.0f*label_col.blue());
 
-
             // Selection
             float mix = 0.5;
             float mix2 = 1.0 - mix;
@@ -69,22 +63,41 @@ void FlatView::updateImage(){
                 col.setBlue(col.blue()*mix + sel.blue()*mix2);
             }
 
-            img_.setPixel(x, pc_->height-y-1, col.rgb());
+            QPoint p = scanToImageCoord(x, y);
+            img_.setPixel(p.x(), p.y(), col.rgb());
         }
     }
 }
 
-void FlatView::setCloud(int id){
-    qDebug("set cloud");
-    // reset image
-    // reset size
-    // if -1 then reset
+void FlatView::setCloud(int id) {
+    qDebug("set 2d cloudview");
+
+    if(pc_.get() != NULL){
+        disconnect(pc_->ed_.get(), SIGNAL(flagUpdate()), this,
+                   SLOT(syncFlags()));
+        disconnect(pc_->ed_.get(), SIGNAL(labelUpdate()), this,
+                   SLOT(syncLabels()));
+    }
     pc_ = dm_->clouds_[id];
+    connect(pc_->ed_.get(), SIGNAL(flagUpdate()), this, SLOT(syncFlags()));
+    connect(pc_->ed_.get(), SIGNAL(labelUpdate()), this, SLOT(syncLabels()));
+
     img_ = QImage(pc_->width, pc_->height, QImage::Format_RGB32);
-
     updateImage();
-
     this->resize(pc_->width, pc_->height);
     update();
+}
 
+void FlatView::syncLabels(){
+    qDebug("sync 2d labels");
+    updateImage();
+    this->resize(pc_->width, pc_->height);
+    update();
+}
+
+void FlatView::syncFlags(){
+    qDebug("sync 2d flags");
+    updateImage();
+    this->resize(pc_->width, pc_->height);
+    update();
 }

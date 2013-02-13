@@ -20,6 +20,8 @@ class FlatView : public QWidget {
  public slots:
     void updateImage();
     void setCloud(int id);
+    void syncLabels();
+    void syncFlags();
 
  private:
    QImage img_;

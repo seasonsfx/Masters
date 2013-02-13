@@ -4,10 +4,10 @@
 #include <cmath>
 #include <cstdlib>
 
-CloudGLData::CloudGLData(std::shared_ptr<PointCloud> pc) {
+CloudGLData::CloudGLData(std::shared_ptr<PointCloud> pc) { 
     // Assumption: cloud size does not change
     pc_ = pc;
-    pc_->pc_mutex->lock();
+    //pc_->pc_mutex->lock();
 
     glGenVertexArrays(1, &vao_);
     glBindVertexArray(vao_);
@@ -47,62 +47,65 @@ CloudGLData::CloudGLData(std::shared_ptr<PointCloud> pc) {
     glEnableVertexAttribArray(3); CE();
     glVertexAttribIPointer(3, 1, GL_BYTE, 0, 0); CE();
     flag_buffer_->release(); CE();
-
     glBindVertexArray(0);
-    pc_->pc_mutex->unlock();
+    //pc_->pc_mutex->unlock();
+
+    QMetaObject::invokeMethod(this, "syncCloud");
+    QMetaObject::invokeMethod(this, "syncFlags");
+    QMetaObject::invokeMethod(this, "syncLabels");
+
+    connect(pc_->ed_.get(), SIGNAL(flagUpdate()), this, SLOT(syncFlags()));
+    connect(pc_->ed_.get(), SIGNAL(labelUpdate()), this, SLOT(syncLabels()));
 }
 
 CloudGLData::~CloudGLData() {
+    disconnect(pc_->ed_.get(), SIGNAL(flagUpdate()), this, SLOT(syncFlags()));
+    disconnect(pc_->ed_.get(), SIGNAL(labelUpdate()), this, SLOT(syncLabels()));
     glDeleteVertexArrays(1, &vao_);
 }
 
-void CloudGLData::sync(){
-    if(!pc_->pc_mutex->try_lock())
-        return;
+void CloudGLData::syncCloud(){
+    point_buffer_->bind(); CE();
+    size_t vb_size = sizeof(pcl::PointXYZI)*pc_->size();
+    point_buffer_->allocate(vb_size); CE();
+    float * pointbuff =
+            static_cast<float *>(glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY)); CE();
+    for(int i = 0; i < pc_->size(); i++) {
+        pointbuff[i*4] = (*pc_)[i].x;
+        pointbuff[i*4+1] = (*pc_)[i].y;
+        pointbuff[i*4+2] = (*pc_)[i].z;
+        pointbuff[i*4+3] = (*pc_)[i].intensity;
+    }
+    glUnmapBuffer(GL_ARRAY_BUFFER);
+    point_buffer_->release(); CE();
+    qDebug() << "Synced cloud";
+}
 
-    if(pc_->cloud_dirty_){
-        point_buffer_->bind(); CE();
-        size_t vb_size = sizeof(pcl::PointXYZI)*pc_->size();
-        point_buffer_->allocate(vb_size); CE();
-        float * pointbuff =
-                static_cast<float *>(glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY)); CE();
-        for(int i = 0; i < pc_->size(); i++) {
-            pointbuff[i*4] = (*pc_)[i].x;
-            pointbuff[i*4+1] = (*pc_)[i].y;
-            pointbuff[i*4+2] = (*pc_)[i].z;
-            pointbuff[i*4+3] = (*pc_)[i].intensity;
-        }
-        glUnmapBuffer(GL_ARRAY_BUFFER);
-        point_buffer_->release(); CE();
-        pc_->cloud_dirty_ = false;
-        qDebug() << "Synced cloud";
+void CloudGLData::syncLabels(){
+    label_buffer_->bind(); CE();
+    label_buffer_->allocate(pc_->size()*sizeof(int16_t)); CE();
+    int16_t * layerbuff =
+            static_cast<int16_t *>(glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY)); CE();
+    for(int i = 0; i < pc_->labels_.size(); i++){
+        layerbuff[i] = pc_->labels_[i];
     }
-    if(pc_->labels_dirty_){
-        label_buffer_->bind(); CE();
-        label_buffer_->allocate(pc_->size()*sizeof(int16_t)); CE();
-        int16_t * layerbuff =
-                static_cast<int16_t *>(glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY)); CE();
-        for(int i = 0; i < pc_->labels_.size(); i++){
-            layerbuff[i] = pc_->labels_[i];
-        }
-        glUnmapBuffer(GL_ARRAY_BUFFER);
-        label_buffer_->release(); CE();
-        pc_->labels_dirty_ = false;
-        qDebug() << "Synced labels";
+    glUnmapBuffer(GL_ARRAY_BUFFER);
+    label_buffer_->release(); CE();
+    qDebug() << "Synced labels";
+    //QMetaObject::invokeMethod(this, "updateGL");
+}
+
+void CloudGLData::syncFlags(){
+    flag_buffer_->bind(); CE();
+    uint8_t * flag_buffer =
+            static_cast<uint8_t *>(glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY)); CE();
+    for(int i = 0; i < pc_->size(); i++) {
+        flag_buffer[i] = static_cast<uint8_t>(pc_->flags_[i]);
     }
-    if(pc_->flags_dirty_){
-        flag_buffer_->bind(); CE();
-        uint8_t * flag_buffer =
-                static_cast<uint8_t *>(glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY)); CE();
-        for(int i = 0; i < pc_->size(); i++) {
-            flag_buffer[i] = static_cast<uint8_t>(pc_->flags_[i]);
-        }
-        glUnmapBuffer(GL_ARRAY_BUFFER);
-        pc_->flags_dirty_ = false;
-        flag_buffer_->release(); CE();
-        qDebug() << "Synced flags";
-    }
-    pc_->pc_mutex->unlock();
+    glUnmapBuffer(GL_ARRAY_BUFFER);
+    flag_buffer_->release(); CE();
+    qDebug() << "Synced flags";
+    //QMetaObject::invokeMethod(this, "updateGL");
 }
 
 void CloudGLData::draw(){
@@ -110,7 +113,6 @@ void CloudGLData::draw(){
     // - shader is loaded
     // - buffertexure is loaded
     glBindVertexArray(vao_);
-    sync();
     glDrawArrays(GL_POINTS, 0, pc_->size()); CE();
     glBindVertexArray(vao_);
 }
@@ -163,9 +165,8 @@ void GLWidget::initializeGL() {
         qWarning() << "Exiting...";
         abort();
     }
-
     //
-    // Resolve uniforms (Does the program need to be bound for this?)
+    // Resolve uniforms
     //
     program_.bind(); CE();
     uni_sampler_ = program_.uniformLocation("sampler"); RC(uni_sampler_);
@@ -173,100 +174,71 @@ void GLWidget::initializeGL() {
     uni_modelview_ = program_.uniformLocation("modelview"); RC(uni_modelview_);
     uni_select_color_ = program_.uniformLocation("select_color"); RC(uni_select_color_);
     program_.release();
-
     //
     // Set camera
     //
     camera_.setDepthRange(0.1f, 100.0f);
     camera_.setAspect(width() / static_cast<float>(height()));
-
     //
     // Selection color
     //
     program_.bind(); CE();
     glUniform4fv(uni_select_color_, 1, selection_color_); CE();
     program_.release(); CE();
-
     //
     // Set up color lookup buffer
     //
     color_lookup_buffer_.reset(new QGLBuffer(QGLBuffer::VertexBuffer)); CE();
     color_lookup_buffer_->create(); CE();
     color_lookup_buffer_->bind(); CE();
-    // allocate space for one color
     color_lookup_buffer_->allocate(sizeof(float)*4); CE();
     color_lookup_buffer_->release(); CE();
-
     //
-    // Set up textures
+    // Set up textures & point size
     //
     glGenTextures(1, &texture_id_); CE();
     glPointSize(point_render_size_);
-
-
-    // Set ogl state for each cloud
-    /*
-    std::map<int, PointCloud>::iterator iter;
-    for (iter = dm_->clouds_.begin(); iter != dm_->clouds_.end(); iter++) {
-        PointCloud & pc = iter->second;
-        int idx = iter->first;
-        cloudgldata_[idx].reset(new CloudGLData(&pc));
-    }
-    */
-
 }
 
-void GLWidget::syncDataModel() {
-    // What about layers dirty
-    // Is it the same as lookup table dirty?
-
-    // Look for new clouds
-    if(dm_->clouds_dirty_){
-        std::map<int, std::shared_ptr<PointCloud> >::iterator iter;
-        for (iter = dm_->clouds_.begin(); iter != dm_->clouds_.end(); iter++) {
-            int idx = iter->first;
-            std::shared_ptr<PointCloud> pc = iter->second;
-            //if(dm_->)
-                cloudgldata_[idx].reset(new CloudGLData(pc));
-            //}
-        }
-        qDebug() << "Clouds synced";
-        dm_->clouds_dirty_ = false;
-    }
-
-    // Check for label changes
-    if(dm_->layer_lookup_table_dirty_){
-        color_lookup_buffer_->bind(); CE();
-        //assert(dm_->last_label_id_ != -1);
-        size_t label_buff_size = (dm_->last_label_id_+1)*sizeof(float)*4;
-        color_lookup_buffer_->allocate(label_buff_size); CE();
-
-        float * color_lookup_buffer =
-                static_cast<float *>(glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY)); CE();
-        for(int i = 0; i <= dm_->last_label_id_; i++) {
-            bool exists = dm_->layer_lookup_table_.find(i)
-                    != dm_->layer_lookup_table_.end();
-
-            QColor color;
-            if(exists) {
-                int layer_id = dm_->layer_lookup_table_[i];
-                color = dm_->layers_[layer_id].color_;
-            }
-            else {
-                qWarning() << "Warning, no label associated with this layer";
-                color = QColor(255, 0, 0, 255);
-            }
-            color_lookup_buffer[i*4] = color.red()/255.0f;
-            color_lookup_buffer[i*4+1] = color.green()/255.0f;
-            color_lookup_buffer[i*4+2] = color.blue()/255.0f;
-            color_lookup_buffer[i*4+3] = color.alpha()/255.0f;
-        }
-        glUnmapBuffer(GL_ARRAY_BUFFER);
-        dm_->layer_lookup_table_dirty_ = false;
-        color_lookup_buffer_->release(); CE();
-        qDebug() << "Color lookup buffer synced";
-    }
+void GLWidget::reloadCloud(int id){
+    cloudgldata_[id].reset(new CloudGLData(dm_->clouds_[id]));
+    qDebug() << "Cloud " << id << "loaded";
 }
+
+void GLWidget::reloadColorLookupBuffer(){
+    //
+    // Resize the buffer, then go through the lookup table and get colours
+    // from layers
+    //
+    color_lookup_buffer_->bind(); CE();
+    size_t label_buff_size = (dm_->last_label_id_+1)*sizeof(float)*4;
+    color_lookup_buffer_->allocate(label_buff_size); CE();
+
+    float * color_lookup_buffer =
+            static_cast<float *>(glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY)); CE();
+
+    for(int i = 0; i <= dm_->last_label_id_; i++) {
+        bool exists = dm_->layer_lookup_table_.find(i)
+                != dm_->layer_lookup_table_.end();
+        QColor color;
+        if(exists) {
+            int layer_id = dm_->layer_lookup_table_[i];
+            color = dm_->layers_[layer_id].color_;
+        }
+        else {
+            qWarning() << "Warning! No label associated with this layer";
+            color = QColor(255, 0, 0, 255);
+        }
+        color_lookup_buffer[i*4] = color.red()/255.0f;
+        color_lookup_buffer[i*4+1] = color.green()/255.0f;
+        color_lookup_buffer[i*4+2] = color.blue()/255.0f;
+        color_lookup_buffer[i*4+3] = color.alpha()/255.0f;
+    }
+    glUnmapBuffer(GL_ARRAY_BUFFER);
+    color_lookup_buffer_->release(); CE();
+    qDebug() << "Color lookup buffer synced";
+}
+
 
 void GLWidget::paintGL() {
 
@@ -288,8 +260,6 @@ void GLWidget::paintGL() {
 
     // TODO(Rickert): Check for new clouds here
     // TODO(Rickert): Cloud position in world space
-
-    syncDataModel();
 
     // Draw all clouds
     for(std::pair<const int, std::shared_ptr<CloudGLData> > pair: cloudgldata_) {

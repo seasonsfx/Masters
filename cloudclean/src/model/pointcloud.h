@@ -14,6 +14,8 @@ class EventDispatcher : public QObject{
 
  signals:
    void progress(int percentage);
+   void flagUpdate();
+   void labelUpdate();
 };
 
 enum class PointFlags : int8_t {
@@ -38,9 +40,8 @@ class PointCloud : public pcl::PointCloud<pcl::PointXYZI> {
     std::vector<int> cloud_to_grid_map_;
     int scan_width_;
     int scan_height_;
-    bool cloud_dirty_;
-    bool labels_dirty_;
-    bool flags_dirty_;
+    //bool labels_dirty_;
+    //bool flags_dirty_;
     std::vector<int16_t> labels_;
     std::vector<PointFlags> flags_;
 

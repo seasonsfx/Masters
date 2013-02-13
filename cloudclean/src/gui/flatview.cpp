@@ -1,11 +1,15 @@
 #include "flatview.h"
+#include <QDebug>
 
-FlatView::FlatView(std::shared_ptr<DataModel> dm): p_(this) {
+FlatView::FlatView(std::shared_ptr<DataModel> dm) {
     dm_ = dm;
 }
 
 void FlatView::paintEvent(QPaintEvent*) {
-    p_.drawImage(0, 0, img_);
+    QPainter p(this);
+    if(!img_.isNull()){
+        p.drawImage(0, 0, img_);
+    }
 }
 
 inline QPoint FlatView::imageToScanCoord(int x, int y){
@@ -16,13 +20,7 @@ inline QPoint FlatView::scanToImageCoord(int x, int y){
     return QPoint(pc_->height-1+y, x);
 }
 
-void FlatView::setCloud(int id){
-    // reset image
-    // reset size
-    // if -1 then reset
-    pc_ = dm_->clouds_[id];
-    img_ = QImage(pc_->width, pc_->height, QImage::Format_RGB32);
-
+void FlatView::updateImage(){
     float max_i = 0;
     for(int i = 0; i < pc_->height * pc_->width; i++){
         pcl::PointXYZI & point = pc_->at(i);
@@ -32,19 +30,61 @@ void FlatView::setCloud(int id){
             max_i = point.intensity;
     }
 
-    for(int w = 0; w < pc_->width; w++){
-        for(int h = 0; h < pc_->height; h++){
-            int idx = w*pc_->height + h;
+    for(int x = 0; x < pc_->width; x++){
+        for(int y = 0; y < pc_->height; y++){
+            int idx = x*pc_->height + y;
+
             pcl::PointXYZI & point = pc_->at(idx);
             int intensity;
             if(point.intensity != point.intensity)
-                intensity = 255*(point.intensity/max_i);
-            else
                 intensity = 0;
-            img_.setPixel(w, pc_->height-h-1, intensity);
+            else
+                intensity = 255*(point.intensity/max_i);
+
+            //QPoint p = scanToImageCoord(x, y);
+            //img_.setPixel(p.x(), p.y(), intensity);
+            //QPoint p2 = imageToScanCoord(p.x(), p.y());
+            //img_.setPixel(p2.x(), p2.y(), intensity);
+
+            QColor col(intensity, intensity, intensity);
+            QColor sel(0, 0, 255);
+
+            int label_id = pc_->labels_[idx];
+            int layer_id = dm_->layer_lookup_table_[label_id];
+            QColor & label_col = dm_->layers_[layer_id].color_;
+
+            // Layer colors
+            col.setRed(col.red()/255.0f*label_col.red());
+            col.setGreen(col.green()/255.0f*label_col.green());
+            col.setBlue(col.blue()/255.0f*label_col.blue());
+
+
+            // Selection
+            float mix = 0.5;
+            float mix2 = 1.0 - mix;
+            if(uint8_t(pc_->flags_[idx]) & uint8_t(PointFlags::selected)
+                    && point.intensity == point.intensity){
+                col.setRed(col.red()*mix + sel.red()*mix2);
+                col.setGreen(col.green()*mix + sel.green()*mix2);
+                col.setBlue(col.blue()*mix + sel.blue()*mix2);
+            }
+
+            img_.setPixel(x, pc_->height-y-1, col.rgb());
         }
     }
+}
 
-    //
+void FlatView::setCloud(int id){
+    qDebug("set cloud");
+    // reset image
+    // reset size
+    // if -1 then reset
+    pc_ = dm_->clouds_[id];
+    img_ = QImage(pc_->width, pc_->height, QImage::Format_RGB32);
+
+    updateImage();
+
+    this->resize(pc_->width, pc_->height);
+    update();
 
 }

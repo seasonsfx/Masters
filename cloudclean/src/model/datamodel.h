@@ -27,7 +27,7 @@ class DataModel {
     bool clouds_dirty_;
 
     std::map<int, Layer> layers_; // a layer is a group of labels
-    std::map<int, int> layer_lookup_table_; // layer associated with color
+    std::map<int, int> layer_lookup_table_; // layer associated with label
     std::map<int, std::shared_ptr<PointCloud> > clouds_;
     std::map<int, std::vector<unsigned int> > selection_table_;
 };

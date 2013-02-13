@@ -168,7 +168,7 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
 
         QMetaObject::invokeMethod(progressbar_, "setRange", Q_ARG(int, 0), Q_ARG(int, 0));
 
-        model_->addCloud(pc);
+        int cloud_id = model_->addCloud(pc);
 
         // make a selection
         std::vector<PointFlags> & flags = pc->flags_;
@@ -191,7 +191,9 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
         for(int i = 0; i < 5; i++)
             model_->genLabelId(i%3);
 
+        QMetaObject::invokeMethod(flatview_, "setCloud", Q_ARG(int, cloud_id));
 
+/*
         // Write 2d image
         QImage image(pc->width, pc->height, QImage::Format_Indexed8);
 
@@ -235,7 +237,7 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
         }
 
         QMetaObject::invokeMethod(this, "loadImage", Q_ARG(QImage, image));
-
+*/
         glwidget_->update();
         QMetaObject::invokeMethod(progressbar_, "setRange", Q_ARG(int, 0), Q_ARG(int, 100));
         QMetaObject::invokeMethod(progressbar_, "reset");
@@ -261,11 +263,11 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
 
 }
 
-void App::loadImage(QImage image){
+/*void App::loadImage(QImage image){
     imageLabel->setPixmap(QPixmap::fromImage(image));
     imageLabel->adjustSize();
     //imageLabel->updateGeometry();
-}
+}*/
 
 App::~App() {
 }
@@ -302,14 +304,17 @@ void App::initGUI() {
     glwidget_->setFormat(base_format);
 
 
-    imageLabel = new QLabel;
-    imageLabel->setBackgroundRole(QPalette::Base);
-    imageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-    imageLabel->setScaledContents(true);
+    flatview_ = new FlatView(model_);
+    flatview_->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+    //imageLabel = new QLabel;
+    //imageLabel->setBackgroundRole(QPalette::Base);
+    //imageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+    //imageLabel->setScaledContents(true);
 
     QScrollArea * scrollArea = new QScrollArea;
     scrollArea->setBackgroundRole(QPalette::Dark);
-    scrollArea->setWidget(imageLabel);
+    //scrollArea->setWidget(imageLabel);
+    scrollArea->setWidget(flatview_);
 
 
     tabs_->addTab(glwidget_, "3D View");

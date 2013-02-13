@@ -12,6 +12,7 @@
 #include "gui/mainwindow.h"
 #include "gui/glwidget.h"
 #include "model/datamodel.h"
+#include "gui/flatview.h"
 
 class App : public QApplication
 {
@@ -35,7 +36,7 @@ class App : public QApplication
         QString getProjectInvocation();
 
     public slots:
-        void loadImage(QImage image);
+        //void loadImage(QImage image);
 
     private:
         void initGUI();
@@ -61,7 +62,7 @@ class App : public QApplication
         QStatusBar * statusbar_;
         QProgressBar *progressbar_;
         QTabWidget * tabs_;
-        QLabel * imageLabel;
+        FlatView * flatview_;
 };
 
 #endif

@@ -11,7 +11,8 @@
 #include <boost/shared_ptr.hpp>
 #include "gui/mainwindow.h"
 #include "gui/glwidget.h"
-#include "model/datamodel.h"
+#include "model/layerlist.h"
+#include "model/cloudlist.h"
 #include "gui/flatview.h"
 
 class App : public QApplication
@@ -56,7 +57,8 @@ class App : public QApplication
         static App* _instance;
         QString _invocation;
         std::shared_ptr<MainWindow> mainwindow_;
-        std::shared_ptr<DataModel> model_;
+        std::shared_ptr<CloudList> cl_;
+        std::shared_ptr<LayerList> ll_;
 
         GLWidget * glwidget_;
         QStatusBar * statusbar_;

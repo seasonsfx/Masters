@@ -3,5 +3,4 @@
 Layer::Layer() {
     name_ = "New Layer";
     color_ = QColor(255, 255, 255, 255);
-    is_visible_ = true;
 }

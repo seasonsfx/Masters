@@ -148,16 +148,17 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
     if ( done ) {
         std::exit(0);
     }
-    
+
     // initialise data model
-    model_.reset(new DataModel);
+    cl_.reset(new CloudList());
+    ll_.reset(new LayerList());
 
     initGUI();
 
     // link up signals to model
-    connect(model_.get(), SIGNAL(layerUpdate(int)), glwidget_, SLOT(reloadColorLookupBuffer()));
-    connect(model_.get(), SIGNAL(cloudUpdate(int)), glwidget_, SLOT(reloadCloud(int)));
-    connect(model_.get(), SIGNAL(lookupTableUpdate()), glwidget_, SLOT(reloadColorLookupBuffer()));
+    connect(cl_.get(), SIGNAL(cloudUpdate(int)), glwidget_, SLOT(reloadCloud(int)));
+    connect(ll_.get(), SIGNAL(layerUpdate(int)), glwidget_, SLOT(reloadColorLookupBuffer()));
+    connect(ll_.get(), SIGNAL(lookupTableUpdate()), glwidget_, SLOT(reloadColorLookupBuffer()));
 
     // load a cloud
     std::thread([&] () {
@@ -173,7 +174,7 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
 
         QMetaObject::invokeMethod(progressbar_, "setRange", Q_ARG(int, 0), Q_ARG(int, 0));
 
-        int cloud_id = model_->addCloud(pc);
+        cl_->addCloud(pc);
 
         // make a selection
         std::vector<PointFlags> & flags = pc->flags_;
@@ -188,15 +189,15 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
         }
 
         // create layers with colors
-        model_->addLayer("Test1", QColor(255, 0, 0));
-        model_->addLayer("Test2", QColor(0, 255, 0));
-        model_->addLayer("Test3", QColor(0, 0, 255));
+        ll_->addLayer("Test1", QColor(255, 0, 0));
+        ll_->addLayer("Test2", QColor(0, 255, 0));
+        ll_->addLayer("Test3", QColor(0, 0, 255));
 
         // make five labels
         for(int i = 0; i < 5; i++)
-            model_->genLabelId(i%3);
+            ll_->genLabelId(i%3);
 
-        QMetaObject::invokeMethod(flatview_, "setCloud", Q_ARG(int, cloud_id));
+        QMetaObject::invokeMethod(flatview_, "setCloud", Q_ARG(int, sp));
 
         glwidget_->update();
         QMetaObject::invokeMethod(progressbar_, "setRange", Q_ARG(int, 0), Q_ARG(int, 100));
@@ -257,14 +258,14 @@ void App::initGUI() {
 
     tabs_ = new QTabWidget(mainwindow_.get());
 
-    glwidget_ = new GLWidget(model_, tabs_);
+    glwidget_ = new GLWidget(cl_, ll_, tabs_);
     QGLFormat base_format = glwidget_->format();
     base_format.setVersion(3, 3);
     base_format.setProfile(QGLFormat::CompatibilityProfile);
     glwidget_->setFormat(base_format);
 
 
-    flatview_ = new FlatView(model_);
+    flatview_ = new FlatView(cl_, ll_);
     flatview_->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
     //imageLabel = new QLabel;
     //imageLabel->setBackgroundRole(QPalette::Base);

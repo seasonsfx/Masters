@@ -6,7 +6,8 @@
 #include <QGLBuffer>
 #include <QGLShaderProgram>
 #include "gui/camera.h"
-#include "model/datamodel.h"
+#include "model/cloudlist.h"
+#include "model/layerlist.h"
 
 class CloudGLData : public QObject{
     Q_OBJECT
@@ -33,7 +34,7 @@ class GLWidget : public QGLWidget
     Q_OBJECT
 
 public:
-    GLWidget(std::shared_ptr<DataModel> & dm_, QWidget *parent = 0);
+    GLWidget(std::shared_ptr<CloudList> &cl, std::shared_ptr<LayerList> &ll, QWidget *parent = 0);
     ~GLWidget();
 
     QSize minimumSizeHint() const;
@@ -76,7 +77,8 @@ protected:
    void reloadColorLookupBuffer();
 
  private:
-    std::shared_ptr<DataModel> dm_;
+    std::shared_ptr<CloudList> cl_;
+    std::shared_ptr<LayerList> ll_;
 
     Camera camera_;
 

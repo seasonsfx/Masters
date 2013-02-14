@@ -117,7 +117,8 @@ void CloudGLData::draw(){
     glBindVertexArray(vao_);
 }
 
-GLWidget::GLWidget(std::shared_ptr<DataModel> & dm, QWidget *parent)
+GLWidget::GLWidget(std::shared_ptr<CloudList> &cl,
+                   std::shared_ptr<LayerList> &ll, QWidget *parent)
     : QGLWidget(QGLFormat(QGL::SampleBuffers), parent) {
     setFocusPolicy(Qt::StrongFocus);
     camera_move_unit_ = 0.4;
@@ -128,7 +129,8 @@ GLWidget::GLWidget(std::shared_ptr<DataModel> & dm, QWidget *parent)
     selection_color_[2] = 1.0f;
     selection_color_[3] = 1.0f;
 
-    this->dm_ = dm;
+    cl_ = cl;
+    ll_ = ll;
     setMouseTracking(true);
 }
 
@@ -201,7 +203,7 @@ void GLWidget::initializeGL() {
 }
 
 void GLWidget::reloadCloud(int id){
-    cloudgldata_[id].reset(new CloudGLData(dm_->clouds_[id]));
+    cloudgldata_[id].reset(new CloudGLData(cl_->clouds_[id]));
     qDebug() << "Cloud " << id << "loaded";
 }
 
@@ -211,19 +213,19 @@ void GLWidget::reloadColorLookupBuffer(){
     // from layers
     //
     color_lookup_buffer_->bind(); CE();
-    size_t label_buff_size = (dm_->last_label_id_+1)*sizeof(float)*4;
+    size_t label_buff_size = (ll_->last_label_id_+1)*sizeof(float)*4;
     color_lookup_buffer_->allocate(label_buff_size); CE();
 
     float * color_lookup_buffer =
             static_cast<float *>(glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY)); CE();
 
-    for(int i = 0; i <= dm_->last_label_id_; i++) {
-        bool exists = dm_->layer_lookup_table_.find(i)
-                != dm_->layer_lookup_table_.end();
+    for(int i = 0; i <= ll_->last_label_id_; i++) {
+        bool exists = ll_->layer_lookup_table_.find(i)
+                != ll_->layer_lookup_table_.end();
         QColor color;
         if(exists) {
-            int layer_id = dm_->layer_lookup_table_[i];
-            color = dm_->layers_[layer_id].color_;
+            int layer_id = ll_->layer_lookup_table_[i];
+            color = ll_->layers_[layer_id].color_;
         }
         else {
             qWarning() << "Warning! No label associated with this layer";

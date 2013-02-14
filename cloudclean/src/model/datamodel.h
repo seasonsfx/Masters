@@ -16,7 +16,6 @@ class DataModel: public QObject {
     int addLayer();
     int addLayer(QString name, QColor color = QColor(255, 255, 255));
     int16_t genLabelId(int layer_id);
-    // save everything as a flat cloud?
 
  signals:
     void layerUpdate(int id);
@@ -30,8 +29,8 @@ class DataModel: public QObject {
 
     std::map<int, Layer> layers_; // a layer is a group of labels
     std::map<int, int> layer_lookup_table_; // layer associated with label
+
     std::map<int, std::shared_ptr<PointCloud> > clouds_;
-    std::map<int, std::vector<unsigned int> > selection_table_;
 };
 
 #endif  // MODEL_CDATAMODEL_H_

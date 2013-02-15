@@ -36,9 +36,6 @@ class App : public QApplication
         QString getProjectCopyrightYears();
         QString getProjectInvocation();
 
-    public slots:
-        //void loadImage(QImage image);
-
     private:
         void initGUI();
         void printHelpMessage();

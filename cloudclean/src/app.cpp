@@ -155,13 +155,16 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
 
     initGUI();
 
+    qRegisterMetaType<std::shared_ptr<PointCloud> >("std::shared_ptr<PointCloud>");
+    qRegisterMetaType<std::shared_ptr<Layer> >("std::shared_ptr<Layer>");
     // link up signals to model
-    connect(cl_.get(), SIGNAL(cloudUpdate(int)), glwidget_, SLOT(reloadCloud(int)));
-    connect(ll_.get(), SIGNAL(layerUpdate(int)), glwidget_, SLOT(reloadColorLookupBuffer()));
+    connect(cl_.get(), SIGNAL(cloudUpdate(std::shared_ptr<PointCloud>)), glwidget_, SLOT(reloadCloud(std::shared_ptr<PointCloud>)));
+    connect(ll_.get(), SIGNAL(layerUpdate(std::shared_ptr<Layer>)), glwidget_, SLOT(reloadColorLookupBuffer()));
     connect(ll_.get(), SIGNAL(lookupTableUpdate()), glwidget_, SLOT(reloadColorLookupBuffer()));
 
+
     // load a cloud
-    std::thread([&] () {
+    std::function<void (const char *)> loadcloud = [&] (const char * fname) {
 
         // Perhaps this should be theaded for performance
 
@@ -169,7 +172,7 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
         pc.reset(new PointCloud());
 
         connect(pc->ed_.get(), SIGNAL(progress(int)), progressbar_, SLOT(setValue(int)));
-        pc->load_ptx("/home/rickert/trees.ptx");
+        pc->load_ptx(fname);
         disconnect(pc->ed_.get(), SIGNAL(progress(int)), progressbar_, SLOT(setValue(int)));
 
         QMetaObject::invokeMethod(progressbar_, "setRange", Q_ARG(int, 0), Q_ARG(int, 0));
@@ -189,46 +192,27 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
         }
 
         // create layers with colors
-        ll_->addLayer("Test1", QColor(255, 0, 0));
-        ll_->addLayer("Test2", QColor(0, 255, 0));
-        ll_->addLayer("Test3", QColor(0, 0, 255));
+        std::shared_ptr<Layer> layers[3];
+        layers[0] = ll_->addLayer("Test1", QColor(255, 0, 0));
+        layers[1] = ll_->addLayer("Test2", QColor(0, 255, 0));
+        layers[2] = ll_->addLayer("Test3", QColor(0, 0, 255));
 
         // make five labels
         for(int i = 0; i < 5; i++)
-            ll_->genLabelId(i%3);
+            ll_->genLabelId(layers[i%3]);
 
-        QMetaObject::invokeMethod(flatview_, "setCloud", Q_ARG(int, sp));
+        qRegisterMetaType<std::shared_ptr<PointCloud> >("std::shared_ptr<PointCloud>");
+        QMetaObject::invokeMethod(flatview_, "setCloud", Q_ARG(std::shared_ptr<PointCloud>, pc));
 
         glwidget_->update();
         QMetaObject::invokeMethod(progressbar_, "setRange", Q_ARG(int, 0), Q_ARG(int, 100));
         QMetaObject::invokeMethod(progressbar_, "reset");
         qDebug() << "Loaded";
-    }).detach();
+    };
 
-    qDebug() << "Hello";
-    // So whats next?
-    // So before drawing i need to set up a buffer for each cloud
-    // There needs to be a dirt bit on the cloud i think
-    // There needs to be a dirt bit for each layer?
-    // Either that or each layer nees to be copied on draw
-    // So drawing will happen for each cloud
-    // The should be a map with each cloud's buffer
-    // update color buffer
-    // for(cloud in clouds){
-    //      if(cloud = dirty)
-    //            reallocate cloud buffer
-    //      allocate and draw layer via mapping
-    //      or
-    //      check dirty bit on layer
-    //
-
+    std::thread(loadcloud, "/home/rickert/trees.ptx").detach();
+    std::thread(loadcloud, "/home/rickert/trees.ptx").detach();
 }
-
-/*void App::loadImage(QImage image){
-    imageLabel->setPixmap(QPixmap::fromImage(image));
-    imageLabel->adjustSize();
-    //imageLabel->updateGeometry();
-}*/
 
 App::~App() {
 }
@@ -277,6 +261,25 @@ void App::initGUI() {
     //scrollArea->setWidget(imageLabel);
     scrollArea->setWidget(flatview_);
 
+
+    QDockWidget * dw = new QDockWidget(mainwindow_.get());
+    QTableView * tv = new QTableView(dw);
+    tv->resize(200, 700);
+    tv->setModel(cl_.get());
+    dw->setWidget(tv);
+    dw->setAllowedAreas(Qt::LeftDockWidgetArea
+                                | Qt::RightDockWidgetArea);
+    mainwindow_->addDockWidget(Qt::RightDockWidgetArea, dw);
+
+
+    QDockWidget * dw2 = new QDockWidget(mainwindow_.get());
+    QTableView * tv2 = new QTableView(dw);
+    tv2->resize(200, 700);
+    tv2->setModel(ll_.get());
+    dw2->setWidget(tv2);
+    dw2->setAllowedAreas(Qt::LeftDockWidgetArea
+                                | Qt::RightDockWidgetArea);
+    mainwindow_->addDockWidget(Qt::RightDockWidgetArea, dw2);
 
     tabs_->addTab(glwidget_, "3D View");
     tabs_->addTab(scrollArea, "2D View");

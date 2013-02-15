@@ -49,8 +49,9 @@ void FlatView::updateImage(){
             QColor sel(0, 0, 255);
 
             int label_id = pc->labels_[idx];
-            int layer_id = ll_->layer_lookup_table_[label_id];
-            QColor & label_col = ll_->layers_[layer_id].color_;
+            std::shared_ptr<Layer> layer =
+                    ll_->layer_lookup_table_[label_id].lock();
+            QColor & label_col = layer->color_;
 
             // Layer colors
             col.setRed(col.red()/255.0f*label_col.red());
@@ -73,7 +74,7 @@ void FlatView::updateImage(){
     }
 }
 
-void FlatView::setCloud(std::shared_ptr<PointCloud> pc) {
+void FlatView::setCloud(std::shared_ptr<PointCloud> new_pc) {
     qDebug("set 2d cloudview");
 
     if(!pc_.expired()){
@@ -83,7 +84,8 @@ void FlatView::setCloud(std::shared_ptr<PointCloud> pc) {
         disconnect(old_pc->ed_.get(), SIGNAL(labelUpdate()), this,
                    SLOT(syncLabels()));
     }
-    pc_ = pc;
+    pc_ = new_pc; //cl_->clouds_[id];
+    std::shared_ptr<PointCloud> pc = pc_.lock();
     connect(pc->ed_.get(), SIGNAL(flagUpdate()), this, SLOT(syncFlags()));
     connect(pc->ed_.get(), SIGNAL(labelUpdate()), this, SLOT(syncLabels()));
 

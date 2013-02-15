@@ -20,7 +20,7 @@ class FlatView : public QWidget {
 
  public slots:
     void updateImage();
-    void setCloud(std::shared_ptr<PointCloud> pc);
+    void setCloud(std::shared_ptr<PointCloud> new_pc);
     void syncLabels();
     void syncFlags();
 

@@ -2,6 +2,7 @@
 #define GLWIDGET_H
 
 #include "glheaders.h"
+#include <unordered_map>
 #include <memory>
 #include <QGLBuffer>
 #include <QGLShaderProgram>
@@ -73,7 +74,7 @@ protected:
    bool eventFilter(QObject *object, QEvent *event);
 
  public slots:
-   void reloadCloud(int id);
+   void reloadCloud(std::shared_ptr<PointCloud> cloud);
    void reloadColorLookupBuffer();
 
  private:
@@ -85,7 +86,7 @@ protected:
     QGLShaderProgram program_;
     std::shared_ptr<QGLBuffer> color_lookup_buffer_;
 
-    std::map<int, std::shared_ptr<CloudGLData> > cloudgldata_;
+    std::map<std::shared_ptr<PointCloud>, std::shared_ptr<CloudGLData> > cloudgldata_;
 
     int uni_sampler_;
     int uni_projection_;

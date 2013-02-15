@@ -13,7 +13,7 @@ QVariant CloudList::data(const QModelIndex & index, int role) const {
     int row = index.row();
     int col = index.column();
 
-    if (col == 1) {
+    if (col == 0) {
         switch (role) {
             case Qt::DisplayRole:
             {
@@ -28,21 +28,19 @@ QVariant CloudList::data(const QModelIndex & index, int role) const {
 
 std::shared_ptr<PointCloud> CloudList::addCloud() {
     std::shared_ptr<PointCloud> pc(new PointCloud());
-    clouds_.push_back(pc);
-    emit cloudUpdate(clouds_.size()-1);
-    return pc;
+    return addCloud(pc);
 }
 
 std::shared_ptr<PointCloud> CloudList::addCloud(const char* filename) {
     std::shared_ptr<PointCloud> pc(new PointCloud());
     pc->load_ptx(filename);
-    clouds_.push_back(pc);
-    emit cloudUpdate(clouds_.size()-1);
-    return pc;
+    return addCloud(pc);
 }
 
 std::shared_ptr<PointCloud> CloudList::addCloud(std::shared_ptr<PointCloud> pc) {
+    beginInsertRows(QModelIndex(), clouds_.size(), clouds_.size());
     clouds_.push_back(pc);
-    emit cloudUpdate(clouds_.size()-1);
+    endInsertRows();
+    emit cloudUpdate(pc);
     return pc;
 }

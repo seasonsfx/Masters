@@ -202,9 +202,9 @@ void GLWidget::initializeGL() {
     glPointSize(point_render_size_);
 }
 
-void GLWidget::reloadCloud(int id){
-    cloudgldata_[id].reset(new CloudGLData(cl_->clouds_[id]));
-    qDebug() << "Cloud " << id << "loaded";
+void GLWidget::reloadCloud(std::shared_ptr<PointCloud> cloud){
+    cloudgldata_[cloud].reset(new CloudGLData(cloud));
+    qDebug() << "Cloud "; // << cloud << "loaded";
 }
 
 void GLWidget::reloadColorLookupBuffer(){
@@ -224,8 +224,8 @@ void GLWidget::reloadColorLookupBuffer(){
                 != ll_->layer_lookup_table_.end();
         QColor color;
         if(exists) {
-            int layer_id = ll_->layer_lookup_table_[i];
-            color = ll_->layers_[layer_id].color_;
+            std::shared_ptr<Layer> layer = ll_->layer_lookup_table_[i].lock();
+            color = layer->color_;
         }
         else {
             qWarning() << "Warning! No label associated with this layer";
@@ -264,7 +264,7 @@ void GLWidget::paintGL() {
     // TODO(Rickert): Cloud position in world space
 
     // Draw all clouds
-    for(std::pair<const int, std::shared_ptr<CloudGLData> > pair: cloudgldata_) {
+    for(std::pair<std::shared_ptr<PointCloud>, std::shared_ptr<CloudGLData> > pair: cloudgldata_) {
         pair.second->draw();
     }
 

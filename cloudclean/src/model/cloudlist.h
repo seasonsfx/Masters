@@ -2,6 +2,7 @@
 #define CLOUDLIST_H
 
 #include <vector>
+#include <mutex>
 #include <QAbstractListModel>
 #include <model/pointcloud.h>
 
@@ -9,6 +10,7 @@ class CloudList : public QAbstractListModel {
     Q_OBJECT
  public:
     explicit CloudList(QObject *parent = 0);
+    ~CloudList();
     int rowCount(const QModelIndex & parent = QModelIndex()) const;
     QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
     std::shared_ptr<PointCloud> addCloud();
@@ -20,6 +22,9 @@ class CloudList : public QAbstractListModel {
 
  public slots:
     
+ private:
+    std::mutex * mtx_;
+
  public:
     std::vector<std::shared_ptr<PointCloud> > clouds_;
 };

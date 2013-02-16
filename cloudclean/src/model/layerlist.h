@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <memory>
+#include <mutex>
 #include <QAbstractListModel>
 #include "model/layer.h"
 
@@ -10,6 +11,7 @@ class LayerList : public QAbstractListModel {
     Q_OBJECT
  public:
     explicit LayerList(QObject *parent = 0);
+    ~LayerList();
     int rowCount(const QModelIndex & parent = QModelIndex()) const;
     QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
     std::shared_ptr<Layer> addLayer(std::shared_ptr<Layer> layer);
@@ -20,6 +22,9 @@ class LayerList : public QAbstractListModel {
  signals:
     void layerUpdate(std::shared_ptr<Layer> layer);
     void lookupTableUpdate();
+
+ private:
+    std::mutex * mtx_;
 
  public:
     int16_t last_label_id_;

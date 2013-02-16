@@ -3,6 +3,11 @@
 
 CloudList::CloudList(QObject *parent)
     : QAbstractListModel(parent) {
+    mtx_ = new std::mutex();
+}
+
+CloudList::~CloudList(){
+    delete mtx_;
 }
 
 int CloudList::rowCount(const QModelIndex &) const {
@@ -38,9 +43,11 @@ std::shared_ptr<PointCloud> CloudList::addCloud(const char* filename) {
 }
 
 std::shared_ptr<PointCloud> CloudList::addCloud(std::shared_ptr<PointCloud> pc) {
+    mtx_->lock();
     beginInsertRows(QModelIndex(), clouds_.size(), clouds_.size());
     clouds_.push_back(pc);
     endInsertRows();
+    mtx_->unlock();
     emit cloudUpdate(pc);
     return pc;
 }

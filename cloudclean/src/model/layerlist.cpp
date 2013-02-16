@@ -3,6 +3,11 @@
 
 LayerList::LayerList(QObject *parent) : QAbstractListModel(parent) {
     last_label_id_ = -1;
+    mtx_ = new std::mutex();
+}
+
+LayerList::~LayerList(){
+    delete mtx_;
 }
 
 int LayerList::rowCount(const QModelIndex &) const {
@@ -29,9 +34,11 @@ QVariant LayerList::data(const QModelIndex & index, int role) const {
 }
 
 std::shared_ptr<Layer> LayerList::addLayer(std::shared_ptr<Layer> layer){
+    mtx_->lock();
     beginInsertRows(QModelIndex(), layers_.size(), layers_.size());
     layers_.push_back(layer);
     endInsertRows();
+    mtx_->unlock();
     emit layerUpdate(layer); // TODO(Rickert): Consider replacing with existing signal
     return layer;
 }

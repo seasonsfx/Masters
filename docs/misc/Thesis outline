@@ -1,0 +1,60 @@
+Thesis outline:
+
+Introduction
+	(Introduce the problem)
+	Problem statement
+
+
+Related Work/Background
+	Introduce different areas and topics
+	Top down
+
+
+	Point cloud cleaning a binary point classification problem. Distinguishing between desirable and undesirable objects or artefacts in a scene.
+
+	Such a classification can be performed by either by man or machine. It can hard to codify which points are desirable and which are not. However, some cleaning problems are amendable to simple heuristics.
+
+	Ways of classifying noise:
+		Sonar clouds, biggest blob is the ocean surface.
+		Land surveys, whats a house whats trees, markov models
+		
+
+
+
+	Traits of existing solutions:
+		Degree of automation
+		Computation required
+		Degree of skill required
+		Paralallisable
+		Difficulty of problem
+		Accuracy required
+		Problem type
+		2.5 vs 3D
+
+
+	What is the most effective way to clean cloud noise.
+		Speed - How fast can a scan be cleaned
+		Accuracy - How accurate are results
+		Skill - Low skills, more people can do it, less money
+
+	What can new methods bring to the table:
+		Graph cuts
+		Noise metric
+
+
+	Classification can be sol
+
+
+	Themes
+		Manual
+
+		Point classification
+		Point features
+		Machine learning
+		2D, 2.5D vs 3D approach
+
+
+
+Appendix
+
+Glossary

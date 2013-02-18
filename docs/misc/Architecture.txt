@@ -1,0 +1,130 @@
+Do plugins need factories?
+What should factories do?
+
+Core: (GUI/Model)
+	Loaded clouds
+	Layers
+	Flags
+		Every point in a cloud has 8 bits of settable flags
+		One of the flags indicates whether the point is selected
+	Labels
+		Every point in a cloud has a label
+
+	Selection operations:
+		Invert selection
+		Subtract selection from layer
+		Add seletion to layer
+
+	Set layer operations:
+		Layers can never intersect with current scheme
+		Therefore there can be no intersections
+		It could be useful to have intersections though
+		Use case:
+			Select vegetation, select trees, subtact trees from vegetation to get grass
+
+		Its cheaper in terms of memory to implement it my way.
+		When rendering a point can only be one color (, or a mixture. not sure if thas a good idea though)
+
+		So with the label scheme, a label can be in multiple layers
+		Color map should blend each visible layer.
+
+		Rendering uses color map.
+
+		Layer has multiple labels.
+		Need mapping from layers to labels. One to many.
+			Layer 6: 1, 6, 7
+		Also mapping from labels to layers. One to many.
+			Label 1: 6, 8, 9
+
+		Colormap based rendering:
+			For each label:
+				Mix each active layer color that corresponds to label
+				Write to color map
+
+		How to perform opperations in terms of labels?
+			Say we give the layer 1 the label 1
+			11111111111111111111111111111111111
+			Then a selection is made
+			This selection is naturally a subset of layer 1
+			All layers in the new selection needs to be assigned a new label
+			This new label needs to be added to both layers
+			11111111111122222222222233333333333
+			Label 1: 1, 2
+			Label 2: 2, 3
+
+			Now a new selection is made, this selection is subtracted from layer 1
+			00011111111122222222222233333333333
+
+			There needs to be some kind of a base layer in the color map
+
+			Intersections/Unions can be performed by getting label intersections/unions
+
+			Differences can be performed by subtracting the intersection of A & B from B
+
+		Layer selections:
+			When clicking on layers, they turn their repective colours
+
+
+		So layer set operations:
+			None selected: Nothing
+			One selected: Delete, Hide
+			Muliple selected:  Merge
+						       New layer from intersection
+
+
+		Idea:
+			Hierarchical groupings of layers?
+
+		Edge case:
+			Layer has no points, layer need to be removed
+
+
+		Events that change color map:
+			New label allocated
+			Point label change
+			Layer change
+
+
+	Aim of program is to classify points
+	Various semantic classifications, primarily aimed at finding noise
+
+	Characteristics of program
+		Classify points
+		Speed
+		Accuracy
+		Flexibility? What the hell is that?
+
+
+
+
+	Limit box
+		This can be implemented in the flags
+
+	Point selection:
+		Implemeted in plugins?
+
+
+Plugin manager
+
+Plugins:
+	Edit 2d/3d:
+		Capture user input
+		Access to draw loop
+
+	Filter:
+		Read/write access to model
+
+
+	Feature:
+		Register callbacks for other plugins
+		Other plugins can link to it
+		Processes cloud and caches features
+		Register slots to free memory when clouds are unloaded
+		Could be asked to flush cache when memory runs low
+
+	Visualisation 2d/3d:
+		Access to model and draw loop
+
+	IO:
+
+

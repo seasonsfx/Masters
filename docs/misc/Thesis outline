@@ -12,16 +12,25 @@ Related Work/Background
 
 	Point cloud cleaning a binary point classification problem. Distinguishing between desirable and undesirable objects or artefacts in a scene.
 
-	Such a classification can be performed by either by man or machine. It can hard to codify which points are desirable and which are not. However, some cleaning problems are amendable to simple heuristics.
+	Such a classification can be performed by either by hand or automatically. It can hard to codify which points are desirable and which are not. However, some cleaning problems are amendable to simple heuristics.
 
 	Ways of classifying noise:
 		Sonar clouds, biggest blob is the ocean surface.
 		Land surveys, whats a house whats trees, markov models
+		Lidar clustering
 		
 
+	Segmentation types:
+		Voxel based
+		Graph based
+		...
+
+	Types of date:
+		2.5D and merged 3d
 
 
-	Traits of existing solutions:
+
+	Taxonomy of existing solutions:
 		Degree of automation
 		Computation required
 		Degree of skill required
@@ -30,6 +39,7 @@ Related Work/Background
 		Accuracy required
 		Problem type
 		2.5 vs 3D
+		Realtime
 
 
 	What is the most effective way to clean cloud noise.

@@ -1,0 +1,9 @@
+Segmentation in computer vision
+	Formulated as graph clustering
+		Graph cuts
+			- Normalised cuts
+			- Min Cuts
+
+			Golovinskiy and Funkhouser 2D to 3D
+				Requires prior knowlege of location
+				Uses KNN

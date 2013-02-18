@@ -1,0 +1,63 @@
+Key:
+Label: {NUM}
+Ref: [NUM]
+Resolved ref in doc: (NUM)
+
+{0}
+Name: On the Segmentation of 3D LIDAR Point Clouds
+Year: 2011
+Authors: 
+--------------------------------------------
+
+Segmentation in computer vision
+	Formulated as graph clustering
+		Graph cuts
+			- Normalised cuts
+			- Min Cuts
+
+			Golovinskiy and Funkhouser 2D to 3D [5]
+				- Requires prior knowlege of location
+				- Exponential decaying edge weights
+				- Uses KNN
+
+			Felzenszwalb and Huttenlocher (FH) [10]
+				- segmentation algorithm of for natural images has gained popularity for robotic applications due to its efficiency [13]
+
+			Zhu et al. [15], [16], [19]
+				- Uses FH
+				- 3D graph with KNN
+				- assuming the ground to be flat for removal during pre-processing
+				- 3D partitioning is then obtained with the FH algorithm [19]
+				- Under-segmentation is corrected via posterior classification including the class “under-segmented”
+
+			Triebel et al. [16]
+				- explores unsupervised probabilistic segmentation in in which the FH [10]algorithm is modified for range images and provides an over-segmentation during pre-processing. Segmentation is cast into a probabilistic inference process in two graphs modeled as Conditional Random Fields: one graph is used to segment in the range space and another graph is used to segment in feature space (built from 3D features such as Spin Images). The evaluation does not involve ground truth data.
+
+			Schoenberg et al. [13] & Strom et al. [15]
+				have applied the FH algorithm to coloured 3D data obtained from a coregistered camera laser pair.
+
+
+			Schoenberg et al. [13]
+				Up-sample range data using the technique in [3] to obtain a depth value for each image pixel. The weights on the image graph are computed as a weighted combination of Euclidean distances, pixel intensity differences and angles between surface normals estimated at each 3D point. The FH algorithm is run on the image graph to provide the final 3D partitioning. The evaluation is done on road segments only, while the evaluation proposed here is performed on entirely hand labeled scans.
+
+			Strom et al. [15]
+				propose a similar approach in which the FH algorithm is modified to integrate angle differences between surface normals in addition to differences in colour values. It is applied to a 3D graph built from a laser scan in which longer edges are disregarded. Segmentation evaluation is done visually without ground truth data.
+
+
+			[11]
+				A maximum spanning tree approach to the segmentation of 3D point clouds is proposed in. Graph nodes represent Gaussian ellipsoids playing the role of geometric primitives. The merging of ellipsoids during the growing of the tree is based on one of the two distance metrics proposed by the authors, each producing a different segmentation “style”. The resulting segmentation is similar to a super voxel type of partitioning (by analogy to super pixels in vision) with voxels of ellipsoidal shapes and various sizes.
+
+			[8]
+				Various methods focus on explicitly modeling the notion of surface discontinuity. Melkumyan defines discontinuities based on acute angles and longer links in a 3D mesh built from range data.
+
+
+			Moosman et al. [9]
+				use the notion of con- vexity in a terrain mesh as a separator between objects 
+
+
+
+
+
+
+
+

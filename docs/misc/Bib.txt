@@ -1,0 +1,14 @@
+@INPROCEEDINGS{
+	5979818, 
+	author={Douillard, B. and Underwood, J. and Kuntz, N. and Vlaskine, V. and Quadros, A. and Morton, P. and Frenkel, A.}, 
+	booktitle={Robotics and Automation (ICRA), 2011 IEEE International Conference on}, title={On the segmentation of 3D LIDAR point clouds}, 
+	year={2011}, 
+	month={may}, 
+	volume={}, 
+	number={}, 
+	pages={2798 -2805}, 
+	abstract={This paper presents a set of segmentation methods for various types of 3D point clouds. Segmentation of dense 3D data (e.g. Riegl scans) is optimised via a simple yet efficient voxelisation of the space. Prior ground extraction is empirically shown to significantly improve segmentation performance. Segmentation of sparse 3D data (e.g. Velodyne scans) is addressed using ground models of non-constant resolution either providing a continuous probabilistic surface or a terrain mesh built from the structure of a range image, both representations providing close to real-time performance. All the algorithms are tested on several hand labeled data sets using two novel metrics for segmentation evaluation.}, 
+	keywords={Data models;Gaussian processes;Image segmentation;Measurement;Partitioning algorithms;Probabilistic logic;Three dimensional displays;image resolution;image segmentation;mesh generation;optical radar;probability;radar imaging;3D LIDAR point cloud segmentation;continuous probabilistic surface;ground extraction;nonconstant resolution;segmentation evaluation;sparse 3D data segmentation;terrain mesh;}, 
+	doi={10.1109/ICRA.2011.5979818}, 
+	ISSN={1050-4729},
+}

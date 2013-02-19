@@ -3,12 +3,16 @@ Label: {NUM}
 Ref: [NUM]
 Resolved ref in doc: (NUM)
 
-{0}
+ID: {0}
 Name: On the Segmentation of 3D LIDAR Point Clouds
 Year: 2011
 Authors: 
 --------------------------------------------
+Conclusion:
+	This study has proposed a set of segmentation methods designed for various densities of 3D point clouds. It first pro- vided empirical evidence of the benefit of ground extraction prior to object segmentation in the context of dense data. The Cluster-All method has achieved the best trade off in terms of simplicity, accuracy and computation times. Its limitations were shown in the context of sparse data and two novel segmentation techniques were proposed for the latter case: the GP-INSAC algorithm for probabilistic ground modeling and for the processing of any 3D point cloud sparse or dense, potentially formed of data accumulated from several sensors; a Mesh Based technique, optimised for the processing of range images. All the algorithms were evaluated on several
+	sets of hand labeled data using two novel metrics.
 
+Related Work: 
 Segmentation in computer vision
 	Formulated as graph clustering
 		Graph cuts
@@ -54,6 +58,44 @@ Segmentation in computer vision
 			Moosman et al. [9]
 				use the notion of con- vexity in a terrain mesh as a separator between objects 
 
+
+		Back refs
+			[2]	Y. Boykov and G. Funka-Lea. Graph cuts and efficient nd image segmentation. International Journal of Computer Vision, 70(2):109-131, 2006.
+
+			[3] J. Diebel and S. Thrun. An application of markov random fields to range sensing. Advances
+
+			[5] A. Golovinskiy and T. Funkhouser. Min-cut based segmentation of point clouds. Princeton University
+
+			[6] A. Hoover, G. Jean-Baptiste, X. Jiang, P.J. Flynn, H. Bunke, D.B. Goldgof, K. Bowyer, D.W. Eggert, A. Fitzgibbon, and R.B. Fisher. An experimental comparison of range image segmentation algorithms. IEEE transactions on pattern analysis and machine intelligence, 18(7):673–689, 1996
+
+			[8] N. Melkumyan. Surface-based Synthesis of 3D Maps for outdoor Un- structured Environments. PhD thesis, University of Sydney, Australian Centre for Field Robotics, 2008.
+
+			[9] F. Moosmann, O. Pink, and C. Stiller. Segmentation of 3D Lidar Data in non-flat Urban Environments using a Local Convexity Criterion. In IEEE Intelligent Vehicles Symposium, pages 215–220, 2009.
+
+			[10] D. Huttenlocher P. Felzenszwalb. Efficient graph-based image seg- mentation. Int. Journal of Computer Vision, 59(2):167–181, 2004.
+
+			[11] F. Pauling, M. Bosse, and R. Zlot. Automatic Segmentation of 3D Laser Point Clouds by Ellipsoidal Region Growing. In Proc. of the Australasian Conference on Robotics & Automation (ACRA), 2009.
+
+			[12] Rahul Raguram, Jan-Michael Frahm, and Marc Pollefeys. A com- parative analysis of ransac techniques leading to adaptive real-time random sample consensus. In David Forsyth, Philip Torr, and Andrew Zisserman, editors, Computer Vision ECCV 2008, volume 5303 of Lecture Notes in Computer Science, pages 500–513. Springer Berlin / Heidelberg, 2008.
+
+			[13] J. Schoenberg, A. Nathan, and M. Campbell. Segmentation of dense range information in complex urban scenes. In Proc. of the IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS), 2010. To appear.
+
+			[14] J. Shi and J. Malik. Normalized cuts and image segmentation. IEEE Transactions on pattern analysis and machine intelligence, 22(8):888– 905, 2000.
+
+			[15] J. Strom, A. Richardson, and E. Olson. Graph-based segmentation of colored 3d laser point clouds. In Proc. of the IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS), 2010. To appear.
+
+			[16] R. Triebel, J. Shin, and R. Siegwart. Segmentation and unsupervised part-based discovery of repetitive objects. In Proceedings of Robotics: Science and Systems, Zaragoza, Spain, June 2010.
+
+			[18] Z. Wu and R. Leahy. An optimal graph theoretic approach to data clustering: Theory and its application to image segmentation. IEEE transactions on pattern analysis and machine intelligence, pages 1101–1113, 1993.
+
+			[19] X. Zhu, H. Zhao, Y. Liu, Y. Zhao, and H. Zha. Segmentation and classification of range image from an intelligent vehicle in urban environment. In Proc. of the IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS), 2010. To appear.
+
+
+		Forward refs:
+			
+
+
+5 8 9 10 11 13 15 16 19
 
 
 

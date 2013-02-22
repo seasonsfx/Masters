@@ -162,6 +162,9 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
     connect(ll_.get(), SIGNAL(layerUpdate(std::shared_ptr<Layer>)), glwidget_, SLOT(reloadColorLookupBuffer()));
     connect(ll_.get(), SIGNAL(lookupTableUpdate()), glwidget_, SLOT(reloadColorLookupBuffer()));
 
+    pm_ = new PluginManager();
+    pm_->loadPlugins();
+    qDebug() << "plugins should noe be loaded";
 
     // load a cloud
     std::function<void (const char *)> loadcloud = [&] (const char * fname) {
@@ -211,7 +214,7 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
     };
 
     std::thread(loadcloud, "/home/rickert/trees.ptx").detach();
-    std::thread(loadcloud, "/home/rickert/trees.ptx").detach();
+    //std::thread(loadcloud, "/home/rickert/Workspace/uscans/Petra_Top_xf.ptx").detach();
 }
 
 App::~App() {

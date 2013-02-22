@@ -14,6 +14,7 @@
 #include "model/layerlist.h"
 #include "model/cloudlist.h"
 #include "gui/flatview.h"
+#include "pluginmanager.h"
 
 class App : public QApplication
 {
@@ -62,6 +63,7 @@ class App : public QApplication
         QProgressBar *progressbar_;
         QTabWidget * tabs_;
         FlatView * flatview_;
+        PluginManager * pm_;
 };
 
 #endif

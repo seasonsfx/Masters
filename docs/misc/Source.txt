@@ -60,13 +60,13 @@ Segmentation in computer vision
 
 
 		Back refs
-			[2]	Y. Boykov and G. Funka-Lea. Graph cuts and efficient nd image segmentation. International Journal of Computer Vision, 70(2):109-131, 2006.
+			(1) - 739 [2]	Y. Boykov and G. Funka-Lea. Graph cuts and efficient nd image segmentation. International Journal of Computer Vision, 70(2):109-131, 2006.
 
-			[3] J. Diebel and S. Thrun. An application of markov random fields to range sensing. Advances
+			(2) - 154 [3] J. Diebel and S. Thrun. An application of markov random fields to range sensing. Advances
 
-			[5] A. Golovinskiy and T. Funkhouser. Min-cut based segmentation of point clouds. Princeton University
+			!! (3) - 23 [5] A. Golovinskiy and T. Funkhouser. Min-cut based segmentation of point clouds. Princeton University
 
-			[6] A. Hoover, G. Jean-Baptiste, X. Jiang, P.J. Flynn, H. Bunke, D.B. Goldgof, K. Bowyer, D.W. Eggert, A. Fitzgibbon, and R.B. Fisher. An experimental comparison of range image segmentation algorithms. IEEE transactions on pattern analysis and machine intelligence, 18(7):673–689, 1996
+			(4) - 736 [6] A. Hoover, G. Jean-Baptiste, X. Jiang, P.J. Flynn, H. Bunke, D.B. Goldgof, K. Bowyer, D.W. Eggert, A. Fitzgibbon, and R.B. Fisher. An experimental comparison of range image segmentation algorithms. IEEE transactions on pattern analysis and machine intelligence, 18(7):673–689, 1996
 
 			[8] N. Melkumyan. Surface-based Synthesis of 3D Maps for outdoor Un- structured Environments. PhD thesis, University of Sydney, Australian Centre for Field Robotics, 2008.
 

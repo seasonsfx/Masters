@@ -4,8 +4,6 @@ include_directories(
     ${FLANN_INCLUDE_DIRS}
 )
 
-message("PCL INCLUDE" ${PCL_INCLUDE_DIRS})
-
 FILE (GLOB model_SOURCE *.cpp *.cxx *.cc *.C *.c *.h *.hpp)
 
 add_library(cloudclean_model STATIC ${model_SOURCE})

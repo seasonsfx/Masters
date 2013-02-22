@@ -12,25 +12,62 @@ Related Work/Background
 	Introduce different areas and topics
 	Top down
 
-
 	Point cloud cleaning a binary point classification problem. Distinguishing between desirable and undesirable objects or artefacts in a scene.
 
 	Such a classification can be performed by either by hand or automatically. It can hard to codify which points are desirable and which are not. However, some cleaning problems are amendable to simple heuristics.
 
-	Ways of classifying noise:
-		Sonar clouds, biggest blob is the ocean surface.
-		Land surveys, whats a house whats trees, markov models
-		Lidar clustering
+	General processing pipeline
+
+	Existing systems (industry mostly)
+		Where does it fit in
+
+	(Look into 2d segmentation methods)
+
+	Ways of classifying point clouds:
+		Heuristic
+			Clustering
+			Graph based
+				Min Cut
+				Normalised cut
+			Feature based
+				FPFH
+				Normals
+				Spin images
+				Principle components (Spina)
+			Filters
+				Distance from source
+				Density
+				Isolated points
+
+		Machine learning
+			Markov models
+			SVM
+			Conditional random fields
+
+		Manual
+			2D vs 3D perspective
+			Lasso, brush, floodfill, etc
+
+
+	UX background (to do)
+		Incude industry stuff
+
+
+
+
+	Sonar clouds, biggest blob is the ocean surface.
+	Land surveys, whats a house whats trees, markov models
+	Lidar clustering
 		
 
-	Segmentation types:
+	Segmentation algorithms/methods:
 		Voxel based
 		Graph based
+
 		...
 
-	Types of date:
+	Types of data:
 		2.5D and merged 3d
-
 
 
 	Taxonomy of existing solutions:
@@ -44,7 +81,6 @@ Related Work/Background
 		2.5 vs 3D
 		Realtime
 		Simplicity (of use?)
-
 
 	What is the most effective way to clean cloud noise.
 		Speed - How fast can a scan be cleaned
@@ -60,8 +96,7 @@ Related Work/Background
 
 
 	Themes
-		Manual
-
+		Hand classification
 		Point classification
 		Point features
 		Machine learning

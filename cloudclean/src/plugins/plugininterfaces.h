@@ -3,13 +3,18 @@
 
 #include <memory>
 #include <QtPlugin>
+#include <QString>
 #include "model/pointcloud.h"
 
-
-class DataSourceIFace : public QObject {
+class CCPlugin: public QObject  {
     Q_OBJECT
  public:
-    DataSourceIFace();
+    virtual QString getName() = 0;
+};
+
+class DataSourceIFace : public CCPlugin{
+    Q_OBJECT
+ public:
     virtual ~DataSourceIFace() = 0;
 
  public slots:
@@ -17,13 +22,6 @@ class DataSourceIFace : public QObject {
     virtual void flushCloud(std::shared_ptr<PointCloud> cloud) = 0;
 };
 
-//Q_DECLARE_INTERFACE(DataSourceIFace, "za.co.circlingthesun.cloudclean.datasourceiface/1.0")
-
-class DataSourceFactoryIFace {
- public:
-    virtual DataSourceIFace * getInstance() = 0;
-};
-
-Q_DECLARE_INTERFACE(DataSourceFactoryIFace, "za.co.circlingthesun.cloudclean.datasourcefactoryiface/1.0")
+Q_DECLARE_INTERFACE(DataSourceIFace, "za.co.circlingthesun.cloudclean.datasourceiface/1.0")
 
 #endif // DATASOURCEINTERFACE_H

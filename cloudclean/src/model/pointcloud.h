@@ -39,8 +39,6 @@ class PointCloud : public pcl::PointCloud<pcl::PointXYZI> {
     std::vector<int> cloud_to_grid_map_;
     int scan_width_;
     int scan_height_;
-    //bool labels_dirty_;
-    //bool flags_dirty_;
     std::vector<int16_t> labels_;
     std::vector<PointFlags> flags_;
 

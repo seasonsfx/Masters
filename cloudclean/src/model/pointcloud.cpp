@@ -124,15 +124,11 @@ bool PointCloud::load_ptx(const char* filename, int subsample) {
 	ptx_file >> this->sensor_origin_[2];
 	this->sensor_origin_[3] = 0.0f;
 	
-	// Registration matrix
-	Eigen::Matrix3f reg_mat;
-
+    Eigen::Matrix3f orientation_mat;
     for(int row = 0; row < 3; row++ )
         for(int col = 0; col < 3; col++ )
-            ptx_file >> reg_mat(row,col);
-
-	// Registration quaternion
-    this->sensor_orientation_ = Eigen::Quaternionf(reg_mat.transpose());
+            ptx_file >> orientation_mat(row,col);
+    this->sensor_orientation_ = Eigen::Quaternionf(orientation_mat.transpose());
 
     // Discard registration mat4
 	Eigen::Matrix4f reg_mat4;

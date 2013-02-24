@@ -11,9 +11,8 @@ void NormalsSource::flushCloud(std::shared_ptr<PointCloud> cloud){
     qDebug() << "Woot woot! Fluss cloud!";
 }
 
-NormalsSource * NormalsSourceFactory:: getInstance(){
-    return new NormalsSource();
+QString NormalsSource::getName(){
+    return "data_normals";
 }
 
-
-Q_EXPORT_PLUGIN2(pnp_data, NormalsSourceFactory)
+Q_EXPORT_PLUGIN2(data_normals, NormalsSource)

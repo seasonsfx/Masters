@@ -42,7 +42,6 @@
 #include <QPluginLoader>
 #include <QDebug>
 #include <QDir>
-#include "plugins/plugininterfaces.h"
 
 static QString DLLExtension() {
 #if defined(Q_OS_WIN)
@@ -98,16 +97,8 @@ void PluginManager::loadPlugins() {
         loader.setFileName(absfilepath);
         bool loaded = loader.load();
         if (!loaded) {
-            qDebug() << "Could not load: " << absfilepath;
             qDebug() << "ERROR: " << loader.errorString();
-
-            QFile test_file(absfilepath);
-            if (test_file.exists()) {
-                qDebug() << "File exists!";
-            } else {
-                qDebug() << "File does not exists!";
-            }
-
+            qDebug() << "Could not load: " << absfilepath;
             continue;
         }
 
@@ -115,19 +106,19 @@ void PluginManager::loadPlugins() {
         QObject *plugin = loader.instance();
 
         if (!loader.isLoaded()) {
-            qDebug() << "Could not instantiate: " << absfilepath;
             qDebug() << "ERROR: " << loader.errorString();
+            qDebug() << "Could not instantiate: " << absfilepath;
             continue;
         }
 
         if (fileName.contains("data_")) {
-            DataSourceFactoryIFace * dataPluginFactory
-                    = qobject_cast<DataSourceFactoryIFace *>(plugin);
-            if (dataPluginFactory) {
-                DataSourceIFace * ds = dataPluginFactory->getInstance();
+            DataSourceIFace * dataPlugin
+                    = qobject_cast<DataSourceIFace *>(plugin);
+            if (dataPlugin) {
+                //DataSourceIFace * ds = dataPluginFactory->getInstance();
 
                 qDebug() << "Plugin loaded: " << loader.fileName();
-                connect(this, SIGNAL(flushTest()), ds, SLOT(flushCache()));
+                connect(this, SIGNAL(flushTest()), dataPlugin, SLOT(flushCache()));
                 emit flushTest();
                 qDebug() << "Flush test done";
             }

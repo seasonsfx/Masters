@@ -1,3 +1,5 @@
+#ifndef GLHEADERS_H_
+#define GLHEADERS_H_
 #ifdef _WIN32
 #include <GL/glew.h>
 #else
@@ -18,3 +20,5 @@ if (gl_err != GL_NO_ERROR) {\
 #define RC(CODE) if(CODE == -1){\
     qDebug() << "Function call failed on line" << __LINE__ << "of" << __FILE__;\
     abort();}
+
+#endif  // GLHEADERS_H_

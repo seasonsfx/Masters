@@ -2,5 +2,8 @@
     <qresource prefix="/">
         <file>points.frag</file>
         <file>points.vert</file>
+        <file>flatview.fs.glsl</file>
+        <file>flatview.gs.glsl</file>
+        <file>flatview.vs.glsl</file>
     </qresource>
 </RCC>

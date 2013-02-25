@@ -8,6 +8,7 @@
 #include <QProgressBar>
 #include <QStatusBar>
 #include <QTabWidget>
+#include <QGLContext>
 #include <boost/shared_ptr.hpp>
 #include "gui/mainwindow.h"
 #include "gui/glwidget.h"
@@ -58,7 +59,6 @@ class App : public QApplication
         
         static App* _instance;
         QString _invocation;
-        std::shared_ptr<MainWindow> mainwindow_;
         std::shared_ptr<CloudList> cl_;
         std::shared_ptr<LayerList> ll_;
 
@@ -66,11 +66,13 @@ class App : public QApplication
         LayerListView * llv_;
 
         GLWidget * glwidget_;
+        MainWindow * mainwindow_;
         QStatusBar * statusbar_;
         QProgressBar *progressbar_;
         QTabWidget * tabs_;
         FlatView * flatview_;
         PluginManager * pm_;
+        QGLContext * glcontext_;
 };
 
 #endif

@@ -8,44 +8,16 @@
 #include <QGLBuffer>
 #include <QGLShaderProgram>
 #include "gui/camera.h"
+#include "gui/cloudgldata.h"
 #include "model/cloudlist.h"
 #include "model/layerlist.h"
-
-class CloudGLData : public QObject{
-    Q_OBJECT
- public:
-    CloudGLData(std::shared_ptr<PointCloud> pc);
-    ~CloudGLData();
-    void draw();
-
-    void copyCloud();
-    void copyLabels();
-    void copyFlags();
-
- public slots:
-    void syncCloud();
-    void syncLabels();
-    void syncFlags();
-
- public:
-    std::shared_ptr<PointCloud> pc_;
-    GLuint vao_;
-    std::shared_ptr<QGLBuffer> label_buffer_;
-    std::shared_ptr<QGLBuffer> point_buffer_;
-    std::shared_ptr<QGLBuffer> flag_buffer_;
-
- private:
-    bool dirty_labels;
-    bool dirty_points;
-    bool dirty_flags;
-};
 
 class GLWidget : public QGLWidget
 {
     Q_OBJECT
 
 public:
-    GLWidget(std::shared_ptr<CloudList> &cl, std::shared_ptr<LayerList> &ll, QWidget *parent = 0);
+    GLWidget(QGLFormat &fmt, std::shared_ptr<CloudList> &cl, std::shared_ptr<LayerList> &ll, QWidget *parent = 0);
     ~GLWidget();
 
     QSize minimumSizeHint() const;

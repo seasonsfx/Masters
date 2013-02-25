@@ -3,7 +3,9 @@
 #include <QDebug>
 #include <QMouseEvent>
 
-FlatView::FlatView(std::shared_ptr<CloudList> cl, std::shared_ptr<LayerList> ll) {
+FlatView::FlatView(QGLFormat &fmt, std::shared_ptr<CloudList> cl,
+                   std::shared_ptr<LayerList> ll, QWidget *parent)
+    : QGLWidget(fmt, parent) {
     cl_ = cl;
     ll_ = ll;
     img_dirty_ = true;

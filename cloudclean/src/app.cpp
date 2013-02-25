@@ -222,6 +222,8 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
 }
 
 App::~App() {
+    delete mainwindow_;
+    delete glcontext_;
 }
 
 App* App::INSTANCE() {
@@ -229,8 +231,16 @@ App* App::INSTANCE() {
 }
 
 void App::initGUI() {
-    // Set up gui
-    mainwindow_.reset(new MainWindow());
+
+    QGLFormat base_format;
+    base_format.setVersion(3, 3);
+    base_format.setProfile(QGLFormat::CompatibilityProfile);
+    base_format.setSampleBuffers(true);
+
+    //glcontext_ = new QGLContext(base_format);
+    //glcontext_->create();
+
+    mainwindow_ = new MainWindow();
     statusbar_ = mainwindow_->statusBar();
 
     progressbar_ = new QProgressBar();
@@ -247,27 +257,22 @@ void App::initGUI() {
     statusbar_->addWidget( size );
     statusbar_->showMessage( tr("Ready"), 2000 );
 
-    tabs_ = new QTabWidget(mainwindow_.get());
+    tabs_ = new QTabWidget(mainwindow_);
 
-    glwidget_ = new GLWidget(cl_, ll_, tabs_);
-    QGLFormat base_format = glwidget_->format();
-    base_format.setVersion(3, 3);
-    base_format.setProfile(QGLFormat::CompatibilityProfile);
+    glwidget_ = new GLWidget(base_format, cl_, ll_, tabs_);
     glwidget_->setFormat(base_format);
 
-
-    flatview_ = new FlatView(cl_, ll_);
+    flatview_ = new FlatView(base_format, cl_, ll_, tabs_);
     flatview_->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
 
     QScrollArea * scrollArea = new QScrollArea;
     scrollArea->setBackgroundRole(QPalette::Dark);
-    //scrollArea->setWidget(imageLabel);
     scrollArea->setWidget(flatview_);
 
-    clv_ = new CloudListView(ll_, cl_, mainwindow_.get());
+    clv_ = new CloudListView(ll_, cl_, mainwindow_);
     mainwindow_->addDockWidget(Qt::RightDockWidgetArea, clv_);
 
-    llv_ = new LayerListView(ll_, cl_, mainwindow_.get());
+    llv_ = new LayerListView(ll_, cl_, mainwindow_);
     mainwindow_->addDockWidget(Qt::RightDockWidgetArea, llv_);
 
     tabs_->addTab(glwidget_, "3D View");

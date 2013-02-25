@@ -1,17 +1,18 @@
 #ifndef FLATVIEW_H
 #define FLATVIEW_H
 
-#include <QWidget>
+#include <QGLWidget>
 #include <QImage>
 #include <QPainter>
 #include "model/cloudlist.h"
 #include "model/layerlist.h"
 #include "model/pointcloud.h"
 
-class FlatView : public QWidget {
+class FlatView : public QGLWidget {
     Q_OBJECT
  public:
-    FlatView(std::shared_ptr<CloudList> cl, std::shared_ptr<LayerList> ll);
+    FlatView(QGLFormat &fmt, std::shared_ptr<CloudList> cl,
+             std::shared_ptr<LayerList> ll, QWidget *parent = 0);
     virtual void paintEvent(QPaintEvent*);
 
  private:

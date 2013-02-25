@@ -1,3 +1,5 @@
+#include "app.h"
+#include "appinfo.h"
 #include <iostream>
 #include <cstdlib>
 #include <cctype>
@@ -5,8 +7,6 @@
 #include <stdexcept>
 #include <memory>
 #include <thread>
-#include "app.h"
-#include "appinfo.h"
 
 #include <QDesktopWidget>
 #include <QLabel>
@@ -159,8 +159,11 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
     qRegisterMetaType<std::shared_ptr<Layer> >("std::shared_ptr<Layer>");
     // link up signals to model
     connect(cl_.get(), SIGNAL(cloudUpdate(std::shared_ptr<PointCloud>)), glwidget_, SLOT(reloadCloud(std::shared_ptr<PointCloud>)));
+    connect(cl_.get(), SIGNAL(updated()), glwidget_, SLOT(update()));
     connect(ll_.get(), SIGNAL(layerUpdate(std::shared_ptr<Layer>)), glwidget_, SLOT(reloadColorLookupBuffer()));
     connect(ll_.get(), SIGNAL(lookupTableUpdate()), glwidget_, SLOT(reloadColorLookupBuffer()));
+
+    connect(clv_, SIGNAL(cloudSelected(std::shared_ptr<PointCloud>)), flatview_, SLOT(setCloud(std::shared_ptr<PointCloud>)));
 
     pm_ = new PluginManager();
     pm_->loadPlugins();
@@ -215,6 +218,7 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
 
     std::thread(loadcloud, "/home/rickert/trees.ptx").detach();
     //std::thread(loadcloud, "/home/rickert/Workspace/uscans/Petra_Top_xf.ptx").detach();
+    std::thread(loadcloud, "/home/rickert/Petra_Top_xf.ptx").detach();
 }
 
 App::~App() {
@@ -254,35 +258,17 @@ void App::initGUI() {
 
     flatview_ = new FlatView(cl_, ll_);
     flatview_->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-    //imageLabel = new QLabel;
-    //imageLabel->setBackgroundRole(QPalette::Base);
-    //imageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-    //imageLabel->setScaledContents(true);
 
     QScrollArea * scrollArea = new QScrollArea;
     scrollArea->setBackgroundRole(QPalette::Dark);
     //scrollArea->setWidget(imageLabel);
     scrollArea->setWidget(flatview_);
 
+    clv_ = new CloudListView(ll_, cl_, mainwindow_.get());
+    mainwindow_->addDockWidget(Qt::RightDockWidgetArea, clv_);
 
-    QDockWidget * dw = new QDockWidget(mainwindow_.get());
-    QTableView * tv = new QTableView(dw);
-    tv->resize(200, 700);
-    tv->setModel(cl_.get());
-    dw->setWidget(tv);
-    dw->setAllowedAreas(Qt::LeftDockWidgetArea
-                                | Qt::RightDockWidgetArea);
-    mainwindow_->addDockWidget(Qt::RightDockWidgetArea, dw);
-
-
-    QDockWidget * dw2 = new QDockWidget(mainwindow_.get());
-    QTableView * tv2 = new QTableView(dw);
-    tv2->resize(200, 700);
-    tv2->setModel(ll_.get());
-    dw2->setWidget(tv2);
-    dw2->setAllowedAreas(Qt::LeftDockWidgetArea
-                                | Qt::RightDockWidgetArea);
-    mainwindow_->addDockWidget(Qt::RightDockWidgetArea, dw2);
+    llv_ = new LayerListView(ll_, cl_, mainwindow_.get());
+    mainwindow_->addDockWidget(Qt::RightDockWidgetArea, llv_);
 
     tabs_->addTab(glwidget_, "3D View");
     tabs_->addTab(scrollArea, "2D View");
@@ -439,6 +425,16 @@ std::string App::convert(const QString& str) const {
 QString App::convert(const std::string& str) const {
     QString result(str.c_str());
     return result;
+}
+
+bool App::notify(QObject * receiver, QEvent * event){
+    try {
+        return QApplication::notify(receiver, event);
+    }
+    catch(std::exception& e) {
+        qDebug() << "Exception thrown:" << e.what();
+        exit(1);
+    }
 }
 
 App* App::_instance = 0;

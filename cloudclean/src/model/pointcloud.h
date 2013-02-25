@@ -10,6 +10,8 @@ class EventDispatcher : public QObject{
     Q_OBJECT
  public:
     void updateProgress(int value);
+    void emitlabelUpdate();
+    void emitflagUpdate();
 
  signals:
    void progress(int percentage);
@@ -31,7 +33,7 @@ class PointCloud : public pcl::PointCloud<pcl::PointXYZI> {
  public:
     explicit PointCloud();
     bool save_ptx(const char* filename);
-    bool load_ptx(const char* filename, int subsample = 1);
+    bool load_ptx(const char* filename, int decimation_factor = 1);
 
  public:
     std::shared_ptr<EventDispatcher> ed_;

@@ -24,6 +24,14 @@ void EventDispatcher::updateProgress(int value){
     emit progress(value);
 }
 
+void EventDispatcher::emitlabelUpdate() {
+    emit labelUpdate();
+}
+
+void EventDispatcher::emitflagUpdate() {
+    emit flagUpdate();
+}
+
 PointCloud::PointCloud()
     : pcl::PointCloud<pcl::PointXYZI>() {
     pc_mutex.reset(new std::mutex());
@@ -86,10 +94,10 @@ bool PointCloud::save_ptx(const char* filename){
     return true;
 }
 
-bool PointCloud::load_ptx(const char* filename, int subsample) {
+bool PointCloud::load_ptx(const char* filename, int decimation_factor) {
     pc_mutex->lock();
     ed_->updateProgress(0);
-	assert(subsample%2 == 0 || subsample == 1);
+    assert(decimation_factor%2 == 0 || decimation_factor == 1);
 
     // Makes things faster apparently
     std::cin.sync_with_stdio(false);
@@ -102,21 +110,13 @@ bool PointCloud::load_ptx(const char* filename, int subsample) {
 	this->is_dense = false;
 
 	// Matrix dimentions
-    int width, height;
-    ptx_file >> width;
-    ptx_file >> height;
+    int file_width, file_height;
+    ptx_file >> file_width;
+    ptx_file >> file_height;
 
 	// Subsample
-    this->width =  width/subsample;
-    this->height = height/subsample;
-
-    this->points.resize (this->width * this->height);
-    labels_.resize(this->width * this->height, 0);
-    flags_.resize(this->width * this->height);
-
-    // original dimensions saved
-    this->scan_width_ = width;
-    this->scan_height_ = height;
+    this->scan_width_ =  file_width/decimation_factor;
+    this->scan_height_ = file_height/decimation_factor;
 
 	// Camera offset
 	ptx_file >> this->sensor_origin_[0];
@@ -140,43 +140,50 @@ bool PointCloud::load_ptx(const char* filename, int subsample) {
 
 	float x, y, z, intensity;
 
-    unsigned int i = 0;
-    int sample = 0;
+    unsigned int sampled_idx = 0;
+    int file_sample_idx = 0;
     int row = 0, col = 0;
 
-    int line_count = width*height;
+    int line_count = file_width*file_height;
     int update_interval = line_count/100;
 
-    while(sample < line_count){
-        if(sample % update_interval == 0)
-            ed_->updateProgress(100*sample/static_cast<float>(line_count));
+    while(file_sample_idx < line_count){
+        if(file_sample_idx % update_interval == 0)
+            ed_->updateProgress(100*file_sample_idx/static_cast<float>(line_count));
 
-        row = sample / width;
-        col = sample % width;
+        row = file_sample_idx / file_width;
+        col = file_sample_idx % file_width;
+        file_sample_idx++;
 
-        // Only process every subsample-ith row and column
-        if((row+1)%subsample != 0 || (col+1)%subsample != 0){
-            //getline( ptx_file, line);
+        // Only process every decimation_factor-ith row and column
+        if((row+1)%decimation_factor != 0 || (col+1)%decimation_factor != 0){
             ptx_file >> x >> y >> z >> intensity;
-            sample++;
             continue;
         }
 
-        sample++;
-
         ptx_file >> x >> y >> z >> intensity;
+        sampled_idx++;
 
+        // Skip points that are invalid
         if((x == 0) && (y == 0) && (z == 0)) {
-                        x = y = z = intensity = NAN;
+            continue;
 		}
 
-		this->points[i].x = x;
-		this->points[i].y = y;
-		this->points[i].z = z;
-		this->points[i].intensity = intensity;
-
-        i++;
+        pcl::PointXYZI point;
+        point.x = x;
+        point.y = y;
+        point.z = z;
+        point.intensity = intensity;;
+        this->points.push_back(point);
+        this->cloud_to_grid_map_.push_back(sampled_idx);
 	}
+
+    this->width = this->points.size();
+    this->height = 1;
+    this->is_dense = true; // Cloud is dense and unorganised
+    labels_.resize(this->width * this->height, 0);
+    flags_.resize(this->width * this->height);
+
     ed_->updateProgress(100);
     pc_mutex->unlock();
 	return this;

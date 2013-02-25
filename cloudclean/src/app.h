@@ -16,6 +16,9 @@
 #include "gui/flatview.h"
 #include "pluginmanager.h"
 
+#include "gui/layerlistview.h"
+#include "gui/cloudlistview.h"
+
 class App : public QApplication
 {
         Q_OBJECT
@@ -36,6 +39,7 @@ class App : public QApplication
         QString getProjectVersion();
         QString getProjectCopyrightYears();
         QString getProjectInvocation();
+        bool notify(QObject *receiver, QEvent *event);
 
     private:
         void initGUI();
@@ -57,6 +61,9 @@ class App : public QApplication
         std::shared_ptr<MainWindow> mainwindow_;
         std::shared_ptr<CloudList> cl_;
         std::shared_ptr<LayerList> ll_;
+
+        CloudListView * clv_;
+        LayerListView * llv_;
 
         GLWidget * glwidget_;
         QStatusBar * statusbar_;

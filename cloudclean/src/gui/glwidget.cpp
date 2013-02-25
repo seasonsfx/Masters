@@ -4,9 +4,14 @@
 #include <cmath>
 #include <cstdlib>
 
-CloudGLData::CloudGLData(std::shared_ptr<PointCloud> pc) { 
+CloudGLData::CloudGLData(std::shared_ptr<PointCloud> pc) {
     // Assumption: cloud size does not change
     pc_ = pc;
+
+    dirty_labels = true;
+    dirty_points = true;
+    dirty_flags = true;
+
     //pc_->pc_mutex->lock();
 
     glGenVertexArrays(1, &vao_);
@@ -64,7 +69,7 @@ CloudGLData::~CloudGLData() {
     glDeleteVertexArrays(1, &vao_);
 }
 
-void CloudGLData::syncCloud(){
+void CloudGLData::copyCloud(){
     point_buffer_->bind(); CE();
     size_t vb_size = sizeof(pcl::PointXYZI)*pc_->size();
     point_buffer_->allocate(vb_size); CE();
@@ -81,7 +86,7 @@ void CloudGLData::syncCloud(){
     qDebug() << "Synced cloud";
 }
 
-void CloudGLData::syncLabels(){
+void CloudGLData::copyLabels(){
     label_buffer_->bind(); CE();
     label_buffer_->allocate(pc_->size()*sizeof(int16_t)); CE();
     int16_t * layerbuff =
@@ -95,7 +100,7 @@ void CloudGLData::syncLabels(){
     //QMetaObject::invokeMethod(this, "updateGL");
 }
 
-void CloudGLData::syncFlags(){
+void CloudGLData::copyFlags(){
     flag_buffer_->bind(); CE();
     uint8_t * flag_buffer =
             static_cast<uint8_t *>(glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY)); CE();
@@ -105,13 +110,38 @@ void CloudGLData::syncFlags(){
     glUnmapBuffer(GL_ARRAY_BUFFER);
     flag_buffer_->release(); CE();
     qDebug() << "Synced flags";
-    //QMetaObject::invokeMethod(this, "updateGL");
+}
+
+void CloudGLData::syncCloud(){
+    dirty_points = true;
+}
+
+void CloudGLData::syncLabels(){
+    dirty_labels = true;
+}
+
+void CloudGLData::syncFlags(){
+    dirty_flags = true;
 }
 
 void CloudGLData::draw(){
     // Assumptions:
     // - shader is loaded
     // - buffertexure is loaded
+
+    if(dirty_points){
+        copyCloud();
+        dirty_points = false;
+    }
+    if(dirty_labels){
+        copyLabels();
+        dirty_labels = false;
+    }
+    if(dirty_flags){
+        copyFlags();
+        dirty_flags = false;
+    }
+
     glBindVertexArray(vao_);
     glDrawArrays(GL_POINTS, 0, pc_->size()); CE();
     glBindVertexArray(vao_);
@@ -204,6 +234,7 @@ void GLWidget::initializeGL() {
 
 void GLWidget::reloadCloud(std::shared_ptr<PointCloud> cloud){
     cloudgldata_[cloud].reset(new CloudGLData(cloud));
+    emit update();
     qDebug() << "Cloud "; // << cloud << "loaded";
 }
 
@@ -239,6 +270,7 @@ void GLWidget::reloadColorLookupBuffer(){
     glUnmapBuffer(GL_ARRAY_BUFFER);
     color_lookup_buffer_->release(); CE();
     qDebug() << "Color lookup buffer synced";
+    emit update();
 }
 
 
@@ -294,7 +326,6 @@ void GLWidget::mouseMoveEvent(QMouseEvent * event) {
 
 void GLWidget::mousePressEvent(QMouseEvent * event) {
     mouse_drag_start_ = QVector2D(0.0f, 0.0f);
-
     camera_.mouseDown(event->x(), event->y(), event->button());
 }
 

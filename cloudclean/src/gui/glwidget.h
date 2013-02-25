@@ -4,6 +4,7 @@
 #include "glheaders.h"
 #include <unordered_map>
 #include <memory>
+#include <functional>
 #include <QGLBuffer>
 #include <QGLShaderProgram>
 #include "gui/camera.h"
@@ -17,6 +18,10 @@ class CloudGLData : public QObject{
     ~CloudGLData();
     void draw();
 
+    void copyCloud();
+    void copyLabels();
+    void copyFlags();
+
  public slots:
     void syncCloud();
     void syncLabels();
@@ -28,6 +33,11 @@ class CloudGLData : public QObject{
     std::shared_ptr<QGLBuffer> label_buffer_;
     std::shared_ptr<QGLBuffer> point_buffer_;
     std::shared_ptr<QGLBuffer> flag_buffer_;
+
+ private:
+    bool dirty_labels;
+    bool dirty_points;
+    bool dirty_flags;
 };
 
 class GLWidget : public QGLWidget

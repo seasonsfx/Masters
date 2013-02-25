@@ -19,6 +19,7 @@ class CloudList : public QAbstractListModel {
     
  signals:
     void cloudUpdate(std::shared_ptr<PointCloud> pc);
+    void updated();
 
  public slots:
     

@@ -48,6 +48,11 @@ std::shared_ptr<PointCloud> CloudList::addCloud(std::shared_ptr<PointCloud> pc) 
     clouds_.push_back(pc);
     endInsertRows();
     mtx_->unlock();
+
+    // TODO(rickert): emove connection when deleted
+    connect(pc->ed_.get(), SIGNAL(flagUpdate()), this, SIGNAL(updated()));
+    connect(pc->ed_.get(), SIGNAL(labelUpdate()), this, SIGNAL(updated()));
+
     emit cloudUpdate(pc);
     return pc;
 }

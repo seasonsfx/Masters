@@ -4,6 +4,7 @@
 #include <QGLWidget>
 #include <QImage>
 #include <QPainter>
+#include <QGLShaderProgram>
 #include "model/cloudlist.h"
 #include "model/layerlist.h"
 #include "model/pointcloud.h"
@@ -32,9 +33,13 @@ class FlatView : public QGLWidget {
   void labelUpdate();
 
  protected:
-   void mouseMoveEvent(QMouseEvent * event);
-   void mousePressEvent(QMouseEvent * event);
-   void mouseReleaseEvent(QMouseEvent * event);
+    void initializeGL();
+    void paintGL();
+    void resizeGL(int width, int height);
+
+    void mouseMoveEvent(QMouseEvent * event);
+    void mousePressEvent(QMouseEvent * event);
+    void mouseReleaseEvent(QMouseEvent * event);
 
  private:
    QImage img_;
@@ -45,6 +50,16 @@ class FlatView : public QGLWidget {
    std::shared_ptr<CloudList> cl_;
    std::shared_ptr<LayerList> ll_;
    std::shared_ptr<GLData> gld_;
+
+   QGLShaderProgram program_;
+
+   int uni_sampler_;
+   int uni_select_color_;
+   int uni_width_;
+   int uni_height_;
+   GLuint texture_id_;
+   GLuint vao_;
+
 };
 
 #endif // FLATVIEW_H

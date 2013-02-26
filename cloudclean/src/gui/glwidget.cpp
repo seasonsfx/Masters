@@ -6,15 +6,10 @@
 
 GLWidget::GLWidget(QGLFormat &fmt, std::shared_ptr<CloudList> &cl,
                    std::shared_ptr<LayerList> &ll, QWidget *parent)
-    : ctx_(new QGLContext(fmt, this)), QGLWidget(ctx_, parent) {
+    : QGLWidget(fmt, parent) {
     setFocusPolicy(Qt::StrongFocus);
     camera_move_unit_ = 0.4;
     point_render_size_ = 4.0f;
-
-    selection_color_[0] = 0.0f;
-    selection_color_[1] = 0.0f;
-    selection_color_[2] = 1.0f;
-    selection_color_[3] = 1.0f;
 
     cl_ = cl;
     ll_ = ll;
@@ -26,10 +21,6 @@ GLWidget::~GLWidget() {
 
 void GLWidget::setGLD(std::shared_ptr<GLData> gld){
     gld_ = gld;
-}
-
-QGLContext * GLWidget::getContext(){
-    return ctx_;
 }
 
 QSize GLWidget::minimumSizeHint() const {
@@ -80,13 +71,16 @@ void GLWidget::initializeGL() {
     // Selection color
     //
     program_.bind(); CE();
-    glUniform4fv(uni_select_color_, 1, selection_color_); CE();
+    glUniform4fv(uni_select_color_, 1, gld_->selection_color_); CE();
     program_.release(); CE();
     //
     // Set up textures & point size
     //
     glGenTextures(1, &texture_id_); CE();
     glPointSize(point_render_size_);
+
+    // Generate vao
+    glGenVertexArrays(1, &vao_);
 }
 
 
@@ -108,12 +102,38 @@ void GLWidget::paintGL() {
     glBindTexture(GL_TEXTURE_BUFFER, texture_id_); CE();
     glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, gld_->color_lookup_buffer_->bufferId()); CE();
 
-    // TODO(Rickert): Check for new clouds here
     // TODO(Rickert): Cloud position in world space
 
     // Draw all clouds
     for(std::pair<std::shared_ptr<PointCloud>, std::shared_ptr<CloudGLData> > pair: gld_->cloudgldata_) {
-        pair.second->draw();
+        std::shared_ptr<CloudGLData> cd = pair.second;
+
+        glBindVertexArray(vao_);
+
+        // Point buffer
+        cd->point_buffer_->bind(); CE();
+        glEnableVertexAttribArray(0); CE();
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float)*4, 0); CE();
+        glEnableVertexAttribArray(1); CE();
+        int offset = sizeof(float)*3;
+        glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(float)*4,
+                              reinterpret_cast<const void *>(offset)); CE();
+        cd->point_buffer_->release(); CE();
+
+        // Label buffer
+        cd->label_buffer_->bind(); CE();
+        glEnableVertexAttribArray(2); CE(); CE();
+        glVertexAttribIPointer(2, 1, GL_SHORT, 0, 0); CE();
+        cd->label_buffer_->release(); CE();
+
+        // Flag buffer
+        cd->flag_buffer_->bind(); CE();
+        glEnableVertexAttribArray(3); CE();
+        glVertexAttribIPointer(3, 1, GL_BYTE, 0, 0); CE();
+        cd->flag_buffer_->release(); CE();
+
+        cd->draw(vao_);
+        glBindVertexArray(0);
     }
 
     glBindTexture(GL_TEXTURE_BUFFER, 0); CE();

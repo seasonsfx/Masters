@@ -11,7 +11,10 @@ class CloudGLData : public QObject{
  public:
     CloudGLData(std::shared_ptr<PointCloud> pc);
     ~CloudGLData();
-    void draw();
+
+    void setVAO(GLuint vao);
+
+    void draw(GLint vao);
 
     void copyCloud();
     void copyLabels();
@@ -26,7 +29,6 @@ class CloudGLData : public QObject{
 
  public:
     std::shared_ptr<PointCloud> pc_;
-    GLuint vao_;
     std::shared_ptr<QGLBuffer> label_buffer_;
     std::shared_ptr<QGLBuffer> point_buffer_;
     std::shared_ptr<QGLBuffer> flag_buffer_;

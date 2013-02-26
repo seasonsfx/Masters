@@ -10,6 +10,7 @@ FlatView::FlatView(QGLFormat & fmt, std::shared_ptr<CloudList> cl,
     ll_ = ll;
     img_dirty_ = true;
     max_intensity = 0;
+    setMouseTracking(true); // Track mouse when up
 }
 
 void FlatView::setGLD(std::shared_ptr<GLData> gld){
@@ -216,4 +217,108 @@ void FlatView::mousePressEvent(QMouseEvent * event) {
 void FlatView::mouseReleaseEvent(QMouseEvent * event) {
     if (event->button() == Qt::RightButton)
     update();
+}
+
+void GLWidget::initializeGL() {
+    glClearColor(0.8, 0.8, 0.8, 1.0);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    glEnable(GL_MULTISAMPLE);
+
+    //
+    // Load shader program
+    //
+    bool succ = program_.addShaderFromSourceFile(
+                QGLShader::Vertex, ":/points.vert"); CE();
+    qWarning() << program_.log();
+    if (!succ) qWarning() << "Shader compile log:" << program_.log();
+    succ = program_.addShaderFromSourceFile(
+                QGLShader::Fragment, ":/points.frag"); CE();
+    if (!succ) qWarning() << "Shader compile log:" << program_.log();
+    succ = program_.link(); CE();
+    if (!succ) {
+        qWarning() << "Could not link shader program_:" << program_.log();
+        qWarning() << "Exiting...";
+        abort();
+    }
+    //
+    // Resolve uniforms
+    //
+    program_.bind(); CE();
+    uni_sampler_ = program_.uniformLocation("sampler"); RC(uni_sampler_);
+    uni_width_ = program_.uniformLocation("width"); RC(uni_width_);
+    uni_height_ = program_.uniformLocation("height"); RC(uni_height_);
+    uni_select_color_ = program_.uniformLocation("select_color"); RC(uni_select_color_);
+    program_.release();
+    //
+    // Selection color
+    //
+    program_.bind(); CE();
+    glUniform4fv(uni_select_color_, 1, gld_->selection_color_); CE();
+    program_.release(); CE();
+    //
+    // Set up textures & point size
+    //
+    glGenTextures(1, &texture_id_); CE();
+    glPointSize(point_render_size_);
+
+    // Generate vao
+    glGenVertexArrays(1, &vao_);
+}
+
+
+void FlatView::paintGL() {
+    std::shared_ptr<PointCloud> pc = pc_.lock();
+    std::shared_ptr<CloudGLData> cd = gld_->cloudgldata_[pc];
+
+    // Make sure the labels are updates
+    // Make sure nothing has changed
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    program_.bind(); CE();
+
+    glUniform1i(uni_width_, pc->scan_with_); CE();
+    glUniform1i(uni_height_, pc->scan_height_); CE();
+
+    glUniform1i(uni_sampler_, 0); CE();
+    glBindTexture(GL_TEXTURE_BUFFER, texture_id_); CE();
+    glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, gld_->color_lookup_buffer_->bufferId()); CE();
+
+    // TODO(Rickert): Cloud position in world space
+
+    glBindVertexArray(vao_);
+
+    // Grid buffer
+    cd->grid_buffer_->bind(); CE();
+    // Grid pos buffer
+    grid_buffer_->bind(); CE();
+    glEnableVertexAttribArray(1); CE();
+    glVertexAttribIPointer(1, 1, GL_INT, 0, 0); CE();
+    grid_buffer_->release(); CE();
+    cd->grid_buffer_->release(); CE();
+
+    // Label buffer
+    cd->label_buffer_->bind(); CE();
+    glEnableVertexAttribArray(2); CE(); CE();
+    glVertexAttribIPointer(2, 1, GL_SHORT, 0, 0); CE();
+    cd->label_buffer_->release(); CE();
+
+    // Flag buffer
+    cd->flag_buffer_->bind(); CE();
+    glEnableVertexAttribArray(3); CE();
+    glVertexAttribIPointer(3, 1, GL_BYTE, 0, 0); CE();
+    cd->flag_buffer_->release(); CE();
+
+    cd->draw(vao_);
+    glBindVertexArray(0);
+
+    glBindTexture(GL_TEXTURE_BUFFER, 0); CE();
+
+    program_.release();
+}
+
+void GLWidget::resizeGL(int width, int height) {
+    camera_.setAspect(width / static_cast<float>(height));
+    glViewport(0, 0, width, qMax(height, 1));
 }

@@ -23,7 +23,6 @@ public:
     ~GLWidget();
 
     void setGLD(std::shared_ptr<GLData> gld);
-    QGLContext * getContext();
     QSize minimumSizeHint() const;
     QSize sizeHint() const;
 
@@ -31,7 +30,6 @@ public:
 
 protected:
     void initializeGL();
-    void syncDataModel();
     void paintGL();
     void resizeGL(int width, int height);
 
@@ -72,14 +70,12 @@ protected:
     int uni_modelview_;
     int uni_select_color_;
 
-    float selection_color_[4];
-
     float camera_move_unit_;
     QVector2D mouse_drag_start_;
     float point_render_size_;
 
     GLuint texture_id_;
-    QGLContext * ctx_;
+    GLuint vao_;
 };
 
 #endif

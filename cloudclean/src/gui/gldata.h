@@ -3,6 +3,7 @@
 
 #include "glheaders.h"
 #include <memory>
+#include <mutex>
 #include <QObject>
 #include <QGLBuffer>
 #include "model/pointcloud.h"
@@ -13,7 +14,8 @@
 class GLData : public QObject {
     Q_OBJECT
  public:
-    explicit GLData(std::shared_ptr<CloudList> &cl,
+    explicit GLData(QGLContext * glcontext,
+                    std::shared_ptr<CloudList> &cl,
                     std::shared_ptr<LayerList> &ll,
                     QObject *parent = 0);
  signals:
@@ -26,11 +28,14 @@ class GLData : public QObject {
  public:
     std::shared_ptr<QGLBuffer> color_lookup_buffer_;
     std::map<std::shared_ptr<PointCloud>, std::shared_ptr<CloudGLData> > cloudgldata_;
+    float selection_color_[4];
+
 
  private:
     std::shared_ptr<CloudList> cl_;
     std::shared_ptr<LayerList> ll_;
-
+    QGLContext * glcontext_;
+    std::mutex * clb_mutex_;
 };
 
 #endif // GLDATA_H

@@ -223,8 +223,6 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
 
 App::~App() {
     delete mainwindow_;
-    //delete glcontext1_;
-    //delete glcontext2_;
 }
 App* App::INSTANCE() {
     return _instance;
@@ -260,16 +258,12 @@ void App::initGUI() {
     glwidget_ = new GLWidget(base_format, cl_, ll_, tabs_);
     flatview_ = new FlatView(base_format, cl_, ll_, tabs_, glwidget_);
 
-    glwidget_->getContext()->makeCurrent();
-    gld_.reset(new GLData(cl_, ll_));
+    QGLContext * ctx = const_cast<QGLContext *>(glwidget_->context());
+    gld_.reset(new GLData(ctx, cl_, ll_));
     glwidget_->setGLD(gld_);
     flatview_->setGLD(gld_);
 
     flatview_->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-
-    qDebug() << "is sharing: " << QGLContext::areSharing(flatview_->context(),
-                                                         glwidget_->context());
-
 
     QScrollArea * scrollArea = new QScrollArea;
     scrollArea->setBackgroundRole(QPalette::Dark);

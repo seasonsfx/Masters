@@ -9,10 +9,7 @@ CloudGLData::CloudGLData(std::shared_ptr<PointCloud> pc) {
     dirty_points = true;
     dirty_flags = true;
 
-    //pc_->pc_mutex->lock();
 
-    glGenVertexArrays(1, &vao_);
-    glBindVertexArray(vao_);
     //
     // Point buffer setup
     //
@@ -21,12 +18,6 @@ CloudGLData::CloudGLData(std::shared_ptr<PointCloud> pc) {
     point_buffer_->bind(); CE();
     size_t vb_size = sizeof(pcl::PointXYZI)*pc->size();
     point_buffer_->allocate(vb_size); CE();
-    glEnableVertexAttribArray(0); CE();
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float)*4, 0); CE();
-    glEnableVertexAttribArray(1); CE();
-    int offset = sizeof(float)*3;
-    glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(float)*4,
-                          reinterpret_cast<const void *>(offset)); CE();
     point_buffer_->release(); CE();
     //
     // Label buffer setup
@@ -35,8 +26,6 @@ CloudGLData::CloudGLData(std::shared_ptr<PointCloud> pc) {
     label_buffer_->create(); CE();
     label_buffer_->bind(); CE();
     label_buffer_->allocate(pc->size()*sizeof(int16_t)); CE();
-    glEnableVertexAttribArray(2); CE(); CE();
-    glVertexAttribIPointer(2, 1, GL_SHORT, 0, 0);
     label_buffer_->release(); CE();
     //
     // Set up flag buffer
@@ -46,10 +35,8 @@ CloudGLData::CloudGLData(std::shared_ptr<PointCloud> pc) {
     flag_buffer_->bind(); CE();
     size_t sb_size = sizeof(uint8_t)*pc->size();
     flag_buffer_->allocate(sb_size); CE();
-    glEnableVertexAttribArray(3); CE();
-    glVertexAttribIPointer(3, 1, GL_BYTE, 0, 0); CE();
     flag_buffer_->release(); CE();
-    glBindVertexArray(0);
+
     //
     // Set up grid position buffer
     //
@@ -58,12 +45,7 @@ CloudGLData::CloudGLData(std::shared_ptr<PointCloud> pc) {
     grid_buffer_->bind(); CE();
     size_t gb_size = sizeof(int)*pc->size();
     grid_buffer_->allocate(gb_size); CE();
-    glEnableVertexAttribArray(4); CE();
-    glVertexAttribIPointer(4, 1, GL_INT, 0, 0); CE();
     grid_buffer_->release(); CE();
-    glBindVertexArray(0);
-
-    //pc_->pc_mutex->unlock();
 
     QMetaObject::invokeMethod(this, "syncCloud");
     QMetaObject::invokeMethod(this, "syncFlags");
@@ -76,7 +58,40 @@ CloudGLData::CloudGLData(std::shared_ptr<PointCloud> pc) {
 CloudGLData::~CloudGLData() {
     disconnect(pc_->ed_.get(), SIGNAL(flagUpdate()), this, SLOT(syncFlags()));
     disconnect(pc_->ed_.get(), SIGNAL(labelUpdate()), this, SLOT(syncLabels()));
-    glDeleteVertexArrays(1, &vao_);
+}
+
+void CloudGLData::setVAO(GLuint vao){
+    glBindVertexArray(vao);
+
+    // Point buffer
+    point_buffer_->bind(); CE();
+    glEnableVertexAttribArray(0); CE();
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float)*4, 0); CE();
+    glEnableVertexAttribArray(1); CE();
+    int offset = sizeof(float)*3;
+    glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(float)*4,
+                          reinterpret_cast<const void *>(offset)); CE();
+    point_buffer_->release(); CE();
+
+    // Label buffer
+    label_buffer_->bind(); CE();
+    glEnableVertexAttribArray(2); CE(); CE();
+    glVertexAttribIPointer(2, 1, GL_SHORT, 0, 0); CE();
+    label_buffer_->release(); CE();
+
+    // Flag buffer
+    flag_buffer_->bind(); CE();
+    glEnableVertexAttribArray(3); CE();
+    glVertexAttribIPointer(3, 1, GL_BYTE, 0, 0); CE();
+    flag_buffer_->release(); CE();
+
+    // Grid pos buffer
+    grid_buffer_->bind(); CE();
+    glEnableVertexAttribArray(4); CE();
+    glVertexAttribIPointer(4, 1, GL_INT, 0, 0); CE();
+    grid_buffer_->release(); CE();
+
+    glBindVertexArray(0);
 }
 
 void CloudGLData::copyCloud(){
@@ -145,7 +160,7 @@ void CloudGLData::syncFlags(){
     dirty_flags = true;
 }
 
-void CloudGLData::draw(){
+void CloudGLData::draw(GLint vao){
     // Assumptions:
     // - shader is loaded
     // - buffertexure is loaded
@@ -163,7 +178,7 @@ void CloudGLData::draw(){
         dirty_flags = false;
     }
 
-    glBindVertexArray(vao_);
+    glBindVertexArray(vao);
     glDrawArrays(GL_POINTS, 0, pc_->size()); CE();
-    glBindVertexArray(vao_);
+    glBindVertexArray(vao);
 }

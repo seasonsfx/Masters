@@ -73,8 +73,6 @@ class App : public QApplication
         QTabWidget * tabs_;
         FlatView * flatview_;
         PluginManager * pm_;
-        QGLContext * glcontext1_;
-        QGLContext * glcontext2_;
 };
 
 #endif

@@ -1,40 +1,41 @@
 #include "gldata.h"
 #include <QDebug>
 
-GLData::GLData(std::shared_ptr<CloudList> &cl, std::shared_ptr<LayerList> &ll, QObject *parent) : QObject(parent) {
+GLData::GLData(QGLContext * glcontext, std::shared_ptr<CloudList> &cl, std::shared_ptr<LayerList> &ll, QObject *parent) : QObject(parent) {
     ll_ = ll;
     cl_ = cl;
+    glcontext_ = glcontext;
+
+    selection_color_[0] = 0.0f;
+    selection_color_[1] = 0.0f;
+    selection_color_[2] = 1.0f;
+    selection_color_[3] = 1.0f;
 
     //
     // Set up color lookup buffer
     //
-    qDebug() << "Valid context: " << QGLContext::currentContext()->isValid();
+    glcontext_->makeCurrent();
     color_lookup_buffer_.reset(new QGLBuffer(QGLBuffer::VertexBuffer)); CE();
     IF_FAIL("create failed") = color_lookup_buffer_->create(); CE();
     IF_FAIL("bind failed") = color_lookup_buffer_->bind(); CE();
     color_lookup_buffer_->allocate(sizeof(float)*4); CE();
     color_lookup_buffer_->release(); CE();
-    qDebug() << "created!!!!!!!!!!!!!!!!!!!!";
-    qDebug() << this;
 }
 
 
 void GLData::reloadCloud(std::shared_ptr<PointCloud> cloud){
+    glcontext_->makeCurrent();
     cloudgldata_[cloud].reset(new CloudGLData(cloud));
     emit update();
-    qDebug() << "Cloud "; // << cloud << "loaded";
 }
 
 void GLData::reloadColorLookupBuffer(){
+
     //
     // Resize the buffer, then go through the lookup table and get colours
     // from layers
     //
-    qDebug() << "Valid context: " << QGLContext::currentContext()->isValid();
-    qDebug() << "created: " << color_lookup_buffer_->isCreated();
-    qDebug() << "size: " << color_lookup_buffer_->size();
-    qDebug() << "buffid:" << color_lookup_buffer_->bufferId();
-    qDebug() << this;
+    glcontext_->makeCurrent();
     IF_FAIL("bind failed") = color_lookup_buffer_->bind(); CE();
     size_t label_buff_size = (ll_->last_label_id_+1)*sizeof(float)*4;
     color_lookup_buffer_->allocate(label_buff_size); CE();

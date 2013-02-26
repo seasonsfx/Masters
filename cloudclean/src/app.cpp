@@ -158,10 +158,11 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
     qRegisterMetaType<std::shared_ptr<PointCloud> >("std::shared_ptr<PointCloud>");
     qRegisterMetaType<std::shared_ptr<Layer> >("std::shared_ptr<Layer>");
     // link up signals to model
-    connect(cl_.get(), SIGNAL(cloudUpdate(std::shared_ptr<PointCloud>)), glwidget_, SLOT(reloadCloud(std::shared_ptr<PointCloud>)));
+    connect(cl_.get(), SIGNAL(cloudUpdate(std::shared_ptr<PointCloud>)), gld_.get(), SLOT(reloadCloud(std::shared_ptr<PointCloud>)));
     connect(cl_.get(), SIGNAL(updated()), glwidget_, SLOT(update()));
-    connect(ll_.get(), SIGNAL(layerUpdate(std::shared_ptr<Layer>)), glwidget_, SLOT(reloadColorLookupBuffer()));
-    connect(ll_.get(), SIGNAL(lookupTableUpdate()), glwidget_, SLOT(reloadColorLookupBuffer()));
+    connect(gld_.get(), SIGNAL(update()), glwidget_, SLOT(update()));
+    connect(ll_.get(), SIGNAL(layerUpdate(std::shared_ptr<Layer>)), gld_.get(), SLOT(reloadColorLookupBuffer()));
+    connect(ll_.get(), SIGNAL(lookupTableUpdate()), gld_.get(), SLOT(reloadColorLookupBuffer()));
 
     connect(clv_, SIGNAL(cloudSelected(std::shared_ptr<PointCloud>)), flatview_, SLOT(setCloud(std::shared_ptr<PointCloud>)));
 
@@ -171,7 +172,6 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
 
     // load a cloud
     std::function<void (const char *)> loadcloud = [&] (const char * fname) {
-
         // Perhaps this should be theaded for performance
 
         std::shared_ptr<PointCloud> pc;
@@ -218,28 +218,19 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
 
     std::thread(loadcloud, "/home/rickert/trees.ptx").detach();
     //std::thread(loadcloud, "/home/rickert/Workspace/uscans/Petra_Top_xf.ptx").detach();
-    std::thread(loadcloud, "/home/rickert/Petra_Top_xf.ptx").detach();
+    //std::thread(loadcloud, "/home/rickert/Petra_Top_xf.ptx").detach();
 }
 
 App::~App() {
     delete mainwindow_;
-    delete glcontext_;
+    //delete glcontext1_;
+    //delete glcontext2_;
 }
-
 App* App::INSTANCE() {
     return _instance;
 }
 
 void App::initGUI() {
-
-    QGLFormat base_format;
-    base_format.setVersion(3, 3);
-    base_format.setProfile(QGLFormat::CompatibilityProfile);
-    base_format.setSampleBuffers(true);
-
-    //glcontext_ = new QGLContext(base_format);
-    //glcontext_->create();
-
     mainwindow_ = new MainWindow();
     statusbar_ = mainwindow_->statusBar();
 
@@ -259,11 +250,26 @@ void App::initGUI() {
 
     tabs_ = new QTabWidget(mainwindow_);
 
-    glwidget_ = new GLWidget(base_format, cl_, ll_, tabs_);
-    glwidget_->setFormat(base_format);
 
-    flatview_ = new FlatView(base_format, cl_, ll_, tabs_);
+    QGLFormat base_format;
+    base_format.setVersion(3, 3);
+    base_format.setProfile(QGLFormat::CompatibilityProfile);
+    base_format.setSampleBuffers(true);
+
+
+    glwidget_ = new GLWidget(base_format, cl_, ll_, tabs_);
+    flatview_ = new FlatView(base_format, cl_, ll_, tabs_, glwidget_);
+
+    glwidget_->getContext()->makeCurrent();
+    gld_.reset(new GLData(cl_, ll_));
+    glwidget_->setGLD(gld_);
+    flatview_->setGLD(gld_);
+
     flatview_->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+
+    qDebug() << "is sharing: " << QGLContext::areSharing(flatview_->context(),
+                                                         glwidget_->context());
+
 
     QScrollArea * scrollArea = new QScrollArea;
     scrollArea->setBackgroundRole(QPalette::Dark);

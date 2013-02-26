@@ -85,8 +85,6 @@ void PluginManager::loadPlugins() {
         return;
     }
 
-    qDebug() << "Dir: " << pluginsDir;
-
     QStringList pluginfilters("*." + DLLExtension());
     pluginsDir.setNameFilters(pluginfilters);
 
@@ -97,8 +95,8 @@ void PluginManager::loadPlugins() {
         loader.setFileName(absfilepath);
         bool loaded = loader.load();
         if (!loaded) {
-            qDebug() << "ERROR: " << loader.errorString();
-            qDebug() << "Could not load: " << absfilepath;
+            //qDebug() << "ERROR: " << loader.errorString();
+            qDebug() << "Could not load plugin: " << absfilepath;
             continue;
         }
 

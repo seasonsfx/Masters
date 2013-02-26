@@ -11,15 +11,19 @@
 #include "gui/cloudgldata.h"
 #include "model/cloudlist.h"
 #include "model/layerlist.h"
+#include "gui/gldata.h"
 
 class GLWidget : public QGLWidget
 {
     Q_OBJECT
 
 public:
-    GLWidget(QGLFormat &fmt, std::shared_ptr<CloudList> &cl, std::shared_ptr<LayerList> &ll, QWidget *parent = 0);
+    GLWidget(QGLFormat & fmt, std::shared_ptr<CloudList> &cl,
+             std::shared_ptr<LayerList> &ll, QWidget *parent = 0);
     ~GLWidget();
 
+    void setGLD(std::shared_ptr<GLData> gld);
+    QGLContext * getContext();
     QSize minimumSizeHint() const;
     QSize sizeHint() const;
 
@@ -55,20 +59,13 @@ protected:
    void keyPressEvent(QKeyEvent * event);
    bool eventFilter(QObject *object, QEvent *event);
 
- public slots:
-   void reloadCloud(std::shared_ptr<PointCloud> cloud);
-   void reloadColorLookupBuffer();
-
  private:
     std::shared_ptr<CloudList> cl_;
     std::shared_ptr<LayerList> ll_;
+    std::shared_ptr<GLData> gld_;
 
     Camera camera_;
-
     QGLShaderProgram program_;
-    std::shared_ptr<QGLBuffer> color_lookup_buffer_;
-
-    std::map<std::shared_ptr<PointCloud>, std::shared_ptr<CloudGLData> > cloudgldata_;
 
     int uni_sampler_;
     int uni_projection_;
@@ -82,6 +79,7 @@ protected:
     float point_render_size_;
 
     GLuint texture_id_;
+    QGLContext * ctx_;
 };
 
 #endif

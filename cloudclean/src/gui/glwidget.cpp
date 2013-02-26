@@ -4,9 +4,9 @@
 #include <cmath>
 #include <cstdlib>
 
-GLWidget::GLWidget(QGLFormat & fmt, std::shared_ptr<CloudList> &cl,
+GLWidget::GLWidget(QGLFormat &fmt, std::shared_ptr<CloudList> &cl,
                    std::shared_ptr<LayerList> &ll, QWidget *parent)
-    : QGLWidget(fmt, parent) {
+    : ctx_(new QGLContext(fmt, this)), QGLWidget(ctx_, parent) {
     setFocusPolicy(Qt::StrongFocus);
     camera_move_unit_ = 0.4;
     point_render_size_ = 4.0f;
@@ -22,6 +22,14 @@ GLWidget::GLWidget(QGLFormat & fmt, std::shared_ptr<CloudList> &cl,
 }
 
 GLWidget::~GLWidget() {
+}
+
+void GLWidget::setGLD(std::shared_ptr<GLData> gld){
+    gld_ = gld;
+}
+
+QGLContext * GLWidget::getContext(){
+    return ctx_;
 }
 
 QSize GLWidget::minimumSizeHint() const {
@@ -75,59 +83,10 @@ void GLWidget::initializeGL() {
     glUniform4fv(uni_select_color_, 1, selection_color_); CE();
     program_.release(); CE();
     //
-    // Set up color lookup buffer
-    //
-    color_lookup_buffer_.reset(new QGLBuffer(QGLBuffer::VertexBuffer)); CE();
-    color_lookup_buffer_->create(); CE();
-    color_lookup_buffer_->bind(); CE();
-    color_lookup_buffer_->allocate(sizeof(float)*4); CE();
-    color_lookup_buffer_->release(); CE();
-    //
     // Set up textures & point size
     //
     glGenTextures(1, &texture_id_); CE();
     glPointSize(point_render_size_);
-}
-
-void GLWidget::reloadCloud(std::shared_ptr<PointCloud> cloud){
-    cloudgldata_[cloud].reset(new CloudGLData(cloud));
-    emit update();
-    qDebug() << "Cloud "; // << cloud << "loaded";
-}
-
-void GLWidget::reloadColorLookupBuffer(){
-    //
-    // Resize the buffer, then go through the lookup table and get colours
-    // from layers
-    //
-    color_lookup_buffer_->bind(); CE();
-    size_t label_buff_size = (ll_->last_label_id_+1)*sizeof(float)*4;
-    color_lookup_buffer_->allocate(label_buff_size); CE();
-
-    float * color_lookup_buffer =
-            static_cast<float *>(glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY)); CE();
-
-    for(int i = 0; i <= ll_->last_label_id_; i++) {
-        bool exists = ll_->layer_lookup_table_.find(i)
-                != ll_->layer_lookup_table_.end();
-        QColor color;
-        if(exists) {
-            std::shared_ptr<Layer> layer = ll_->layer_lookup_table_[i].lock();
-            color = layer->color_;
-        }
-        else {
-            qWarning() << "Warning! No label associated with this layer";
-            color = QColor(255, 0, 0, 255);
-        }
-        color_lookup_buffer[i*4] = color.red()/255.0f;
-        color_lookup_buffer[i*4+1] = color.green()/255.0f;
-        color_lookup_buffer[i*4+2] = color.blue()/255.0f;
-        color_lookup_buffer[i*4+3] = color.alpha()/255.0f;
-    }
-    glUnmapBuffer(GL_ARRAY_BUFFER);
-    color_lookup_buffer_->release(); CE();
-    qDebug() << "Color lookup buffer synced";
-    emit update();
 }
 
 
@@ -147,13 +106,13 @@ void GLWidget::paintGL() {
 
     glUniform1i(uni_sampler_, 0); CE();
     glBindTexture(GL_TEXTURE_BUFFER, texture_id_); CE();
-    glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, color_lookup_buffer_->bufferId()); CE();
+    glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, gld_->color_lookup_buffer_->bufferId()); CE();
 
     // TODO(Rickert): Check for new clouds here
     // TODO(Rickert): Cloud position in world space
 
     // Draw all clouds
-    for(std::pair<std::shared_ptr<PointCloud>, std::shared_ptr<CloudGLData> > pair: cloudgldata_) {
+    for(std::pair<std::shared_ptr<PointCloud>, std::shared_ptr<CloudGLData> > pair: gld_->cloudgldata_) {
         pair.second->draw();
     }
 

@@ -8,7 +8,6 @@
 #include <QProgressBar>
 #include <QStatusBar>
 #include <QTabWidget>
-#include <QGLContext>
 #include <boost/shared_ptr.hpp>
 #include "gui/mainwindow.h"
 #include "gui/glwidget.h"
@@ -19,6 +18,7 @@
 
 #include "gui/layerlistview.h"
 #include "gui/cloudlistview.h"
+#include "gui/gldata.h"
 
 class App : public QApplication
 {
@@ -61,6 +61,7 @@ class App : public QApplication
         QString _invocation;
         std::shared_ptr<CloudList> cl_;
         std::shared_ptr<LayerList> ll_;
+        std::shared_ptr<GLData> gld_;
 
         CloudListView * clv_;
         LayerListView * llv_;
@@ -72,7 +73,8 @@ class App : public QApplication
         QTabWidget * tabs_;
         FlatView * flatview_;
         PluginManager * pm_;
-        QGLContext * glcontext_;
+        QGLContext * glcontext1_;
+        QGLContext * glcontext2_;
 };
 
 #endif

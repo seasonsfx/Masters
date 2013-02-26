@@ -3,13 +3,17 @@
 #include <QDebug>
 #include <QMouseEvent>
 
-FlatView::FlatView(QGLFormat &fmt, std::shared_ptr<CloudList> cl,
-                   std::shared_ptr<LayerList> ll, QWidget *parent)
-    : QGLWidget(fmt, parent) {
+FlatView::FlatView(QGLFormat & fmt, std::shared_ptr<CloudList> cl,
+                   std::shared_ptr<LayerList> ll, QWidget *parent, QGLWidget *sharing)
+    : QGLWidget(fmt, parent, sharing) {
     cl_ = cl;
     ll_ = ll;
     img_dirty_ = true;
     max_intensity = 0;
+}
+
+void FlatView::setGLD(std::shared_ptr<GLData> gld){
+    gld_ = gld;
 }
 
 void FlatView::paintEvent(QPaintEvent*) {

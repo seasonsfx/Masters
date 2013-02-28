@@ -216,7 +216,8 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
         qDebug() << "Loaded";
     };
 
-    std::thread(loadcloud, "/home/rickert/trees.ptx").detach();
+    //std::thread(loadcloud, "/home/rickert/trees.ptx").detach();
+    std::thread(loadcloud, "/home/rickert/Workspace/uscans/2011.06.11-10.23.54.zfs_cy.ptx").detach();
     //std::thread(loadcloud, "/home/rickert/Workspace/uscans/Petra_Top_xf.ptx").detach();
     //std::thread(loadcloud, "/home/rickert/Petra_Top_xf.ptx").detach();
 }
@@ -263,11 +264,11 @@ void App::initGUI() {
     glwidget_->setGLD(gld_);
     flatview_->setGLD(gld_);
 
-    flatview_->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+    //flatview_->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
 
-    QScrollArea * scrollArea = new QScrollArea;
-    scrollArea->setBackgroundRole(QPalette::Dark);
-    scrollArea->setWidget(flatview_);
+    //QScrollArea * scrollArea = new QScrollArea;
+    //scrollArea->setBackgroundRole(QPalette::Dark);
+    //scrollArea->setWidget(flatview_);
 
     clv_ = new CloudListView(ll_, cl_, mainwindow_);
     mainwindow_->addDockWidget(Qt::RightDockWidgetArea, clv_);
@@ -276,7 +277,7 @@ void App::initGUI() {
     mainwindow_->addDockWidget(Qt::RightDockWidgetArea, llv_);
 
     tabs_->addTab(glwidget_, "3D View");
-    tabs_->addTab(scrollArea, "2D View");
+    tabs_->addTab(flatview_, "2D View");
     mainwindow_->setCentralWidget(tabs_);
     mainwindow_->setVisible(true);
 }

@@ -5,9 +5,10 @@ CloudGLData::CloudGLData(std::shared_ptr<PointCloud> pc) {
     // Assumption: cloud size does not change
     pc_ = pc;
 
-    dirty_labels = true;
-    dirty_points = true;
-    dirty_flags = true;
+    dirty_labels_ = true;
+    dirty_points_ = true;
+    dirty_flags_ = true;
+    dirty_grid_ = true;
 
 
     //
@@ -149,15 +150,15 @@ void CloudGLData::copyGrid(){
 }
 
 void CloudGLData::syncCloud(){
-    dirty_points = true;
+    dirty_points_ = true;
 }
 
 void CloudGLData::syncLabels(){
-    dirty_labels = true;
+    dirty_labels_ = true;
 }
 
 void CloudGLData::syncFlags(){
-    dirty_flags = true;
+    dirty_flags_ = true;
 }
 
 void CloudGLData::draw(GLint vao){
@@ -165,17 +166,21 @@ void CloudGLData::draw(GLint vao){
     // - shader is loaded
     // - buffertexure is loaded
 
-    if(dirty_points){
+    if(dirty_points_){
         copyCloud();
-        dirty_points = false;
+        dirty_points_ = false;
     }
-    if(dirty_labels){
+    if(dirty_labels_){
         copyLabels();
-        dirty_labels = false;
+        dirty_labels_ = false;
     }
-    if(dirty_flags){
+    if(dirty_flags_){
         copyFlags();
-        dirty_flags = false;
+        dirty_flags_ = false;
+    }
+    if(dirty_grid_){
+        copyGrid();
+        dirty_grid_ = false;
     }
 
     glBindVertexArray(vao);

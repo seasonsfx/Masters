@@ -8,8 +8,9 @@ FlatView::FlatView(QGLFormat & fmt, std::shared_ptr<CloudList> cl,
     : QGLWidget(fmt, parent, sharing) {
     cl_ = cl;
     ll_ = ll;
-    img_dirty_ = true;
-    max_intensity = 0;
+    scale_ = 1.0f;
+    aspect_ratio_ = QVector2D(-1, -1);
+    offset_ = QPoint(0, 0);
     setMouseTracking(true); // Track mouse when up
 }
 
@@ -17,21 +18,6 @@ void FlatView::setGLD(std::shared_ptr<GLData> gld){
     gld_ = gld;
 }
 
-void FlatView::paintEvent(QPaintEvent*) {
-    if(img_dirty_){
-        std::shared_ptr<PointCloud> pc = pc_.lock();
-        updateImage();
-        this->resize(pc->scan_width_, pc->scan_height_);
-        update();
-        qDebug("Reload image");
-        img_dirty_ = false;
-    }
-
-    QPainter p(this);
-    if(!img_.isNull()){
-        p.drawImage(0, 0, img_);
-    }
-}
 
 /*            height
  *
@@ -65,12 +51,7 @@ int binary_search(std::vector<int> A, int key) {
 
 inline int FlatView::imageToCloudIdx(int x, int y){
     std::shared_ptr<PointCloud> pc = pc_.lock();
-
     return cloud_idx_lookup_[x + y*pc->scan_width_];
-    //y = pc->scan_height_ - 1 - y;
-    // Now in scan coordinates
-    //int idx = pc->scan_height_ * x + y;
-    //return binary_search(pc->cloud_to_grid_map_, idx);
 }
 
 // scan lines go from top to bottom & left to right
@@ -83,48 +64,6 @@ inline QPoint FlatView::cloudToImageCoord(int idx){
     return QPoint(x, y);
 }
 
-void FlatView::updateImage(){
-    std::shared_ptr<PointCloud> pc = pc_.lock();
-    // Blank
-    for(int y = 0 ; y < img_.height(); y++){
-        for(int x = 0 ; x < img_.width(); x++){
-            img_.setPixel(x, y, qRgb(0, 0, 0));
-        }
-    }
-
-    for(int idx = 0 ; idx < pc->cloud_to_grid_map_.size(); idx++){
-        pcl::PointXYZI & point = pc->at(idx);
-        int intensity = 255*(point.intensity/max_intensity);
-
-        QColor col(intensity, intensity, intensity);
-        QColor sel(0, 0, 255);
-
-        int label_id = pc->labels_[idx];
-        std::shared_ptr<Layer> layer =
-                ll_->layer_lookup_table_[label_id].lock();
-        QColor & label_col = layer->color_;
-
-        // Layer colors
-        col.setRed(col.red()/255.0f*label_col.red());
-        col.setGreen(col.green()/255.0f*label_col.green());
-        col.setBlue(col.blue()/255.0f*label_col.blue());
-
-        // Selection
-        float mix = 0.5;
-        float mix2 = 1.0 - mix;
-        if(uint8_t(pc->flags_[idx]) & uint8_t(PointFlags::selected)
-                && point.intensity == point.intensity){
-            col.setRed(col.red()*mix + sel.red()*mix2);
-            col.setGreen(col.green()*mix + sel.green()*mix2);
-            col.setBlue(col.blue()*mix + sel.blue()*mix2);
-        }
-
-        QPoint p = cloudToImageCoord(idx);
-        img_.setPixel(p.x(), p.y(), col.rgb());
-        cloud_idx_lookup_[p.x() + p.y()*img_.width()] = idx;
-    }
-}
-
 void FlatView::setCloud(std::shared_ptr<PointCloud> new_pc) {
     qDebug("set 2d cloudview");
 
@@ -134,84 +73,53 @@ void FlatView::setCloud(std::shared_ptr<PointCloud> new_pc) {
     if(!pc_.expired()){
         std::shared_ptr<PointCloud> old_pc = pc_.lock();
         disconnect(old_pc->ed_.get(), SIGNAL(flagUpdate()), this,
-                   SLOT(syncImage()));
+                   SLOT(update()));
         disconnect(old_pc->ed_.get(), SIGNAL(labelUpdate()), this,
-                   SLOT(syncImage()));
-
+                   SLOT(update()));
     }
+
     pc_ = new_pc;
     std::shared_ptr<PointCloud> pc = pc_.lock();
     cloud_idx_lookup_.resize(pc->scan_width_*pc->scan_height_, -1);
-    connect(pc->ed_.get(), SIGNAL(flagUpdate()), this, SLOT(syncImage()));
-    connect(pc->ed_.get(), SIGNAL(labelUpdate()), this, SLOT(syncImage()));
-
-    // find max intensity
-    max_intensity = 0;
-    for(int i = 0; i < pc->size(); i++){
-        pcl::PointXYZI & point = pc->at(i);
-        if(point.intensity > max_intensity)
-            max_intensity = point.intensity;
+    for(int idx = 0 ; idx < pc->cloud_to_grid_map_.size(); idx++){
+        QPoint p = cloudToImageCoord(idx);
+        cloud_idx_lookup_[p.x() + p.y()*pc->scan_width_] = idx;
     }
 
-    img_ = QImage(pc->scan_width_, pc->scan_height_, QImage::Format_RGB32);
-    updateImage();
-    this->resize(pc->scan_width_, pc->scan_height_);
+    connect(pc->ed_.get(), SIGNAL(flagUpdate()), this, SLOT(update()));
+    connect(pc->ed_.get(), SIGNAL(labelUpdate()), this, SLOT(update()));
+
+    scale_ = 1.0f;
+    offset_ = QPoint(0, 0);
+
     update();
 }
 
-void FlatView::syncImage(){
-    img_dirty_= true;
-    if(isVisible())
-        update();
-}
-
 void FlatView::mouseMoveEvent(QMouseEvent * event) {
-    if(event->buttons()){
-        int idx = imageToCloudIdx(event->x(), event->y());
+    if(event->buttons() == Qt::LeftButton ){
+        /*int idx = imageToCloudIdx(event->x(), event->y());
         if (idx != -1){
             std::shared_ptr<PointCloud> pc = pc_.lock();
 
             PointFlags & pf = pc->flags_[idx];
             pf = PointFlags((uint8_t(PointFlags::selected)) | uint8_t(pf));
 
-
-            pcl::PointXYZI & point = pc->at(idx);
-            int intensity = 255*(point.intensity/max_intensity);
-            QColor col(intensity, intensity, intensity);
-            QColor sel(0, 0, 255);
-            int label_id = pc->labels_[idx];
-            std::shared_ptr<Layer> layer =
-                    ll_->layer_lookup_table_[label_id].lock();
-            QColor & label_col = layer->color_;
-
-            // Layer colors
-            col.setRed(col.red()/255.0f*label_col.red());
-            col.setGreen(col.green()/255.0f*label_col.green());
-            col.setBlue(col.blue()/255.0f*label_col.blue());
-
-            // Selection
-            float mix = 0.5;
-            float mix2 = 1.0 - mix;
-            if(uint8_t(pc->flags_[idx]) & uint8_t(PointFlags::selected)
-                    && point.intensity == point.intensity){
-                col.setRed(col.red()*mix + sel.red()*mix2);
-                col.setGreen(col.green()*mix + sel.green()*mix2);
-                col.setBlue(col.blue()*mix + sel.blue()*mix2);
-            }
-
-            img_.setPixel(event->x(), event->y(), col.rgb());
             update();
 
             //emit labelUpdate();
-            disconnect(pc->ed_.get(), SIGNAL(flagUpdate()), this, SLOT(syncImage()));
             pc->ed_->emitflagUpdate();
-            connect(pc->ed_.get(), SIGNAL(flagUpdate()), this, SLOT(syncImage()));
         }
+        */
+    }
+    else if(event->buttons() == Qt::RightButton){
+         offset_ = saved_offset_ + event->pos() - drag_start_pos;
+         update();
     }
 }
 
 void FlatView::mousePressEvent(QMouseEvent * event) {
-
+    drag_start_pos = event->pos();
+    saved_offset_ = offset_;
 }
 
 void FlatView::mouseReleaseEvent(QMouseEvent * event) {
@@ -219,9 +127,20 @@ void FlatView::mouseReleaseEvent(QMouseEvent * event) {
     update();
 }
 
-void GLWidget::initializeGL() {
-    glClearColor(0.8, 0.8, 0.8, 1.0);
-    glEnable(GL_DEPTH_TEST);
+void FlatView::wheelEvent(QWheelEvent * event) {
+    float delta = (event->delta()/120.0f) * 1.1;
+
+    if(delta > 0 && scale_ < 100){
+        scale_ *= delta;
+    }
+    else if (delta < 0 && scale_ > 0.01){
+        scale_ /= -delta;
+    }
+    update();
+}
+
+void FlatView::initializeGL() {
+    glClearColor(0.0, 0.0, 0.0, 1.0);
     glEnable(GL_CULL_FACE);
     glEnable(GL_MULTISAMPLE);
 
@@ -229,18 +148,24 @@ void GLWidget::initializeGL() {
     // Load shader program
     //
     bool succ = program_.addShaderFromSourceFile(
-                QGLShader::Vertex, ":/points.vert"); CE();
-    qWarning() << program_.log();
-    if (!succ) qWarning() << "Shader compile log:" << program_.log();
+                QGLShader::Vertex, ":/flatview.vs.glsl"); CE();
+    if (!succ)
+        qWarning() << "Shader compile log:" << program_.log();
     succ = program_.addShaderFromSourceFile(
-                QGLShader::Fragment, ":/points.frag"); CE();
-    if (!succ) qWarning() << "Shader compile log:" << program_.log();
+                QGLShader::Fragment, ":/flatview.fs.glsl"); CE();
+    if (!succ)
+        qWarning() << "Shader compile log:" << program_.log();
+    succ = program_.addShaderFromSourceFile(
+                QGLShader::Geometry, ":/flatview.gs.glsl"); CE();
+    if (!succ)
+        qWarning() << "Shader compile log:" << program_.log();
     succ = program_.link(); CE();
     if (!succ) {
         qWarning() << "Could not link shader program_:" << program_.log();
         qWarning() << "Exiting...";
         abort();
     }
+
     //
     // Resolve uniforms
     //
@@ -248,6 +173,9 @@ void GLWidget::initializeGL() {
     uni_sampler_ = program_.uniformLocation("sampler"); RC(uni_sampler_);
     uni_width_ = program_.uniformLocation("width"); RC(uni_width_);
     uni_height_ = program_.uniformLocation("height"); RC(uni_height_);
+    uni_scale_ = program_.uniformLocation("scale"); RC(uni_scale_);
+    uni_offset_ = program_.uniformLocation("offset"); RC(uni_offset_);
+    uni_aspect_ratio_ = program_.uniformLocation("aspect_ratio"); RC(uni_aspect_ratio_);
     uni_select_color_ = program_.uniformLocation("select_color"); RC(uni_select_color_);
     program_.release();
     //
@@ -260,43 +188,44 @@ void GLWidget::initializeGL() {
     // Set up textures & point size
     //
     glGenTextures(1, &texture_id_); CE();
-    glPointSize(point_render_size_);
-
+    //
     // Generate vao
+    //
     glGenVertexArrays(1, &vao_);
 }
 
 
 void FlatView::paintGL() {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    if(pc_.expired()){
+        qDebug() << "Nothing to paint on flatview";
+        return;
+    }
+
     std::shared_ptr<PointCloud> pc = pc_.lock();
     std::shared_ptr<CloudGLData> cd = gld_->cloudgldata_[pc];
 
-    // Make sure the labels are updates
-    // Make sure nothing has changed
-
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
     program_.bind(); CE();
 
-    glUniform1i(uni_width_, pc->scan_with_); CE();
+    glUniform1i(uni_width_, pc->scan_width_); CE();
     glUniform1i(uni_height_, pc->scan_height_); CE();
-
+    glUniform1f(uni_scale_, scale_); CE();
     glUniform1i(uni_sampler_, 0); CE();
+    glUniform2f(uni_offset_, offset_.x(), offset_.y());
     glBindTexture(GL_TEXTURE_BUFFER, texture_id_); CE();
     glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, gld_->color_lookup_buffer_->bufferId()); CE();
 
-    // TODO(Rickert): Cloud position in world space
 
     glBindVertexArray(vao_);
 
-    // Grid buffer
-    cd->grid_buffer_->bind(); CE();
-    // Grid pos buffer
-    grid_buffer_->bind(); CE();
+    // Point intensity buffer
+    cd->point_buffer_->bind(); CE();
     glEnableVertexAttribArray(1); CE();
-    glVertexAttribIPointer(1, 1, GL_INT, 0, 0); CE();
-    grid_buffer_->release(); CE();
-    cd->grid_buffer_->release(); CE();
+    int offset = sizeof(float)*3;
+    glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(float)*4,
+                          reinterpret_cast<const void *>(offset)); CE();
+    cd->point_buffer_->release(); CE();
 
     // Label buffer
     cd->label_buffer_->bind(); CE();
@@ -310,15 +239,52 @@ void FlatView::paintGL() {
     glVertexAttribIPointer(3, 1, GL_BYTE, 0, 0); CE();
     cd->flag_buffer_->release(); CE();
 
-    cd->draw(vao_);
-    glBindVertexArray(0);
+    // Grid buffer
+    cd->grid_buffer_->bind(); CE();
+    glEnableVertexAttribArray(4); CE();
+    glVertexAttribIPointer(4, 1, GL_INT, 0, 0); CE();
+    cd->grid_buffer_->release(); CE();
 
+    cd->draw(vao_);
+
+    glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_BUFFER, 0); CE();
 
     program_.release();
 }
 
-void GLWidget::resizeGL(int width, int height) {
-    camera_.setAspect(width / static_cast<float>(height));
+void FlatView::resizeGL(int width, int height) {
     glViewport(0, 0, width, qMax(height, 1));
+
+    auto pc = pc_.lock();
+
+    float ar_screen = width / static_cast<float>(height);
+    float ar_scan = pc->scan_width_ / static_cast<float>(pc->scan_height_);
+
+    float yscale = width/static_cast<float>(pc->scan_width_);
+    float xscale = height/static_cast<float>(pc->scan_height_);
+
+    if(ar_screen == 1.0f && ar_scan == 1.0f)
+        aspect_ratio_ = QVector2D(1, 1);
+    else if(ar_screen < 1.0f && ar_scan == 1.0f)
+        aspect_ratio_ = QVector2D(xscale, 1);
+    else if(ar_screen > 1.0f && ar_scan == 1.0f)
+        aspect_ratio_ = QVector2D(1, yscale);
+    else if(ar_screen == 1.0f && ar_scan < 1.0f)
+        aspect_ratio_ = QVector2D(1, yscale);
+    else if(ar_screen < 1.0f && ar_scan < 1.0f)
+        aspect_ratio_ = QVector2D(xscale, 1);
+    else if(ar_screen > 1.0f && ar_scan < 1.0f)
+        aspect_ratio_ = QVector2D(1, yscale);
+    else if(ar_screen == 1.0f && ar_scan > 1.0f)
+        aspect_ratio_ = QVector2D(xscale, 1);
+    else if(ar_screen < 1.0f && ar_scan > 1.0f)
+        aspect_ratio_ = QVector2D(1, yscale);
+    else if(ar_screen > 1.0f && ar_scan > 1.0f)
+        aspect_ratio_ = QVector2D(1, yscale*2);
+
+    program_.bind(); CE();
+    glUniform2f(uni_aspect_ratio_, aspect_ratio_.x(), aspect_ratio_.y()); CE();
+    program_.release(); CE();
+
 }

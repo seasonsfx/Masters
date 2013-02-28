@@ -22,8 +22,8 @@ class GLData : public QObject {
     void update();
     
  public slots:
-  void reloadCloud(std::shared_ptr<PointCloud> cloud);
-  void reloadColorLookupBuffer();
+    void reloadCloud(std::shared_ptr<PointCloud> cloud);
+    void reloadColorLookupBuffer();
     
  public:
     std::shared_ptr<QGLBuffer> color_lookup_buffer_;

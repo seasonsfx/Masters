@@ -35,9 +35,10 @@ class CloudGLData : public QObject{
     std::shared_ptr<QGLBuffer> grid_buffer_;
 
  private:
-    bool dirty_labels;
-    bool dirty_points;
-    bool dirty_flags;
+    bool dirty_labels_;
+    bool dirty_points_;
+    bool dirty_flags_;
+    bool dirty_grid_;
 };
 
 

@@ -20,8 +20,8 @@ if (gl_err != GL_NO_ERROR) {\
 }
 
 #define RC(CODE) if(CODE == -1){\
-    qDebug() << "Function call failed on line" << __LINE__ << "of" << __FILE__;\
-    abort();}
+    qDebug() << "Function call failed on line" << __LINE__ << "of" << __FILE__;}//\
+    //abort();}
 
 #define ERR_MSG(err) QString(QString(err) + QString(" @ Line ") + QString::number(__LINE__) +  QString(" of ") +  QString(__FILE__))
 

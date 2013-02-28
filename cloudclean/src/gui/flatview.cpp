@@ -10,7 +10,8 @@ FlatView::FlatView(QGLFormat & fmt, std::shared_ptr<CloudList> cl,
     ll_ = ll;
     scale_ = 1.0f;
     aspect_ratio_ = QVector2D(-1, -1);
-    offset_ = QPoint(0, 0);
+    camera_.setIdentity();
+    offset_ = QVector2D(0, 0);
     setMouseTracking(true); // Track mouse when up
 }
 
@@ -90,7 +91,7 @@ void FlatView::setCloud(std::shared_ptr<PointCloud> new_pc) {
     connect(pc->ed_.get(), SIGNAL(labelUpdate()), this, SLOT(update()));
 
     scale_ = 1.0f;
-    offset_ = QPoint(0, 0);
+    offset_ = QVector2D(0, 0);
 
     update();
 }
@@ -112,7 +113,7 @@ void FlatView::mouseMoveEvent(QMouseEvent * event) {
         */
     }
     else if(event->buttons() == Qt::RightButton){
-         offset_ = saved_offset_ + event->pos() - drag_start_pos;
+         offset_ = saved_offset_ + QVector2D(event->pos() - drag_start_pos);
          update();
     }
 }
@@ -133,9 +134,9 @@ void FlatView::wheelEvent(QWheelEvent * event) {
     if(delta > 0 && scale_ < 100){
         scale_ *= delta;
         // offset in direction of mouse
-        int x = (this->width()/2.0 - event->x())/2.0f;
-        int y = (this->height()/2.0 - event->y())/2.0f;
-        offset_ += QPoint(x, y);
+        float x = (this->width()/2.0 - event->x())/2.0f;
+        float y = (this->height()/2.0 - event->y())/2.0f;
+        offset_ += QVector2D(x, y);
     }
     else if (delta < 0 && scale_ > 0.01){
         scale_ /= -delta;
@@ -181,6 +182,7 @@ void FlatView::initializeGL() {
     uni_offset_ = program_.uniformLocation("offset"); RC(uni_offset_);
     uni_aspect_ratio_ = program_.uniformLocation("aspect_ratio"); RC(uni_aspect_ratio_);
     uni_select_color_ = program_.uniformLocation("select_color"); RC(uni_select_color_);
+    uni_camera_ = program_.uniformLocation("camera"); RC(uni_camera_);
     program_.release();
     //
     // Selection color
@@ -270,7 +272,15 @@ void FlatView::resizeGL(int width, int height) {
     else
         aspect_ratio_ = QVector2D(xscale*4, 1);
 
-    program_.bind(); CE();
+    float tr_x = (offset_.x()/width - 0.5f) * 2.0f;
+    float tr_y = (offset_.y()/height - 0.5f) * 2.0f;
+
+    camera_ << scale_*aspect_ratio_.x(), 0, tr_x,
+               0, scale_*aspect_ratio_.y(), tr_y,
+               0, 0, 1.0f;
+
+    program_.bind(); CE();   
+    glUniformMatrix3fv(uni_camera_,1, GL_FALSE, camera_.data()); CE();
     glUniform2f(uni_aspect_ratio_, aspect_ratio_.x(), aspect_ratio_.y()); CE();
     program_.release(); CE();
 

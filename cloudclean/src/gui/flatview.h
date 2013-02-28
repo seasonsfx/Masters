@@ -11,6 +11,7 @@
 #include "model/layerlist.h"
 #include "model/pointcloud.h"
 #include "gui/gldata.h"
+#include <Eigen/Dense>
 
 class FlatView : public QGLWidget {
     Q_OBJECT
@@ -57,15 +58,17 @@ class FlatView : public QGLWidget {
    int uni_scale_;
    int uni_offset_;
    int uni_aspect_ratio_;
+   int uni_camera_;
    GLuint texture_id_;
    GLuint vao_;
 
    float scale_;
-   QPoint offset_;
-   QPoint saved_offset_;
+   QVector2D offset_;
+   QVector2D saved_offset_;
    QVector2D aspect_ratio_;
 
    QPoint drag_start_pos;
+   Eigen::Matrix3f camera_;
 
 };
 

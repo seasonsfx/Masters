@@ -12,6 +12,7 @@ uniform int height;
 uniform float scale;
 uniform vec2 offset;
 uniform vec2 aspect_ratio;
+uniform mat3 camera;
 
 out vec4 colour;
 
@@ -24,15 +25,23 @@ void main( void ) {
         colour = colour * 0.7f + select_color * 0.3f;
     }
 
-    float y = float(position%height) - offset.y;
-    float x = float(position/float(height)) + offset.x;
+
+    vec3 pos;
+    pos.y = float(position%height);
+    pos.x = float(position/float(height));
+    pos.z = 1;
 
     // put in ndc space
-    x = (x/width - 0.5f) * 2.0f;
-    y = (y/height - 0.5f) * 2.0f;
+    pos = (pos/vec3(width, height, 1) - 0.5f) * 2.0f;
 
-    x *= scale * aspect_ratio.x;
-    y *= scale * aspect_ratio.y;
+    /*vec2 s = scale * aspect_ratio;
+    vec2 tr = (offset/vec2(width, height) - 0.5f) * 2.0f;
+    mat3 camera = mat3(
+        s.x, 0.0f, 0.0f,
+        0.0f, s.y, 0.0f,
+        tr.x, tr.y, 1.0f
+    );
+    */
 
-    gl_Position = vec4(x, y, 0, 1);
+    gl_Position = vec4((pos*camera).xy, 0, 1);
 }

@@ -132,6 +132,10 @@ void FlatView::wheelEvent(QWheelEvent * event) {
 
     if(delta > 0 && scale_ < 100){
         scale_ *= delta;
+        // offset in direction of mouse
+        int x = (this->width()/2.0 - event->x())/2.0f;
+        int y = (this->height()/2.0 - event->y())/2.0f;
+        offset_ += QPoint(x, y);
     }
     else if (delta < 0 && scale_ > 0.01){
         scale_ /= -delta;
@@ -258,40 +262,13 @@ void FlatView::resizeGL(int width, int height) {
 
     auto pc = pc_.lock();
 
-    //float ar_screen = width / static_cast<float>(height);
-    //float ar_scan = pc->scan_width_ / static_cast<float>(pc->scan_height_);
-
     float yscale = width/static_cast<float>(pc->scan_width_);
     float xscale = height/static_cast<float>(pc->scan_height_);
 
-    if(yscale <  xscale){
+    if(yscale <  xscale)
         aspect_ratio_ = QVector2D(1, yscale*4);
-    }
-    else{
+    else
         aspect_ratio_ = QVector2D(xscale*4, 1);
-    }
-
-    /*
-    if(ar_screen == 1.0f && ar_scan == 1.0f)
-        aspect_ratio_ = QVector2D(1, 1);
-    else if(ar_screen < 1.0f && ar_scan == 1.0f)
-        aspect_ratio_ = QVector2D(xscale, 1);
-    else if(ar_screen > 1.0f && ar_scan == 1.0f)
-        aspect_ratio_ = QVector2D(1, yscale);
-    else if(ar_screen == 1.0f && ar_scan < 1.0f)
-        aspect_ratio_ = QVector2D(1, yscale);
-    else if(ar_screen < 1.0f && ar_scan < 1.0f)
-        aspect_ratio_ = QVector2D(xscale, 1);
-    else if(ar_screen > 1.0f && ar_scan < 1.0f)
-        aspect_ratio_ = QVector2D(1, yscale);
-    else if(ar_screen == 1.0f && ar_scan > 1.0f)
-        aspect_ratio_ = QVector2D(xscale, 1);
-    else if(ar_screen < 1.0f && ar_scan > 1.0f)
-        aspect_ratio_ = QVector2D(1, yscale);
-    else if(ar_screen > 1.0f && ar_scan > 1.0f)
-        aspect_ratio_ = QVector2D(1, yscale*2);
-    */
-
 
     program_.bind(); CE();
     glUniform2f(uni_aspect_ratio_, aspect_ratio_.x(), aspect_ratio_.y()); CE();

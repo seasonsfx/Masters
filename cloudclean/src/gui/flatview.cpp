@@ -258,12 +258,20 @@ void FlatView::resizeGL(int width, int height) {
 
     auto pc = pc_.lock();
 
-    float ar_screen = width / static_cast<float>(height);
-    float ar_scan = pc->scan_width_ / static_cast<float>(pc->scan_height_);
+    //float ar_screen = width / static_cast<float>(height);
+    //float ar_scan = pc->scan_width_ / static_cast<float>(pc->scan_height_);
 
     float yscale = width/static_cast<float>(pc->scan_width_);
     float xscale = height/static_cast<float>(pc->scan_height_);
 
+    if(yscale <  xscale){
+        aspect_ratio_ = QVector2D(1, yscale*4);
+    }
+    else{
+        aspect_ratio_ = QVector2D(xscale*4, 1);
+    }
+
+    /*
     if(ar_screen == 1.0f && ar_scan == 1.0f)
         aspect_ratio_ = QVector2D(1, 1);
     else if(ar_screen < 1.0f && ar_scan == 1.0f)
@@ -282,6 +290,8 @@ void FlatView::resizeGL(int width, int height) {
         aspect_ratio_ = QVector2D(1, yscale);
     else if(ar_screen > 1.0f && ar_scan > 1.0f)
         aspect_ratio_ = QVector2D(1, yscale*2);
+    */
+
 
     program_.bind(); CE();
     glUniform2f(uni_aspect_ratio_, aspect_ratio_.x(), aspect_ratio_.y()); CE();

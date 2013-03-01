@@ -55,15 +55,11 @@ class FlatView : public QGLWidget {
    int uni_select_color_;
    int uni_width_;
    int uni_height_;
-   int uni_scale_;
-   int uni_offset_;
-   int uni_aspect_ratio_;
    int uni_camera_;
    GLuint texture_id_;
    GLuint vao_;
 
-   float scale_;
-   QVector2D offset_;
+   float current_scale_;
    QVector2D saved_offset_;
    QVector2D aspect_ratio_;
 

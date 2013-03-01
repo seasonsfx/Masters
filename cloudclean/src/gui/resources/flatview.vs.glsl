@@ -9,9 +9,6 @@ uniform samplerBuffer sampler;
 uniform vec4 select_color;
 uniform int width;
 uniform int height;
-uniform float scale;
-uniform vec2 offset;
-uniform vec2 aspect_ratio;
 uniform mat3 camera;
 
 out vec4 colour;
@@ -34,14 +31,5 @@ void main( void ) {
     // put in ndc space
     pos = (pos/vec3(width, height, 1) - 0.5f) * 2.0f;
 
-    /*vec2 s = scale * aspect_ratio;
-    vec2 tr = (offset/vec2(width, height) - 0.5f) * 2.0f;
-    mat3 camera = mat3(
-        s.x, 0.0f, 0.0f,
-        0.0f, s.y, 0.0f,
-        tr.x, tr.y, 1.0f
-    );
-    */
-
-    gl_Position = vec4((pos*camera).xy, 0, 1);
+    gl_Position = vec4((camera*pos).xy, 0, 1);
 }

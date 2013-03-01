@@ -8,10 +8,9 @@ FlatView::FlatView(QGLFormat & fmt, std::shared_ptr<CloudList> cl,
     : QGLWidget(fmt, parent, sharing) {
     cl_ = cl;
     ll_ = ll;
-    scale_ = 1.0f;
+    current_scale_ = 1;
     aspect_ratio_ = QVector2D(-1, -1);
     camera_.setIdentity();
-    offset_ = QVector2D(0, 0);
     setMouseTracking(true); // Track mouse when up
 }
 
@@ -90,9 +89,6 @@ void FlatView::setCloud(std::shared_ptr<PointCloud> new_pc) {
     connect(pc->ed_.get(), SIGNAL(flagUpdate()), this, SLOT(update()));
     connect(pc->ed_.get(), SIGNAL(labelUpdate()), this, SLOT(update()));
 
-    scale_ = 1.0f;
-    offset_ = QVector2D(0, 0);
-
     update();
 }
 
@@ -113,14 +109,21 @@ void FlatView::mouseMoveEvent(QMouseEvent * event) {
         */
     }
     else if(event->buttons() == Qt::RightButton){
-         offset_ = saved_offset_ + QVector2D(event->pos() - drag_start_pos);
-         update();
+        QVector2D dist(event->pos() - drag_start_pos);
+        dist.setX(2.0f*dist.x()/width());
+        dist.setY(2.0f*-dist.y()/height());
+        dist += saved_offset_;
+
+        camera_(0, 2) = dist.x();
+        camera_(1, 2) = dist.y();
+
+        update();
     }
 }
 
 void FlatView::mousePressEvent(QMouseEvent * event) {
     drag_start_pos = event->pos();
-    saved_offset_ = offset_;
+    saved_offset_ = QVector2D(camera_(0,2), camera_(1,2));
 }
 
 void FlatView::mouseReleaseEvent(QMouseEvent * event) {
@@ -130,17 +133,27 @@ void FlatView::mouseReleaseEvent(QMouseEvent * event) {
 
 void FlatView::wheelEvent(QWheelEvent * event) {
     float delta = (event->delta()/120.0f) * 1.1;
+    float s = 1.0f;
 
-    if(delta > 0 && scale_ < 100){
-        scale_ *= delta;
-        // offset in direction of mouse
-        float x = (this->width()/2.0 - event->x())/2.0f;
-        float y = (this->height()/2.0 - event->y())/2.0f;
-        offset_ += QVector2D(x, y);
-    }
-    else if (delta < 0 && scale_ > 0.01){
-        scale_ /= -delta;
-    }
+    // NDC translate
+    Eigen::Matrix3f translate;
+    translate.setIdentity();
+    translate(0, 2) = 2.0f* ((event->x()/float(width())) - 0.5);
+    translate(1, 2) = -2.0f* ((event->y()/float(height())) - 0.5);
+
+    if(delta > 0 && current_scale_ < 100)
+        s = delta;
+    else if (delta < 0 && current_scale_ > 0.01)
+        s = 1/-delta;
+
+    Eigen::Matrix3f scale;
+    scale.setIdentity();
+    scale(0, 0) = s;
+    scale(1, 1) = s;
+
+    camera_ = translate * scale * translate.inverse() * camera_;
+
+    current_scale_ *= s;
     update();
 }
 
@@ -178,9 +191,6 @@ void FlatView::initializeGL() {
     uni_sampler_ = program_.uniformLocation("sampler"); RC(uni_sampler_);
     uni_width_ = program_.uniformLocation("width"); RC(uni_width_);
     uni_height_ = program_.uniformLocation("height"); RC(uni_height_);
-    uni_scale_ = program_.uniformLocation("scale"); RC(uni_scale_);
-    uni_offset_ = program_.uniformLocation("offset"); RC(uni_offset_);
-    uni_aspect_ratio_ = program_.uniformLocation("aspect_ratio"); RC(uni_aspect_ratio_);
     uni_select_color_ = program_.uniformLocation("select_color"); RC(uni_select_color_);
     uni_camera_ = program_.uniformLocation("camera"); RC(uni_camera_);
     program_.release();
@@ -214,11 +224,10 @@ void FlatView::paintGL() {
 
     program_.bind(); CE();
 
+    glUniformMatrix3fv(uni_camera_, 1, GL_FALSE, camera_.data()); CE();
     glUniform1i(uni_width_, pc->scan_width_); CE();
     glUniform1i(uni_height_, pc->scan_height_); CE();
-    glUniform1f(uni_scale_, scale_); CE();
     glUniform1i(uni_sampler_, 0); CE();
-    glUniform2f(uni_offset_, offset_.x(), offset_.y());
     glBindTexture(GL_TEXTURE_BUFFER, texture_id_); CE();
     glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, gld_->color_lookup_buffer_->bufferId()); CE();
 
@@ -272,16 +281,12 @@ void FlatView::resizeGL(int width, int height) {
     else
         aspect_ratio_ = QVector2D(xscale*4, 1);
 
-    float tr_x = (offset_.x()/width - 0.5f) * 2.0f;
-    float tr_y = (offset_.y()/height - 0.5f) * 2.0f;
 
-    camera_ << scale_*aspect_ratio_.x(), 0, tr_x,
-               0, scale_*aspect_ratio_.y(), tr_y,
-               0, 0, 1.0f;
+    camera_(0, 0) = current_scale_*aspect_ratio_.x();
+    camera_(1, 1) = current_scale_*aspect_ratio_.y();
+
 
     program_.bind(); CE();   
-    glUniformMatrix3fv(uni_camera_,1, GL_FALSE, camera_.data()); CE();
-    glUniform2f(uni_aspect_ratio_, aspect_ratio_.x(), aspect_ratio_.y()); CE();
+    glUniformMatrix3fv(uni_camera_, 1, GL_FALSE, camera_.data()); CE();
     program_.release(); CE();
-
 }

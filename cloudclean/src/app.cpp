@@ -214,6 +214,7 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
         QMetaObject::invokeMethod(progressbar_, "setRange", Q_ARG(int, 0), Q_ARG(int, 100));
         QMetaObject::invokeMethod(progressbar_, "reset");
         qDebug() << "Loaded";
+        qDebug() << "Size: " << pc->size();
     };
 
     //std::thread(loadcloud, "/home/rickert/trees.ptx").detach();

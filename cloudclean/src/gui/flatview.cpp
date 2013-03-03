@@ -51,6 +51,15 @@ int binary_search(std::vector<int> A, int key) {
 
 inline int FlatView::imageToCloudIdx(int x, int y){
     std::shared_ptr<PointCloud> pc = pc_.lock();
+    if(x < 0 || x > pc->scan_width_){
+        qDebug() << "x out of range";
+        return -1;
+    }
+    else if(y < 0 || y > pc->scan_height_){
+        qDebug() << "y out of range";
+        return -1;
+    }
+
     return cloud_idx_lookup_[x + y*pc->scan_width_];
 }
 
@@ -94,19 +103,24 @@ void FlatView::setCloud(std::shared_ptr<PointCloud> new_pc) {
 
 void FlatView::mouseMoveEvent(QMouseEvent * event) {
     if(event->buttons() == Qt::LeftButton ){
-        /*int idx = imageToCloudIdx(event->x(), event->y());
-        if (idx != -1){
-            std::shared_ptr<PointCloud> pc = pc_.lock();
+        std::shared_ptr<PointCloud> pc = pc_.lock();
 
+        Eigen::Vector3f coord;
+        coord << 2.0f* (event->x()/float(width()) - 0.5),
+            -2.0f* (event->y()/float(height()) - 0.5), 1;
+        coord = camera_.inverse() * coord;
+        coord[1] = -coord[1];
+        coord = coord/2.0f+Eigen::Vector3f(0.5f, 0.5f, 1.0f);
+        Eigen::Vector3f scan_dim(pc->scan_width_, pc->scan_height_, 1.0f);
+        coord = scan_dim.cwiseProduct(coord);
+        int idx = imageToCloudIdx(int(coord.x() + 0.5), int(coord.y() + 0.5));
+
+        if (idx != -1){
             PointFlags & pf = pc->flags_[idx];
             pf = PointFlags((uint8_t(PointFlags::selected)) | uint8_t(pf));
-
-            update();
-
-            //emit labelUpdate();
             pc->ed_->emitflagUpdate();
         }
-        */
+
     }
     else if(event->buttons() == Qt::RightButton){
         QVector2D dist(event->pos() - drag_start_pos);
@@ -273,18 +287,20 @@ void FlatView::resizeGL(int width, int height) {
 
     auto pc = pc_.lock();
 
-    float yscale = width/static_cast<float>(pc->scan_width_);
-    float xscale = height/static_cast<float>(pc->scan_height_);
+    float war = width/float(height);
+    float sar = pc->scan_width_/float(pc->scan_height_);
 
-    if(yscale <  xscale)
-        aspect_ratio_ = QVector2D(1, yscale*4);
+    float cfx = sar/war;
+    float cfy = (1/sar)/(1/war);
+
+    // if wider than scan
+    if(war <  sar)
+        aspect_ratio_ = QVector2D(1, 1/cfx);
     else
-        aspect_ratio_ = QVector2D(xscale*4, 1);
-
+        aspect_ratio_ = QVector2D(1/cfy, 1);
 
     camera_(0, 0) = current_scale_*aspect_ratio_.x();
     camera_(1, 1) = current_scale_*aspect_ratio_.y();
-
 
     program_.bind(); CE();   
     glUniformMatrix3fv(uni_camera_, 1, GL_FALSE, camera_.data()); CE();

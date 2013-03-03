@@ -174,7 +174,10 @@ void GLWidget::mouseReleaseEvent(QMouseEvent * event) {
 }
 
 void GLWidget::wheelEvent(QWheelEvent * event) {
-    camera_.mouseWheel(event->delta());
+    float x = 2.0f* ((event->x()/float(width())) - 0.5);
+    float y = -2.0f* ((event->y()/float(height())) - 0.5);
+
+    camera_.mouseWheel(event->delta(), x, y);
     updateGL();
 }
 

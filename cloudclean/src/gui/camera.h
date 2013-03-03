@@ -95,7 +95,7 @@ class DLLSPEC Camera {
     void mouseDown(int x, int y, int button);
     void mouseRelease(int x, int y);
     void mouseMove(int x, int y);
-    void mouseWheel(int val);
+    void mouseWheel(int val, float x = 0, float y = 0);
 
  private:
     void recalculateModelviewMatrix();

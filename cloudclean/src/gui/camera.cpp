@@ -230,7 +230,8 @@ void Camera::mouseMove(int x, int y) {
     mModelviewMatrixDirty = true;
 }
 
-void Camera::mouseWheel(int val) {
+void Camera::mouseWheel(int val, float x, float y) {
+    //mLookAt = AngleAxis<float>(x) * AngleAxis<float>(y) * mLookAt;
     // Mouse seems to move in 120 increments
     val = -val/60.0f;
     if (mFoV + val < 170.0f && mFoV + val > 2.0f)

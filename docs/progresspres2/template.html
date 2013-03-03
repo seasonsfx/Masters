@@ -15,29 +15,158 @@
 </section>
 
 <section>
-    <p>Some random text: But I've never been to the moon! You can see how I lived before I met you. Also Zoidberg.
-    I could if you hadn't turned on the light and shut off my stereo.</p>
+    <h1>?</h1>
 </section>
 
 <section>
-    <h3>An incremental list</h3>
+    <h2>I'm trying to remove ...</h2>
+</section>
+
+<section>
+    <figure>
+      <img src="pics/tree.jpg">
+      <figcaption><h1 class="white">trees<h1></figcaption>
+    </figure>
+</section>
+
+<section>
+    <figure>
+      <img src="pics/treecloud.jpg">
+	<figcaption><h1 class="black">from pointclouds...</h1></figcaption>
+    </figure>
+</section>
+
+<section>
+      <figure>
+      <img src="pics/lumberjack2.png">
+    </figure>
+</section>
+
+<section>
+	<h2>Why?</h2>
+</section>
+
+<section>
+<figure>
+    <img src="pics/zamani.png">
+</figure>
+</section>
+
+<section>
+    <h3>Cleaning point clouds is hard</h3>
     <ul class="incremental">
-      <li>Item 1
-      <li>Item 2
-      <li>Item 3
+      <li>Very manual process
+      <li>Takes 30min - 2hour per scan
+      <li>Up to 2000 scans per expedition
     </ul>
-    <div role="note">Some notes. They are only visible using onstage shell.</div>
 </section>
 
 <section>
-  <blockquote>
-    Who's brave enough to fly into something we all keep calling a death sphere?
-  </blockquote>
-  <details>
-    <p>In the onstage shell, notes scroll rather than overflow:</p>
-    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla ac dui eu est feugiat lacinia sit amet nec leo. Mauris eu ipsum leo. Nulla mi odio, cursus sed sollicitudin non, fringilla id magna. Suspendisse sit amet posuere elit. Maecenas iaculis, turpis a placerat imperdiet, libero lorem feugiat nisi, nec tincidunt diam nibh sit amet massa. Vestibulum quis adipiscing tellus. Maecenas sollicitudin sodales pulvinar. Donec dui ipsum, bibendum facilisis consequat interdum, tempus ut mauris. Aliquam ut dolor nec odio scelerisque bibendum quis in neque. Aliquam dui dui, pulvinar quis fermentum quis, gravida eu augue. Nunc tristique dolor a urna pulvinar bibendum. Curabitur mollis cursus neque, in scelerisque metus porta non. Donec tempor enim in nibh vestibulum et convallis nisi malesuada. Duis ut lectus sed metus venenatis porttitor id pharetra quam. Suspendisse sapien turpis, ornare in molestie et, gravida eget turpis.
-    </p>
-  </details>
+    <h2>Making this easier and faster would be great</h2>
+</section>
+
+
+<section>
+    <h2>Project has limited scope so I decided focus on trees</h2>
+</section>
+
+<section>
+    <h2>Because also the hardest to clean</h2>
+</section>
+
+<section>
+    <h3>Ideal solution</h3>
+    <ul class="incremental">
+      <li>Simple interaction
+      <li>Real time
+      <li>Accurate
+    </ul>
+</section>
+
+<section>
+    <h2>So, I have tried some things...</h2>
+    <div role="note">
+    </div>
+</section>
+
+<section>
+	<h2>Point Normals</h2>
+	<img src="pics/normals.png"/>
+	<div role="note">
+		<h2>Normal noise metric</h2>
+		<ul>
+			<li> Calculate a noise metric for each point
+			<li> User specifies how noisey
+			<li> User clicks point in tree
+			<li> Grow region to neighbours, if LOWER_BOUND &gt; point_noise_metric &lt; UPPER_BOUND
+		</ul>
+	
+		<h2>Does it work?</h2>
+		<ul>
+			<li class ="slide"> Nope</li>
+			<li class ="slide"> Region doesn't grow very far</li>
+			<li class ="slide"> Turbulant areas seen to be isolated</li>
+			<li class ="slide"> Could be a problem with normal estimation</li>
+		</ul>
+	
+	</div>
+</section>
+
+
+<section>
+    <h3>Fast Point Feature Histograms (FPFH)</h3>
+    <center><img src="pics/fpfh.png"/></center>
+    <div role="note">
+	<ul>
+		<li>Grow region to neighbours within a threshold feature distance.
+		<li>Euclidian distance or Cosine similarity used.
+	</ul>
+    </div>
+</section>
+
+<section>
+    <h3>Region growing with principle components</h3>
+	<center><img src="pics/plane.png"/></center>
+
+    <div role="note">
+	
+	<ul>
+		<li>Find what is not a tree
+		<li>Specify along which axis the points lie
+		<li>Not quite realtime but GPU could work
+		<li>1:0:0 finds edges
+		<li>1:1:0 finds planes
+		
+	</ul>
+    </div>
+</section>
+
+<section>
+    <figure>
+      <img src="pics/mincut.png">
+	<figcaption><h3>Min Cuts</h3></figcaption>
+    </figure>
+
+    <div role="note">
+	
+	<ul>
+		<li>Set up a K-neighbourhood graph
+		<li>Points are highly connected to other points in the same object
+		<li>Points are weakly connected to points the background
+
+		<li>Weights between points = exp(-distance/density)^2
+		<li>Have user select point on object (tree)
+		<li>Penalise edges far away from center
+
+		<li>S-T cut seperates object from background
+
+		<li>Bit slow to set up graph
+		<li>Seems to work pretty well
+		<li>Results dependent on correct parameters.
+		<li>Tried a modification that failed miserably
+	</ul>
+
+    </div>
 </section>
 
 <section>
@@ -45,22 +174,83 @@
 </section>
 
 <section>
-    <figure> <!-- Figures are used to display images and videos fullpage -->
-      <img src="http://placekitten.com/g/800/600">
-      <figcaption>An image</figcaption>
-    </figure>
-    <div role="note">Kittens are so cute!</div>
+    <h2>Decide to give Zamani a prototype</h2>
 </section>
 
+
 <section>
-    <figure> <!-- Videos are automatically played -->
-      <video src="http://videos-cdn.mozilla.net/brand/Mozilla_Firefox_Manifesto_v0.2_640.webm" poster="http://www.mozilla.org/images/about/poster.jpg"></video>
-      <figcaption>A video</figcaption>
+    <figure>
+      <img src="pics/win.jpg">
+      <!--<figcaption class="white">Requested windows port</figcaption>-->
     </figure>
 </section>
 
 <section>
-    <h2>End!</h2>
+    <h3>All the packages I used are cross platform, so it shouldn't be that hard, right?</h3>
+</section>
+
+<section>
+    <figure>
+      <img src="pics/grumpy.jpg">
+      <!--<figcaption class="white">Requested windows port</figcaption>-->
+    </figure>
+</section>
+
+<section>
+    <h3>Issues</h3>
+    <ul class="incremental">
+      <li>Incompatible precompiled dependencies
+      <li>No precompiled QT 64 bit version for windows
+      <li>Windows PE executables dont export symbols
+      <li>__declspec(dllexport)
+    </ul>
+</section>
+
+<section>
+    <h3>Windows inspired changes</h3>
+    <ul class="incremental">
+      <li>QMake to CMake & CPack for cross platform builds
+      <li>Compiled all dependencies from source
+      <li>Refactor plugin system to work with PE
+    </ul>
+</section>
+
+<section>
+    <h3>Prototype looks pretty good in the end.</h3>
+    <h3>So I go to Geomatics...</h3>
+</section>
+
+<section>
+    <figure>
+      <img src="pics/code-07.gif">
+      <!--<figcaption class="white">Requested windows port</figcaption>-->
+    </figure>
+</section>
+
+<section>
+      <h3>Problems</h3>
+      <ul class="incremental">
+      <li>Quirk in PTX file
+      <li>System freezes on load
+      <li>They have software package thats pretty fast and effective
+    </ul>
+
+    <div role="note">
+	
+	<ul>
+		<li>X & Z has filters
+		<li>Implementing 2d plugins
+		<li>Normals removed from start
+		<li>Normals should go to CPU
+		<li>Flip switch for ptx
+		<li>//File sizes much larger
+	</ul>
+    </div>
+
+</section>
+
+<section>
+    <h2>Questions!</h2>
 </section>
 
 <!-- Your Style -->
@@ -91,6 +281,17 @@
     text-align: center;
     margin: 1em 0 1em 0;
   }
+
+  .white {
+	color: #FFFFFF;
+	/*text-shadow: -3px 0 black, 0 3px black, 3px 0 black, 0 -1px black;*/
+	text-shadow: 0 0 20px #000;
+   }
+  .black {
+	color: #000000;
+	/*text-shadow: -3px 0 white, 0 3px white, 3px 0 white, 0 -1px black;*/
+	text-shadow: 0 0 20px #FFF;
+   }
 
   h1, h2 {
     margin-top: 200px;

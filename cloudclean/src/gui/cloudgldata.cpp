@@ -52,13 +52,18 @@ CloudGLData::CloudGLData(std::shared_ptr<PointCloud> pc) {
     QMetaObject::invokeMethod(this, "syncFlags");
     QMetaObject::invokeMethod(this, "syncLabels");
 
-    connect(pc_->ed_.get(), SIGNAL(flagUpdate()), this, SLOT(syncFlags()));
-    connect(pc_->ed_.get(), SIGNAL(labelUpdate()), this, SLOT(syncLabels()));
+
+    connect(pc_->ed_.get(), SIGNAL(flagUpdate(std::shared_ptr<std::vector<int> >)),
+            this, SLOT(syncFlags(std::shared_ptr<std::vector<int> >)));
+    connect(pc_->ed_.get(), SIGNAL(labelUpdate(std::shared_ptr<std::vector<int> >)),
+            this, SLOT(syncLabels(std::shared_ptr<std::vector<int> >)));
 }
 
 CloudGLData::~CloudGLData() {
-    disconnect(pc_->ed_.get(), SIGNAL(flagUpdate()), this, SLOT(syncFlags()));
-    disconnect(pc_->ed_.get(), SIGNAL(labelUpdate()), this, SLOT(syncLabels()));
+    disconnect(pc_->ed_.get(), SIGNAL(flagUpdate(std::shared_ptr<std::vector<int> >)),
+               this, SLOT(syncFlags(std::shared_ptr<std::vector<int> >)));
+    disconnect(pc_->ed_.get(), SIGNAL(labelUpdate(std::shared_ptr<std::vector<int> >)),
+               this, SLOT(syncLabels(std::shared_ptr<std::vector<int> >)));
 }
 
 void CloudGLData::setVAO(GLuint vao){
@@ -101,12 +106,14 @@ void CloudGLData::copyCloud(){
     point_buffer_->allocate(vb_size); CE();
     float * pointbuff =
             static_cast<float *>(glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY)); CE();
+
     for(int i = 0; i < pc_->size(); i++) {
         pointbuff[i*4] = (*pc_)[i].x;
         pointbuff[i*4+1] = (*pc_)[i].y;
         pointbuff[i*4+2] = (*pc_)[i].z;
         pointbuff[i*4+3] = (*pc_)[i].intensity;
     }
+
     glUnmapBuffer(GL_ARRAY_BUFFER);
     point_buffer_->release(); CE();
     qDebug() << "Synced cloud";
@@ -117,8 +124,15 @@ void CloudGLData::copyLabels(){
     label_buffer_->allocate(pc_->size()*sizeof(int16_t)); CE();
     int16_t * layerbuff =
             static_cast<int16_t *>(glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY)); CE();
-    for(int i = 0; i < pc_->labels_.size(); i++){
-        layerbuff[i] = pc_->labels_[i];
+
+    if(dirty_label_list_.get() == nullptr){
+        for(int i = 0; i < pc_->labels_.size(); i++){
+            layerbuff[i] = pc_->labels_[i];
+        }
+    } else {
+        for(int i : *dirty_label_list_){
+            layerbuff[i] = pc_->labels_[i];
+        }
     }
     glUnmapBuffer(GL_ARRAY_BUFFER);
     label_buffer_->release(); CE();
@@ -129,9 +143,15 @@ void CloudGLData::copyFlags(){
     flag_buffer_->bind(); CE();
     uint8_t * flag_buffer =
             static_cast<uint8_t *>(glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY)); CE();
-    for(int i = 0; i < pc_->size(); i++) {
-        flag_buffer[i] = static_cast<uint8_t>(pc_->flags_[i]);
+
+    if(dirty_flag_list_.get() == nullptr){
+        for(int i = 0; i < pc_->size(); i++)
+            flag_buffer[i] = static_cast<uint8_t>(pc_->flags_[i]);
+    } else {
+        for(int i : *dirty_flag_list_)
+            flag_buffer[i] = static_cast<uint8_t>(pc_->flags_[i]);
     }
+
     glUnmapBuffer(GL_ARRAY_BUFFER);
     flag_buffer_->release(); CE();
     qDebug() << "Synced flags";
@@ -149,15 +169,17 @@ void CloudGLData::copyGrid(){
     qDebug() << "Synced grid";
 }
 
-void CloudGLData::syncCloud(){
+void CloudGLData::syncCloud() {
     dirty_points_ = true;
 }
 
-void CloudGLData::syncLabels(){
+void CloudGLData::syncLabels(std::shared_ptr<std::vector<int> > idxs) {
+    dirty_label_list_ = idxs;
     dirty_labels_ = true;
 }
 
-void CloudGLData::syncFlags(){
+void CloudGLData::syncFlags(std::shared_ptr<std::vector<int> > idxs) {
+    dirty_flag_list_ = idxs;
     dirty_flags_ = true;
 }
 
@@ -177,6 +199,7 @@ void CloudGLData::draw(GLint vao){
     if(dirty_flags_){
         copyFlags();
         dirty_flags_ = false;
+        dirty_flag_list_.reset();
     }
     if(dirty_grid_){
         copyGrid();

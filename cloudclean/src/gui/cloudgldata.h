@@ -24,8 +24,8 @@ class CloudGLData : public QObject{
 
  public slots:
     void syncCloud();
-    void syncLabels();
-    void syncFlags();
+    void syncLabels(std::shared_ptr<std::vector<int> > idxs = nullptr);
+    void syncFlags(std::shared_ptr<std::vector<int> > idxs = nullptr);
 
  public:
     std::shared_ptr<PointCloud> pc_;
@@ -39,6 +39,11 @@ class CloudGLData : public QObject{
     bool dirty_points_;
     bool dirty_flags_;
     bool dirty_grid_;
+
+    std::shared_ptr<std::vector<int> > dirty_label_list_;
+    std::shared_ptr<std::vector<int> > dirty_point_list_;
+    std::shared_ptr<std::vector<int> > dirty_flag_list_;
+    std::shared_ptr<std::vector<int> > dirty_grid_list_;
 };
 
 

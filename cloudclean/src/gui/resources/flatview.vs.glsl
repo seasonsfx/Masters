@@ -22,14 +22,10 @@ void main( void ) {
         colour = colour * 0.7f + select_color * 0.3f;
     }
 
-
     vec3 pos;
     pos.y = float(position%height);
     pos.x = float(position/float(height));
     pos.z = 1;
-
-    // put in ndc space
-    pos = (pos/vec3(width, height, 1) - 0.5f) * 2.0f;
 
     gl_Position = vec4((camera*pos).xy, 0, 1);
 }

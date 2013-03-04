@@ -2,15 +2,18 @@
 #include <algorithm>
 #include <QDebug>
 #include <QMouseEvent>
+#include <QApplication>
 
 FlatView::FlatView(QGLFormat & fmt, std::shared_ptr<CloudList> cl,
                    std::shared_ptr<LayerList> ll, QWidget *parent, QGLWidget *sharing)
     : QGLWidget(fmt, parent, sharing) {
     cl_ = cl;
     ll_ = ll;
-    current_scale_ = 1;
+    current_scale_ = 2;
     aspect_ratio_ = QVector2D(-1, -1);
     camera_.setIdentity();
+    camera_(0,2) = -1;
+    camera_(1,2) = -0.5;
     setMouseTracking(true); // Track mouse when up
 }
 
@@ -109,17 +112,34 @@ void FlatView::mouseMoveEvent(QMouseEvent * event) {
         coord << 2.0f* (event->x()/float(width()) - 0.5),
             -2.0f* (event->y()/float(height()) - 0.5), 1;
         coord = camera_.inverse() * coord;
-        coord[1] = -coord[1];
-        coord = coord/2.0f+Eigen::Vector3f(0.5f, 0.5f, 1.0f);
-        Eigen::Vector3f scan_dim(pc->scan_width_, pc->scan_height_, 1.0f);
-        coord = scan_dim.cwiseProduct(coord);
-        int idx = imageToCloudIdx(int(coord.x() + 0.5), int(coord.y() + 0.5));
 
-        if (idx != -1){
-            PointFlags & pf = pc->flags_[idx];
-            pf = PointFlags((uint8_t(PointFlags::selected)) | uint8_t(pf));
-            pc->ed_->emitflagUpdate();
+        coord[1] = pc->scan_height_-coord[1];
+
+        std::shared_ptr<std::vector<int> > idxs;
+        idxs.reset(new std::vector<int>());
+
+        bool negative_select = QApplication::keyboardModifiers() == Qt::ControlModifier;
+
+        int size = 20;
+        for(int x = -size/2; x < size/2; x++){
+            for(int y = -size/2; y < size/2; y++){
+                if(x*x + y*y > (size/2.0f)*(size/2.0f) )
+                    continue;
+
+                int idx = imageToCloudIdx(int(coord.x() + x + 0.5), int(coord.y() + y + 0.5));
+                if (idx != -1){
+                    PointFlags & pf = pc->flags_[idx];
+                    if(negative_select)
+                        pf = PointFlags(~(uint8_t(PointFlags::selected)) & uint8_t(pf));
+                    else
+                        pf = PointFlags((uint8_t(PointFlags::selected)) | uint8_t(pf));
+
+                    idxs->push_back(idx);
+                }
+            }
         }
+
+        pc->ed_->emitflagUpdate(idxs);
 
     }
     else if(event->buttons() == Qt::RightButton){
@@ -295,9 +315,9 @@ void FlatView::resizeGL(int width, int height) {
 
     // if wider than scan
     if(war <  sar)
-        aspect_ratio_ = QVector2D(1, 1/cfx);
+        aspect_ratio_ = QVector2D(1.0f/pc->scan_width_, 1.0/(cfx*pc->scan_height_));
     else
-        aspect_ratio_ = QVector2D(1/cfy, 1);
+        aspect_ratio_ = QVector2D(1.0/(cfy*pc->scan_width_), 1.0f/pc->scan_height_);
 
     camera_(0, 0) = current_scale_*aspect_ratio_.x();
     camera_(1, 1) = current_scale_*aspect_ratio_.y();

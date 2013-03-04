@@ -2,6 +2,7 @@
 #define MODEL_CPOINTCLOUD_H_
 
 #include <mutex>
+#include <memory>
 #include <QObject>
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
@@ -10,13 +11,13 @@ class EventDispatcher : public QObject{
     Q_OBJECT
  public:
     void updateProgress(int value);
-    void emitlabelUpdate();
-    void emitflagUpdate();
+    void emitlabelUpdate(std::shared_ptr<std::vector<int> > idxs = nullptr);
+    void emitflagUpdate(std::shared_ptr<std::vector<int> > idxs = nullptr);
 
  signals:
    void progress(int percentage);
-   void flagUpdate();
-   void labelUpdate();
+   void flagUpdate(std::shared_ptr<std::vector<int> > idxs = nullptr);
+   void labelUpdate(std::shared_ptr<std::vector<int> > idxs = nullptr);
 };
 
 enum class PointFlags : int8_t {

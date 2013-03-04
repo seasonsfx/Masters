@@ -24,12 +24,12 @@ void EventDispatcher::updateProgress(int value){
     emit progress(value);
 }
 
-void EventDispatcher::emitlabelUpdate() {
+void EventDispatcher::emitlabelUpdate(std::shared_ptr<std::vector<int> > idxs) {
     emit labelUpdate();
 }
 
-void EventDispatcher::emitflagUpdate() {
-    emit flagUpdate();
+void EventDispatcher::emitflagUpdate(std::shared_ptr<std::vector<int> > idxs) {
+    emit flagUpdate(idxs);
 }
 
 PointCloud::PointCloud()

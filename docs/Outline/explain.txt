@@ -1,0 +1,45 @@
+Idx		Cloud		Label buffer (int)  	Flags (uint8)
+
+0		x y z i		0						Selected
+1		x y z i		2						Not seleceted
+2		x y z i		2						Selected
+3		x y z i		1						Selected
+4		x y z i		2						Selected
+5		x y z i		3						Not seleceted
+6		x y z i		5						Selected
+7		x y z i		4						Not seleceted
+
+
+
+Layer
+-------
+Layer name		Color		labels
+
+Grass			#009900		1, 2, 4
+Walls			#0000FF		0, 3
+Tree			#00FF00		2, 3
+
+
+GPU color lookup
+-----------------
+label 		color
+
+0 			Walls
+1			Grass
+3			mix(walls, tree)
+4			Grass
+
+
+Benefits
+---------
+Less memory
+Easy set operations
+Supports multiple clouds
+N layers requires sizeof(int) * cloud.size() space
+	Better than  N * sizeof(int) * cloud.size()
+One source of truth
+
+Tradeoffs
+---------
+Has to process CPU data structure and copy to GPU for GPGPU algos
+	Copy time should be little compared to processing

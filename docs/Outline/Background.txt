@@ -1,0 +1,47 @@
+Chapter 2: Background / Related Work (~8-20 pages)
+
+* More than a literature review
+* Organize related work - impose structure
+* Be clear as to how previous work being described relates to your own.
+* The reader should not be left wondering why you've described something!!
+* Critique the existing work - Where is it strong where is it weak? What are the unreasonable/undesirable assumptions?
+* Identify opportunities for more research (i.e., your thesis) Are there unaddressed, or more important related topics?
+* After reading this chapter, one should understand the motivation for and importance of your thesis
+* You should clearly and precisely define all of the key concepts dealt with in the rest of the thesis, and teach the reader what s/he needs to know to understand the rest of the thesis.
+
+Outline
+-------
+
+Literature:
+	Point cloud classification
+		Point cloud cleaning
+	UI research
+
+Implementations vs Research
+	Work related to point cloud cleaning can manifest as either published research or as applications. Ideally published research would result in some kind of publicly availible implementation and applications would publish or cite research. Unfortunately commercial applications often don't disclose their methods and publications don't release implementations.
+
+
+	This assymetric knowledge makes it hard to evaluate related work within the same framework. How easy is it to use classification method X from paper Y? In the absence of a user interface that implements method X and a user study, one can only speculate. What is the algorithmic complexity of method W in system Z? Again, without implementation details, one can only speculate.
+
+
+
+Taxonomy: Previous work will be critiqued based on this
+	User interaction:
+		Interactive input required?
+			Filters = no
+			Segmantation algorithms = no
+		Complex parameters?
+			
+		Intervention required?
+		Fine motor action?
+		Repetitive
+	Computational characteristics:
+		Time and space complexity of the method
+		Some methods might be to costly to run
+		Others might be costly but paralizale
+		Yet others may be costly but could be useful on small N
+			Presegment section and run algo on that
+		Realtime?
+	
+		
+

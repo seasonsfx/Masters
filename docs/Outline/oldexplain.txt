@@ -1,0 +1,23 @@
+Idx			Cloud			Layer 1		Layer 2
+0			x y z i 		0			-1
+1			x y z i 		1			-1
+2			x y z i 		-1			2
+3			x y z i 		3			-1
+4			x y z i 		-1			4
+5			x y z i 		5			-1
+6			x y z i 		6			-1
+7			x y z i 		7			-1
+
+
+Pro's
+-----
+Easy to render
+Easy to use on GPU
+
+Problems
+--------
+High memory overhead
+Has to filter -1 on CPU or lots of if statements
+Syncing between CPU and GPU is messy
+	2 sources of truth
+N layers requires N * sizeof(int) * cloud.size()

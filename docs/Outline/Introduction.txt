@@ -1,0 +1,54 @@
+Chapter 1: Introduction (~5-10 pages)
+
+Thesis Statement (one or two sentences)
+	What is your thesis about and what have you done?
+	If you have a hypothesis what is it?
+	How will you test (prove/disprove) your hypothesis?
+Motivation
+	Why is this problem you've worked on important
+Goals / Objectives
+	What are you trying to do and why?
+	How will you or the reader know if or when you've met your objectives?
+**** Contributions *****
+	What is new, different, better, significant?
+	Why is the world a better place because of what you've done?
+	What have you contributed to the field of research?
+	What is now known/possible/better because of your thesis?
+Outline of the thesis (optional)
+
+Outline
+-------
+
+
+Motitavtion
+	Point cloud cleaning is a manual and time consuming task.
+	Big impact on zamani productivity
+	Critique existng systems
+		Proprientary
+		Make open source
+		Accelerated memory eficient algorithm to remove trees...
+		GPU accelerations
+
+	Improvements over simple manual systems
+
+Goals
+	Speed up cleaning by making it faster (than what?) and less manual while maintaining accuracy.
+	(Is accuracy really important to mention? Surely if accuracy is compromised, it will simply require more manual effort to correct?)
+
+Contributions
+	* Evaluate usefullness of existing computer vision algorithms in the context of point cloud cleaning
+	* Determine the effectiveness of modifications made to existing algorithms
+	* Determine if mutual information can be used reduce labour
+
+
+(Evaluation)
+	Evaluate manual against automated in system
+	Assest performance measures
+		Memory & processing
+
+
+Make sure arguement is solid.
+Send before next weeks meeting.
+
+Implement undo functionality
+	Save state vs operations

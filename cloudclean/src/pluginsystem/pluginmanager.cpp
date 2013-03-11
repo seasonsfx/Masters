@@ -63,6 +63,28 @@ PluginManager::~PluginManager() {
 
 }
 
+void PluginManager::loadSpecs() {
+    // Look for plugin directory
+    QDir pluginsDir(qApp->applicationDirPath());
+    bool succ = false;
+    if (!succ)
+        succ = pluginsDir.cd("plugins");
+    if (!succ)
+        succ = pluginsDir.cd("../plugins");
+    if (!succ)
+        succ = pluginsDir.cd("../lib");
+    if (!succ)
+        succ = pluginsDir.cd("../lib/plugins");
+    if (!succ)
+        succ = pluginsDir.cd("/usr/lib/cloudclean/plugins");
+    if (!succ){
+        qDebug("Plugins directory not found!");
+        return;
+    }
+
+
+}
+
 void PluginManager::loadPlugins() {
     // Add locations to load dynamic libraries from
     qApp->addLibraryPath(qApp->applicationDirPath());

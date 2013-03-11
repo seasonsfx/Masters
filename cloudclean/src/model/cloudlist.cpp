@@ -1,9 +1,11 @@
 #include "cloudlist.h"
 #include <QTextStream>
+#include <QUndoStack>
 
-CloudList::CloudList(QObject *parent)
+CloudList::CloudList(QUndoStack * undostack, QObject *parent)
     : QAbstractListModel(parent) {
     mtx_ = new std::mutex();
+    undostack_ = undostack;
 }
 
 CloudList::~CloudList(){

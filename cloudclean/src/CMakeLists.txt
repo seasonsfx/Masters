@@ -14,12 +14,13 @@ INCLUDE_DIRECTORIES(
 add_subdirectory(gui)
 add_subdirectory(model)
 add_subdirectory(plugins)
+add_subdirectory(pluginsystem)
 
 #
 # Build main binary
 #
 FILE (GLOB project_SRCS *.cpp *.cxx *.cc *.C *.c *.h *.hpp)
-SET (project_SRCS ${project_SRCS} plugins/plugininterfaces.h)
+SET (project_SRCS ${project_SRCS} pluginsystem/plugininterfaces.h)
 SET (project_LIBS ${QT_LIBRARIES} cloudclean_gui)
 SET (project_BIN ${PROJECT_NAME})
 
@@ -37,6 +38,7 @@ target_link_libraries(${project_BIN}
     ${QT_QTGUI_LIBRARY}
     ${QT_QTOPENGL_LIBRARY}
     cloudclean_model
+    pluginsystem
 )
 #QT5_USE_MODULES(${project_BIN} Widgets Gui OpenGL)
 

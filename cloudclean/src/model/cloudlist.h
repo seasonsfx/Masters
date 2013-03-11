@@ -6,10 +6,12 @@
 #include <QAbstractListModel>
 #include <model/pointcloud.h>
 
+class QUndoStack;
+
 class CloudList : public QAbstractListModel {
     Q_OBJECT
  public:
-    explicit CloudList(QObject *parent = 0);
+    explicit CloudList(QUndoStack *undostack, QObject *parent = 0);
     ~CloudList();
     int rowCount(const QModelIndex & parent = QModelIndex()) const;
     QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
@@ -28,6 +30,7 @@ class CloudList : public QAbstractListModel {
 
  public:
     std::vector<std::shared_ptr<PointCloud> > clouds_;
+    QUndoStack * undostack_;
 };
 
 #endif // CLOUDLIST_H

@@ -8,8 +8,11 @@
 #include <memory>
 #include <thread>
 
+#include <QProgressBar>
+#include <QStatusBar>
+#include <QTabWidget>
+#include <QUndoStack>
 #include <QDesktopWidget>
-#include <QLabel>
 #include <QGridLayout>
 
 #ifdef _WIN32
@@ -149,8 +152,10 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
         std::exit(0);
     }
 
+    undostack_ = new QUndoStack();
+
     // initialise data model
-    cl_.reset(new CloudList());
+    cl_.reset(new CloudList(undostack_));
     ll_.reset(new LayerList());
 
     initGUI();

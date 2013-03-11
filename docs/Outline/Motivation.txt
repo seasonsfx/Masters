@@ -1,0 +1,74 @@
+Motivation for project
+======================
+
+Problem:
+--------
+    Point cloud cleaning is a manual and time consuming task.
+    Many systems provide manual cleaning tools.
+    Assisted cleaning methods lets a user leverage computational resources to perform this task more efficiently.
+    Assisted cleaning methods are available in many proprietary systems.
+    Cleaning vegetation however, remains a difficult task.
+
+Goals:
+------
+    Speed up cleaning of vegetation through assisted cleaning methods.
+    Show that our methods are improves on manual editing
+        Manual editing:
+            Brush tool
+            Lasso selection
+            Set operations
+    Compare the performance of our methods to existing methods.
+
+Contributions:
+--------------
+    * Show that assisted methods can reduce the time it takes to clean vegetation 
+    * Show that mutual information can be used reduce repeated work
+    * Evaluate usefulness of existing computer vision algorithms in the context of an interactive point cloud cleaning system?
+    
+
+Evaluation:
+-----------
+    Proposed user study 1:
+        Procedure:
+            Let users clean clouds with our system.
+            Let the control group use only the manual tools.
+            Let the experimental group use assisted tools. (How to make sure they use the automated tools and not just the manual tools that will also be available in this condition? Set quota?)
+
+        Metrics:
+            Accuracy as measured by point cloud diff
+            Speed
+
+        Notes:
+            Using our own baseline rules out confounding factors that would otherwise be present when comparing against existing systems.
+                Eg. Existing systems could perhaps have a better interface.
+        
+            However, this also does not make a strong argument in that our methods are better than those present in other systems.
+
+    Proposed user study 2:
+        Procedure:
+            Let users clean clouds with our system and existing systems.
+            Let control groups use the existing systems.
+                Measure a baseline by letting them only use manual tools
+                Measure improvement when using assisted tools.
+
+        Metrics:
+            Change in speed & accuracy relative to baseline.
+            Compare relative improvement between systems.
+
+        Notes:
+            Need to train users to use various systems
+            More users required
+            Can isolate the performance effect of using individual tools.
+            It would probably a good idea to perform post testing interviews in order to make sure observations can be attributed to the method. Also gain insight on short comings.
+
+    Expert opinion:
+        Interview the Zamani people and ask them what they think.
+
+
+    Algorithmic evaluation:
+        Purely descriptive?
+        Describe algorithmic complexity and compare to published methods.
+        Describe performance under various conditions?
+            Eg: Method performs at interactive levels when use on a subset of points, but becomes unresponsive when used on a full cloud
+
+        Describe results using different parameters. How were optimal parameters determined.

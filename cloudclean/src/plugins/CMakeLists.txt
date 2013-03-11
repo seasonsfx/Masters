@@ -1,1 +1,1 @@
-add_subdirectory(data_normals)
+add_subdirectory(helloworld)

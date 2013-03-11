@@ -36,7 +36,8 @@
  */
 
 #include "gui/camera.h"
-#include <math.h>
+#include <cmath>
+#include <mutex>
 #include <Eigen/LU>
 #include <QDebug>
 
@@ -49,6 +50,7 @@ template <typename T> int sgn(T val) {
 }
 
 Camera::Camera() {
+    mutex_ = new std::mutex();
     mFoV = 60.0f;
     mAspect = 1.0f;
     mDepthNear = 1.0f;

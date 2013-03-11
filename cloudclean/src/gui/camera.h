@@ -42,6 +42,9 @@
 #include "appexport.h"
 
 // Contains code from kgllib
+namespace std {
+    class mutex;
+}
 
 class DLLSPEC Camera {
  public:
@@ -133,6 +136,8 @@ class DLLSPEC Camera {
     bool mModelviewMatrixDirty;
     Eigen::Affine3f mProjectionMatrix;
     bool mProjectionMatrixDirty;
+
+    std::mutex * mutex_;
 };
 
 #endif  // CLOUDCLEAN_SRC_CLOUDCLEAN_CAMERA_H_

@@ -5,20 +5,23 @@
 #include <QtCore>
 #include <QtGui>
 #include <QApplication>
-#include <QProgressBar>
-#include <QStatusBar>
-#include <QTabWidget>
+
 #include <boost/shared_ptr.hpp>
 #include "gui/mainwindow.h"
 #include "gui/glwidget.h"
 #include "model/layerlist.h"
 #include "model/cloudlist.h"
 #include "gui/flatview.h"
-#include "pluginmanager.h"
+#include "pluginsystem/pluginmanager.h"
 
 #include "gui/layerlistview.h"
 #include "gui/cloudlistview.h"
 #include "gui/gldata.h"
+
+class QProgressBar;
+class QStatusBar;
+class QTabWidget;
+class QUndoStack;
 
 class App : public QApplication
 {
@@ -73,6 +76,7 @@ class App : public QApplication
         QTabWidget * tabs_;
         FlatView * flatview_;
         PluginManager * pm_;
+        QUndoStack * undostack_;
 };
 
 #endif

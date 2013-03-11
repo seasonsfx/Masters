@@ -2,3 +2,5 @@ Abstract (<= 1 page)
 
 one page stating what the thesis is about
 highlight the contributions of the thesis
+
+Removing unwanted objects from laser range scans is a costly part of the 3d reconstruction pipeline. Existing software leaves much to be desired in terms of efficiency, especially when removing vegetation. In this paper a semi-automated approach to laser scan segmentation is presented that lets a user automatically refine a crude selection of points. Refinement is performed by calculating point features for the selected region and performing a graph cut. GPU resources are used to speed up costly feature calculations. Exploiting mutual information in overlapping scans further allows the user to minimize repeated cleaning actions. It is shown that application of these techniques reduces the overall cleaning time by 50% relative to manual methods.

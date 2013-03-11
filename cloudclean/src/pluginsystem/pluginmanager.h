@@ -4,13 +4,15 @@
 #include <map>
 #include <string>
 #include <QObject>
-#include "plugins/plugininterfaces.h"
+#include "pluginsystem/plugininterfaces.h"
 
 class PluginManager : public QObject{
     Q_OBJECT
  public:
     PluginManager();
     ~PluginManager();
+    void loadSpecs();
+
     void loadPlugins();
  signals:
     void flushTest();

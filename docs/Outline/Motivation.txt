@@ -19,11 +19,17 @@ Goals:
             Set operations
     Compare the performance of our methods to existing methods.
 
+    Can my algorithms help clean clouds?
+
 Contributions:
 --------------
     * Show that assisted methods can reduce the time it takes to clean vegetation 
     * Show that mutual information can be used reduce repeated work
     * Evaluate usefulness of existing computer vision algorithms in the context of an interactive point cloud cleaning system?
+    * Sesible use of modern hardware
+    * Focus on open source
+        * Availible to many people
+        * Can facilitate future research
     
 
 Evaluation:
@@ -33,6 +39,7 @@ Evaluation:
             Let users clean clouds with our system.
             Let the control group use only the manual tools.
             Let the experimental group use assisted tools. (How to make sure they use the automated tools and not just the manual tools that will also be available in this condition? Set quota?)
+                Can log stuff in program
 
         Metrics:
             Accuracy as measured by point cloud diff
@@ -44,7 +51,7 @@ Evaluation:
         
             However, this also does not make a strong argument in that our methods are better than those present in other systems.
 
-    Proposed user study 2:
+    Proposed user study 2: (Nope)
         Procedure:
             Let users clean clouds with our system and existing systems.
             Let control groups use the existing systems.
@@ -60,15 +67,34 @@ Evaluation:
             More users required
             Can isolate the performance effect of using individual tools.
             It would probably a good idea to perform post testing interviews in order to make sure observations can be attributed to the method. Also gain insight on short comings.
+            Hard sell coz absolute time matters
+
+
 
     Expert opinion:
         Interview the Zamani people and ask them what they think.
+        Can ask how to do it withiut antagonising experts
 
 
-    Algorithmic evaluation:
+    Algorithmic evaluation (Emphisize):
         Purely descriptive?
         Describe algorithmic complexity and compare to published methods.
         Describe performance under various conditions?
             Eg: Method performs at interactive levels when use on a subset of points, but becomes unresponsive when used on a full cloud
 
         Describe results using different parameters. How were optimal parameters determined.
+
+        Focus:
+            Minimise computation
+            Preprocess
+            Report how much time is spent waiting and how much for processing
+            Why choose parameters
+
+
+    Experiments
+        Time to get used to system
+        Training
+
+    Less focus on user
+    Need to beef up algorithmic side of things
+    Show mastery of reseatrch methods

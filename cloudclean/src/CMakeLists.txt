@@ -36,6 +36,7 @@ target_link_libraries(${project_BIN}
     ${QT_QTCORE_LIBRARY}
     ${QT_QTGUI_LIBRARY}
     ${QT_QTOPENGL_LIBRARY}
+    ${Boost_LIBRARIES}
     cloudclean_model
 )
 #QT5_USE_MODULES(${project_BIN} Widgets Gui OpenGL)

@@ -187,13 +187,13 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
 
         // make a selection
         std::vector<PointFlags> & flags = pc->flags_;
-        for(int i = 0; i < flags.size()/5; i++){
+        for(uint i = 0; i < flags.size()/5; i++){
             flags[i] = PointFlags::selected;
         }
 
         // label the cloud
         std::vector<int16_t> & labels = pc->labels_;
-        for(int i = 0; i < labels.size(); i++){
+        for(uint i = 0; i < labels.size(); i++){
             labels[i] = i%5;
         }
 
@@ -218,8 +218,8 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
     };
 
     //std::thread(loadcloud, "/home/rickert/trees.ptx").detach();
-    std::thread(loadcloud, "/home/rickert/Workspace/uscans/2011.06.11-10.23.54.zfs_cy.ptx").detach();
-    //std::thread(loadcloud, "/home/rickert/Workspace/uscans/Petra_Top_xf.ptx").detach();
+    //std::thread(loadcloud, "/home/rickert/Workspace/uscans/2011.06.11-10.23.54.zfs_cy.ptx").detach();
+    std::thread(loadcloud, "/home/rickert/Workspace/uscans/Petra_Top_xf.ptx").detach();
     //std::thread(loadcloud, "/home/rickert/Petra_Top_xf.ptx").detach();
 }
 
@@ -442,6 +442,7 @@ bool App::notify(QObject * receiver, QEvent * event){
         qDebug() << "Exception thrown:" << e.what();
         exit(1);
     }
+    return true;
 }
 
 App* App::_instance = 0;

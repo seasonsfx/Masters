@@ -29,7 +29,7 @@ void LayerListView::selectionChanged(const QItemSelection &sel,
         std::shared_ptr<Layer> layer = ll_->layers_[s.row()];
 
         for(std::shared_ptr<PointCloud> pc : cl_->clouds_){
-            for(int i = 0; i < pc->flags_.size(); i++){
+            for(uint i = 0; i < pc->flags_.size(); i++){
                 // if label in layer
                 uint8_t label = pc->labels_[i];
                 if(ll_->layer_lookup_table_[label].lock() == layer){
@@ -44,7 +44,7 @@ void LayerListView::selectionChanged(const QItemSelection &sel,
         std::shared_ptr<Layer> layer = ll_->layers_[s.row()];
 
         for(std::shared_ptr<PointCloud> pc : cl_->clouds_){
-            for(int i = 0; i < pc->flags_.size(); i++){
+            for(uint i = 0; i < pc->flags_.size(); i++){
                 // if label in layer
                 uint8_t label = pc->labels_[i];
                 if(ll_->layer_lookup_table_[label].lock() == layer){

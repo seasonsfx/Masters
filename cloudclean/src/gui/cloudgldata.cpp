@@ -107,7 +107,7 @@ void CloudGLData::copyCloud(){
     float * pointbuff =
             static_cast<float *>(glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY)); CE();
 
-    for(int i = 0; i < pc_->size(); i++) {
+    for(uint i = 0; i < pc_->size(); i++) {
         pointbuff[i*4] = (*pc_)[i].x;
         pointbuff[i*4+1] = (*pc_)[i].y;
         pointbuff[i*4+2] = (*pc_)[i].z;
@@ -126,7 +126,7 @@ void CloudGLData::copyLabels(){
             static_cast<int16_t *>(glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY)); CE();
 
     if(dirty_label_list_.get() == nullptr){
-        for(int i = 0; i < pc_->labels_.size(); i++){
+        for(uint i = 0; i < pc_->labels_.size(); i++){
             layerbuff[i] = pc_->labels_[i];
         }
     } else {
@@ -145,7 +145,7 @@ void CloudGLData::copyFlags(){
             static_cast<uint8_t *>(glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY)); CE();
 
     if(dirty_flag_list_.get() == nullptr){
-        for(int i = 0; i < pc_->size(); i++)
+        for(uint i = 0; i < pc_->size(); i++)
             flag_buffer[i] = static_cast<uint8_t>(pc_->flags_[i]);
     } else {
         for(int i : *dirty_flag_list_)
@@ -161,7 +161,7 @@ void CloudGLData::copyGrid(){
     grid_buffer_->bind(); CE();
     int * gridbuff =
             static_cast<int *>(glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY)); CE();
-    for(int i = 0; i < pc_->cloud_to_grid_map_.size(); i++){
+    for(uint i = 0; i < pc_->cloud_to_grid_map_.size(); i++){
         gridbuff[i] = pc_->cloud_to_grid_map_[i];
     }
     glUnmapBuffer(GL_ARRAY_BUFFER);

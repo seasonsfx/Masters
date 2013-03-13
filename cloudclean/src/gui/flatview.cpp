@@ -93,14 +93,13 @@ void FlatView::setCloud(std::shared_ptr<PointCloud> new_pc) {
     pc_ = new_pc;
     std::shared_ptr<PointCloud> pc = pc_.lock();
     cloud_idx_lookup_.resize(pc->scan_width_*pc->scan_height_, -1);
-    for(int idx = 0 ; idx < pc->cloud_to_grid_map_.size(); idx++){
+    for(uint idx = 0 ; idx < pc->cloud_to_grid_map_.size(); idx++){
         QPoint p = cloudToImageCoord(idx);
         cloud_idx_lookup_[p.x() + p.y()*pc->scan_width_] = idx;
     }
 
     connect(pc->ed_.get(), SIGNAL(flagUpdate()), this, SLOT(update()));
     connect(pc->ed_.get(), SIGNAL(labelUpdate()), this, SLOT(update()));
-
     update();
 }
 
@@ -246,6 +245,7 @@ void FlatView::initializeGL() {
 
 
 void FlatView::paintGL() {
+    resizeGL(width(), height());
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     if(pc_.expired()){
@@ -305,6 +305,8 @@ void FlatView::paintGL() {
 void FlatView::resizeGL(int width, int height) {
     glViewport(0, 0, width, qMax(height, 1));
 
+    if(pc_.expired())
+        return;
     auto pc = pc_.lock();
 
     float war = width/float(height);
@@ -318,6 +320,9 @@ void FlatView::resizeGL(int width, int height) {
         aspect_ratio_ = QVector2D(1.0f/pc->scan_width_, 1.0/(cfx*pc->scan_height_));
     else
         aspect_ratio_ = QVector2D(1.0/(cfy*pc->scan_width_), 1.0f/pc->scan_height_);
+
+    qDebug() << "screen: " << width << height;
+    qDebug() << "scan: " << pc->scan_width_ << pc->scan_height_;
 
     camera_(0, 0) = current_scale_*aspect_ratio_.x();
     camera_(1, 1) = current_scale_*aspect_ratio_.y();

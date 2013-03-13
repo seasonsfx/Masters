@@ -52,12 +52,13 @@ ELSE (CMAKE_SIZEOF_VOID_P EQUAL 8)
   SET (_OPENCL_POSSIBLE_LIB_SUFFIXES lib/Win32 lib/x86)
 ENDIF (CMAKE_SIZEOF_VOID_P EQUAL 8)
 
-LIST (APPEND _OPENCL_POSSIBLE_LIB_SUFFIXES lib/nvidia-current)
+LIST (APPEND _OPENCL_POSSIBLE_LIB_SUFFIXES lib/nvidia-current lib/nvidia-304)
 
 FIND_PATH (OPENCL_ROOT_DIR
   NAMES OpenCL/cl.h
         include/CL/cl.h
         include/nvidia-current/CL/cl.h
+        include/nvidia-304/CL/cl.h
   PATHS ENV OCLROOT
         ENV AMDAPPSDKROOT
         ENV CUDA_PATH
@@ -68,7 +69,7 @@ FIND_PATH (OPENCL_ROOT_DIR
 FIND_PATH (OPENCL_INCLUDE_DIR
   NAMES OpenCL/cl.h CL/cl.h
   HINTS ${OPENCL_ROOT_DIR}
-  PATH_SUFFIXES include include/nvidia-current
+  PATH_SUFFIXES include include/nvidia-current include/nvidia-304
   DOC "OpenCL include directory")
 
 FIND_LIBRARY (OPENCL_LIBRARY

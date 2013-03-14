@@ -8,8 +8,11 @@
 #include <cassert>
 
 #include <pcl/io/io.h>
+#include <Eigen/Dense>
 #include <Eigen/Core>
 #include <Eigen/Geometry>
+
+using namespace Eigen;
 
 #ifdef _WIN32
 #   define INFINITY (DBL_MAX+DBL_MAX)
@@ -188,4 +191,20 @@ bool PointCloud::load_ptx(const char* filename, int decimation_factor) {
     ed_->updateProgress(100);
     pc_mutex->unlock();
 	return this;
+}
+
+void PointCloud::translate(const Eigen::Vector3f& pos) {
+    sensor_origin_ += Vector4f(pos.x(), pos.y(), pos.z(), 0);
+}
+
+void PointCloud::rotate2D(float x, float y) {
+    float move_sensitivity = 5;
+    Vector2f rot = Vector2f(x*move_sensitivity, y*move_sensitivity);
+    AngleAxis<float> rotX(rot.x()*move_sensitivity, Vector3f(1, 0, 0));
+    AngleAxis<float> rotY(rot.y()*move_sensitivity, Vector3f(0, 1, 0));
+    sensor_orientation_ = (rotX * rotY) * sensor_orientation_;
+}
+
+Eigen::Affine3f PointCloud::modelview() {
+    return Affine3f::Identity() * sensor_orientation_ * Translation3f(sensor_origin_.x(), sensor_origin_.y(), sensor_origin_.z());
 }

@@ -6,6 +6,7 @@
 #include <QObject>
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
+#include <Eigen/Dense>
 
 class EventDispatcher : public QObject{
     Q_OBJECT
@@ -33,13 +34,21 @@ enum class PointFlags : int8_t {
 enum class CoordinateFrame: bool {
     Camera,
     Laser,
-}
+};
 
 class PointCloud : public pcl::PointCloud<pcl::PointXYZI> {
  public:
     explicit PointCloud();
     bool save_ptx(const char* filename);
     bool load_ptx(const char* filename, int decimation_factor = 1);
+
+    void translate(const Eigen::Vector3f& pos);
+    void translate(float x, float y, float z)  {
+        translate(Eigen::Vector3f(x, y, z));
+    }
+    void rotate2D(float x, float y);
+
+    Eigen::Affine3f modelview();
 
  public:
     std::shared_ptr<EventDispatcher> ed_;

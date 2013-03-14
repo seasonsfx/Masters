@@ -65,77 +65,43 @@ class DLLSPEC Camera {
         setPosition(Eigen::Vector3f(x, y, z));
     }
 
-    void adjustPosition(const Eigen::Vector3f& pos);
-    void adjustPosition(float x, float y, float z)  {
-        adjustPosition(Eigen::Vector3f(x, y, z));
-    }
 
     void setLookAt(const Eigen::Vector3f& lookat);
     void setLookAt(float x, float y, float z)  {
         setLookAt(Eigen::Vector3f(x, y, z));
     }
 
-    void setUp(const Eigen::Vector3f& up);
-    void setUp(float x, float y, float z)  { setUp(Eigen::Vector3f(x, y, z)); }
-
-    void setDirection(const Eigen::Vector3f& dir);
-    void setDirection(float x, float y, float z)  {
-        setDirection(Eigen::Vector3f(x, y, z));
-    }
-
-    Eigen::Vector3f position() const  { return mPosition; }
-    Eigen::Vector3f lookAt() const  { return mLookAt; }
-    Eigen::Vector3f up() const  { return mUp; }
-
-    void setObjectOrientationMatrix(const Eigen::Affine3f& objectorient);
     void setModelviewMatrix(const Eigen::Affine3f& modelview);
     void setProjectionMatrix(const Eigen::Affine3f& projection);
 
     Eigen::Affine3f modelviewMatrix() const;
-
     Eigen::Affine3f projectionMatrix() const;
 
-    void mouseDown(int x, int y, int button);
-    void mouseRelease(int x, int y);
-    void mouseMove(int x, int y);
-    void mouseWheel(int val, float x = 0, float y = 0);
+    void translate(const Eigen::Vector3f& pos);
+    void translate(float x, float y, float z)  {
+        translate(Eigen::Vector3f(x, y, z));
+    }
+
+    void rotate2D(float x, float y);
+    void adjustFov(int val);
 
  private:
-    void recalculateModelviewMatrix();
     void recalculateProjectionMatrix();
 
- public:
-    static const int LEFT_BTN = 1;
-    static const int RIGHT_BTN = 2;
-
  private:
-    int mouseButtonPressed;
-    Eigen::Vector2f mouseStart;
-    bool mMouseDown;
-    float moveSensitivity;
+    Eigen::Vector3f start_side_axis_;
+    Eigen::Vector3f start_up_axis_;
+    Eigen::Vector3f start_forward_axis_;
 
-    Eigen::Vector3f startSideAxis;
-    Eigen::Vector3f startUpAxis;
-    Eigen::Vector3f startForwardAxis;
+    Eigen::Vector3f forward_;
+    Eigen::Vector3f position_;
+    Eigen::Vector3f lookat_;
+    Eigen::Vector3f up_;
+    float fov_, aspect_, depth_near_, depth_far_;
 
-    Eigen::Vector3f forward;
-    Eigen::Vector3f savedForward;
-
-
-    Eigen::Affine3f savedObjectOrientationMatrix;
-
-
-    Eigen::Vector3f mPosition;
-    Eigen::Vector3f mLookAt;
-    Eigen::Vector3f mUp;
-    float mFoV, mAspect, mDepthNear, mDepthFar;
-
-    Eigen::Affine3f mObjectOrientationMatrix;
-    bool mObjectOrientationMatrixDirty;
-    Eigen::Affine3f mModelviewMatrix;
-    bool mModelviewMatrixDirty;
-    Eigen::Affine3f mProjectionMatrix;
-    bool mProjectionMatrixDirty;
+    Eigen::Affine3f modelview_matrix_;
+    Eigen::Affine3f projection_matrix_;
+    bool projection_matrix_dirty_;
 
     std::mutex * mutex_;
 };

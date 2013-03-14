@@ -225,8 +225,8 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
     };
 
     //std::thread(loadcloud, "/home/rickert/trees.ptx").detach();
-    //std::thread(loadcloud, "/home/rickert/Workspace/uscans/2011.06.11-10.23.54.zfs_cy.ptx").detach();
-    std::thread(loadcloud, "/home/rickert/Workspace/uscans/Petra_Top_xf.ptx").detach();
+    std::thread(loadcloud, "/home/rickert/Workspace/uscans/2011.06.11-10.23.54.zfs_cy.ptx").detach();
+    //std::thread(loadcloud, "/home/rickert/Workspace/uscans/Petra_Top_xf.ptx").detach();
     //std::thread(loadcloud, "/home/rickert/Petra_Top_xf.ptx").detach();
 }
 

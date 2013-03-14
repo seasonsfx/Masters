@@ -106,6 +106,7 @@ void GLWidget::paintGL() {
 
     // Draw all clouds
     for(std::pair<std::shared_ptr<PointCloud>, std::shared_ptr<CloudGLData> > pair: gld_->cloudgldata_) {
+        std::shared_ptr<PointCloud> pc = pair.first;
         std::shared_ptr<CloudGLData> cd = pair.second;
 
         glBindVertexArray(vao_);
@@ -132,6 +133,9 @@ void GLWidget::paintGL() {
         glVertexAttribIPointer(3, 1, GL_BYTE, 0, 0); CE();
         cd->flag_buffer_->release(); CE();
 
+        glUniformMatrix4fv(uni_modelview_, 1, GL_FALSE,
+                           (pc->modelview()*camera_.modelviewMatrix()).data());CE();
+
         cd->draw(vao_);
         glBindVertexArray(0);
     }
@@ -151,34 +155,39 @@ void GLWidget::mouseDoubleClickEvent(QMouseEvent * event) {
 }
 
 void GLWidget::mouseMoveEvent(QMouseEvent * event) {
-    if(event->buttons() & Qt::RightButton)
-        camera_.mouseMove(event->x(), event->y());
-    if(event->buttons() &  Qt::LeftButton)
-        camera_.mouseMove(event->x(), event->y());
+    float damp = 0.05;
+    Eigen::Vector2f rot(event->x()-last_mouse_pos_.x(), event->y()-last_mouse_pos_.y());
+    rot*=damp;
+
+    if(event->buttons() & Qt::LeftButton)
+        camera_.rotate2D(rot.x(), rot.y());
+    if(event->buttons() &  Qt::RightButton){
+        std::shared_ptr<PointCloud> pc = cl_->clouds_[0];
+        pc->rotate2D(rot.x(), rot.y());
+    }
+
+    last_mouse_pos_ << event->x(), event->y();
 
     if(event->buttons())
-        updateGL();
+        update();
 }
 
 void GLWidget::mousePressEvent(QMouseEvent * event) {
     mouse_drag_start_ = QVector2D(0.0f, 0.0f);
-    camera_.mouseDown(event->x(), event->y(), event->button());
+    last_mouse_pos_ << event->x(), event->y();
 }
 
 void GLWidget::mouseReleaseEvent(QMouseEvent * event) {
-    if (event->button() == Qt::RightButton)
-        camera_.mouseRelease(event->x(), event->y());
-    else if (event->button() == Qt::LeftButton)
-        camera_.mouseRelease(event->x(), event->y());
-    updateGL();
+    last_mouse_pos_ << event->x(), event->y();
+    update();
 }
 
 void GLWidget::wheelEvent(QWheelEvent * event) {
     float x = 2.0f* ((event->x()/float(width())) - 0.5);
     float y = -2.0f* ((event->y()/float(height())) - 0.5);
 
-    camera_.mouseWheel(event->delta(), x, y);
-    updateGL();
+    camera_.adjustFov(event->delta());
+    update();
 }
 
 void GLWidget::keyPressEvent(QKeyEvent * event) {
@@ -188,25 +197,25 @@ void GLWidget::keyPressEvent(QKeyEvent * event) {
             break;
     case Qt::Key_D:
     case Qt::Key_Right:
-            camera_.adjustPosition(camera_move_unit_, 0, 0);
+            camera_.translate(camera_move_unit_, 0, 0);
             break;
     case Qt::Key_A:
     case Qt::Key_Left:
-            camera_.adjustPosition(-camera_move_unit_, 0, 0);
+            camera_.translate(-camera_move_unit_, 0, 0);
             break;
     case Qt::Key_W:
     case Qt::Key_Up:
-            camera_.adjustPosition(0, 0, camera_move_unit_);
+            camera_.translate(0, 0, camera_move_unit_);
             break;
     case Qt::Key_S:
     case Qt::Key_Down:
-            camera_.adjustPosition(0, 0, -camera_move_unit_);
+            camera_.translate(0, 0, -camera_move_unit_);
             break;
     case Qt::Key_Q:
-            camera_.adjustPosition(0, +camera_move_unit_, 0);
+            camera_.translate(0, +camera_move_unit_, 0);
             break;
     case Qt::Key_E:
-            camera_.adjustPosition(0, -camera_move_unit_, 0);
+            camera_.translate(0, -camera_move_unit_, 0);
             break;
     case Qt::Key_R:
             if (event->modifiers() == Qt::ControlModifier)
@@ -223,7 +232,7 @@ void GLWidget::keyPressEvent(QKeyEvent * event) {
             glPointSize(point_render_size_);
             break;
     }
-    updateGL();
+    update();
 }
 
 bool GLWidget::eventFilter(QObject *object, QEvent *event) {

@@ -39,7 +39,9 @@
 #include <cmath>
 #include <mutex>
 #include <Eigen/LU>
+#include <Eigen/Dense>
 #include <QDebug>
+#include <iostream>
 
 using Eigen::Vector3f;
 using Eigen::Vector2f;
@@ -50,193 +52,117 @@ template <typename T> int sgn(T val) {
 }
 
 Camera::Camera() {
+
+
+
     mutex_ = new std::mutex();
-    mFoV = 60.0f;
-    mAspect = 1.0f;
-    mDepthNear = 1.0f;
-    mDepthFar = 100.0f;
-    mPosition = Vector3f(0, 0, 0);
-    mLookAt = Vector3f(0, 0, 1);
+    fov_ = 60.0f;
+    aspect_ = 1.0f;
+    depth_near_ = 1.0f;
+    depth_far_ = 100.0f;
+    position_ = Vector3f(0, 0, 0);
+    lookat_ = Vector3f(0, 0, 1);
 
-    startSideAxis =     Vector3f(1, 0, 0);
-    startUpAxis =       Vector3f(0, 0, 1);
-    startForwardAxis =  Vector3f(0, 1, 0);
+    start_side_axis_ =     Vector3f(1, 0, 0);
+    start_up_axis_ =       Vector3f(0, 0, 1);
+    start_forward_axis_ =  Vector3f(0, 1, 0);
 
-    forward = startForwardAxis;
-    mUp =     startUpAxis;
+    forward_ = start_forward_axis_;
+    up_ = start_up_axis_;
 
-    mModelviewMatrixDirty = true;
-    mProjectionMatrixDirty = true;
-    mMouseDown = false;
-    moveSensitivity = 0.05;
-    mObjectOrientationMatrix.setIdentity();
-    mouseButtonPressed = 0;
+    projection_matrix_dirty_ = true;
+
+    // Setup initial position
+    Vector3f side = forward_.cross(up_).normalized();
+    Vector3f up = side.cross(forward_);
+    modelview_matrix_.setIdentity();
+    modelview_matrix_.linear() << side.transpose(), up.transpose(),
+            -forward_.transpose();
+    modelview_matrix_.translate(-position_);
 }
 
 Camera::~Camera() {
 }
 
 void Camera::setFoV(float fov) {
-    mFoV = fov;
-    mProjectionMatrixDirty = true;
+    fov_ = fov;
+    projection_matrix_dirty_ = true;
 }
 
 void Camera::setAspect(float aspect) {
-    mAspect = aspect;
-    mProjectionMatrixDirty = true;
+    aspect_ = aspect;
+    projection_matrix_dirty_ = true;
 }
 
 void Camera::setDepthRange(float near, float far) {
-    mDepthNear = near;
-    mDepthFar = far;
-    mProjectionMatrixDirty = true;
+    depth_near_ = near;
+    depth_far_ = far;
+    projection_matrix_dirty_ = true;
 }
 
 void Camera::setPosition(const Eigen::Vector3f& pos) {
-    mPosition = pos;
-    mModelviewMatrixDirty = true;
+    modelview_matrix_(0, 3) = pos.x();
+    modelview_matrix_(1, 3) = pos.y();
+    modelview_matrix_(2, 3) = pos.y();
 }
 
-void Camera::adjustPosition(const Eigen::Vector3f& pos) {
-    Vector3f side = forward.cross(mUp).normalized();
-    Vector3f up = side.cross(forward);
-    Vector3f offset  = pos.x() * side + pos.y() * up + pos.z() * forward;
-    mPosition += offset;
-    mModelviewMatrixDirty = true;
-}
-
-void Camera::setLookAt(const Eigen::Vector3f& lookat) {
-    mLookAt = lookat;
-    forward = (mLookAt - mPosition).normalized();
-    mModelviewMatrixDirty = true;
-}
-
-void Camera::setUp(const Eigen::Vector3f& up) {
-    mUp = up;
-    mModelviewMatrixDirty = true;
-}
-
-void Camera::setDirection(const Eigen::Vector3f& dir) {
-    setLookAt(mPosition + dir);
-}
-
-void Camera::recalculateModelviewMatrix() {
-    // Code from Mesa project, src/glu/sgi/libutil/project.c
-    mModelviewMatrixDirty = false;
-    Vector3f side = forward.cross(mUp).normalized();
-    // Recompute up vector, using cross product
-    Vector3f up = side.cross(forward);
-
-    mModelviewMatrix.setIdentity();
-    mModelviewMatrix.linear() << side.transpose(), up.transpose(),
-            -forward.transpose();
-    mModelviewMatrix.translate(-mPosition);
-    mModelviewMatrix *=mObjectOrientationMatrix.matrix();\
-}
 
 void Camera::recalculateProjectionMatrix() {
     // Code from Mesa project, src/glu/sgi/libutil/project.c
-    mProjectionMatrixDirty = false;
-    mProjectionMatrix.setIdentity();
-    float radians = mFoV / 2 * M_PI / 180;
+    projection_matrix_.setIdentity();
+    float radians = fov_ / 2 * M_PI / 180;
 
-    float deltaZ = mDepthFar - mDepthNear;
+    float deltaZ = depth_far_ - depth_near_;
     float sine = sin(radians);
-    if ((deltaZ == 0) || (sine == 0) || (mAspect == 0)) {
+    if ((deltaZ == 0) || (sine == 0) || (aspect_ == 0)) {
         return;
     }
     float cotangent = cos(radians) / sine;
 
-    mProjectionMatrix(0, 0) = cotangent / mAspect;
-    mProjectionMatrix(1, 1) = cotangent;
-    mProjectionMatrix(2, 2) = -(mDepthFar + mDepthNear) / deltaZ;
-    mProjectionMatrix(3, 2) = -1;
-    mProjectionMatrix(2, 3) = -2 * mDepthNear * mDepthFar / deltaZ;
-    mProjectionMatrix(3, 3) = 0;
-}
-
-void Camera::setObjectOrientationMatrix(const Eigen::Affine3f& objectorient) {
-    mObjectOrientationMatrix = objectorient;
-    mModelviewMatrixDirty = true;
+    projection_matrix_(0, 0) = cotangent / aspect_;
+    projection_matrix_(1, 1) = cotangent;
+    projection_matrix_(2, 2) = -(depth_far_ + depth_near_) / deltaZ;
+    projection_matrix_(3, 2) = -1;
+    projection_matrix_(2, 3) = -2 * depth_near_ * depth_far_ / deltaZ;
+    projection_matrix_(3, 3) = 0;
+    projection_matrix_dirty_ = false;
 }
 
 void Camera::setModelviewMatrix(const Eigen::Affine3f& modelview) {
-    mModelviewMatrix = modelview;
-    mModelviewMatrixDirty = false;
+    modelview_matrix_ = modelview;
 }
 
 void Camera::setProjectionMatrix(const Eigen::Affine3f& projection) {
-    mProjectionMatrix = projection;
-    mProjectionMatrixDirty = false;
+    projection_matrix_ = projection;
+    projection_matrix_dirty_ = false;
 }
 
 Eigen::Affine3f Camera::modelviewMatrix() const {
-    if (mModelviewMatrixDirty) {
-        const_cast<Camera*>(this)->recalculateModelviewMatrix();
-    }
-    return mModelviewMatrix;
+    return modelview_matrix_;
 }
 
 Eigen::Affine3f Camera::projectionMatrix() const {
-    if (mProjectionMatrixDirty) {
+    if (projection_matrix_dirty_) {
         const_cast<Camera*>(this)->recalculateProjectionMatrix();
     }
-    return mProjectionMatrix;
+    return projection_matrix_;
 }
 
-void Camera::mouseDown(int x, int y, int button) {
-    mouseButtonPressed = button;
-    mouseStart << x*moveSensitivity, y*moveSensitivity;
-    savedForward = forward;
-    savedObjectOrientationMatrix = mObjectOrientationMatrix;
-    mMouseDown = true;
-}
-void Camera::mouseRelease(int x, int y) {
-    mouseButtonPressed = 0;
-    mMouseDown = false;
+void Camera::translate(const Eigen::Vector3f& pos) {
+    modelview_matrix_ = Eigen::Translation3f(pos) * modelview_matrix_;
 }
 
-// TODO(Rickert): object roation should be more inteligent
 // Read: http://nehe.gamedev.net/tutorial/loading_and_moving_through_a_3d_world/22003/
-void Camera::mouseMove(int x, int y) {
-    if (!mMouseDown)
-        return;
-    Vector2f rot = Vector2f(x*moveSensitivity, y*moveSensitivity) - mouseStart;
-
-    if (mouseButtonPressed == LEFT_BTN) {
-        Vector3f side = forward.cross(startUpAxis).normalized();
-
-        AngleAxis<float> rotX(-rot.x()*moveSensitivity, startUpAxis);
-        AngleAxis<float> rotY(-rot.y()*moveSensitivity, side);
-
-        forward = (rotX * rotY) * savedForward;
-        forward.normalize();
-
-        Vector3f side_after = forward.cross(startUpAxis).normalized();
-
-        float dot = side.dot(side_after);
-
-        // Still not working 100%
-        if (dot < 0.9) {
-            forward = savedForward;
-        }
-    } else if (mouseButtonPressed == RIGHT_BTN) {
-        Vector3f side = forward.cross(mUp).normalized();
-        Vector3f up = side.cross(forward);
-
-        AngleAxis<float> rotX(-rot.x()*moveSensitivity, up);
-        AngleAxis<float> rotY(-rot.y()*moveSensitivity, side);
-        mObjectOrientationMatrix = rotX * rotY * savedObjectOrientationMatrix;
-    }
-
-    mModelviewMatrixDirty = true;
+void Camera::rotate2D(float x, float y) {
+    Vector2f rot = Vector2f(x, y);
+    AngleAxis<float> rotX(rot.x(), start_forward_axis_);
+    AngleAxis<float> rotY(rot.y(), start_side_axis_);
+    modelview_matrix_ = (rotX * rotY) * modelview_matrix_;
 }
 
-void Camera::mouseWheel(int val, float x, float y) {
-    //mLookAt = AngleAxis<float>(x) * AngleAxis<float>(y) * mLookAt;
-    // Mouse seems to move in 120 increments
+void Camera::adjustFov(int val) {
+    // Mouse seems to move in increments of 120
     val = -val/60.0f;
-    if (mFoV + val < 170.0f && mFoV + val > 2.0f)
-        setFoV(mFoV + val);
-    //mModelviewMatrixDirty = true;
+    if (fov_ + val < 170.0f && fov_ + val > 2.0f)
+        setFoV(fov_ + val);
 }

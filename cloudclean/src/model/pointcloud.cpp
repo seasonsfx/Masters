@@ -36,6 +36,7 @@ PointCloud::PointCloud()
     : pcl::PointCloud<pcl::PointXYZI>() {
     pc_mutex.reset(new std::mutex());
     ed_.reset(new EventDispatcher());
+    frame_ = CoordinateFrame::Laser;
 }
 
 bool PointCloud::save_ptx(const char* filename){

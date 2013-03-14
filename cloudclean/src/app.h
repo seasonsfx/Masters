@@ -12,12 +12,12 @@
 #include "model/layerlist.h"
 #include "model/cloudlist.h"
 #include "gui/flatview.h"
-#include "pluginsystem/pluginmanager.h"
 
 #include "gui/layerlistview.h"
 #include "gui/cloudlistview.h"
 #include "gui/gldata.h"
 
+class PluginManager;
 class QProgressBar;
 class QStatusBar;
 class QTabWidget;

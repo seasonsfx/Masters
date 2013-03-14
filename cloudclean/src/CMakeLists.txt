@@ -20,7 +20,7 @@ add_subdirectory(pluginsystem)
 # Build main binary
 #
 FILE (GLOB project_SRCS *.cpp *.cxx *.cc *.C *.c *.h *.hpp)
-SET (project_SRCS ${project_SRCS} pluginsystem/plugininterfaces.h)
+SET (project_SRCS ${project_SRCS} )
 SET (project_LIBS ${QT_LIBRARIES} cloudclean_gui)
 SET (project_BIN ${PROJECT_NAME})
 

@@ -15,6 +15,8 @@
 #include <QDesktopWidget>
 #include <QGridLayout>
 
+#include "pluginsystem/pluginmanager.h"
+
 #ifdef _WIN32
 #   define INFINITY (DBL_MAX+DBL_MAX)
 #   define NAN (INFINITY-INFINITY)

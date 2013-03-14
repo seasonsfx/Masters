@@ -30,6 +30,11 @@ enum class PointFlags : int8_t {
     reserved6 = 0x040,
 };
 
+enum class CoordinateFrame: bool {
+    Camera,
+    Laser,
+}
+
 class PointCloud : public pcl::PointCloud<pcl::PointXYZI> {
  public:
     explicit PointCloud();
@@ -45,6 +50,7 @@ class PointCloud : public pcl::PointCloud<pcl::PointXYZI> {
     std::vector<int16_t> labels_;
     std::vector<PointFlags> flags_;
 
+    CoordinateFrame frame_;
     // What needs to be in here?
     // Should normals be a default requirement
     // Maybe store attributes in a map and generate on the fly

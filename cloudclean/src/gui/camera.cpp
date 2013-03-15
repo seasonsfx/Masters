@@ -58,8 +58,8 @@ Camera::Camera() {
     depth_near_ = 1.0f;
     depth_far_ = 100.0f;
 
-    //rotation_ = AngleAxis<float>(M_PI/2, Vector3f(1, 0, 0));
-    rotation_ = AngleAxis<float>(0, Vector3f(1, 0, 0));
+    rotation_ = AngleAxis<float>(-M_PI/2, Vector3f(1, 0, 0));
+    //rotation_ = AngleAxis<float>(0, Vector3f(1, 0, 0));
 
     translation_ = Vector3f(0, 0, 0);
 
@@ -146,27 +146,22 @@ void Camera::translate(const Eigen::Vector3f& pos) {
     translation_ = Eigen::Translation3f(rotation_.inverse() * pos) * translation_;
 }
 
-// Read: http://nehe.gamedev.net/tutorial/loading_and_moving_through_a_3d_world/22003/
 void Camera::rotate2D(float x, float y) {
     Vector2f rot = Vector2f(x, y);
 
-    //AngleAxis<float> current_rot(modelview_matrix_.rotation());
-
-    Vector3f up = rotation_ * start_up_axis_;
-    Vector3f side = rotation_ * start_side_axis_;
-    Vector3f forward = rotation_ * start_forward_axis_;
-
-    std::cout << "rotating x about: \n" << up << std::endl;
-    std::cout.flush();
-
-    std::cout << "rotating y about: \n" << start_side_axis_ << std::endl;
-    std::cout.flush();
-
-
-
-    AngleAxis<float> rotX(rot.x(), up); // look left right
-    AngleAxis<float> rotY(rot.y(), start_side_axis_); // look up down
+    AngleAxis<float> rotX(rot.x(), Vector3f::UnitY()); // look left right
+    AngleAxis<float> rotY(rot.y(), Vector3f::UnitX()); // look up down
     rotation_ = (rotX * rotY) * rotation_;
+
+    Eigen::Matrix3f rot2 = rotation_.toRotationMatrix();
+    double roll = -atan2(rot2(0,2), rot2(1,2));
+    double yaw = -atan2(rot2(2,0), rot2(2,1));
+
+    if(fabs(yaw) < M_PI/2){
+        AngleAxis<float> roll_correction(-roll, Vector3f::UnitZ());
+        rotation_ = roll_correction * rotation_;
+    }
+
     rotation_.normalize();
 }
 

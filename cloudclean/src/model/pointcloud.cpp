@@ -184,7 +184,7 @@ bool PointCloud::load_ptx(const char* filename, int decimation_factor) {
 
     this->width = this->points.size();
     this->height = 1;
-    this->is_dense = true; // Cloud is dense and unorganised
+    this->is_dense = true;
     labels_.resize(this->width * this->height, 0);
     flags_.resize(this->width * this->height);
 
@@ -198,13 +198,12 @@ void PointCloud::translate(const Eigen::Vector3f& pos) {
 }
 
 void PointCloud::rotate2D(float x, float y) {
-    float move_sensitivity = 5;
-    Vector2f rot = Vector2f(x*move_sensitivity, y*move_sensitivity);
-    AngleAxis<float> rotX(rot.x()*move_sensitivity, Vector3f(1, 0, 0));
-    AngleAxis<float> rotY(rot.y()*move_sensitivity, Vector3f(0, 1, 0));
+    AngleAxis<float> rotX(-x, Vector3f::UnitZ());
+    AngleAxis<float> rotY(-y, Vector3f::UnitY());
     sensor_orientation_ = (rotX * rotY) * sensor_orientation_;
 }
 
 Eigen::Affine3f PointCloud::modelview() {
-    return Affine3f::Identity() * sensor_orientation_ * Translation3f(sensor_origin_.x(), sensor_origin_.y(), sensor_origin_.z());
+    Translation3f tr(sensor_origin_.x(), sensor_origin_.y(), sensor_origin_.z());
+    return Affine3f::Identity() * sensor_orientation_ * tr;
 }

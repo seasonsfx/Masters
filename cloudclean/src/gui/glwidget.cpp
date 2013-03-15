@@ -4,11 +4,13 @@
 #include <cmath>
 #include <cstdlib>
 
+using namespace Eigen;
+
 GLWidget::GLWidget(QGLFormat &fmt, std::shared_ptr<CloudList> &cl,
                    std::shared_ptr<LayerList> &ll, QWidget *parent)
     : QGLWidget(fmt, parent) {
     setFocusPolicy(Qt::StrongFocus);
-    camera_move_unit_ = 0.4;
+    translate_unit_ = 0.4;
     point_render_size_ = 4.0f;
 
     cl_ = cl;
@@ -134,7 +136,8 @@ void GLWidget::paintGL() {
         cd->flag_buffer_->release(); CE();
 
         glUniformMatrix4fv(uni_modelview_, 1, GL_FALSE,
-                           (pc->modelview()*camera_.modelviewMatrix()).data());CE();
+                           (camera_.modelviewMatrix()*pc->modelview())
+                           .data());CE();
 
         cd->draw(vao_);
         glBindVertexArray(0);
@@ -156,17 +159,17 @@ void GLWidget::mouseDoubleClickEvent(QMouseEvent * event) {
 
 void GLWidget::mouseMoveEvent(QMouseEvent * event) {
     float damp = 0.005;
-    Eigen::Vector2f rot(event->x()-last_mouse_pos_.x(), event->y()-last_mouse_pos_.y());
+    Vector2f rot(event->x()-last_mouse_pos_.x(), event->y()-last_mouse_pos_.y());
     last_mouse_pos_ << event->x(), event->y();
     rot*=damp;
 
-    if(event->buttons() == Qt::LeftButton)
+    if(event->buttons() == Qt::LeftButton && event->modifiers() != Qt::ControlModifier){
         camera_.rotate2D(rot.x(), rot.y());
-    if(event->buttons() ==  Qt::RightButton){
+    }
+    else if(event->buttons() ==  Qt::RightButton || event->modifiers() == Qt::ControlModifier){
         std::shared_ptr<PointCloud> pc = cl_->clouds_[0];
         pc->rotate2D(rot.x(), rot.y());
     }
-
 
     if(event->buttons())
         update();
@@ -192,45 +195,76 @@ void GLWidget::wheelEvent(QWheelEvent * event) {
 
 void GLWidget::keyPressEvent(QKeyEvent * event) {
     switch (event->key()) {
+
     case Qt::Key_Escape:
-            QCoreApplication::instance()->quit();
-            break;
+        QCoreApplication::instance()->quit();
+        break;
+
+    //
+    // Translations:
+    //
     case Qt::Key_D:
     case Qt::Key_Right:
-            camera_.translate(-camera_move_unit_, 0, 0);
-            break;
+        if (event->modifiers() == Qt::ControlModifier)
+            cl_->clouds_[0]->translate(translate_unit_ * camera_.rotation_.matrix().inverse() * Vector3f::UnitX());
+        else
+            camera_.translate(-translate_unit_ * Vector3f::UnitX());
+        break;
     case Qt::Key_A:
     case Qt::Key_Left:
-            camera_.translate(camera_move_unit_, 0, 0);
-            break;
+        if (event->modifiers() == Qt::ControlModifier)
+            cl_->clouds_[0]->translate(-translate_unit_ * camera_.rotation_.matrix().inverse() * Vector3f::UnitX());
+        else
+            camera_.translate(translate_unit_ * Vector3f::UnitX());
+        break;
     case Qt::Key_W:
     case Qt::Key_Up:
-            camera_.translate(0, 0, camera_move_unit_);
-            break;
+        if (event->modifiers() == Qt::ControlModifier)
+            cl_->clouds_[0]->translate(-translate_unit_ * camera_.rotation_.matrix().inverse() * Vector3f::UnitZ());
+        else
+            camera_.translate(translate_unit_ * Vector3f::UnitZ());
+        break;
     case Qt::Key_S:
     case Qt::Key_Down:
-            camera_.translate(0, 0, -camera_move_unit_);
-            break;
+        if (event->modifiers() == Qt::ControlModifier)
+            cl_->clouds_[0]->translate(translate_unit_ * camera_.rotation_.matrix().inverse() * Vector3f::UnitZ());
+        else
+            camera_.translate(-translate_unit_ * Vector3f::UnitZ());
+        break;
     case Qt::Key_Q:
-            camera_.translate(0, +camera_move_unit_, 0);
-            break;
+        if (event->modifiers() == Qt::ControlModifier)
+            cl_->clouds_[0]->translate(-translate_unit_ * camera_.rotation_.matrix().inverse() * Vector3f::UnitY());
+        else
+            camera_.translate(translate_unit_ * Vector3f::UnitY());
+        break;
     case Qt::Key_E:
-            camera_.translate(0, -camera_move_unit_, 0);
-            break;
+        if (event->modifiers() == Qt::ControlModifier)
+            cl_->clouds_[0]->translate(translate_unit_ * camera_.rotation_.matrix().inverse() * Vector3f::UnitY());
+        else
+            camera_.translate(-translate_unit_ * Vector3f::UnitY());
+        break;
+
+    //
+    // Reset
+    //
     case Qt::Key_R:
-            if (event->modifiers() == Qt::ControlModifier)
-                camera_.setPosition(0, 0, 0);
-            break;
+        if (event->modifiers() == Qt::ControlModifier)
+            camera_.setPosition(0, 0, 0);
+        break;
+
+    //
+    // Zoom
+    //
     case Qt::Key_Plus:
-            if (point_render_size_ < 30)
-                point_render_size_++;
-            glPointSize(point_render_size_);
-            break;
+        if (point_render_size_ < 30)
+            point_render_size_++;
+        glPointSize(point_render_size_);
+        break;
     case Qt::Key_Minus:
-            if ( point_render_size_ > 1 )
-                point_render_size_--;
-            glPointSize(point_render_size_);
-            break;
+        if ( point_render_size_ > 1 )
+            point_render_size_--;
+        glPointSize(point_render_size_);
+        break;
     }
     update();
 }

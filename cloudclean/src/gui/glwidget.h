@@ -70,7 +70,7 @@ protected:
     int uni_modelview_;
     int uni_select_color_;
 
-    float camera_move_unit_;
+    float translate_unit_;
     QVector2D mouse_drag_start_;
     float point_render_size_;
 

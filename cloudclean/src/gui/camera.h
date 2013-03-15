@@ -41,6 +41,8 @@
 #include <Eigen/Geometry>
 #include "appexport.h"
 
+class GLWidget;
+
 // Contains code from kgllib
 namespace std {
     class mutex;
@@ -105,6 +107,8 @@ class DLLSPEC Camera {
     bool modelview_dirty_;
 
     std::mutex * mtx_;
+
+    friend class GLWidget;
 };
 
 #endif  // CLOUDCLEAN_SRC_CLOUDCLEAN_CAMERA_H_

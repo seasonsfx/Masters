@@ -155,18 +155,18 @@ void GLWidget::mouseDoubleClickEvent(QMouseEvent * event) {
 }
 
 void GLWidget::mouseMoveEvent(QMouseEvent * event) {
-    float damp = 0.05;
+    float damp = 0.005;
     Eigen::Vector2f rot(event->x()-last_mouse_pos_.x(), event->y()-last_mouse_pos_.y());
+    last_mouse_pos_ << event->x(), event->y();
     rot*=damp;
 
-    if(event->buttons() & Qt::LeftButton)
+    if(event->buttons() == Qt::LeftButton)
         camera_.rotate2D(rot.x(), rot.y());
-    if(event->buttons() &  Qt::RightButton){
+    if(event->buttons() ==  Qt::RightButton){
         std::shared_ptr<PointCloud> pc = cl_->clouds_[0];
         pc->rotate2D(rot.x(), rot.y());
     }
 
-    last_mouse_pos_ << event->x(), event->y();
 
     if(event->buttons())
         update();
@@ -197,11 +197,11 @@ void GLWidget::keyPressEvent(QKeyEvent * event) {
             break;
     case Qt::Key_D:
     case Qt::Key_Right:
-            camera_.translate(camera_move_unit_, 0, 0);
+            camera_.translate(-camera_move_unit_, 0, 0);
             break;
     case Qt::Key_A:
     case Qt::Key_Left:
-            camera_.translate(-camera_move_unit_, 0, 0);
+            camera_.translate(camera_move_unit_, 0, 0);
             break;
     case Qt::Key_W:
     case Qt::Key_Up:

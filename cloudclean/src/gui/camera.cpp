@@ -52,33 +52,27 @@ template <typename T> int sgn(T val) {
 }
 
 Camera::Camera() {
-
-
-
-    mutex_ = new std::mutex();
+    mtx_ = new std::mutex();
     fov_ = 60.0f;
     aspect_ = 1.0f;
     depth_near_ = 1.0f;
     depth_far_ = 100.0f;
-    position_ = Vector3f(0, 0, 0);
-    lookat_ = Vector3f(0, 0, 1);
 
-    start_side_axis_ =     Vector3f(1, 0, 0);
-    start_up_axis_ =       Vector3f(0, 0, 1);
-    start_forward_axis_ =  Vector3f(0, 1, 0);
+    //rotation_ = AngleAxis<float>(M_PI/2, Vector3f(1, 0, 0));
+    rotation_ = AngleAxis<float>(0, Vector3f(1, 0, 0));
 
-    forward_ = start_forward_axis_;
-    up_ = start_up_axis_;
+    translation_ = Vector3f(0, 0, 0);
 
-    projection_matrix_dirty_ = true;
+    projection_dirty_ = true;
+    modelview_dirty_ = true;
 
-    // Setup initial position
-    Vector3f side = forward_.cross(up_).normalized();
-    Vector3f up = side.cross(forward_);
-    modelview_matrix_.setIdentity();
-    modelview_matrix_.linear() << side.transpose(), up.transpose(),
-            -forward_.transpose();
-    modelview_matrix_.translate(-position_);
+    start_modelview_matrix_.setIdentity();
+    start_modelview_matrix_ = rotation_ * start_modelview_matrix_;
+
+    start_side_axis_ = start_modelview_matrix_.rotation().col(0);
+    start_forward_axis_ =  start_modelview_matrix_.rotation().col(1);
+    start_up_axis_ = start_modelview_matrix_.rotation().col(2);
+
 }
 
 Camera::~Camera() {
@@ -86,24 +80,24 @@ Camera::~Camera() {
 
 void Camera::setFoV(float fov) {
     fov_ = fov;
-    projection_matrix_dirty_ = true;
+    projection_dirty_ = true;
 }
 
 void Camera::setAspect(float aspect) {
     aspect_ = aspect;
-    projection_matrix_dirty_ = true;
+    projection_dirty_ = true;
 }
 
 void Camera::setDepthRange(float near, float far) {
     depth_near_ = near;
     depth_far_ = far;
-    projection_matrix_dirty_ = true;
+    projection_dirty_ = true;
 }
 
 void Camera::setPosition(const Eigen::Vector3f& pos) {
-    modelview_matrix_(0, 3) = pos.x();
-    modelview_matrix_(1, 3) = pos.y();
-    modelview_matrix_(2, 3) = pos.y();
+    start_modelview_matrix_(0, 3) = pos.x();
+    start_modelview_matrix_(1, 3) = pos.y();
+    start_modelview_matrix_(2, 3) = pos.y();
 }
 
 
@@ -125,39 +119,55 @@ void Camera::recalculateProjectionMatrix() {
     projection_matrix_(3, 2) = -1;
     projection_matrix_(2, 3) = -2 * depth_near_ * depth_far_ / deltaZ;
     projection_matrix_(3, 3) = 0;
-    projection_matrix_dirty_ = false;
+    projection_dirty_ = false;
 }
 
 void Camera::setModelviewMatrix(const Eigen::Affine3f& modelview) {
-    modelview_matrix_ = modelview;
+    start_modelview_matrix_ = modelview;
 }
 
 void Camera::setProjectionMatrix(const Eigen::Affine3f& projection) {
     projection_matrix_ = projection;
-    projection_matrix_dirty_ = false;
+    projection_dirty_ = false;
 }
 
-Eigen::Affine3f Camera::modelviewMatrix() const {
-    return modelview_matrix_;
+Eigen::Affine3f Camera::modelviewMatrix() {
+    return rotation_  * Eigen::Translation3f(translation_) * Eigen::Affine3f::Identity();
 }
 
 Eigen::Affine3f Camera::projectionMatrix() const {
-    if (projection_matrix_dirty_) {
+    if (projection_dirty_) {
         const_cast<Camera*>(this)->recalculateProjectionMatrix();
     }
     return projection_matrix_;
 }
 
 void Camera::translate(const Eigen::Vector3f& pos) {
-    modelview_matrix_ = Eigen::Translation3f(pos) * modelview_matrix_;
+    translation_ = Eigen::Translation3f(rotation_.inverse() * pos) * translation_;
 }
 
 // Read: http://nehe.gamedev.net/tutorial/loading_and_moving_through_a_3d_world/22003/
 void Camera::rotate2D(float x, float y) {
     Vector2f rot = Vector2f(x, y);
-    AngleAxis<float> rotX(rot.x(), start_forward_axis_);
-    AngleAxis<float> rotY(rot.y(), start_side_axis_);
-    modelview_matrix_ = (rotX * rotY) * modelview_matrix_;
+
+    //AngleAxis<float> current_rot(modelview_matrix_.rotation());
+
+    Vector3f up = rotation_ * start_up_axis_;
+    Vector3f side = rotation_ * start_side_axis_;
+    Vector3f forward = rotation_ * start_forward_axis_;
+
+    std::cout << "rotating x about: \n" << up << std::endl;
+    std::cout.flush();
+
+    std::cout << "rotating y about: \n" << start_side_axis_ << std::endl;
+    std::cout.flush();
+
+
+
+    AngleAxis<float> rotX(rot.x(), up); // look left right
+    AngleAxis<float> rotY(rot.y(), start_side_axis_); // look up down
+    rotation_ = (rotX * rotY) * rotation_;
+    rotation_.normalize();
 }
 
 void Camera::adjustFov(int val) {

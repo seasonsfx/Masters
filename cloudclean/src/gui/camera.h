@@ -74,7 +74,7 @@ class DLLSPEC Camera {
     void setModelviewMatrix(const Eigen::Affine3f& modelview);
     void setProjectionMatrix(const Eigen::Affine3f& projection);
 
-    Eigen::Affine3f modelviewMatrix() const;
+    Eigen::Affine3f modelviewMatrix();
     Eigen::Affine3f projectionMatrix() const;
 
     void translate(const Eigen::Vector3f& pos);
@@ -93,17 +93,18 @@ class DLLSPEC Camera {
     Eigen::Vector3f start_up_axis_;
     Eigen::Vector3f start_forward_axis_;
 
-    Eigen::Vector3f forward_;
-    Eigen::Vector3f position_;
-    Eigen::Vector3f lookat_;
-    Eigen::Vector3f up_;
+    Eigen::Quaternion<float> rotation_;
+    Eigen::Vector3f translation_;
+
     float fov_, aspect_, depth_near_, depth_far_;
 
-    Eigen::Affine3f modelview_matrix_;
+    Eigen::Affine3f start_modelview_matrix_;
     Eigen::Affine3f projection_matrix_;
-    bool projection_matrix_dirty_;
 
-    std::mutex * mutex_;
+    bool projection_dirty_;
+    bool modelview_dirty_;
+
+    std::mutex * mtx_;
 };
 
 #endif  // CLOUDCLEAN_SRC_CLOUDCLEAN_CAMERA_H_

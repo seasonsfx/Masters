@@ -47,10 +47,6 @@ using Eigen::Vector3f;
 using Eigen::Vector2f;
 using Eigen::AngleAxis;
 
-template <typename T> int sgn(T val) {
-    return (T(0) < val) - (val < T(0));
-}
-
 Camera::Camera() {
     mtx_ = new std::mutex();
     fov_ = 60.0f;
@@ -59,20 +55,10 @@ Camera::Camera() {
     depth_far_ = 100.0f;
 
     rotation_ = AngleAxis<float>(-M_PI/2, Vector3f(1, 0, 0));
-    //rotation_ = AngleAxis<float>(0, Vector3f(1, 0, 0));
 
     translation_ = Vector3f(0, 0, 0);
 
     projection_dirty_ = true;
-    modelview_dirty_ = true;
-
-    start_modelview_matrix_.setIdentity();
-    start_modelview_matrix_ = rotation_ * start_modelview_matrix_;
-
-    start_side_axis_ = start_modelview_matrix_.rotation().col(0);
-    start_forward_axis_ =  start_modelview_matrix_.rotation().col(1);
-    start_up_axis_ = start_modelview_matrix_.rotation().col(2);
-
 }
 
 Camera::~Camera() {
@@ -95,9 +81,7 @@ void Camera::setDepthRange(float near, float far) {
 }
 
 void Camera::setPosition(const Eigen::Vector3f& pos) {
-    start_modelview_matrix_(0, 3) = pos.x();
-    start_modelview_matrix_(1, 3) = pos.y();
-    start_modelview_matrix_(2, 3) = pos.y();
+    translation_ = pos;
 }
 
 
@@ -120,10 +104,6 @@ void Camera::recalculateProjectionMatrix() {
     projection_matrix_(2, 3) = -2 * depth_near_ * depth_far_ / deltaZ;
     projection_matrix_(3, 3) = 0;
     projection_dirty_ = false;
-}
-
-void Camera::setModelviewMatrix(const Eigen::Affine3f& modelview) {
-    start_modelview_matrix_ = modelview;
 }
 
 void Camera::setProjectionMatrix(const Eigen::Affine3f& projection) {
@@ -151,17 +131,47 @@ void Camera::rotate2D(float x, float y) {
 
     AngleAxis<float> rotX(rot.x(), Vector3f::UnitY()); // look left right
     AngleAxis<float> rotY(rot.y(), Vector3f::UnitX()); // look up down
+
     rotation_ = (rotX * rotY) * rotation_;
 
-    Eigen::Matrix3f rot2 = rotation_.toRotationMatrix();
-    double roll = -atan2(rot2(0,2), rot2(1,2));
-    double yaw = -atan2(rot2(2,0), rot2(2,1));
+    auto clamp = [] (double num, double low, double high) {
+        if (num > high)
+            return high;
+        if (num < low)
+            return low;
+        return num;
+    };
 
-    if(fabs(yaw) < M_PI/2){
-        AngleAxis<float> roll_correction(-roll, Vector3f::UnitZ());
-        rotation_ = roll_correction * rotation_;
-    }
+    Eigen::Matrix3f r = rotation_.toRotationMatrix();
+    double roll = -atan2(r(0,2), r(1, 2));
+    double pitch = acos(r(2,2));
+    //double yaw = atan2(r(2, 0), r(2, 1));
 
+
+    Vector3f dir = rotation_ * Vector3f::UnitZ();
+    double dotp = dir.dot(Vector3f::UnitZ());
+
+    double sign = dir.dot(Vector3f::UnitY()) > 0 ? 1.0 : -1.0;
+    double angle = sign * acos(dotp);
+
+/*
+    qDebug() << "Y angle" << angle;
+    qDebug() << "Y angle (DEG)" << (angle/M_PI) * 180;
+    qDebug() << "Roll" << roll;
+    qDebug() << "Pitch" << pitch;
+    qDebug() << "Yaw" << yaw;
+*/
+    double correction_factor = 1.0 - fabs(pitch-M_PI/2)/(M_PI/2);
+    correction_factor = -0.5 + 1.5 * correction_factor;
+    correction_factor = clamp(correction_factor, 0, 1);
+
+    if(angle < 0)
+        correction_factor = 0;
+
+    //qDebug() << "Correction factor:" << correction_factor;
+
+    AngleAxis<float> roll_correction(correction_factor*-roll, Vector3f::UnitZ());
+    rotation_ = roll_correction * rotation_;
     rotation_.normalize();
 }
 

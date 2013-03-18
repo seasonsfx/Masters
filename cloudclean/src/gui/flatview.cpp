@@ -91,6 +91,11 @@ void FlatView::setCloud(std::shared_ptr<PointCloud> new_pc) {
     }
 
     pc_ = new_pc;
+
+    // Late event cause deletion possible? Seems to help?
+    if(pc_.expired())
+        return;
+
     std::shared_ptr<PointCloud> pc = pc_.lock();
     cloud_idx_lookup_.resize(pc->scan_width_*pc->scan_height_, -1);
     for(uint idx = 0 ; idx < pc->cloud_to_grid_map_.size(); idx++){
@@ -321,8 +326,8 @@ void FlatView::resizeGL(int width, int height) {
     else
         aspect_ratio_ = QVector2D(1.0/(cfy*pc->scan_width_), 1.0f/pc->scan_height_);
 
-    qDebug() << "screen: " << width << height;
-    qDebug() << "scan: " << pc->scan_width_ << pc->scan_height_;
+    //qDebug() << "screen: " << width << height;
+    //qDebug() << "scan: " << pc->scan_width_ << pc->scan_height_;
 
     camera_(0, 0) = current_scale_*aspect_ratio_.x();
     camera_(1, 1) = current_scale_*aspect_ratio_.y();

@@ -14,16 +14,18 @@
 class GLData : public QObject {
     Q_OBJECT
  public:
-    explicit GLData(QGLContext * glcontext,
+    GLData(QGLContext * glcontext,
                     std::shared_ptr<CloudList> &cl,
                     std::shared_ptr<LayerList> &ll,
                     QObject *parent = 0);
+    ~GLData();
  signals:
     void update();
     
  public slots:
     void reloadCloud(std::shared_ptr<PointCloud> cloud);
     void reloadColorLookupBuffer();
+    void deleteCloud(std::shared_ptr<PointCloud> cloud);
     
  public:
     std::shared_ptr<QGLBuffer> color_lookup_buffer_;

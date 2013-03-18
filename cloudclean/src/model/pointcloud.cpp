@@ -12,6 +12,8 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
+#include <QDebug>
+
 using namespace Eigen;
 
 #ifdef _WIN32
@@ -21,6 +23,10 @@ using namespace Eigen;
 
 inline bool isNaN(float val){
     return (val != val);
+}
+
+EventDispatcher::EventDispatcher(PointCloud * pc) {
+    pc_ = pc;
 }
 
 void EventDispatcher::updateProgress(int value){
@@ -35,10 +41,16 @@ void EventDispatcher::emitflagUpdate(std::shared_ptr<std::vector<int> > idxs) {
     emit flagUpdate(idxs);
 }
 
+void EventDispatcher::resetOrientation() {
+    qDebug() << "reset";
+    pc_->sensor_orientation_ = pc_->sensor_orientation_.setIdentity();
+    emit transformed();
+}
+
 PointCloud::PointCloud()
     : pcl::PointCloud<pcl::PointXYZI>() {
     pc_mutex.reset(new std::mutex());
-    ed_.reset(new EventDispatcher());
+    ed_.reset(new EventDispatcher(this));
     frame_ = CoordinateFrame::Laser;
 }
 

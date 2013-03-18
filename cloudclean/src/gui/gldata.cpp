@@ -20,6 +20,11 @@ GLData::GLData(QGLContext * glcontext, std::shared_ptr<CloudList> &cl, std::shar
     IF_FAIL("bind failed") = color_lookup_buffer_->bind(); CE();
     color_lookup_buffer_->allocate(sizeof(float)*4); CE();
     color_lookup_buffer_->release(); CE();
+
+    CloudList * clp = cl_.get();
+    connect(clp, SIGNAL(deletingCloud(std::shared_ptr<PointCloud>)),
+            this, SLOT(deleteCloud(std::shared_ptr<PointCloud>)));
+
 }
 
 
@@ -27,6 +32,10 @@ void GLData::reloadCloud(std::shared_ptr<PointCloud> cloud){
     glcontext_->makeCurrent();
     cloudgldata_[cloud].reset(new CloudGLData(cloud));
     emit update();
+}
+
+void GLData::deleteCloud(std::shared_ptr<PointCloud> cloud){
+    cloudgldata_.erase(cloudgldata_.find(cloud));
 }
 
 void GLData::reloadColorLookupBuffer(){
@@ -64,4 +73,9 @@ void GLData::reloadColorLookupBuffer(){
     color_lookup_buffer_->release(); CE();
     qDebug() << "Color lookup buffer synced";
     emit update();
+}
+
+GLData::~GLData(){
+    disconnect(cl_.get(), SIGNAL(deletingCloud(std::shared_ptr<PointCloud>)),
+            this, SLOT(deleteCloud(std::shared_ptr<PointCloud>)));
 }

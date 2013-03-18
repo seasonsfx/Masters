@@ -8,17 +8,34 @@
 #include <pcl/point_cloud.h>
 #include <Eigen/Dense>
 
-class EventDispatcher : public QObject{
+class PointCloud;
+
+class EventDispatcher : public QObject {
     Q_OBJECT
  public:
+    EventDispatcher(PointCloud * pc);
+
+ private:
     void updateProgress(int value);
     void emitlabelUpdate(std::shared_ptr<std::vector<int> > idxs = nullptr);
+    void emitTransformed(std::shared_ptr<std::vector<int> > idxs = nullptr);
+
+ public:
     void emitflagUpdate(std::shared_ptr<std::vector<int> > idxs = nullptr);
 
  signals:
-   void progress(int percentage);
-   void flagUpdate(std::shared_ptr<std::vector<int> > idxs = nullptr);
-   void labelUpdate(std::shared_ptr<std::vector<int> > idxs = nullptr);
+    void transformed();
+    void progress(int percentage);
+    void flagUpdate(std::shared_ptr<std::vector<int> > idxs = nullptr);
+    void labelUpdate(std::shared_ptr<std::vector<int> > idxs = nullptr);
+
+ public slots:
+   void resetOrientation();
+
+ private:
+   PointCloud * pc_;
+
+ friend class PointCloud;
 };
 
 enum class PointFlags : int8_t {

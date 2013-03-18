@@ -170,8 +170,8 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
     connect(gld_.get(), SIGNAL(update()), glwidget_, SLOT(update()));
     connect(ll_.get(), SIGNAL(layerUpdate(std::shared_ptr<Layer>)), gld_.get(), SLOT(reloadColorLookupBuffer()));
     connect(ll_.get(), SIGNAL(lookupTableUpdate()), gld_.get(), SLOT(reloadColorLookupBuffer()));
-
-    connect(clv_, SIGNAL(cloudSelected(std::shared_ptr<PointCloud>)), flatview_, SLOT(setCloud(std::shared_ptr<PointCloud>)));
+    connect(cl_.get(), SIGNAL(updatedActive(std::shared_ptr<PointCloud>)), flatview_, SLOT(setCloud(std::shared_ptr<PointCloud>)));
+    connect(cl_.get(), SIGNAL(progressUpdate(int)), progressbar_, SLOT(setValue(int)));
 
     pm_ = new PluginManager();
     pm_->loadPlugins();
@@ -181,16 +181,18 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
     std::function<void (const char *)> loadcloud = [&] (const char * fname) {
         // Perhaps this should be theaded for performance
 
-        std::shared_ptr<PointCloud> pc;
-        pc.reset(new PointCloud());
+        //std::shared_ptr<PointCloud> pc;
+        //pc.reset(new PointCloud());
 
-        connect(pc->ed_.get(), SIGNAL(progress(int)), progressbar_, SLOT(setValue(int)));
-        pc->load_ptx(fname);
-        disconnect(pc->ed_.get(), SIGNAL(progress(int)), progressbar_, SLOT(setValue(int)));
+        std::shared_ptr<PointCloud> pc = cl_->loadFile(fname);
 
-        QMetaObject::invokeMethod(progressbar_, "setRange", Q_ARG(int, 0), Q_ARG(int, 0));
+        //pc->ed_->moveToThread(QApplication::instance()->thread());
 
-        cl_->addCloud(pc);
+        //connect(pc->ed_.get(), SIGNAL(progress(int)), progressbar_, SLOT(setValue(int)));
+        //pc->load_ptx(fname);
+        //disconnect(pc->ed_.get(), SIGNAL(progress(int)), progressbar_, SLOT(setValue(int)));
+
+        //QMetaObject::invokeMethod(progressbar_, "setRange", Q_ARG(int, 0), Q_ARG(int, 0));
 
         // make a selection
         std::vector<PointFlags> & flags = pc->flags_;
@@ -222,6 +224,7 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
         QMetaObject::invokeMethod(progressbar_, "reset");
         qDebug() << "Loaded";
         qDebug() << "Size: " << pc->size();
+
     };
 
     //std::thread(loadcloud, "/home/rickert/trees.ptx").detach();
@@ -271,12 +274,6 @@ void App::initGUI() {
     gld_.reset(new GLData(ctx, cl_, ll_));
     glwidget_->setGLD(gld_);
     flatview_->setGLD(gld_);
-
-    //flatview_->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-
-    //QScrollArea * scrollArea = new QScrollArea;
-    //scrollArea->setBackgroundRole(QPalette::Dark);
-    //scrollArea->setWidget(flatview_);
 
     clv_ = new CloudListView(ll_, cl_, mainwindow_);
     mainwindow_->addDockWidget(Qt::RightDockWidgetArea, clv_);

@@ -67,13 +67,6 @@ class DLLSPEC Camera {
         setPosition(Eigen::Vector3f(x, y, z));
     }
 
-
-    void setLookAt(const Eigen::Vector3f& lookat);
-    void setLookAt(float x, float y, float z)  {
-        setLookAt(Eigen::Vector3f(x, y, z));
-    }
-
-    void setModelviewMatrix(const Eigen::Affine3f& modelview);
     void setProjectionMatrix(const Eigen::Affine3f& projection);
 
     Eigen::Affine3f modelviewMatrix();
@@ -91,16 +84,11 @@ class DLLSPEC Camera {
     void recalculateProjectionMatrix();
 
  private:
-    Eigen::Vector3f start_side_axis_;
-    Eigen::Vector3f start_up_axis_;
-    Eigen::Vector3f start_forward_axis_;
-
     Eigen::Quaternion<float> rotation_;
     Eigen::Vector3f translation_;
 
     float fov_, aspect_, depth_near_, depth_far_;
 
-    Eigen::Affine3f start_modelview_matrix_;
     Eigen::Affine3f projection_matrix_;
 
     bool projection_dirty_;

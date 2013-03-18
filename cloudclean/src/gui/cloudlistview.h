@@ -20,13 +20,12 @@ class CloudListView : public QDockWidget
                            std::shared_ptr<CloudList> cl,
                            QWidget *parent = 0);
     ~CloudListView();
-    
- signals:
-    void cloudSelected(std::shared_ptr<PointCloud> cloud);
 
  private slots:
-   void selectionChanged(const QItemSelection & sel,
-                         const QItemSelection & des);
+   void contextMenu(const QPoint &pos);
+
+ public slots:
+   void loadFile();
 
  private:
     std::shared_ptr<LayerList> ll_;

@@ -15,6 +15,9 @@ LayerListView::LayerListView(std::shared_ptr<LayerList> ll,
                                  const QItemSelection &)), this,
             SLOT(selectionChanged(const QItemSelection &,
                                     const QItemSelection &)));
+
+    connect(ui_->saveSelectionBtn, SIGNAL(clicked()), this, SLOT(selectionToLayer()));
+
 }
 
 LayerListView::~LayerListView() {
@@ -59,4 +62,8 @@ void LayerListView::selectionChanged(const QItemSelection &sel,
     for(std::shared_ptr<PointCloud> pc : cl_->clouds_){
         pc->ed_->emitflagUpdate();
     }
+}
+
+void LayerListView::selectionToLayer(){
+    //ll_->
 }

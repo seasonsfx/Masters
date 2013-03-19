@@ -7,6 +7,7 @@
 #include <cstdlib>
 #include <cassert>
 
+#include <boost/serialization/shared_ptr.hpp>
 #include <pcl/io/io.h>
 #include <Eigen/Dense>
 #include <Eigen/Core>
@@ -52,6 +53,9 @@ PointCloud::PointCloud()
     pc_mutex.reset(new std::mutex());
     ed_.reset(new EventDispatcher(this));
     frame_ = CoordinateFrame::Laser;
+
+    min_bounding_box_ = Eigen::Vector3f(INFINITY, INFINITY, INFINITY);
+    max_bounding_box_ = Eigen::Vector3f(-INFINITY, -INFINITY, -INFINITY);
 }
 
 bool PointCloud::save_ptx(const char* filename){
@@ -163,6 +167,9 @@ bool PointCloud::load_ptx(const char* filename, int decimation_factor) {
     int line_count = file_width*file_height;
     int update_interval = line_count/100;
 
+    if(update_interval == 0)
+        update_interval = 1;
+
     while(file_sample_idx < line_count){
         if(file_sample_idx % update_interval == 0)
             ed_->updateProgress(100*file_sample_idx/static_cast<float>(line_count));
@@ -185,6 +192,22 @@ bool PointCloud::load_ptx(const char* filename, int decimation_factor) {
             continue;
 		}
 
+        // Set bounding box
+        if(x < min_bounding_box_.x())
+            min_bounding_box_.x() = x;
+        if(y < min_bounding_box_.y())
+            min_bounding_box_.y() = y;
+        if(z < min_bounding_box_.z())
+            min_bounding_box_.z() = z;
+
+        if(x > max_bounding_box_.x())
+            min_bounding_box_.x() = x;
+        if(y > max_bounding_box_.y())
+            min_bounding_box_.y() = y;
+        if(z > max_bounding_box_.z())
+            min_bounding_box_.z() = z;
+
+
         pcl::PointXYZI point;
         point.x = x;
         point.y = y;
@@ -202,6 +225,20 @@ bool PointCloud::load_ptx(const char* filename, int decimation_factor) {
 
     ed_->updateProgress(100);
     pc_mutex->unlock();
+
+    // Start loading octree
+    fut_octree = std::async(std::launch::async, [this](){
+        double resolution = 0.2;
+        qDebug() << "Start octree";
+        Octree::Ptr octree = Octree::Ptr(new Octree(resolution));
+        pcl::PointCloud<pcl::PointXYZI>::ConstPtr cptr(this, boost::serialization::null_deleter());
+        octree->setInputCloud(cptr);
+        octree->defineBoundingBox();
+        octree->addPointsFromInputCloud();
+        qDebug() << "Done with octree";
+        return octree;
+    });
+
 	return this;
 }
 

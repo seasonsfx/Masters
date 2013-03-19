@@ -46,29 +46,58 @@ void GLData::reloadColorLookupBuffer(){
     //
     glcontext_->makeCurrent();
     IF_FAIL("bind failed") = color_lookup_buffer_->bind(); CE();
-    size_t label_buff_size = (ll_->last_label_id_+1)*sizeof(float)*4;
+    size_t label_buff_size = (ll_->last_label_+1)*sizeof(float)*4;
     color_lookup_buffer_->allocate(label_buff_size); CE();
 
     float * color_lookup_buffer =
             static_cast<float *>(glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY)); CE();
 
-    for(int i = 0; i <= ll_->last_label_id_; i++) {
-        bool exists = ll_->layer_lookup_table_.find(i)
-                != ll_->layer_lookup_table_.end();
-        QColor color;
-        if(exists) {
-            std::shared_ptr<Layer> layer = ll_->layer_lookup_table_[i].lock();
-            color = layer->color_;
+    // For every label calculate the color
+
+    auto mix = [this] (LayerSet & layerset) {
+        std::vector<std::shared_ptr<Layer>> selected;
+
+        for(const std::weak_ptr<Layer> & wl : layerset) {
+            std::shared_ptr<Layer> layer = wl.lock();
+            for(int idx : ll_->selection_){
+                std::shared_ptr<Layer> & selected_layer = ll_->layers_[idx];
+                if(layer == selected_layer){
+                    selected.push_back(layer);
+                    break;
+                }
+            }
         }
-        else {
-            qWarning() << "Warning! No label associated with this layer";
-            color = QColor(255, 0, 0, 255);
+
+        if(selected.size() == 0){
+            selected.push_back(ll_->default_layer_);
         }
+
+        float r = 0, g = 0, b = 0;
+        float weight = 1.0/selected.size();
+
+        for(const std::shared_ptr<Layer> & l : selected) {
+            r += l->color_.red() * weight;
+            g += l->color_.green() * weight;
+            b += l->color_.blue() * weight;
+        }
+
+        // Round up
+        r += 0.5; g +=0.5; b +=0.5;
+        return QColor(r, g, b);
+
+    };
+
+    qDebug() << "Set all the labels";
+    for(int i = 0; i < ll_->last_label_+1; i++) {
+        LayerSet & ll = ll_->layer_lookup_table_[i];
+        QColor color = mix(ll);
+        qDebug() << "Label" << i << "Color" << color;
         color_lookup_buffer[i*4] = color.red()/255.0f;
         color_lookup_buffer[i*4+1] = color.green()/255.0f;
         color_lookup_buffer[i*4+2] = color.blue()/255.0f;
         color_lookup_buffer[i*4+3] = color.alpha()/255.0f;
     }
+
     glUnmapBuffer(GL_ARRAY_BUFFER);
     color_lookup_buffer_->release(); CE();
     qDebug() << "Color lookup buffer synced";

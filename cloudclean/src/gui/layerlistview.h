@@ -21,9 +21,9 @@ class LayerListView : public QDockWidget
     ~LayerListView();
 
  private slots:
-    void selectionChanged(const QItemSelection & sel,
-                          const QItemSelection & des);
     void selectionToLayer();
+    void contextMenu(const QPoint &pos);
+    void setColor();
 
  private:
     std::shared_ptr<LayerList> ll_;

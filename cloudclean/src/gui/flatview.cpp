@@ -109,6 +109,9 @@ void FlatView::setCloud(std::shared_ptr<PointCloud> new_pc) {
 }
 
 void FlatView::mouseMoveEvent(QMouseEvent * event) {
+    if(pc_.expired())
+        return;
+
     if(event->buttons() == Qt::LeftButton ){
         std::shared_ptr<PointCloud> pc = pc_.lock();
 

@@ -100,7 +100,6 @@ void CloudList::selectionChanged(const QItemSelection &sel,
 }
 
 std::shared_ptr<PointCloud> CloudList::loadFile(QString filename){
-
     std::shared_ptr<PointCloud> pc;
     pc.reset(new PointCloud());
     pc->ed_->moveToThread(QApplication::instance()->thread());
@@ -114,47 +113,16 @@ std::shared_ptr<PointCloud> CloudList::loadFile(QString filename){
     addCloud(pc);
     emit endNonDetJob();
 
-    /*
-    pc->ed_->moveToThread(QApplication::instance()->thread());
-
-    connect(pc->ed_.get(), SIGNAL(progress(int)), progressbar_, SLOT(setValue(int)));
-    pc->load_ptx(fname);
-    disconnect(pc->ed_.get(), SIGNAL(progress(int)), progressbar_, SLOT(setValue(int)));
-
-    QMetaObject::invokeMethod(progressbar_, "setRange", Q_ARG(int, 0), Q_ARG(int, 0));
-
-    cl_->addCloud(pc);
-
-    // make a selection
-    std::vector<PointFlags> & flags = pc->flags_;
-    for(uint i = 0; i < flags.size()/5; i++){
-        flags[i] = PointFlags::selected;
-    }
-
-    // label the cloud
-    std::vector<int16_t> & labels = pc->labels_;
-    for(uint i = 0; i < labels.size(); i++){
-        labels[i] = i%5;
-    }
-
-    // create layers with colors
-    std::shared_ptr<Layer> layers[3];
-    layers[0] = ll_->addLayer("Test1", QColor(255, 0, 0));
-    layers[1] = ll_->addLayer("Test2", QColor(0, 255, 0));
-    layers[2] = ll_->addLayer("Test3", QColor(0, 0, 255));
-
-    // make five labels
-    for(int i = 0; i < 5; i++)
-        ll_->genLabelId(layers[i%3]);
-
-    qRegisterMetaType<std::shared_ptr<PointCloud> >("std::shared_ptr<PointCloud>");
-    QMetaObject::invokeMethod(flatview_, "setCloud", Q_ARG(std::shared_ptr<PointCloud>, pc));
-
-    glwidget_->update();
-    QMetaObject::invokeMethod(progressbar_, "setRange", Q_ARG(int, 0), Q_ARG(int, 100));
-    QMetaObject::invokeMethod(progressbar_, "reset");
-    qDebug() << "Loaded";
-    qDebug() << "Size: " << pc->size();
-    */
     return pc;
+}
+
+void CloudList::deselectAllPoints(){
+    for(std::shared_ptr<PointCloud> & cloud : clouds_){
+        for(PointFlags & flag : cloud->flags_){
+            if(uint8_t(PointFlags::selected) & uint8_t(flag))
+                flag = PointFlags(uint8_t(flag) & ~uint8_t(PointFlags::selected));
+        }
+        // TODO(Rickert): Update with vector
+        cloud->ed_->emitflagUpdate();
+    }
 }

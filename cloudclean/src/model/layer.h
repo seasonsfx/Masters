@@ -5,10 +5,15 @@
 #include <QAbstractListModel>
 #include <QColor>
 
-class Layer {
-    //Q_OBJECT
+class Layer : public QObject {
+    Q_OBJECT
  public:
     Layer();
+    void setColor(QColor color);
+    void setRandomColor();
+
+ signals:
+    void colorChanged();
 
  public:
     QString name_;

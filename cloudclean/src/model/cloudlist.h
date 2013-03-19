@@ -36,6 +36,7 @@ class CloudList : public QAbstractListModel {
     void removeCloud();
     void selectionChanged(const QItemSelection &sel, const QItemSelection &des);
     std::shared_ptr<PointCloud> loadFile(QString filename);
+    void deselectAllPoints();
     
  private:
     std::mutex * mtx_;

@@ -157,21 +157,32 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
     undostack_ = new QUndoStack();
 
     // initialise data model
-    cl_.reset(new CloudList(undostack_));
     ll_.reset(new LayerList());
+    cl_.reset(new CloudList(undostack_));
 
     initGUI();
+
+    QMenu * edit = new QMenu(tr("Edit"), mainwindow_);
+    QAction * deselect = new QAction(tr("Deselect all"), mainwindow_);
+    edit->addAction(deselect);
+    mainwindow_->menuBar()->addMenu(edit);
+
+    connect(deselect, SIGNAL(triggered()), cl_.get(), SLOT(deselectAllPoints()));
 
     qRegisterMetaType<std::shared_ptr<PointCloud> >("std::shared_ptr<PointCloud>");
     qRegisterMetaType<std::shared_ptr<Layer> >("std::shared_ptr<Layer>");
     // link up signals to model
     connect(cl_.get(), SIGNAL(cloudUpdate(std::shared_ptr<PointCloud>)), gld_.get(), SLOT(reloadCloud(std::shared_ptr<PointCloud>)));
     connect(cl_.get(), SIGNAL(updated()), glwidget_, SLOT(update()));
-    connect(gld_.get(), SIGNAL(update()), glwidget_, SLOT(update()));
-    connect(ll_.get(), SIGNAL(layerUpdate(std::shared_ptr<Layer>)), gld_.get(), SLOT(reloadColorLookupBuffer()));
-    connect(ll_.get(), SIGNAL(lookupTableUpdate()), gld_.get(), SLOT(reloadColorLookupBuffer()));
     connect(cl_.get(), SIGNAL(updatedActive(std::shared_ptr<PointCloud>)), flatview_, SLOT(setCloud(std::shared_ptr<PointCloud>)));
     connect(cl_.get(), SIGNAL(progressUpdate(int)), progressbar_, SLOT(setValue(int)));
+    connect(gld_.get(), SIGNAL(update()), glwidget_, SLOT(update()));
+    connect(gld_.get(), SIGNAL(update()), flatview_, SLOT(update()));
+    connect(ll_.get(), SIGNAL(layerUpdate(std::shared_ptr<Layer>)), gld_.get(), SLOT(reloadColorLookupBuffer()));
+    connect(ll_.get(), SIGNAL(lookupTableUpdate()), gld_.get(), SLOT(reloadColorLookupBuffer()));
+
+    // Look the lookup table
+    gld_->reloadColorLookupBuffer();
 
     pm_ = new PluginManager();
     pm_->loadPlugins();
@@ -179,20 +190,8 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
 
     // load a cloud
     std::function<void (const char *)> loadcloud = [&] (const char * fname) {
-        // Perhaps this should be theaded for performance
-
-        //std::shared_ptr<PointCloud> pc;
-        //pc.reset(new PointCloud());
 
         std::shared_ptr<PointCloud> pc = cl_->loadFile(fname);
-
-        //pc->ed_->moveToThread(QApplication::instance()->thread());
-
-        //connect(pc->ed_.get(), SIGNAL(progress(int)), progressbar_, SLOT(setValue(int)));
-        //pc->load_ptx(fname);
-        //disconnect(pc->ed_.get(), SIGNAL(progress(int)), progressbar_, SLOT(setValue(int)));
-
-        //QMetaObject::invokeMethod(progressbar_, "setRange", Q_ARG(int, 0), Q_ARG(int, 0));
 
         // make a selection
         std::vector<PointFlags> & flags = pc->flags_;
@@ -200,21 +199,24 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
             flags[i] = PointFlags::selected;
         }
 
-        // label the cloud
-        std::vector<int16_t> & labels = pc->labels_;
-        for(uint i = 0; i < labels.size(); i++){
-            labels[i] = i%5;
-        }
 
         // create layers with colors
         std::shared_ptr<Layer> layers[3];
-        layers[0] = ll_->addLayer("Test1", QColor(255, 0, 0));
-        layers[1] = ll_->addLayer("Test2", QColor(0, 255, 0));
-        layers[2] = ll_->addLayer("Test3", QColor(0, 0, 255));
+        layers[0] = ll_->addLayer("Test1");
+        layers[1] = ll_->addLayer("Test2");
+        layers[2] = ll_->addLayer("Test3");
 
         // make five labels
         for(int i = 0; i < 5; i++)
             ll_->genLabelId(layers[i%3]);
+
+
+        // label the cloud
+        std::vector<int16_t> & labels = pc->labels_;
+        for(uint i = 1; i <= labels.size(); i++){
+            int l = 1+5.999*(float(i)/labels.size());
+            labels[i] = l;
+        }
 
         qRegisterMetaType<std::shared_ptr<PointCloud> >("std::shared_ptr<PointCloud>");
         QMetaObject::invokeMethod(flatview_, "setCloud", Q_ARG(std::shared_ptr<PointCloud>, pc));
@@ -222,8 +224,11 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
         glwidget_->update();
         QMetaObject::invokeMethod(progressbar_, "setRange", Q_ARG(int, 0), Q_ARG(int, 100));
         QMetaObject::invokeMethod(progressbar_, "reset");
+
+
         qDebug() << "Loaded";
         qDebug() << "Size: " << pc->size();
+
 
     };
 

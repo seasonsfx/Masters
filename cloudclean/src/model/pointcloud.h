@@ -3,12 +3,17 @@
 
 #include <mutex>
 #include <memory>
+#include <future>
+#include <thread>
 #include <QObject>
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
+#include <pcl/search/octree.h>
 #include <Eigen/Dense>
 
 class PointCloud;
+
+typedef pcl::octree::OctreePointCloudSearch<pcl::PointXYZI> Octree;
 
 class EventDispatcher : public QObject {
     Q_OBJECT
@@ -17,10 +22,10 @@ class EventDispatcher : public QObject {
 
  private:
     void updateProgress(int value);
-    void emitlabelUpdate(std::shared_ptr<std::vector<int> > idxs = nullptr);
     void emitTransformed(std::shared_ptr<std::vector<int> > idxs = nullptr);
 
  public:
+    void emitlabelUpdate(std::shared_ptr<std::vector<int> > idxs = nullptr);
     void emitflagUpdate(std::shared_ptr<std::vector<int> > idxs = nullptr);
 
  signals:
@@ -45,12 +50,12 @@ enum class PointFlags : int8_t {
     reserved3 = 0x008,
     reserved4 = 0x010,
     reserved5 = 0x020,
-    reserved6 = 0x040,
+    reserved6 = 0x040
 };
 
 enum class CoordinateFrame: bool {
     Camera,
-    Laser,
+    Laser
 };
 
 class PointCloud : public pcl::PointCloud<pcl::PointXYZI> {
@@ -80,6 +85,11 @@ class PointCloud : public pcl::PointCloud<pcl::PointXYZI> {
     // What needs to be in here?
     // Should normals be a default requirement
     // Maybe store attributes in a map and generate on the fly
+
+    std::future<Octree::Ptr> fut_octree;
+
+    Eigen::Vector3f min_bounding_box_;
+    Eigen::Vector3f max_bounding_box_;
 };
 
 #endif // MODEL_CPOINTCLOUD_H_

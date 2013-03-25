@@ -3,6 +3,7 @@
 #include <QResource>
 #include <cmath>
 #include <cstdlib>
+#include "utilities/pointpicker.h"
 
 using namespace Eigen;
 
@@ -55,6 +56,25 @@ void GLWidget::initializeGL() {
         qWarning() << "Exiting...";
         abort();
     }
+
+    //
+    // program 2
+    //
+    succ = program2_.addShaderFromSourceFile(
+                QGLShader::Vertex, ":/basic.vert"); CE();
+    qWarning() << program2_.log();
+    if (!succ) qWarning() << "Shader compile log:" << program2_.log();
+    succ = program2_.addShaderFromSourceFile(
+                QGLShader::Fragment, ":/basic.frag"); CE();
+    if (!succ) qWarning() << "Shader compile log:" << program2_.log();
+    succ = program2_.link(); CE();
+    if (!succ) {
+        qWarning() << "Could not link shader program_:" << program2_.log();
+        qWarning() << "Exiting...";
+        abort();
+    }
+
+
     //
     // Resolve uniforms
     //
@@ -143,7 +163,44 @@ void GLWidget::paintGL() {
 
     glBindTexture(GL_TEXTURE_BUFFER, 0); CE();
 
-    program_.release();
+    program2_.bind();
+    // Draw line
+    QGLBuffer line;
+    line.create(); CE();
+    line.bind(); CE();
+    size_t point_size = 3*sizeof(float);
+    line.allocate(2*point_size);
+
+    float * layerbuff =
+            static_cast<float *>(glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY)); CE();
+
+    layerbuff[0] = temp_p1.x();
+    layerbuff[1] = temp_p1.y();
+    layerbuff[2] = temp_p1.z();
+    layerbuff[3] = temp_p2.x();
+    layerbuff[4] = temp_p2.y();
+    layerbuff[5] = temp_p2.z();
+
+    glUnmapBuffer(GL_ARRAY_BUFFER);
+
+
+    glUniformMatrix4fv(program2_.uniformLocation("mv"), 1, GL_FALSE,
+                       camera_.modelviewMatrix().data());CE();
+    glUniformMatrix4fv(program2_.uniformLocation("proj"), 1, GL_FALSE,
+                       camera_.projectionMatrix().data()); CE();
+    float col[3] = {0, 1, 0};
+    glUniform3fv(program2_.uniformLocation("colour"), 1, col); CE();
+
+
+    glEnableVertexAttribArray(0); CE();
+    glVertexAttribPointer(0, 3, GL_FLOAT, FALSE, 0, 0); CE();
+
+    glLineWidth(2);
+    glDrawArrays(GL_LINES, 0, 2); CE();
+
+    line.release(); CE();
+
+    program2_.release();
 }
 
 void GLWidget::resizeGL(int width, int height) {
@@ -179,7 +236,46 @@ void GLWidget::mousePressEvent(QMouseEvent * event) {
 }
 
 void GLWidget::mouseReleaseEvent(QMouseEvent * event) {
+    float dist = (Eigen::Vector2d(event->x(), event->y()) - last_mouse_pos_).norm();
     last_mouse_pos_ << event->x(), event->y();
+
+    bool valid_click = dist < 1;
+
+    if(valid_click) {
+
+
+
+        screenToRay(event->x(), event->y(), width(), height(),
+                          camera_.modelviewMatrix(),
+                          camera_.projectionMatrix(),
+                          temp_p1,
+                          temp_p2);
+
+
+        int idx = pick(event->x(), event->y(), width(), height(), 1e-04,
+                       camera_.projectionMatrix(), camera_.modelviewMatrix(),
+                       cl_->active_);
+
+        if(idx == -1)
+            return;
+
+        std::shared_ptr<std::vector<int>> indices;
+        indices.reset(new std::vector<int>());
+
+        //update->push_back(idx);
+
+
+        std::vector<float> distsq;
+        cl_->active_->getOctree()->radiusSearch(idx, 0.5, *indices, distsq);
+
+        for(int idx : *indices){
+            PointFlags & flag = cl_->active_->flags_[idx];
+            flag = PointFlags(uint8_t(flag) | uint8_t(PointFlags::selected));
+        }
+
+        cl_->active_->ed_->emitflagUpdate(indices);
+    }
+
     update();
 }
 

@@ -41,15 +41,9 @@ void LayerListView::selectionToLayer(){
         auto new_label_it = old_to_new.find(old);
         if (new_label_it == old_to_new.cend()) {
             // Create a new label set
-            uint8_t new_label = ll_->genLabelId(layer);
+            uint8_t new_label = ll_->newLabelId(layer);
 
-            LayerSet & old_layerset = ll_->layer_lookup_table_[old];
-            LayerSet & new_layerset = ll_->layer_lookup_table_[new_label];
-
-            // Add labels from old set to new
-            for(auto layer : old_layerset) {
-                new_layerset.insert(layer);
-            }
+            ll_->copyLayerSet(old, new_label);
 
             // Set cache
             old_to_new[old] = new_label;
@@ -59,17 +53,21 @@ void LayerListView::selectionToLayer(){
     };
 
     // Remap all selected points
-    for(std::shared_ptr<PointCloud> pc : cl_->clouds_){
+    for(std::shared_ptr<PointCloud> & pc : cl_->clouds_){
         for(uint i = 0; i < pc->points.size(); i++){
             bool selected = uint8_t(pc->flags_[i]) & uint8_t(PointFlags::selected);
 
             if(selected) {
+                pc->flags_[i] = PointFlags(uint8_t(pc->flags_[i]) & ~uint8_t(PointFlags::selected));
                 uint8_t old_label = pc->labels_[i];
                 pc->labels_[i] = getNewLabel(old_label);
             }
         }
         pc->ed_->emitlabelUpdate();
+        pc->ed_->emitflagUpdate();
     }
+    emit update();
+    ui_->tableView->selectRow(ll_->layers_.size()-1);
 }
 
 void LayerListView::contextMenu(const QPoint &pos) {
@@ -95,6 +93,16 @@ void LayerListView::contextMenu(const QPoint &pos) {
         del.setProperty("layer_id", row);
         connect(&del, SIGNAL(triggered()), ll_.get(), SLOT(deleteLayer()));
         menu.addAction(&del);
+
+        QAction merge("Merge", 0);
+        connect(&merge, SIGNAL(triggered()), ll_.get(),
+                SLOT(mergeSelectedLayers()));
+        menu.addAction(&merge);
+
+        QAction inter("Intersect", 0);
+        connect(&inter, SIGNAL(triggered()), ll_.get(),
+                SLOT(intersectSelectedLayers()));
+        menu.addAction(&inter);
 
         QAction selectLayer("Select", 0);
         menu.addAction(&selectLayer);

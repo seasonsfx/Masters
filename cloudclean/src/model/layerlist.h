@@ -10,9 +10,6 @@
 #include <QItemSelection>
 #include "model/layer.h"
 
-typedef std::set<std::weak_ptr<Layer>,
-    std::owner_less<std::weak_ptr<Layer> > > LayerSet;
-
 class LayerList : public QAbstractListModel {
     Q_OBJECT
  public:
@@ -23,7 +20,10 @@ class LayerList : public QAbstractListModel {
     std::shared_ptr<Layer> addLayer(std::shared_ptr<Layer> layer);
     std::shared_ptr<Layer> addLayer();
     std::shared_ptr<Layer> addLayer(QString name);
-    int16_t genLabelId(std::shared_ptr<Layer> layer);
+    int16_t newLabelId(std::shared_ptr<Layer> layer);
+
+    const LayerSet &getLayersForLabel(int i);
+    void copyLayerSet(uint8_t source_label, uint8_t dest_label);
 
  signals:
     void layerUpdate(std::shared_ptr<Layer> layer);
@@ -32,18 +32,20 @@ class LayerList : public QAbstractListModel {
 
  public slots:
     void selectionChanged(const QItemSelection &sel, const QItemSelection &des);
+    void mergeSelectedLayers();
+    void intersectSelectedLayers();
     void deleteLayer(int idx);
     void deleteLayer();
 
  private:
     std::mutex * mtx_;
+    std::map<uint8_t, LayerSet> layer_lookup_table_; // label associated with layer
 
  public:
-    int last_label_;
+    uint last_label_;
     std::vector<int> selection_;
     std::shared_ptr<Layer> default_layer_;
     std::vector<std::shared_ptr<Layer> > layers_; // a layer is a group of labels
-    std::map<uint8_t, LayerSet> layer_lookup_table_; // label associated with layer
 };
 
 #endif // LAYERLIST_H

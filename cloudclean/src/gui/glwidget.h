@@ -78,6 +78,10 @@ protected:
     GLuint vao_;
 
     Eigen::Vector2d last_mouse_pos_;
+
+    Eigen::Vector3f temp_p1;
+    Eigen::Vector3f temp_p2;
+    QGLShaderProgram program2_;
 };
 
 #endif

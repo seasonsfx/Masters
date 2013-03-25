@@ -5,5 +5,7 @@
         <file>flatview.fs.glsl</file>
         <file>flatview.gs.glsl</file>
         <file>flatview.vs.glsl</file>
+        <file>basic.frag</file>
+        <file>basic.vert</file>
     </qresource>
 </RCC>

@@ -1,4 +1,5 @@
 #include "gtest/gtest.h"
+#include "utilities/pointpicker.h"
 
 namespace {
 
@@ -7,10 +8,15 @@ class FooTest : public ::testing::Test {
  protected:
   // You can remove any or all of the following functions if its body
   // is empty.
-  int a;
+  Eigen::Vector4f world_point;
+  Eigen::Vector4f projected_point;
+  Eigen::Affine3f proj;
+  Eigen::Affine3f mv;
+  int win_width;
+  int win_height;
 
   FooTest() {
-    a = 1;
+      world_point = Eigen::Vector4f(0.1, 0.3, 0.7, 1);
     // You can do set-up work for each test here.
   }
 
@@ -37,7 +43,7 @@ class FooTest : public ::testing::Test {
 
 // Tests that the Foo::Bar() method does Abc.
 TEST_F(FooTest, MethodBarDoesAbc) {
-	EXPECT_EQ(a, 1);
+    EXPECT_EQ(1, 1);
 }
 
 // Tests that Foo does Xyz.

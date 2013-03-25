@@ -208,13 +208,13 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
 
         // make five labels
         for(int i = 0; i < 5; i++)
-            ll_->genLabelId(layers[i%3]);
+            ll_->newLabelId(layers[i%3]);
 
 
         // label the cloud
         std::vector<int16_t> & labels = pc->labels_;
         for(uint i = 1; i <= labels.size(); i++){
-            int l = 1+5.999*(float(i)/labels.size());
+            int l = 1+5*(float(i)/labels.size());
             labels[i] = l;
         }
 

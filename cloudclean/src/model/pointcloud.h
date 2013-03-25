@@ -71,6 +71,11 @@ class PointCloud : public pcl::PointCloud<pcl::PointXYZI> {
     void rotate2D(float x, float y);
 
     Eigen::Affine3f modelview();
+    const Octree::Ptr getOctree();
+
+ private:
+    std::future<Octree::Ptr> fut_octree;
+    Octree::Ptr octree;
 
  public:
     std::shared_ptr<EventDispatcher> ed_;
@@ -85,8 +90,6 @@ class PointCloud : public pcl::PointCloud<pcl::PointXYZI> {
     // What needs to be in here?
     // Should normals be a default requirement
     // Maybe store attributes in a map and generate on the fly
-
-    std::future<Octree::Ptr> fut_octree;
 
     Eigen::Vector3f min_bounding_box_;
     Eigen::Vector3f max_bounding_box_;

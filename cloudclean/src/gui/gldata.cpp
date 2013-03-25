@@ -54,14 +54,13 @@ void GLData::reloadColorLookupBuffer(){
 
     // For every label calculate the color
 
-    auto mix = [this] (LayerSet & layerset) {
-        std::vector<std::shared_ptr<Layer>> selected;
+    auto mix = [this] (const LayerSet & layerset) {
+        std::vector<const Layer *> selected;
 
-        for(const std::weak_ptr<Layer> & wl : layerset) {
-            std::shared_ptr<Layer> layer = wl.lock();
+        for(const Layer * layer : layerset) {
             for(int idx : ll_->selection_){
                 std::shared_ptr<Layer> & selected_layer = ll_->layers_[idx];
-                if(layer == selected_layer){
+                if(layer == selected_layer.get()){
                     selected.push_back(layer);
                     break;
                 }
@@ -69,13 +68,13 @@ void GLData::reloadColorLookupBuffer(){
         }
 
         if(selected.size() == 0){
-            selected.push_back(ll_->default_layer_);
+            selected.push_back(ll_->default_layer_.get());
         }
 
         float r = 0, g = 0, b = 0;
         float weight = 1.0/selected.size();
 
-        for(const std::shared_ptr<Layer> & l : selected) {
+        for(const Layer * l : selected) {
             r += l->color_.red() * weight;
             g += l->color_.green() * weight;
             b += l->color_.blue() * weight;
@@ -87,11 +86,9 @@ void GLData::reloadColorLookupBuffer(){
 
     };
 
-    qDebug() << "Set all the labels";
-    for(int i = 0; i < ll_->last_label_+1; i++) {
-        LayerSet & ll = ll_->layer_lookup_table_[i];
+    for(uint i = 0; i < ll_->last_label_+1; i++) {
+        const LayerSet &ll = ll_->getLayersForLabel(i);
         QColor color = mix(ll);
-        qDebug() << "Label" << i << "Color" << color;
         color_lookup_buffer[i*4] = color.red()/255.0f;
         color_lookup_buffer[i*4+1] = color.green()/255.0f;
         color_lookup_buffer[i*4+2] = color.blue()/255.0f;

@@ -256,3 +256,11 @@ Eigen::Affine3f PointCloud::modelview() {
     Translation3f tr(sensor_origin_.x(), sensor_origin_.y(), sensor_origin_.z());
     return Affine3f::Identity() * sensor_orientation_ * tr;
 }
+
+const Octree::Ptr PointCloud::getOctree() {
+    if(octree.get() != nullptr)
+        return octree;
+
+    octree = fut_octree.get();
+    return octree;
+}

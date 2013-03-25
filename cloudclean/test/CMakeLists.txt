@@ -3,11 +3,16 @@ SET (test_LIBS gtest)
 
 SET (test_BIN ${PROJECT_NAME}-unittests)
 
-INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/thirdparty/gtest/include)
+INCLUDE_DIRECTORIES(
+    ${PROJECT_SOURCE_DIR}/thirdparty/gtest/include
+    ${PCL_INCLUDE_DIRS}
+    ${QT_QTCORE_INCLUDE_DIR}
+)
+
 
 ADD_EXECUTABLE(${test_BIN} ${test_SRCS})
 ADD_DEPENDENCIES(${test_BIN} googletest)
-TARGET_LINK_LIBRARIES(${test_BIN} ${test_LIBS})
+TARGET_LINK_LIBRARIES(${test_BIN} ${test_LIBS} ${Boost_LIBRARIES} cloudclean_util)
 #QT5_USE_MODULES(${test_BIN} Widgets Gui OpenGL)
 
 ADD_CUSTOM_TARGET(check ALL "${MAINFOLDER}/bin/${test_BIN}" DEPENDS ${test_BIN} COMMENT "Executing unit tests..." VERBATIM SOURCES ${test_SRCS})

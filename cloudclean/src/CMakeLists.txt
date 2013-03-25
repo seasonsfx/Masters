@@ -10,7 +10,7 @@ INCLUDE_DIRECTORIES(
 #
 # Build sub projects
 #
-#add_subdirectory(common)
+add_subdirectory(utilities)
 add_subdirectory(gui)
 add_subdirectory(model)
 add_subdirectory(plugins)
@@ -39,6 +39,7 @@ target_link_libraries(${project_BIN}
     ${QT_QTOPENGL_LIBRARY}
     ${Boost_LIBRARIES}
     cloudclean_model
+    cloudclean_util
     pluginsystem
 )
 #QT5_USE_MODULES(${project_BIN} Widgets Gui OpenGL)

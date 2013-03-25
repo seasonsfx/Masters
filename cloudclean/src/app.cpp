@@ -185,6 +185,22 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
     gld_->reloadColorLookupBuffer();
 
     pm_ = new PluginManager();
+
+    connect(glwidget_, SIGNAL(pluginDoubleClickE(QMouseEvent*)),
+            pm_, SIGNAL(plugin3dDoubleClickE(QMouseEvent*)));
+    connect(glwidget_, SIGNAL(pluginKeyPressE(QKeyEvent*)),
+            pm_, SIGNAL(plugin3dKeyPressE(QKeyEvent*)));
+    connect(glwidget_, SIGNAL(pluginMouseMoveE(QMouseEvent*)),
+            pm_, SIGNAL(plugin3dMouseMoveE(QMouseEvent*)));
+    connect(glwidget_, SIGNAL(pluginMousePressE(QMouseEvent*)),
+            pm_, SIGNAL(plugin3dMousePressE(QMouseEvent*)));
+    connect(glwidget_, SIGNAL(pluginMouseReleaseE(QMouseEvent*)),
+            pm_, SIGNAL(plugin3dMouseReleaseE(QMouseEvent*)));
+    connect(glwidget_, SIGNAL(pluginWheelE(QWheelEvent*)),
+            pm_, SIGNAL(plugin3dWheelE(QWheelEvent*)));
+    connect(glwidget_, SIGNAL(pluginPaint(Eigen::Affine3f,Eigen::Affine3f)),
+            pm_, SIGNAL(plugin3dPaint(Eigen::Affine3f,Eigen::Affine3f)));
+
     pm_->loadPlugins();
     qDebug() << "plugins should noe be loaded";
 

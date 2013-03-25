@@ -74,6 +74,7 @@ void GLWidget::initializeGL() {
         abort();
     }
 
+    emit pluginPaint(camera_.projectionMatrix(), camera_.modelviewMatrix());
 
     //
     // Resolve uniforms
@@ -209,10 +210,18 @@ void GLWidget::resizeGL(int width, int height) {
 }
 
 void GLWidget::mouseDoubleClickEvent(QMouseEvent * event) {
-
+    // Plugin hook
+    bool stop = emit pluginDoubleClickE(event);
+    if(stop)
+        return;
 }
 
 void GLWidget::mouseMoveEvent(QMouseEvent * event) {
+    // Plugin hook
+    bool stop = emit pluginMouseMoveE(event);
+    if(stop)
+        return;
+
     float damp = 0.005;
     Vector2f rot(event->x()-last_mouse_pos_.x(), event->y()-last_mouse_pos_.y());
     last_mouse_pos_ << event->x(), event->y();
@@ -231,15 +240,26 @@ void GLWidget::mouseMoveEvent(QMouseEvent * event) {
 }
 
 void GLWidget::mousePressEvent(QMouseEvent * event) {
+    // Plugin hook
+    bool stop = emit pluginMousePressE(event);
+    if(stop)
+        return;
+
     mouse_drag_start_ = QVector2D(0.0f, 0.0f);
     last_mouse_pos_ << event->x(), event->y();
 }
 
 void GLWidget::mouseReleaseEvent(QMouseEvent * event) {
+    // Plugin hook
+    bool stop = emit pluginMouseReleaseE(event);
+    if(stop)
+        return;
+
     float dist = (Eigen::Vector2d(event->x(), event->y()) - last_mouse_pos_).norm();
     last_mouse_pos_ << event->x(), event->y();
 
     bool valid_click = dist < 1;
+
 
     if(valid_click) {
 
@@ -280,14 +300,21 @@ void GLWidget::mouseReleaseEvent(QMouseEvent * event) {
 }
 
 void GLWidget::wheelEvent(QWheelEvent * event) {
-    //float x = 2.0f* ((event->x()/float(width())) - 0.5);
-    //float y = -2.0f* ((event->y()/float(height())) - 0.5);
+    // Plugin hook
+    bool stop = emit pluginWheelE(event);
+    if(stop)
+        return;
 
     camera_.adjustFov(event->delta());
     update();
 }
 
 void GLWidget::keyPressEvent(QKeyEvent * event) {
+    // Plugin hook
+    bool stop = emit pluginKeyPressE(event);
+    if(stop)
+        return;
+
     switch (event->key()) {
 
     case Qt::Key_Escape:

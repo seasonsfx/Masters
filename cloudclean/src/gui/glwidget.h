@@ -57,6 +57,16 @@ protected:
    void keyPressEvent(QKeyEvent * event);
    bool eventFilter(QObject *object, QEvent *event);
 
+ signals:
+   void pluginPaint(Eigen::Affine3f proj, Eigen::Affine3f mv);
+
+   bool pluginDoubleClickE(QMouseEvent * event);
+   bool pluginMouseMoveE(QMouseEvent * event);
+   bool pluginMousePressE(QMouseEvent * event);
+   bool pluginMouseReleaseE(QMouseEvent * event);
+   bool pluginWheelE(QWheelEvent * event);
+   bool pluginKeyPressE(QKeyEvent * event);
+
  private:
     std::shared_ptr<CloudList> cl_;
     std::shared_ptr<LayerList> ll_;

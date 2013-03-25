@@ -31,11 +31,11 @@ bool isPointOnLineSegment(Eigen::Vector2f lineA,
     return fabs(viaPoint - lineLength) < 1e-6;
 }
 
-bool oppositeSides(Eigen::Vector2f lineA, Eigen::Vector2f lineB, Eigen::Vector2f pointC, Eigen::Vector2f pointD)
+bool oppositeSides(Eigen::Vector2f lineStart, Eigen::Vector2f lineEnd, Eigen::Vector2f pointA, Eigen::Vector2f pointB)
 {
-    Eigen::Vector2f lineDir = lineA-lineB;
-    Eigen::Vector2f pointDir1 = lineA-pointC;
-    Eigen::Vector2f pointDir2 = lineA-pointD;
+    Eigen::Vector2f lineDir = lineStart-lineEnd;
+    Eigen::Vector2f pointDir1 = lineStart-pointA;
+    Eigen::Vector2f pointDir2 = lineStart-pointB;
 
     float cross1 = lineDir.x()*pointDir1.y() - lineDir.y()*pointDir1.x();
     float cross2 = lineDir.x()*pointDir2.y() - lineDir.y()*pointDir2.x();
@@ -45,12 +45,12 @@ bool oppositeSides(Eigen::Vector2f lineA, Eigen::Vector2f lineB, Eigen::Vector2f
     return sideC != sideD;
 }
 
-bool intersects(Eigen::Vector2f lineA1,
-                Eigen::Vector2f lineA2,
-                Eigen::Vector2f lineB1,
-                Eigen::Vector2f lineB2){
-    if(oppositeSides(lineA1, lineA2, lineB1, lineB2) &&
-            oppositeSides(lineB1, lineB2, lineA1, lineA2))
+bool intersects(Eigen::Vector2f line1Start,
+                Eigen::Vector2f line1End,
+                Eigen::Vector2f line2Start,
+                Eigen::Vector2f line2End) {
+    if(oppositeSides(line1Start, line1End, line2Start, line2End) &&
+            oppositeSides(line2Start, line2End, line1Start, line1End))
         return true;
     return false;
 }
@@ -131,7 +131,7 @@ void Lasso::getIndices(Eigen::Matrix4f & ndc_mat,
                 std::vector<int> & dest){
 
 
-    float * matdata = ndc_mat.data();
+    //float * matdata = ndc_mat.data();
 
     for(int idx : source){
 
@@ -152,11 +152,8 @@ void Lasso::getIndices(Eigen::Matrix4f & ndc_mat,
         /// do lasso test
         bool in_lasso = pointInsidePolygon(points, p_2);
 
-        if(in_lasso){
+        if(in_lasso) {
             dest.push_back(idx);
         }
-
     }
-
-
 }

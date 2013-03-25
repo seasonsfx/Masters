@@ -79,46 +79,6 @@ void screenToRay(int x, int y, int win_width, int win_height,
                          static_cast<float>(dZ));
 }
 
-/* Figure out why this doesnt work. Inverse seems to be broken
-void screenToRay(int winx, int winy, int win_width, int win_height,
-                              Eigen::Affine3f mv,
-                              Eigen::Affine3f proj,
-                              Eigen::Vector3f& p1,
-                              Eigen::Vector3f& p2) {
-
-
-    float ndc_x = winx/float(win_width)*2.0-1.0;
-    float ndc_y = (win_height-winy)/float(win_height)*2.0-1.0;
-
-    Eigen::Vector4f near(ndc_x, ndc_y, -1, 1);
-    Eigen::Vector4f far(ndc_x, ndc_y, 1, 1);
-
-    Eigen::Affine3f inverse_trans = (proj * mv).inverse(Eigen::Affine);
-
-    near = inverse_trans * near;
-    far = inverse_trans * far;
-
-    // undo persepctive divide
-    if(near.w() == 0)
-        near[3] = 0.0000001;
-    if(far.w() == 0)
-        far[3] = 0.0000001;
-
-    //near[3] = 1.0/near[3];
-    near /=near.w();
-    //far[3] = 1.0/far[3];
-    far /=far.w();
-
-    p1 = Eigen::Vector3f(near.x(), near.y(), near.z());
-    p2 = Eigen::Vector3f(far.x(), far.y(), far.z());
-
-    qDebug() << "ndc" << ndc_x << ndc_y;
-    qDebug() << "near" << p1.x() << p1.y() << p1.z();
-    qDebug() << "far" << p2.x() << p2.y() << p2.z();
-
-}
-*/
-
 int pick(int win_x, int win_y, int win_width, int win_height, float max_dist,
         Eigen::Affine3f proj, Eigen::Affine3f cam_mv,
         std::shared_ptr<PointCloud> pc,
@@ -151,7 +111,7 @@ int pick(int win_x, int win_y, int win_width, int win_height, float max_dist,
         if(labels.size() != 0){
             bool in_layer = false;
             for(auto label : labels){
-                if(pc->labels_ == label){
+                if(pc->labels_[i] == label){
                     in_layer = true;
                     break;
                 }

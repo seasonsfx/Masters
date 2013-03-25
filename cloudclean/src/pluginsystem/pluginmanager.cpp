@@ -42,6 +42,8 @@
 #include <QPluginLoader>
 #include <QDebug>
 #include <QDir>
+#include <model/layerlist.h>
+#include <model/cloudlist.h>
 
 static QString DLLExtension() {
 #if defined(Q_OS_WIN)
@@ -60,28 +62,6 @@ PluginManager::PluginManager() {
 }
 
 PluginManager::~PluginManager() {
-
-}
-
-void PluginManager::loadSpecs() {
-    // Look for plugin directory
-    QDir pluginsDir(qApp->applicationDirPath());
-    bool succ = false;
-    if (!succ)
-        succ = pluginsDir.cd("plugins");
-    if (!succ)
-        succ = pluginsDir.cd("../plugins");
-    if (!succ)
-        succ = pluginsDir.cd("../lib");
-    if (!succ)
-        succ = pluginsDir.cd("../lib/plugins");
-    if (!succ)
-        succ = pluginsDir.cd("/usr/lib/cloudclean/plugins");
-    if (!succ){
-        qDebug("Plugins directory not found!");
-        return;
-    }
-
 
 }
 
@@ -117,8 +97,8 @@ void PluginManager::loadPlugins() {
         loader.setFileName(absfilepath);
         bool loaded = loader.load();
         if (!loaded) {
-            //qDebug() << "ERROR: " << loader.errorString();
             qDebug() << "Could not load plugin: " << absfilepath;
+            qDebug() << "ERROR: " << loader.errorString();
             continue;
         }
 
@@ -131,18 +111,18 @@ void PluginManager::loadPlugins() {
             continue;
         }
 
-        if (fileName.contains("data_")) {
-            DataSourceIFace * dataPlugin
-                    = qobject_cast<DataSourceIFace *>(plugin);
-            if (dataPlugin) {
-                //DataSourceIFace * ds = dataPluginFactory->getInstance();
-
-                qDebug() << "Plugin loaded: " << loader.fileName();
-                connect(this, SIGNAL(flushTest()), dataPlugin, SLOT(flushCache()));
-                emit flushTest();
-                qDebug() << "Flush test done";
-            }
+        IPlugin * iplugin = qobject_cast<IPlugin *>(plugin);
+        if(iplugin){
+            plugins_.push_back(iplugin);
         }
+        else {
+            qDebug() << "Not iplugin";
+        }
+    }
+}
 
+void PluginManager::initializePlugins(CloudList * cl, LayerList * ll) {
+    for(IPlugin * plugin : plugins_){
+        plugin->initialize(this, cl, ll);
     }
 }

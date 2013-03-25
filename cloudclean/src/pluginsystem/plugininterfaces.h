@@ -5,14 +5,9 @@
 #include <QtPlugin>
 #include <QString>
 #include "model/pointcloud.h"
+#include "pluginsystem/iplugin.h"
 
-class CCPlugin: public QObject  {
-    Q_OBJECT
- public:
-    virtual QString getName() = 0;
-};
-
-class DataSourceIFace : public CCPlugin{
+class DataSourceIFace : public IPlugin{
     Q_OBJECT
  public:
     virtual ~DataSourceIFace() = 0;

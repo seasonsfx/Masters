@@ -7,11 +7,6 @@
 #include <QApplication>
 
 #include <boost/shared_ptr.hpp>
-#include "gui/mainwindow.h"
-#include "gui/glwidget.h"
-#include "model/layerlist.h"
-#include "model/cloudlist.h"
-#include "gui/flatview.h"
 
 #include "gui/layerlistview.h"
 #include "gui/cloudlistview.h"
@@ -22,6 +17,13 @@ class QProgressBar;
 class QStatusBar;
 class QTabWidget;
 class QUndoStack;
+class ActionManager;
+
+class MainWindow;
+class GLWidget;
+class FlatView;
+class LayerList;
+class CloudList;
 
 class App : public QApplication
 {
@@ -77,6 +79,7 @@ class App : public QApplication
         FlatView * flatview_;
         PluginManager * pm_;
         QUndoStack * undostack_;
+        ActionManager * am_;
 };
 
 #endif

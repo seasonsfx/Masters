@@ -40,6 +40,7 @@
 
 #include <Eigen/Dense>
 #include <pcl/octree/octree.h>
+#include <set>
 //#include "glheaders.h"
 
 class Camera;

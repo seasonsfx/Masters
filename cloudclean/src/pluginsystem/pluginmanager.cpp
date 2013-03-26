@@ -44,6 +44,7 @@
 #include <QDir>
 #include <model/layerlist.h>
 #include <model/cloudlist.h>
+#include "actionmanager.h"
 
 static QString DLLExtension() {
 #if defined(Q_OS_WIN)
@@ -57,8 +58,12 @@ static QString DLLExtension() {
     return QString();
 }
 
-PluginManager::PluginManager() {
-
+PluginManager::PluginManager(GLWidget * glwidget, FlatView * flatview, CloudList * cl, LayerList * ll, ActionManager *am) {
+    glwidget_ = glwidget;
+    flatview_ = flatview;
+    cl_ = cl;
+    ll_ = ll;
+    am_ = am;
 }
 
 PluginManager::~PluginManager() {
@@ -121,8 +126,8 @@ void PluginManager::loadPlugins() {
     }
 }
 
-void PluginManager::initializePlugins(CloudList * cl, LayerList * ll) {
+void PluginManager::initializePlugins() {
     for(IPlugin * plugin : plugins_){
-        plugin->initialize(this, cl, ll);
+        plugin->initialize(this, am_, cl_, ll_, glwidget_, flatview_);
     }
 }

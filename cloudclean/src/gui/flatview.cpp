@@ -3,6 +3,7 @@
 #include <QDebug>
 #include <QMouseEvent>
 #include <QApplication>
+#include "selectcommand.h"
 
 FlatView::FlatView(QGLFormat & fmt, std::shared_ptr<CloudList> cl,
                    std::shared_ptr<LayerList> ll, QWidget *parent, QGLWidget *sharing)
@@ -122,8 +123,11 @@ void FlatView::mouseMoveEvent(QMouseEvent * event) {
 
         coord[1] = pc->scan_height_-coord[1];
 
-        std::shared_ptr<std::vector<int> > idxs;
-        idxs.reset(new std::vector<int>());
+        std::shared_ptr<std::vector<int> > selected;
+        selected.reset(new std::vector<int>());
+
+        std::shared_ptr<std::vector<int> > deselected;
+        deselected.reset(new std::vector<int>());
 
         bool negative_select = QApplication::keyboardModifiers() == Qt::ControlModifier;
 
@@ -135,18 +139,15 @@ void FlatView::mouseMoveEvent(QMouseEvent * event) {
 
                 int idx = imageToCloudIdx(int(coord.x() + x + 0.5), int(coord.y() + y + 0.5));
                 if (idx != -1){
-                    PointFlags & pf = pc->flags_[idx];
                     if(negative_select)
-                        pf = PointFlags(~(uint8_t(PointFlags::selected)) & uint8_t(pf));
+                        deselected->push_back(idx);
                     else
-                        pf = PointFlags((uint8_t(PointFlags::selected)) | uint8_t(pf));
-
-                    idxs->push_back(idx);
+                        selected->push_back(idx);
                 }
             }
         }
 
-        pc->ed_->emitflagUpdate(idxs);
+        cl_->undostack_->push(new SelectCommand(pc, selected, deselected));
 
     }
     else if(event->buttons() == Qt::RightButton){

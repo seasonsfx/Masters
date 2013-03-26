@@ -15,6 +15,13 @@
 #include <QDesktopWidget>
 #include <QGridLayout>
 
+#include "actionmanager.h"
+#include "gui/mainwindow.h"
+#include "gui/glwidget.h"
+#include "gui/flatview.h"
+#include "model/layerlist.h"
+#include "model/cloudlist.h"
+
 #include "pluginsystem/pluginmanager.h"
 
 #ifdef _WIN32
@@ -162,12 +169,16 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
 
     initGUI();
 
-    QMenu * edit = new QMenu(tr("Edit"), mainwindow_);
-    QAction * deselect = new QAction(tr("Deselect all"), mainwindow_);
-    edit->addAction(deselect);
-    mainwindow_->menuBar()->addMenu(edit);
+    QAction * undo = undostack_->createUndoAction(0);
+    QAction * redo = undostack_->createRedoAction(0);
+    am_->addAction(undo, "Edit");
+    am_->addAction(redo, "Edit");
 
+    QAction * deselect = new QAction(tr("Deselect all"), mainwindow_);
     connect(deselect, SIGNAL(triggered()), cl_.get(), SLOT(deselectAllPoints()));
+
+    am_->addAction(deselect, "Edit");
+
 
     qRegisterMetaType<std::shared_ptr<PointCloud> >("std::shared_ptr<PointCloud>");
     qRegisterMetaType<std::shared_ptr<Layer> >("std::shared_ptr<Layer>");
@@ -181,28 +192,12 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
     connect(ll_.get(), SIGNAL(layerUpdate(std::shared_ptr<Layer>)), gld_.get(), SLOT(reloadColorLookupBuffer()));
     connect(ll_.get(), SIGNAL(lookupTableUpdate()), gld_.get(), SLOT(reloadColorLookupBuffer()));
 
-    // Look the lookup table
+    // reload the lookup table
     gld_->reloadColorLookupBuffer();
 
-    pm_ = new PluginManager();
-
-    connect(glwidget_, SIGNAL(pluginDoubleClickE(QMouseEvent*)),
-            pm_, SIGNAL(plugin3dDoubleClickE(QMouseEvent*)));
-    connect(glwidget_, SIGNAL(pluginKeyPressE(QKeyEvent*)),
-            pm_, SIGNAL(plugin3dKeyPressE(QKeyEvent*)));
-    connect(glwidget_, SIGNAL(pluginMouseMoveE(QMouseEvent*)),
-            pm_, SIGNAL(plugin3dMouseMoveE(QMouseEvent*)));
-    connect(glwidget_, SIGNAL(pluginMousePressE(QMouseEvent*)),
-            pm_, SIGNAL(plugin3dMousePressE(QMouseEvent*)));
-    connect(glwidget_, SIGNAL(pluginMouseReleaseE(QMouseEvent*)),
-            pm_, SIGNAL(plugin3dMouseReleaseE(QMouseEvent*)));
-    connect(glwidget_, SIGNAL(pluginWheelE(QWheelEvent*)),
-            pm_, SIGNAL(plugin3dWheelE(QWheelEvent*)));
-    connect(glwidget_, SIGNAL(pluginPaint(Eigen::Affine3f,Eigen::Affine3f)),
-            pm_, SIGNAL(plugin3dPaint(Eigen::Affine3f,Eigen::Affine3f)));
-
+    pm_ = new PluginManager(glwidget_, flatview_, cl_.get(), ll_.get(), am_);
     pm_->loadPlugins();
-    qDebug() << "plugins should noe be loaded";
+    pm_->initializePlugins();
 
     // load a cloud
     std::function<void (const char *)> loadcloud = [&] (const char * fname) {
@@ -256,6 +251,7 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
 
 App::~App() {
     delete mainwindow_;
+    delete am_;
 }
 App* App::INSTANCE() {
     return _instance;
@@ -263,6 +259,7 @@ App* App::INSTANCE() {
 
 void App::initGUI() {
     mainwindow_ = new MainWindow();
+    am_ = new ActionManager(mainwindow_->menuBar());
     statusbar_ = mainwindow_->statusBar();
 
     progressbar_ = new QProgressBar();
@@ -301,6 +298,15 @@ void App::initGUI() {
 
     llv_ = new LayerListView(ll_, cl_, mainwindow_);
     mainwindow_->addDockWidget(Qt::RightDockWidgetArea, llv_);
+
+    //QAction * show_cloudlist = new QAction("Show Cloudlist", 0);
+    //QAction * show_layerlist = new QAction("Show Layerlist", 0);
+
+    //connect(show_cloudlist, SIGNAL(toggled(bool)), clv_, SLOT(show()));
+    //connect(show_layerlist, SIGNAL(toggled(bool)), llv_, SLOT(show()));
+
+    am_->addAction(clv_->toggleViewAction(), "View");
+    am_->addAction(llv_->toggleViewAction(), "View");
 
     tabs_->addTab(glwidget_, "3D View");
     tabs_->addTab(flatview_, "2D View");

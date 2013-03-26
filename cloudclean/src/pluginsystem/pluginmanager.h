@@ -8,39 +8,34 @@
 class QMouseEvent;
 class QWheelEvent;
 class QKeyEvent;
+class ActionManager;
 
-#include <gui/camera.h>
+#include "gui/camera.h"
+#include "gui/glwidget.h"
+#include "gui/flatview.h"
 #include <model/cloudlist.h>
 #include <model/layerlist.h>
-
 #include "pluginsystem/iplugin.h"
-#include "pluginsystem/plugininterfaces.h"
 
 class PluginManager : public QObject{
     Q_OBJECT
  public:
-    PluginManager();
+    PluginManager(GLWidget * glwidget, FlatView * flatview, CloudList * cl, LayerList * ll, ActionManager * am);
     ~PluginManager();
 
     void loadPlugins();
-    void initializePlugins(CloudList * cl, LayerList * ll);
+    void initializePlugins();
 
  signals:
-    void paint2d();
-
-    void end2dEdit();
-    void end3dEdit();
-
-    void plugin3dPaint(Eigen::Affine3f, Eigen::Affine3f);
-    bool plugin3dDoubleClickE(QMouseEvent * event);
-    bool plugin3dMouseMoveE(QMouseEvent * event);
-    bool plugin3dMousePressE(QMouseEvent * event);
-    bool plugin3dMouseReleaseE(QMouseEvent * event);
-    bool plugin3dWheelE(QWheelEvent * event);
-    bool plugin3dKeyPressE(QKeyEvent * event);
+    void endEdit();
 
  private:
     std::vector<IPlugin *> plugins_;
+    GLWidget * glwidget_;
+    FlatView * flatview_;
+    CloudList * cl_;
+    LayerList * ll_;
+    ActionManager * am_;
 
 };
 

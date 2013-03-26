@@ -60,19 +60,14 @@ protected:
  signals:
    void pluginPaint(Eigen::Affine3f proj, Eigen::Affine3f mv);
 
-   bool pluginDoubleClickE(QMouseEvent * event);
-   bool pluginMouseMoveE(QMouseEvent * event);
-   bool pluginMousePressE(QMouseEvent * event);
-   bool pluginMouseReleaseE(QMouseEvent * event);
-   bool pluginWheelE(QWheelEvent * event);
-   bool pluginKeyPressE(QKeyEvent * event);
+ public:
+   Camera camera_;
 
  private:
     std::shared_ptr<CloudList> cl_;
     std::shared_ptr<LayerList> ll_;
     std::shared_ptr<GLData> gld_;
 
-    Camera camera_;
     QGLShaderProgram program_;
 
     int uni_sampler_;
@@ -88,10 +83,6 @@ protected:
     GLuint vao_;
 
     Eigen::Vector2d last_mouse_pos_;
-
-    Eigen::Vector3f temp_p1;
-    Eigen::Vector3f temp_p2;
-    QGLShaderProgram program2_;
 };
 
 #endif

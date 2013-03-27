@@ -1,6 +1,8 @@
 #include "newlayercommand.h"
 
 #include <model/layerlist.h>
+#include <model/pointcloud.h>
+#include <model/layer.h>
 
 NewLayerCommand::NewLayerCommand(std::shared_ptr<PointCloud> pc,
                                  std::shared_ptr<std::vector<int> > idxs,
@@ -16,7 +18,7 @@ QString NewLayerCommand::actionText(){
 
 void NewLayerCommand::undo(){
     // Change labels back
-    for(int idx : idxs_){
+    for(int idx : *idxs_){
         pc_->labels_[idx] = new_to_old[pc_->labels_[idx]];
     }
 
@@ -24,11 +26,11 @@ void NewLayerCommand::undo(){
     if(!new_layer_.expired()){
         auto layer = new_layer_.lock();
         layer_color_ = layer->color_;
-        ll->deleteLayer(layer);
+        ll_->deleteLayer(layer);
     }
 }
 
-uint16_t getNewLabel(uint16_t old, std::shared_ptr<Layer> layer) {
+uint16_t NewLayerCommand::getNewLabel(uint16_t old, std::shared_ptr<Layer> layer) {
     auto new_label_it = old_to_new.find(old);
 
     bool unknown_mapping = new_label_it == old_to_new.cend();
@@ -53,16 +55,16 @@ void NewLayerCommand::redo(){
     std::shared_ptr<Layer> layer = ll_->addLayer();
     new_layer_ = layer;
     if(new_to_old.size() != 0)
-        layer.setColor(layer_color_);
+        layer->setColor(layer_color_);
 
 
     // Relabel
-    for(int idx : idxs_){
+    for(int idx : *idxs_){
         pc_->labels_[idx] = getNewLabel(pc_->labels_[idx], layer);
     }
 
-    pc->ed_->emitlabelUpdate();
-    pc->ed_->emitflagUpdate();
+    pc_->ed_->emitlabelUpdate();
+    pc_->ed_->emitflagUpdate();
 
     // TODO(Rickert) : Update color lookup buffer
 

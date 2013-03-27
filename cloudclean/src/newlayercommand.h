@@ -3,12 +3,14 @@
 
 #include <vector>
 #include <memory>
+#include <map>
 #include <QUndoCommand>
 #include <QColor>
 #include <QString>
 
 class LayerList;
 class PointCloud;
+class Layer;
 
 class NewLayerCommand : public QUndoCommand
 {
@@ -21,6 +23,9 @@ class NewLayerCommand : public QUndoCommand
     virtual void redo();
     virtual bool mergeWith(const QUndoCommand *other);
     virtual int id() const;
+
+ private:
+    uint16_t getNewLabel(uint16_t old, std::shared_ptr<Layer> layer);
 
  private:
     std::map<uint16_t, uint16_t> old_to_new;

@@ -73,7 +73,7 @@ void LayerList::deleteLayer(std::shared_ptr<Layer> layer) {
     auto iter = std::find_if(layers_.begin(), layers_.end(), isEq);
     size_t idx = std::distance(layers_.begin(), iter);
 
-    if(idx != vec.size()) {
+    if(idx != layers_.size()) {
         deleteLayer(idx);
     }
 }

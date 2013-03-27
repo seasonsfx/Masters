@@ -5,6 +5,7 @@
 #include <QMenu>
 
 #include "newlayercommand.h"
+#include "selectcommand.h"
 
 LayerListView::LayerListView(std::shared_ptr<LayerList> ll,
                              std::shared_ptr<CloudList> cl, QWidget *parent) :
@@ -30,78 +31,30 @@ LayerListView::~LayerListView() {
     delete ui_;
 }
 
-// TODO(Rickert): selections should also be in a vector
+// TODO(Rickert): selections should also be updated via a vector
 
 void LayerListView::selectionToLayer(){
-    // New layer
-    auto layer = ll_->addLayer();
-
-    // Map old label to new
-    std::map<uint16_t, uint16_t> old_to_new;
-
-    // So all selected points need a new label
-    // A label as many layers associated with it
-    // When a point gets relabled, these labels need to
-    // be added to the new labels's layer set
-    // The get old to new map caches these values
-    // getNewLabel gets the value or calcuates a new one
-
-    auto getNewLabel = [&old_to_new, &layer, this] (int old) {
-        auto new_label_it = old_to_new.find(old);
-        if (new_label_it == old_to_new.cend()) {
-            // Create a new label / layer_set
-            uint16_t new_label = ll_->newLabelId();
-            layer->addLabel(new_label);
-
-            ll_->copyLayerSet(old, new_label);
-
-            // Set cache
-            old_to_new[old] = new_label;
-            return new_label;
-        }
-        return old_to_new[old];
-    };
-
-    // So it looks like a label will always have the same set of layers associated with it?
-
-
-    // To make the new layer, I need to create a bunch of new labels.
-    // Then I need to add existing layers to these labels in addition to the new one
-    // Then in need to relabel points
-
-    // To undo, I need to relabel the points. Remove the labels, and remove the new layer
-
-
-    std::shared_ptr<std::vector<int> > points;
-    std::shared_ptr<std::vector<uint16_t> > old_label;
-    std::shared_ptr<std::vector<uint16_t> > new_label;
-
-
-    // Undo:
-    // For each point:
-    //  Lookup new label
-    //  For that new label, see what the old label was
-    //  Now set it back to old one
-
-    // Now delete the new label in the lookup table
-    // Also delete the new layer
-
-    std::shared_ptr<> new_layers_lookup;
-
+    cl_->undostack_->beginMacro("Layer from selection");
     // Remap all selected points
     for(std::shared_ptr<PointCloud> & pc : cl_->clouds_){
+        std::shared_ptr<std::vector<int> > idxs;
+        idxs.reset(new std::vector<int>());
+
+        std::shared_ptr<std::vector<int> > empty;
+        empty.reset(new std::vector<int>());
+
         for(uint i = 0; i < pc->points.size(); i++){
             bool selected = uint8_t(pc->flags_[i]) & uint8_t(PointFlags::selected);
 
-            if(selected) {
-                pc->flags_[i] = PointFlags(uint8_t(pc->flags_[i]) & ~uint8_t(PointFlags::selected));
-                uint16_t old_label = pc->labels_[i];
-                pc->labels_[i] = getNewLabel(old_label);
-            }
+            if(selected)
+                idxs->push_back(i);
         }
-        pc->ed_->emitlabelUpdate();
-        pc->ed_->emitflagUpdate();
+
+        cl_->undostack_->push(new NewLayerCommand(pc, idxs, ll_.get()));
+        cl_->undostack_->push(new SelectCommand(pc, empty, idxs));
+
     }
+    cl_->undostack_->endMacro();
     emit update();
     ui_->tableView->selectRow(ll_->layers_.size()-1);
 }

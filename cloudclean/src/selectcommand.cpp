@@ -1,13 +1,32 @@
 #include "selectcommand.h"
 
-SelectCommand::SelectCommand(std::weak_ptr<PointCloud> pc,
+#include <QDebug>
+
+SelectCommand::SelectCommand(std::shared_ptr<PointCloud> pc,
         std::shared_ptr<std::vector<int> > selected,
         std::shared_ptr<std::vector<int> > deselected,
         QUndoCommand *parent)
         : QUndoCommand(parent) {
-    selected_ = selected;
-    deselected_ = deselected;
+    selected_.reset(new std::vector<int>());
+    deselected_.reset(new std::vector<int>());
     pc_ = pc;
+
+    // Check that select and deselect are not already in desired state
+
+    auto is_selected = [&pc] (int idx) {
+        return bool((uint8_t)PointFlags::selected & uint8_t(pc->flags_[idx]));
+    };
+
+    for(int idx : *deselected) {
+        if(is_selected(idx))
+            deselected_->push_back(idx);
+    }
+
+    for(int idx : *selected) {
+        if(!is_selected(idx))
+            selected_->push_back(idx);
+    }
+
 }
 
 QString SelectCommand::actionText(){
@@ -67,3 +86,33 @@ void SelectCommand::redo(){
     pc->ed_->emitflagUpdate(update);
 
 }
+
+std::shared_ptr<std::vector<int> > mergeUnique(
+        std::shared_ptr<std::vector<int> > a,
+        std::shared_ptr<std::vector<int> > b){
+
+    std::copy(b->begin(), b->end(), std::back_inserter(*a));
+    std::sort(a->begin(), a->end());
+    auto it = std::unique(a->begin(), a->end());
+    a->resize(std::distance( a->begin(), it));
+
+    return a;
+}
+
+bool SelectCommand::mergeWith(const QUndoCommand *other){
+    if (other->id() != id())
+        return false;
+
+    const SelectCommand * o = static_cast<const SelectCommand *>(other);
+
+    if (o->pc_.lock() != pc_.lock())
+        return false;
+
+    selected_ = mergeUnique(selected_, o->selected_);
+    deselected_ = mergeUnique(deselected_, o->deselected_);
+}
+
+int SelectCommand::id() const {
+    return 1;
+}
+

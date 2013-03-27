@@ -218,8 +218,9 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
         layers[2] = ll_->addLayer("Test3");
 
         // make five labels
-        for(int i = 0; i < 5; i++)
-            ll_->newLabelId(layers[i%3]);
+        for(int i = 0; i < 5; i++){
+            layers[i%3]->addLabel(ll_->newLabelId());
+        }
 
 
         // label the cloud

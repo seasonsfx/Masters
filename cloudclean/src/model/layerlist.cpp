@@ -65,6 +65,19 @@ void LayerList::deleteLayer(){
     deleteLayer(sender()->property("layer_id").toInt());
 }
 
+void LayerList::deleteLayer(std::shared_ptr<Layer> layer) {
+    auto isEq = [&layer] (std::shared_ptr<Layer> layer2) {
+            return layer == layer2;
+    };
+
+    auto iter = std::find_if(layers_.begin(), layers_.end(), isEq);
+    size_t idx = std::distance(layers_.begin(), iter);
+
+    if(idx != vec.size()) {
+        deleteLayer(idx);
+    }
+}
+
 void LayerList::deleteLayer(int idx){
     disconnect(layers_[idx].get(), SIGNAL(colorChanged()),
                this, SIGNAL(lookupTableUpdate()));
@@ -90,9 +103,21 @@ void LayerList::deleteLayer(int idx){
     emit lookupTableUpdate();
 }
 
-int16_t LayerList::newLabelId(std::shared_ptr<Layer> layer) {
-    layer_lookup_table_[++last_label_].insert(layer.get());
-    layer->labels_.insert(last_label_);
+int16_t LayerList::newLabelId() {
+    if(last_label_ == 0xFFFF){
+        qDebug() << "Whoops, we ran out of shorts";
+        exit(1);
+    }
+
+    if(free_labels_.size() > 0) {
+        int16_t id = free_labels_.back();
+        free_labels_.pop_back();
+        return id;
+    }
+    // Add this label to default layer
+    default_layer_->addLabel(++last_label_);
+    //layer_lookup_table_[++last_label_].insert(default_layer_.get());
+    //layer->labels_.insert(last_label_);
     return last_label_;
 }
 
@@ -150,7 +175,7 @@ void LayerList::intersectSelectedLayers(){
         return;
     }
     // First selected label
-    std::set<uint8_t> & labels = layers_.at(selection_[0])->labels_;
+    std::set<uint16_t> & labels = layers_.at(selection_[0])->labels_;
     int intersection_count = 0;
 
     // Find intersecting labels

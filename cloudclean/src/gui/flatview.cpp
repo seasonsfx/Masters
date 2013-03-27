@@ -137,7 +137,8 @@ void FlatView::mouseMoveEvent(QMouseEvent * event) {
                 if(x*x + y*y > (size/2.0f)*(size/2.0f) )
                     continue;
 
-                int idx = imageToCloudIdx(int(coord.x() + x + 0.5), int(coord.y() + y + 0.5));
+                int idx = imageToCloudIdx(int(coord.x() + x + 0.5),
+                                          int(coord.y() + y + 0.5));
                 if (idx != -1){
                     if(negative_select)
                         deselected->push_back(idx);

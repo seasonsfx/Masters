@@ -3,6 +3,7 @@
 #include <QUndoStack>
 #include <QItemSelection>
 #include <QApplication>
+#include <selectcommand.h>
 
 CloudList::CloudList(QUndoStack * undostack, QObject *parent)
     : QAbstractListModel(parent) {
@@ -117,12 +118,21 @@ std::shared_ptr<PointCloud> CloudList::loadFile(QString filename){
 }
 
 void CloudList::deselectAllPoints(){
-    for(std::shared_ptr<PointCloud> & cloud : clouds_){
-        for(PointFlags & flag : cloud->flags_){
+    undostack_->beginMacro("Deselect All");
+    for(std::shared_ptr<PointCloud> cloud : clouds_){
+        std::shared_ptr<std::vector<int> > indices;
+        indices.reset(new std::vector<int>());
+
+        std::shared_ptr<std::vector<int> > empty;
+        empty.reset(new std::vector<int>());
+
+        for(int idx = 0; idx < cloud->flags_.size(); idx++){
+            PointFlags & flag =  cloud->flags_[idx];
             if(uint8_t(PointFlags::selected) & uint8_t(flag))
-                flag = PointFlags(uint8_t(flag) & ~uint8_t(PointFlags::selected));
+                indices->push_back(idx);
         }
-        // TODO(Rickert): Update with vector
-        cloud->ed_->emitflagUpdate();
+
+        undostack_->push(new SelectCommand(cloud, empty, indices));
     }
+    undostack_->endMacro();
 }

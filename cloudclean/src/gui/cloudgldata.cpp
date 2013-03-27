@@ -174,12 +174,22 @@ void CloudGLData::syncCloud() {
 }
 
 void CloudGLData::syncLabels(std::shared_ptr<std::vector<int> > idxs) {
-    dirty_label_list_ = idxs;
+    if(dirty_labels_ && dirty_label_list_.get() != nullptr && dirty_label_list_->size() !=0){
+        dirty_label_list_->insert(dirty_label_list_->end(), idxs->begin(), idxs->end());
+    }
+    else {
+        dirty_label_list_ = idxs;
+    }
     dirty_labels_ = true;
 }
 
 void CloudGLData::syncFlags(std::shared_ptr<std::vector<int> > idxs) {
-    dirty_flag_list_ = idxs;
+    if(dirty_flags_ && dirty_flag_list_.get() != nullptr && dirty_flag_list_->size() !=0){
+        dirty_flag_list_->insert(dirty_flag_list_->end(), idxs->begin(), idxs->end());
+    }
+    else {
+        dirty_flag_list_ = idxs;
+    }
     dirty_flags_ = true;
 }
 

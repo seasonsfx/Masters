@@ -6,12 +6,14 @@
 #include <QGLShaderProgram>
 #include <QGLBuffer>
 #include <QTabWidget>
+#include <QApplication>
 #include "model/layerlist.h"
 #include "model/cloudlist.h"
 #include "gui/glwidget.h"
 #include "gui/flatview.h"
 #include "actionmanager.h"
 #include "utilities/pointpicker.h"
+#include "selectcommand.h"
 
 QString Brush3D::getName(){
     return "3D Brush Tool";
@@ -112,14 +114,7 @@ void Brush3D::paint(Eigen::Affine3f, Eigen::Affine3f){
     qDebug() << "Hello from paint plugin";
 }
 
-bool Brush3D::mouseClickEvent(QMouseEvent * event){
-
-    screenToRay(event->x(), event->y(), glwidget_->width(), glwidget_->height(),
-                      glwidget_->camera_.modelviewMatrix(),
-                      glwidget_->camera_.projectionMatrix(),
-                      p1,
-                      p2);
-
+void Brush3D::select(QMouseEvent * event){
     int idx = pick(event->x(), event->y(), glwidget_->width(),
                    glwidget_->height(), 1e-04,
                    glwidget_->camera_.projectionMatrix(),
@@ -127,35 +122,47 @@ bool Brush3D::mouseClickEvent(QMouseEvent * event){
                    cl_->active_);
 
     if(idx == -1)
-        return true;
+        return;
 
-    std::shared_ptr<std::vector<int>> indices;
+    std::shared_ptr<std::vector<int> > indices;
     indices.reset(new std::vector<int>());
+
+    std::shared_ptr<std::vector<int> > empty;
+    empty.reset(new std::vector<int>());
 
     std::vector<float> distsq;
     cl_->active_->getOctree()->radiusSearch(idx, 0.5, *indices, distsq);
 
-    for(int idx : *indices){
-        PointFlags & flag = cl_->active_->flags_[idx];
-        flag = PointFlags(uint8_t(flag) | uint8_t(PointFlags::selected));
-    }
+    bool negative_select = QApplication::keyboardModifiers() == Qt::ControlModifier;
 
-    cl_->active_->ed_->emitflagUpdate(indices);
+    if(negative_select)
+        cl_->undostack_->push(new SelectCommand(cl_->active_, empty, indices));
+    else
+        cl_->undostack_->push(new SelectCommand(cl_->active_, indices, empty));
+
+}
+
+bool Brush3D::mouseClickEvent(QMouseEvent * event){
     return true;
 }
 
 bool Brush3D::mouseMoveEvent(QMouseEvent * event) {
+    if(event->buttons())
+        select(event);
     last_mouse_pos_ << event->x(), event->y();
     return true;
 }
 
 bool Brush3D::mousePressEvent(QMouseEvent * event) {
+    cl_->undostack_->beginMacro("3d Select");
+    select(event);
     last_mouse_pos_ << event->x(), event->y();
     mouse_down_pos_ = last_mouse_pos_;
     return true;
 }
 
 bool Brush3D::mouseReleaseEvent(QMouseEvent * event){
+    cl_->undostack_->endMacro();
     last_mouse_pos_ << event->x(), event->y();
     float dist = (last_mouse_pos_ - mouse_down_pos_).norm();
     if(dist < 2){
@@ -174,9 +181,9 @@ void Brush3D::enable() {
     tabs->setCurrentWidget(glwidget_);
     enable_->setChecked(true);
     emit enabling();
-    connect(glwidget_, SIGNAL(pluginPaint(Eigen::Affine3f, Eigen::Affine3f)),
-            this, SLOT(paint(Eigen::Affine3f, Eigen::Affine3f)),
-            Qt::DirectConnection);
+    //connect(glwidget_, SIGNAL(pluginPaint(Eigen::Affine3f, Eigen::Affine3f)),
+    //        this, SLOT(paint(Eigen::Affine3f, Eigen::Affine3f)),
+    //        Qt::DirectConnection);
     glwidget_->installEventFilter(this);
     connect((QObject *)pm_, SIGNAL(endEdit()), this, SLOT(disable()));
     is_enabled_ = true;
@@ -185,8 +192,8 @@ void Brush3D::enable() {
 void Brush3D::disable() {
     enable_->setChecked(false);
     disconnect((QObject *) pm_, SIGNAL(endEdit()), this, SLOT(disable()));
-    disconnect(glwidget_, SIGNAL(pluginPaint(Eigen::Affine3f, Eigen::Affine3f)),
-            this, SLOT(paint(Eigen::Affine3f, Eigen::Affine3f)));
+    //disconnect(glwidget_, SIGNAL(pluginPaint(Eigen::Affine3f, Eigen::Affine3f)),
+    //        this, SLOT(paint(Eigen::Affine3f, Eigen::Affine3f)));
     glwidget_->removeEventFilter(this);
     is_enabled_ = false;
 }

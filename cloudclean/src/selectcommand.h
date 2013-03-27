@@ -10,17 +10,15 @@
 class SelectCommand : public QUndoCommand
 {
 public:
-    explicit SelectCommand(std::weak_ptr<PointCloud> pc,
+    explicit SelectCommand(std::shared_ptr<PointCloud> pc,
                            std::shared_ptr<std::vector<int> > selected,
-                            std::shared_ptr<std::vector<int> > deselected,
+                           std::shared_ptr<std::vector<int> > deselected = std::shared_ptr<std::vector<int> >(new std::vector<int>()),
                            QUndoCommand *parent = 0);
     QString actionText();
     virtual void undo();
     virtual void redo();
-
-signals:
-    
-public slots:
+    virtual bool mergeWith(const QUndoCommand *other);
+    virtual int id() const;
     
 private:
     std::weak_ptr<PointCloud> pc_;

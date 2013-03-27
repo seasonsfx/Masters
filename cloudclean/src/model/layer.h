@@ -2,6 +2,7 @@
 #define MODEL_CLAYER_H_
 
 #include <set>
+#include <map>
 #include <memory>
 #include <QAbstractListModel>
 #include <QColor>
@@ -14,24 +15,24 @@ typedef std::set<Layer *> LayerSet;
 class Layer : public QObject {
     Q_OBJECT
  private:
-    Layer(std::map<uint8_t, LayerSet> & layer_lookup_table);
+    Layer(std::map<uint16_t, LayerSet> & layer_lookup_table);
 
  public:
     ~Layer();
     void setColor(QColor color);
     void setRandomColor();
     void setName(QString name);
-    void addLabel(uint8_t id);
-    void removeLabel(uint8_t id);
-    const std::set<uint8_t> &getLabelSet();
+    void addLabel(uint16_t id);
+    void removeLabel(uint16_t id);
+    const std::set<uint16_t> &getLabelSet();
 
  signals:
     void colorChanged();
     void nameChanged();
 
  private:
-    std::map<uint8_t, LayerSet> & layer_lookup_table_;
-    std::set<uint8_t> labels_;
+    std::map<uint16_t, LayerSet> & layer_lookup_table_;
+    std::set<uint16_t> labels_;
 
  public:
     QString name_;

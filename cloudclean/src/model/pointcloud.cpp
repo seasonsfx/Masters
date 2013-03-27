@@ -221,7 +221,7 @@ bool PointCloud::load_ptx(const char* filename, int decimation_factor) {
     this->height = 1;
     this->is_dense = true;
     labels_.resize(this->width * this->height, 0);
-    flags_.resize(this->width * this->height);
+    flags_.resize(this->width * this->height, PointFlags(0));
 
     ed_->updateProgress(100);
     pc_mutex->unlock();

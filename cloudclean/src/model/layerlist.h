@@ -20,7 +20,7 @@ class LayerList : public QAbstractListModel {
     std::shared_ptr<Layer> addLayer(std::shared_ptr<Layer> layer);
     std::shared_ptr<Layer> addLayer();
     std::shared_ptr<Layer> addLayer(QString name);
-    int16_t newLabelId(std::shared_ptr<Layer> layer);
+    int16_t newLabelId();
 
     const LayerSet &getLayersForLabel(int i);
     void copyLayerSet(uint8_t source_label, uint8_t dest_label);
@@ -34,12 +34,14 @@ class LayerList : public QAbstractListModel {
     void selectionChanged(const QItemSelection &sel, const QItemSelection &des);
     void mergeSelectedLayers();
     void intersectSelectedLayers();
-    void deleteLayer(int idx);
+    void deleteLayer(std::shared_ptr<Layer> layer);
     void deleteLayer();
+    void deleteLayer(int idx);
 
  private:
     std::mutex * mtx_;
-    std::map<uint8_t, LayerSet> layer_lookup_table_; // label associated with layer
+    std::map<uint16_t, LayerSet> layer_lookup_table_; // label associated with layer
+    std::vector<uint16_t> free_labels_;
 
  public:
     uint last_label_;

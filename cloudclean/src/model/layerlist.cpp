@@ -99,19 +99,15 @@ void LayerList::deleteLayer(int idx){
                this, SIGNAL(lookupTableUpdate()));
     beginRemoveRows(QModelIndex(), idx, idx);
 
-    auto toDel = [&idx] (int i) {
-        if(i == idx)
-            return true;
+    auto toDel = [&idx, this] (std::weak_ptr<Layer> l) {
+            if(l.expired())
+                return true;
         return false;
     };
 
     // If selected, fix that state up
     selection_.erase( remove_if(selection_.begin(), selection_.end(), toDel),
                       selection_.end() );
-    for(int i = 0; i < selection_.size(); i++){
-        if(selection_[i] > idx)
-            --selection_[i];
-    }
 
     // Add labels to free list (Label should maybe do this)
     for(int label : layers_[idx]->labels_) {
@@ -171,9 +167,11 @@ void LayerList::selectionChanged(const QItemSelection &sel,
                                      const QItemSelection &des) {
 
     // Labda to remove selection
-    auto toDel = [&des] (int i) {
+    auto toDel = [&des, this] (std::weak_ptr<Layer> l) {
         for(QModelIndex d : des.indexes()){
-            if(i == d.row())
+            if(l.expired())
+                return true; // this should not happen, just in case take care of it
+            if(l.lock() == layers_[d.row()])
                 return true;
         }
         return false;
@@ -183,7 +181,7 @@ void LayerList::selectionChanged(const QItemSelection &sel,
                       selection_.end() );
 
     for (QModelIndex s : sel.indexes()) {
-        selection_.push_back(s.row());
+        selection_.push_back(layers_[s.row()]);
     }
 
     emit changedSelection(selection_);

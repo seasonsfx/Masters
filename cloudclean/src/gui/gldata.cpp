@@ -58,8 +58,8 @@ void GLData::reloadColorLookupBuffer(){
         std::vector<const Layer *> selected;
 
         for(const Layer * layer : layerset) {
-            for(int idx : ll_->selection_){
-                std::shared_ptr<Layer> & selected_layer = ll_->layers_[idx];
+            for(std::weak_ptr<Layer> l : ll_->selection_){
+                std::shared_ptr<Layer> selected_layer = l.lock();
                 if(layer == selected_layer.get()){
                     selected.push_back(layer);
                     break;

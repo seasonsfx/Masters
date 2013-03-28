@@ -76,8 +76,8 @@ void LayerListView::intersectSelectedLayers(){
 
 
     // First selected label
-    std::set<uint16_t> & labels = ll_->layers_.at(ll_->selection_[0])->labels_;
-    int intersection_count = 0;
+    std::set<uint16_t> & labels = ll_->selection_[0].lock()->labels_;
+    uint intersection_count = 0;
 
     // Find intersecting labels
     std::shared_ptr<std::vector<uint16_t> > intersecting_labels;
@@ -87,10 +87,10 @@ void LayerListView::intersectSelectedLayers(){
     for(uint8_t label : labels){
         intersection_count = 0;
         // For every other selected layer
-        for(int i = 1; i < ll_->selection_.size(); i++){
-            int layer_idx = ll_->selection_[i];
+        for(uint i = 1; i < ll_->selection_.size(); i++){
+            std::shared_ptr<Layer> layer = ll_->selection_[i].lock();
             // For every label in the orther layer
-            for(uint8_t qlabel : ll_->layers_[layer_idx]->labels_){
+            for(uint8_t qlabel : layer->labels_){
                 if(label == qlabel){
                     intersection_count++;
                     break;
@@ -119,8 +119,8 @@ void LayerListView::intersectSelectedLayers(){
 void LayerListView::mergeSelectedLayers() {
     // Mark for deletion
     std::vector<std::shared_ptr<Layer> > merge_these;
-    for(int idx: ll_->selection_) {
-        merge_these.push_back(ll_->layers_[idx]);
+    for(std::weak_ptr<Layer> l: ll_->selection_) {
+        merge_these.push_back(l.lock());
     }
 
 
@@ -128,9 +128,9 @@ void LayerListView::mergeSelectedLayers() {
     labels.reset(new std::vector<uint16_t>());
 
 
-    for(int idx: ll_->selection_){
-        Layer & layer = *ll_->layers_[idx];
-        for(int label : layer.labels_){
+    for(std::weak_ptr<Layer> l: ll_->selection_){
+        std::shared_ptr<Layer> layer = l.lock();
+        for(int label : layer->labels_){
             labels->push_back(label);
         }
     }

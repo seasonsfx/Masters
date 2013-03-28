@@ -31,7 +31,7 @@ class LayerList : public QAbstractListModel {
  signals:
     void layerUpdate(std::shared_ptr<Layer> layer);
     void lookupTableUpdate();
-    void changedSelection(std::vector<int> selection);
+    void changedSelection(std::vector<std::weak_ptr<Layer> > selection);
 
  public slots:
     void selectionChanged(const QItemSelection &sel, const QItemSelection &des);
@@ -46,7 +46,7 @@ class LayerList : public QAbstractListModel {
 
  public:
     uint last_label_;
-    std::vector<int> selection_;
+    std::vector<std::weak_ptr<Layer> > selection_;
     std::shared_ptr<Layer> default_layer_;
     std::vector<std::shared_ptr<Layer> > layers_; // a layer is a group of labels
     std::map<uint, std::shared_ptr<Layer> > layer_id_map_;

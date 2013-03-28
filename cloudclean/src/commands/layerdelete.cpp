@@ -17,7 +17,8 @@ QString LayerDelete::actionText(){
 }
 
 void LayerDelete::undo(){
-    std::shared_ptr<Layer> layer = ll_->addLayer(name_);
+    std::shared_ptr<Layer> layer = ll_->addLayerWithId(id_);
+    layer->setName(name_);
     layer->setColor(col_);
     for(uint16_t label : labels_){
         layer->addLabel(label);
@@ -26,7 +27,9 @@ void LayerDelete::undo(){
 }
 
 void LayerDelete::redo(){
-    ll_->deleteLayer(layer_.lock());
+    auto layer = layer_.lock();
+    id_ = layer->id_;
+    ll_->deleteLayer(layer);
 }
 
 bool LayerDelete::mergeWith(const QUndoCommand *other){

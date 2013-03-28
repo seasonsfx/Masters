@@ -26,6 +26,7 @@ class LayerDelete : public QUndoCommand {
     QColor col_;
     QString name_;
     LayerList * ll_;
+    uint id_;
     std::weak_ptr<Layer> layer_;
 };
 

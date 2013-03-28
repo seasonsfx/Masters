@@ -6,6 +6,7 @@ Layer::Layer(std::map<uint16_t, LayerSet> & layer_lookup_table)
     : layer_lookup_table_(layer_lookup_table) {
     name_ = "New Layer";
     color_.setHsl(rand()%359, rand()%55 + 200, 127);
+    id_ = ++last_id_;
 }
 
 Layer::~Layer(){
@@ -45,3 +46,5 @@ void Layer::removeLabel(uint16_t id) {
 const std::set<uint16_t> &Layer::getLabelSet(){
     return labels_;
 }
+
+uint Layer::last_id_ = 0;

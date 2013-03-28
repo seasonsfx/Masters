@@ -200,6 +200,10 @@ void Brush3D::disable() {
 
 bool Brush3D::eventFilter(QObject *object, QEvent *event){
 
+    // Bypass plugin via shift
+    if(QApplication::keyboardModifiers() == Qt::SHIFT)
+        return false;
+
     switch(event->type()){
     case QEvent::MouseButtonPress:
         return mousePressEvent(static_cast<QMouseEvent*>(event));

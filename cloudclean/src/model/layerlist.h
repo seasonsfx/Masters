@@ -18,6 +18,7 @@ class LayerList : public QAbstractListModel {
     int rowCount(const QModelIndex & parent = QModelIndex()) const;
     QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
     std::shared_ptr<Layer> addLayer(std::shared_ptr<Layer> layer);
+    std::shared_ptr<Layer> addLayerWithId(uint id);
     std::shared_ptr<Layer> addLayer();
     std::shared_ptr<Layer> addLayer(QString name);
     int16_t newLabelId();
@@ -48,6 +49,7 @@ class LayerList : public QAbstractListModel {
     std::vector<int> selection_;
     std::shared_ptr<Layer> default_layer_;
     std::vector<std::shared_ptr<Layer> > layers_; // a layer is a group of labels
+    std::map<uint, std::shared_ptr<Layer> > layer_id_map_;
 };
 
 #endif // LAYERLIST_H

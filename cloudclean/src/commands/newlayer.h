@@ -38,6 +38,8 @@ class NewLayer : public QUndoCommand
     std::weak_ptr<Layer> new_layer_;
     QColor layer_color_;
 
+    bool applied_once_;
+
 };
 
 #endif // NEWLAYERCOMMAND_H

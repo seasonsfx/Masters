@@ -41,6 +41,7 @@ QVariant LayerList::data(const QModelIndex & index, int role) const {
 std::shared_ptr<Layer> LayerList::addLayer(std::shared_ptr<Layer> layer){
     mtx_->lock();
     beginInsertRows(QModelIndex(), layers_.size(), layers_.size());
+    layer_id_map_[layer->id_] = layer;
     layers_.push_back(layer);
     endInsertRows();
     mtx_->unlock();
@@ -48,6 +49,12 @@ std::shared_ptr<Layer> LayerList::addLayer(std::shared_ptr<Layer> layer){
             this, SIGNAL(lookupTableUpdate()));
     emit layerUpdate(layer); // TODO(Rickert): Consider replacing with existing signal
     return layer;
+}
+
+std::shared_ptr<Layer> LayerList::addLayerWithId(uint id) {
+    std::shared_ptr<Layer> layer(new Layer(layer_lookup_table_));
+    layer->id_ = id;
+    return addLayer(layer);
 }
 
 std::shared_ptr<Layer> LayerList::addLayer() {
@@ -120,7 +127,8 @@ void LayerList::deleteLayer(int idx){
             this->free_labels_.push_back(label);
     }
 
-
+    // Do actual deleting of layer
+    layer_id_map_.erase(layers_[idx]->id_);
     layers_.erase(layers_.begin()+idx);
 
     endRemoveRows();

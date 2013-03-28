@@ -28,8 +28,9 @@ void LayerFromLabels::undo(){
     // Undo subtractive
     if(subtractive_) {
         for(auto it : removed_from_){
-            for(uint16_t label : it.second)
-                it.first->addLabel(label);
+            for(uint16_t label : it.second) {
+                ll_->layer_id_map_[it.first]->addLabel(label);
+            }
         }
     }
 
@@ -45,7 +46,7 @@ void LayerFromLabels::redo(){
             const LayerSet & ls = ll_->getLayersForLabel(label);
             for(Layer * l : ls){
                 if(l != ll_->default_layer_.get()){
-                    removed_from_[l].push_back(label);
+                    removed_from_[l->id_].push_back(label);
                     l->removeLabel(label);
                 }
             }

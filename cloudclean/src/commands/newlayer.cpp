@@ -10,6 +10,7 @@ NewLayer::NewLayer(std::shared_ptr<PointCloud> pc,
     pc_ = pc;
     idxs_ = idxs;
     ll_ = ll;
+    applied_once_ = false;
 }
 
 QString NewLayer::actionText(){
@@ -63,11 +64,18 @@ void NewLayer::redo(){
         pc_->labels_[idx] = getNewLabel(pc_->labels_[idx], layer);
     }
 
+    if(applied_once_) {
+        // Add labels to layers
+        for(auto it: new_to_old) {
+            layer->addLabel(it.first);
+        }
+    }
+    applied_once_ = true;
+
     pc_->ed_->emitlabelUpdate();
     pc_->ed_->emitflagUpdate();
 
     // TODO(Rickert) : Update color lookup buffer
-
 }
 
 bool NewLayer::mergeWith(const QUndoCommand *other){

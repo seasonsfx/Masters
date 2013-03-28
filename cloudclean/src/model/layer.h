@@ -34,9 +34,12 @@ class Layer : public QObject {
     std::map<uint16_t, LayerSet> & layer_lookup_table_;
     std::set<uint16_t> labels_;
 
+    static uint last_id_;
+
  public:
     QString name_;
     QColor color_;
+    uint id_;
 
     friend class LayerListView;
     friend class LayerList;

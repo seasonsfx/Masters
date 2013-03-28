@@ -1,4 +1,4 @@
-#include "newlayercommand.h"
+#include "newlayer.h"
 
 #include <model/layerlist.h>
 #include <model/pointcloud.h>

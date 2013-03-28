@@ -13,7 +13,7 @@
 #include "gui/flatview.h"
 #include "actionmanager.h"
 #include "utilities/pointpicker.h"
-#include "commands/selectcommand.h"
+#include "commands/select.h"
 
 QString Brush3D::getName(){
     return "3D Brush Tool";
@@ -136,9 +136,9 @@ void Brush3D::select(QMouseEvent * event){
     bool negative_select = QApplication::keyboardModifiers() == Qt::ControlModifier;
 
     if(negative_select)
-        cl_->undostack_->push(new SelectCommand(cl_->active_, empty, indices));
+        cl_->undostack_->push(new Select(cl_->active_, empty, indices));
     else
-        cl_->undostack_->push(new SelectCommand(cl_->active_, indices, empty));
+        cl_->undostack_->push(new Select(cl_->active_, indices, empty));
 
 }
 

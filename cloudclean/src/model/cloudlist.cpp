@@ -132,7 +132,7 @@ void CloudList::deselectAllPoints(){
                 indices->push_back(idx);
         }
 
-        undostack_->push(new SelectCommand(cloud, empty, indices));
+        undostack_->push(new Select(cloud, empty, indices));
     }
     undostack_->endMacro();
 }

@@ -26,6 +26,7 @@ class LayerListView : public QDockWidget
  private slots:
     void selectionToLayer();
     void intersectSelectedLayers();
+    void mergeSelectedLayers();
     void contextMenu(const QPoint &pos);
     void setColor();
 

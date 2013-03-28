@@ -34,7 +34,6 @@ class LayerList : public QAbstractListModel {
 
  public slots:
     void selectionChanged(const QItemSelection &sel, const QItemSelection &des);
-    void mergeSelectedLayers();
     void deleteLayer(std::shared_ptr<Layer> layer);
     void deleteLayer();
     void deleteLayer(int idx);

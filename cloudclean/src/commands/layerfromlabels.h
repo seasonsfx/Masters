@@ -2,6 +2,7 @@
 #define LayerFromLabels_H
 
 #include <vector>
+#include <map>
 #include <memory>
 #include <QUndoCommand>
 #include <QColor>
@@ -27,7 +28,7 @@ class LayerFromLabels : public QUndoCommand
     std::shared_ptr<std::vector<uint16_t> > labels_;
     LayerList * ll_;
     std::weak_ptr<Layer> new_layer_;
-    std::vector<Layer *> removed_from_;
+    std::map<Layer *, std::vector<uint16_t> > removed_from_;
 };
 
 #endif // LayerFromLabels_H

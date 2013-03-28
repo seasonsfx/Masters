@@ -158,38 +158,6 @@ void LayerList::copyLayerSet(uint8_t source_label, uint8_t dest_label){
     emit lookupTableUpdate(); // TODO(Rickert): Might be inefficient with many calls to this slot
 }
 
-void LayerList::mergeSelectedLayers() {
-    // Mark for deletion
-    std::vector<std::shared_ptr<Layer>> merge_these;
-    for(int idx: selection_) {
-        merge_these.push_back(layers_[idx]);
-    }
-
-    // Note: selection may change when adding layer. Bugs?
-    // Create new layer
-    std::shared_ptr<Layer> layer = addLayer();
-    layer->setName("Merged layer");
-
-    for(int idx: selection_){
-        // copy labels associated with layer
-        std::shared_ptr<Layer> & l = layers_[idx];
-
-        for(uint8_t idx: l->labels_){
-            layer->addLabel(idx);
-        }
-    }
-
-    // Delete marked labels
-    for(std::shared_ptr<Layer> dl : merge_these){
-        for(int idx = 0; idx < layers_.size(); idx++){
-            if(layers_[idx] == dl){
-                deleteLayer(idx);
-                break;
-            }
-        }
-    }
-}
-
 void LayerList::selectionChanged(const QItemSelection &sel,
                                      const QItemSelection &des) {
 

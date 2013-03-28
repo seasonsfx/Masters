@@ -3,7 +3,7 @@
 #include <QDebug>
 #include <QMouseEvent>
 #include <QApplication>
-#include "commands/selectcommand.h"
+#include "commands/select.h"
 
 FlatView::FlatView(QGLFormat & fmt, std::shared_ptr<CloudList> cl,
                    std::shared_ptr<LayerList> ll, QWidget *parent, QGLWidget *sharing)
@@ -148,7 +148,7 @@ void FlatView::mouseMoveEvent(QMouseEvent * event) {
             }
         }
 
-        cl_->undostack_->push(new SelectCommand(pc, selected, deselected));
+        cl_->undostack_->push(new Select(pc, selected, deselected));
 
     }
     else if(event->buttons() == Qt::RightButton){

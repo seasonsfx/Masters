@@ -38,7 +38,7 @@ class Layer : public QObject {
     QString name_;
     QColor color_;
 
-
+    friend class LayerListView;
     friend class LayerList;
 };
 

@@ -7,10 +7,10 @@
 #include <QUndoCommand>
 #include "model/pointcloud.h"
 
-class SelectCommand : public QUndoCommand
+class Select : public QUndoCommand
 {
 public:
-    explicit SelectCommand(std::shared_ptr<PointCloud> pc,
+    explicit Select(std::shared_ptr<PointCloud> pc,
                            std::shared_ptr<std::vector<int> > selected,
                            std::shared_ptr<std::vector<int> > deselected = std::shared_ptr<std::vector<int> >(new std::vector<int>()),
                            QUndoCommand *parent = 0);

@@ -15,6 +15,7 @@ add_subdirectory(gui)
 add_subdirectory(model)
 add_subdirectory(plugins)
 add_subdirectory(pluginsystem)
+add_subdirectory(commands)
 
 #
 # Build main binary
@@ -40,6 +41,7 @@ target_link_libraries(${project_BIN}
     ${Boost_LIBRARIES}
     cloudclean_model
     cloudclean_util
+    cloudclean_commands
     pluginsystem
 )
 #QT5_USE_MODULES(${project_BIN} Widgets Gui OpenGL)

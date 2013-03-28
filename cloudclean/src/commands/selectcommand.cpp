@@ -2,7 +2,7 @@
 
 #include <QDebug>
 
-SelectCommand::SelectCommand(std::shared_ptr<PointCloud> pc,
+Select::Select(std::shared_ptr<PointCloud> pc,
         std::shared_ptr<std::vector<int> > selected,
         std::shared_ptr<std::vector<int> > deselected,
         QUndoCommand *parent)
@@ -29,11 +29,11 @@ SelectCommand::SelectCommand(std::shared_ptr<PointCloud> pc,
 
 }
 
-QString SelectCommand::actionText(){
+QString Select::actionText(){
     return "Selection";
 }
 
-void SelectCommand::undo(){
+void Select::undo(){
     if(pc_.expired())
         return;
 
@@ -60,7 +60,7 @@ void SelectCommand::undo(){
 
 }
 
-void SelectCommand::redo(){
+void Select::redo(){
     if(pc_.expired())
         return;
 
@@ -99,11 +99,11 @@ std::shared_ptr<std::vector<int> > mergeUnique(
     return a;
 }
 
-bool SelectCommand::mergeWith(const QUndoCommand *other){
+bool Select::mergeWith(const QUndoCommand *other){
     if (other->id() != id())
         return false;
 
-    const SelectCommand * o = static_cast<const SelectCommand *>(other);
+    const Select * o = static_cast<const Select *>(other);
 
     if (o->pc_.lock() != pc_.lock())
         return false;
@@ -112,7 +112,7 @@ bool SelectCommand::mergeWith(const QUndoCommand *other){
     deselected_ = mergeUnique(deselected_, o->deselected_);
 }
 
-int SelectCommand::id() const {
+int Select::id() const {
     return 1;
 }
 

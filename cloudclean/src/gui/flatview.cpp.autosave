@@ -148,7 +148,7 @@ void FlatView::mouseMoveEvent(QMouseEvent * event) {
             }
         }
 
-        cl_->undostack_->push(new SelectCommand(pc, selected, deselected));
+        cl_->undostack_->push(new Select(pc, selected, deselected));
 
     }
     else if(event->buttons() == Qt::RightButton){

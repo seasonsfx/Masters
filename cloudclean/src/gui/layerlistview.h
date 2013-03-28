@@ -20,8 +20,12 @@ class LayerListView : public QDockWidget
                            std::shared_ptr<CloudList> cl, QWidget *parent = 0);
     ~LayerListView();
 
+ public slots:
+    void selectLayer(std::shared_ptr<Layer> layer);
+
  private slots:
     void selectionToLayer();
+    void intersectSelectedLayers();
     void contextMenu(const QPoint &pos);
     void setColor();
 

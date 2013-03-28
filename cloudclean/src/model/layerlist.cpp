@@ -61,11 +61,7 @@ std::shared_ptr<Layer> LayerList::addLayer(QString name) {
     return addLayer(layer);
 }
 
-void LayerList::deleteLayer(){
-    deleteLayer(sender()->property("layer_id").toInt());
-}
-
-void LayerList::deleteLayer(std::shared_ptr<Layer> layer) {
+int LayerList::getLayerIndex(std::shared_ptr<Layer> layer){
     auto isEq = [&layer] (std::shared_ptr<Layer> layer2) {
             return layer == layer2;
     };
@@ -73,7 +69,20 @@ void LayerList::deleteLayer(std::shared_ptr<Layer> layer) {
     auto iter = std::find_if(layers_.begin(), layers_.end(), isEq);
     size_t idx = std::distance(layers_.begin(), iter);
 
-    if(idx != layers_.size()) {
+    if(idx == layers_.size())
+        return -1;
+
+    return idx;
+}
+
+void LayerList::deleteLayer(){
+    deleteLayer(sender()->property("layer_id").toInt());
+}
+
+void LayerList::deleteLayer(std::shared_ptr<Layer> layer) {
+    int idx = getLayerIndex(layer);
+
+    if(idx != -1) {
         deleteLayer(idx);
     }
 }
@@ -89,12 +98,26 @@ void LayerList::deleteLayer(int idx){
         return false;
     };
 
+    // If selected, fix that state up
     selection_.erase( remove_if(selection_.begin(), selection_.end(), toDel),
                       selection_.end() );
-
     for(int i = 0; i < selection_.size(); i++){
         if(selection_[i] > idx)
             --selection_[i];
+    }
+
+    // Add labels to free list (Label should maybe do this)
+    for(int label : layers_[idx]->labels_) {
+        LayerSet & ls = layer_lookup_table_[label];
+        bool is_free = true;
+        for(Layer * l: ls) {
+            if(l != this->default_layer_.get() && l !=  layers_[idx].get()){
+                is_free = false;
+                break;
+            }
+        }
+        if(is_free)
+            this->free_labels_.push_back(label);
     }
 
     layers_.erase(layers_.begin()+idx);
@@ -116,8 +139,6 @@ int16_t LayerList::newLabelId() {
     }
     // Add this label to default layer
     default_layer_->addLabel(++last_label_);
-    //layer_lookup_table_[++last_label_].insert(default_layer_.get());
-    //layer->labels_.insert(last_label_);
     return last_label_;
 }
 
@@ -167,61 +188,6 @@ void LayerList::mergeSelectedLayers() {
             }
         }
     }
-}
-
-void LayerList::intersectSelectedLayers(){
-    if(selection_.size() < 2){
-        qDebug() << "Yeah... no. Select at least 2";
-        return;
-    }
-    // First selected label
-    std::set<uint16_t> & labels = layers_.at(selection_[0])->labels_;
-    int intersection_count = 0;
-
-    // Find intersecting labels
-    std::vector<int> intersecting_labels;
-
-    // For every label index in the first layer
-    for(uint8_t label : labels){
-        intersection_count = 0;
-        // For every other selected layer
-        for(int i = 1; i < selection_.size(); i++){
-            int layer_idx = selection_[i];
-            // For every label in the orther layer
-            for(uint8_t qlabel : layers_[layer_idx]->labels_){
-                if(label == qlabel){
-                    intersection_count++;
-                    break;
-                }
-            }
-        }
-        if(intersection_count == selection_.size()-1) {
-            intersecting_labels.push_back(label);
-        }
-    }
-
-    if(intersecting_labels.size() != 0) {
-        // Remove from source
-        for(uint8_t label : intersecting_labels){
-            for(int layer_idx : selection_){
-                std::shared_ptr<Layer> layer = layers_[layer_idx];
-                layer->removeLabel(label);
-            }
-        }
-
-        // Create new layer
-        std::shared_ptr<Layer> layer = addLayer();
-        layer->setName("New intersection");
-
-        for(uint8_t label : intersecting_labels){
-            layer->addLabel(label);
-        }
-    }
-    else {
-        qDebug() << "no interception";
-    }
-
-
 }
 
 void LayerList::selectionChanged(const QItemSelection &sel,

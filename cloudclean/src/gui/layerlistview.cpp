@@ -4,8 +4,8 @@
 #include <QColorDialog>
 #include <QMenu>
 
-#include "newlayercommand.h"
-#include "selectcommand.h"
+#include "commands/newlayercommand.h"
+#include "commands/selectcommand.h"
 
 LayerListView::LayerListView(std::shared_ptr<LayerList> ll,
                              std::shared_ptr<CloudList> cl, QWidget *parent) :
@@ -31,8 +31,15 @@ LayerListView::~LayerListView() {
     delete ui_;
 }
 
+void LayerListView::selectLayer(std::shared_ptr<Layer> layer) {
+
+}
+
 // TODO(Rickert): selections should also be updated via a vector
 
+
+// This function is here because i do not want to put the layerlist in the
+// cloudlist
 void LayerListView::selectionToLayer(){
     cl_->undostack_->beginMacro("Layer from selection");
     // Remap all selected points
@@ -50,14 +57,75 @@ void LayerListView::selectionToLayer(){
                 idxs->push_back(i);
         }
 
-        cl_->undostack_->push(new NewLayerCommand(pc, idxs, ll_.get()));
-        cl_->undostack_->push(new SelectCommand(pc, empty, idxs));
+        cl_->undostack_->push(new LayerFromSelection(pc, idxs, ll_.get()));
+        cl_->undostack_->push(new Select(pc, empty, idxs));
 
     }
     cl_->undostack_->endMacro();
     emit update();
     ui_->tableView->selectRow(ll_->layers_.size()-1);
 }
+
+void LayerListView::intersectSelectedLayers(){
+    if(ll_->selection_.size() < 2){
+        qDebug() << "Select at least 2 layers";
+        return;
+    }
+
+    // First selected label
+    std::set<uint16_t> & labels = ll_->layers_.at(ll_->selection_[0])->labels_;
+    int intersection_count = 0;
+
+    // Find intersecting labels
+    std::vector<int> intersecting_labels;
+
+    // For every label index in the first layer
+    for(uint8_t label : labels){
+        intersection_count = 0;
+        // For every other selected layer
+        for(int i = 1; i < ll_->selection_.size(); i++){
+            int layer_idx = ll_->selection_[i];
+            // For every label in the orther layer
+            for(uint8_t qlabel : ll_->layers_[layer_idx]->labels_){
+                if(label == qlabel){
+                    intersection_count++;
+                    break;
+                }
+            }
+        }
+        if(intersection_count == ll_->selection_.size()-1) {
+            intersecting_labels.push_back(label);
+        }
+    }
+
+
+    if(intersecting_labels.size() == 0){
+        qDebug() << "no interception";
+        return;
+    }
+
+
+    // Remove from source
+    for(uint8_t label : intersecting_labels){
+        for(int layer_idx : ll_->selection_){
+            std::shared_ptr<Layer> layer = ll_->layers_[layer_idx];
+            layer->removeLabel(label);
+        }
+    }
+
+    // Create new layer
+    std::shared_ptr<Layer> layer = ll_->addLayer();
+    layer->setName("New intersection");
+
+    for(uint8_t label : intersecting_labels){
+        layer->addLabel(label);
+    }
+
+    ui_->tableView->selectRow(ll_->layers_.size()-1);
+
+}
+
+
 
 void LayerListView::contextMenu(const QPoint &pos) {
     QMenu menu;
@@ -89,7 +157,7 @@ void LayerListView::contextMenu(const QPoint &pos) {
         menu.addAction(&merge);
 
         QAction inter("Intersect", 0);
-        connect(&inter, SIGNAL(triggered()), ll_.get(),
+        connect(&inter, SIGNAL(triggered()), this,
                 SLOT(intersectSelectedLayers()));
         menu.addAction(&inter);
 

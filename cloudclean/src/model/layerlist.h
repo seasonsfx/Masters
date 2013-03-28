@@ -25,6 +25,8 @@ class LayerList : public QAbstractListModel {
     const LayerSet &getLayersForLabel(int i);
     void copyLayerSet(uint8_t source_label, uint8_t dest_label);
 
+    int getLayerIndex(std::shared_ptr<Layer> layer);
+
  signals:
     void layerUpdate(std::shared_ptr<Layer> layer);
     void lookupTableUpdate();
@@ -33,7 +35,6 @@ class LayerList : public QAbstractListModel {
  public slots:
     void selectionChanged(const QItemSelection &sel, const QItemSelection &des);
     void mergeSelectedLayers();
-    void intersectSelectedLayers();
     void deleteLayer(std::shared_ptr<Layer> layer);
     void deleteLayer();
     void deleteLayer(int idx);

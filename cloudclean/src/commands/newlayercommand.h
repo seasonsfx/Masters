@@ -12,10 +12,10 @@ class LayerList;
 class PointCloud;
 class Layer;
 
-class NewLayerCommand : public QUndoCommand
+class NewLayer : public QUndoCommand
 {
  public:
-    NewLayerCommand(std::shared_ptr<PointCloud> pc,
+    NewLayer(std::shared_ptr<PointCloud> pc,
                     std::shared_ptr<std::vector<int> > idxs,
                     LayerList * ll);
     QString actionText();

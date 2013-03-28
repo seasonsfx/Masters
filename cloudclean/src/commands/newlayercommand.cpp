@@ -4,7 +4,7 @@
 #include <model/pointcloud.h>
 #include <model/layer.h>
 
-NewLayerCommand::NewLayerCommand(std::shared_ptr<PointCloud> pc,
+NewLayer::NewLayer(std::shared_ptr<PointCloud> pc,
                                  std::shared_ptr<std::vector<int> > idxs,
                                  LayerList * ll) {
     pc_ = pc;
@@ -12,11 +12,11 @@ NewLayerCommand::NewLayerCommand(std::shared_ptr<PointCloud> pc,
     ll_ = ll;
 }
 
-QString NewLayerCommand::actionText(){
+QString NewLayer::actionText(){
     return "New Layer";
 }
 
-void NewLayerCommand::undo(){
+void NewLayer::undo(){
     // Change labels back
     for(int idx : *idxs_){
         pc_->labels_[idx] = new_to_old[pc_->labels_[idx]];
@@ -30,7 +30,7 @@ void NewLayerCommand::undo(){
     }
 }
 
-uint16_t NewLayerCommand::getNewLabel(uint16_t old, std::shared_ptr<Layer> layer) {
+uint16_t NewLayer::getNewLabel(uint16_t old, std::shared_ptr<Layer> layer) {
     auto new_label_it = old_to_new.find(old);
 
     bool unknown_mapping = new_label_it == old_to_new.cend();
@@ -51,7 +51,7 @@ uint16_t NewLayerCommand::getNewLabel(uint16_t old, std::shared_ptr<Layer> layer
     return old_to_new[old];
 }
 
-void NewLayerCommand::redo(){
+void NewLayer::redo(){
     std::shared_ptr<Layer> layer = ll_->addLayer();
     new_layer_ = layer;
     if(new_to_old.size() != 0)
@@ -70,10 +70,10 @@ void NewLayerCommand::redo(){
 
 }
 
-bool NewLayerCommand::mergeWith(const QUndoCommand *other){
+bool NewLayer::mergeWith(const QUndoCommand *other){
     return false;
 }
 
-int NewLayerCommand::id() const{
+int NewLayer::id() const{
     return 2;
 }

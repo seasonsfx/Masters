@@ -120,6 +120,7 @@ void LayerList::deleteLayer(int idx){
             this->free_labels_.push_back(label);
     }
 
+
     layers_.erase(layers_.begin()+idx);
 
     endRemoveRows();

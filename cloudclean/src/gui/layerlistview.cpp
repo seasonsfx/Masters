@@ -7,6 +7,7 @@
 #include "commands/newlayer.h"
 #include "commands/select.h"
 #include "commands/layerfromlabels.h"
+#include "commands/layerdelete.h"
 
 LayerListView::LayerListView(std::shared_ptr<LayerList> ll,
                              std::shared_ptr<CloudList> cl, QWidget *parent) :
@@ -117,34 +118,39 @@ void LayerListView::intersectSelectedLayers(){
 
 void LayerListView::mergeSelectedLayers() {
     // Mark for deletion
-    std::vector<std::shared_ptr<Layer>> merge_these;
-    for(int idx: selection_) {
-        merge_these.push_back(layers_[idx]);
+    std::vector<std::shared_ptr<Layer> > merge_these;
+    for(int idx: ll_->selection_) {
+        merge_these.push_back(ll_->layers_[idx]);
     }
 
-    // Note: selection may change when adding layer. Bugs?
-    // Create new layer
-    std::shared_ptr<Layer> layer = addLayer();
-    layer->setName("Merged layer");
 
-    for(int idx: selection_){
-        // copy labels associated with layer
-        std::shared_ptr<Layer> & l = layers_[idx];
+    std::shared_ptr<std::vector<uint16_t> > labels;
+    labels.reset(new std::vector<uint16_t>());
 
-        for(uint8_t idx: l->labels_){
-            layer->addLabel(idx);
+
+    for(int idx: ll_->selection_){
+        Layer & layer = *ll_->layers_[idx];
+        for(int label : layer.labels_){
+            labels->push_back(label);
         }
     }
+
+    // Get rid of duplicates
+    std::sort(labels->begin(), labels->end());
+    labels->erase( unique(labels->begin(), labels->end()), labels->end());
+
+    cl_->undostack_->beginMacro("Merge layers");
+    cl_->undostack_->push(new LayerFromLabels(labels, ll_.get(), true));
+
 
     // Delete marked labels
-    for(std::shared_ptr<Layer> dl : merge_these){
-        for(int idx = 0; idx < layers_.size(); idx++){
-            if(layers_[idx] == dl){
-                deleteLayer(idx);
-                break;
-            }
-        }
+    for(std::shared_ptr<Layer> dl : merge_these) {
+        cl_->undostack_->push(new LayerDelete(dl, ll_.get()));
     }
+
+
+    cl_->undostack_->endMacro();
+    ui_->tableView->selectRow(ll_->layers_.size()-1);
 }
 
 void LayerListView::contextMenu(const QPoint &pos) {

@@ -1,21 +1,21 @@
-#include "layerfromlabels.h"
+#include "layerguiselect.h"
 
 #include <model/layerlist.h>
 #include <model/pointcloud.h>
 #include <model/layer.h>
 
-LayerFromLabels::LayerFromLabels(std::shared_ptr<std::vector<uint16_t> > labels,
+LayerGuiSelect::LayerGuiSelect(std::shared_ptr<std::vector<uint16_t> > labels,
                                  LayerList * ll, bool subtractive) {
     subtractive_ = subtractive;
     labels_ = labels;
     ll_ = ll;
 }
 
-QString LayerFromLabels::actionText(){
+QString LayerGuiSelect::actionText(){
     return "New Layer";
 }
 
-void LayerFromLabels::undo(){
+void LayerGuiSelect::undo(){
 
     // Delete layer
     if(!new_layer_.expired()){
@@ -35,7 +35,7 @@ void LayerFromLabels::undo(){
 
 }
 
-void LayerFromLabels::redo(){
+void LayerGuiSelect::redo(){
     std::shared_ptr<Layer> layer = ll_->addLayer();
     new_layer_ = layer;
 
@@ -59,10 +59,10 @@ void LayerFromLabels::redo(){
 
 }
 
-bool LayerFromLabels::mergeWith(const QUndoCommand *other){
+bool LayerGuiSelect::mergeWith(const QUndoCommand *other){
     return false;
 }
 
-int LayerFromLabels::id() const{
-    return 4;
+int LayerGuiSelect::id() const{
+    return 3;
 }

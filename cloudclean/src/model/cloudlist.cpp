@@ -3,7 +3,7 @@
 #include <QUndoStack>
 #include <QItemSelection>
 #include <QApplication>
-#include <commands/selectcommand.h>
+#include <commands/select.h>
 
 CloudList::CloudList(QUndoStack * undostack, QObject *parent)
     : QAbstractListModel(parent) {

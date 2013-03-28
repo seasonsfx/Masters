@@ -1,4 +1,5 @@
 # Code
+*.autosave
 cloudclean/bin
 cloudclean/build
 cloudclean_bin

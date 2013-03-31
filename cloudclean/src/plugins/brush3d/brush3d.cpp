@@ -11,22 +11,23 @@
 #include "model/cloudlist.h"
 #include "gui/glwidget.h"
 #include "gui/flatview.h"
+#include "gui/mainwindow.h"
 #include "actionmanager.h"
 #include "utilities/pointpicker.h"
 #include "commands/select.h"
+#include "core.h"
 
 QString Brush3D::getName(){
     return "3D Brush Tool";
 }
 
-void Brush3D::initialize(PluginManager * pm, ActionManager *am, CloudList * cl, LayerList * ll,
-                         GLWidget * glwidget, FlatView * flatview){
-    cl_ = cl;
-    ll_ = ll;
-    glwidget_ = glwidget;
-    flatview_ = flatview;
-    am_ = am;
-    pm_ = pm;
+void Brush3D::initialize(Core *core){
+    core_= core;
+    cl_ = core_->cl_;
+    ll_ = core_->ll_;
+    glwidget_ = core_->mw_->glwidget_;
+    flatview_ = core_->mw_->flatview_;
+    am_ = core_->mw_->getActionManager();
     initialized_gl = false;
 
     enable_ = new QAction("3d Brush Tool", 0);
@@ -36,13 +37,13 @@ void Brush3D::initialize(PluginManager * pm, ActionManager *am, CloudList * cl, 
     is_enabled_ = false;
 
     connect(enable_, SIGNAL(triggered()), this, SLOT(enable()));
-    connect(this, SIGNAL(enabling()), (QObject *)pm_, SIGNAL(endEdit()));
+    connect(this, SIGNAL(enabling()), core_, SIGNAL(endEdit()));
 
     am_->addAction(enable_, "Edit");
 }
 
 void Brush3D::cleanup(){
-    disconnect(this, SIGNAL(enabling()), (QObject *)pm_, SIGNAL(endEdit()));
+    disconnect(this, SIGNAL(enabling()), core_, SIGNAL(endEdit()));
     disconnect(enable_, SIGNAL(triggered()), this, SLOT(enable()));
     delete line_;
     delete program_;
@@ -136,9 +137,9 @@ void Brush3D::select(QMouseEvent * event){
     bool negative_select = QApplication::keyboardModifiers() == Qt::ControlModifier;
 
     if(negative_select)
-        cl_->undostack_->push(new Select(cl_->active_, empty, indices));
+        core_->us_->push(new Select(cl_->active_, empty, indices));
     else
-        cl_->undostack_->push(new Select(cl_->active_, indices, empty));
+        core_->us_->push(new Select(cl_->active_, indices, empty));
 
 }
 
@@ -154,7 +155,7 @@ bool Brush3D::mouseMoveEvent(QMouseEvent * event) {
 }
 
 bool Brush3D::mousePressEvent(QMouseEvent * event) {
-    cl_->undostack_->beginMacro("3d Select");
+    core_->us_->beginMacro("3d Select");
     select(event);
     last_mouse_pos_ << event->x(), event->y();
     mouse_down_pos_ = last_mouse_pos_;
@@ -162,7 +163,7 @@ bool Brush3D::mousePressEvent(QMouseEvent * event) {
 }
 
 bool Brush3D::mouseReleaseEvent(QMouseEvent * event){
-    cl_->undostack_->endMacro();
+    core_->us_->endMacro();
     last_mouse_pos_ << event->x(), event->y();
     float dist = (last_mouse_pos_ - mouse_down_pos_).norm();
     if(dist < 2){
@@ -185,13 +186,13 @@ void Brush3D::enable() {
     //        this, SLOT(paint(Eigen::Affine3f, Eigen::Affine3f)),
     //        Qt::DirectConnection);
     glwidget_->installEventFilter(this);
-    connect((QObject *)pm_, SIGNAL(endEdit()), this, SLOT(disable()));
+    connect(core_, SIGNAL(endEdit()), this, SLOT(disable()));
     is_enabled_ = true;
 }
 
 void Brush3D::disable() {
     enable_->setChecked(false);
-    disconnect((QObject *) pm_, SIGNAL(endEdit()), this, SLOT(disable()));
+    disconnect(core_, SIGNAL(endEdit()), this, SLOT(disable()));
     //disconnect(glwidget_, SIGNAL(pluginPaint(Eigen::Affine3f, Eigen::Affine3f)),
     //        this, SLOT(paint(Eigen::Affine3f, Eigen::Affine3f)));
     glwidget_->removeEventFilter(this);

@@ -8,19 +8,18 @@
 class QMouseEvent;
 class QWheelEvent;
 class QKeyEvent;
+class QUndoStack;
 class ActionManager;
+class MainWindow;
+class Core;
 
-#include "gui/camera.h"
-#include "gui/glwidget.h"
-#include "gui/flatview.h"
-#include <model/cloudlist.h>
-#include <model/layerlist.h>
+#include "core.h"
 #include "pluginsystem/iplugin.h"
 
 class PluginManager : public QObject{
     Q_OBJECT
  public:
-    PluginManager(GLWidget * glwidget, FlatView * flatview, CloudList * cl, LayerList * ll, ActionManager * am);
+    PluginManager(Core * core);
     ~PluginManager();
 
     void loadPlugins();
@@ -31,11 +30,7 @@ class PluginManager : public QObject{
 
  private:
     std::vector<IPlugin *> plugins_;
-    GLWidget * glwidget_;
-    FlatView * flatview_;
-    CloudList * cl_;
-    LayerList * ll_;
-    ActionManager * am_;
+    Core * core_;
 
 };
 

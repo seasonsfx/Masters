@@ -16,10 +16,10 @@
 class FlatView : public QGLWidget {
     Q_OBJECT
  public:
-    FlatView(QGLFormat &fmt, std::shared_ptr<CloudList> cl,
-             std::shared_ptr<LayerList> ll, QWidget *parent = 0,
+    FlatView(QGLFormat &fmt, CloudList * cl,
+             LayerList * ll, QWidget *parent = 0,
              QGLWidget * sharing = 0);
-    void setGLD(std::shared_ptr<GLData> gld);
+    void setGLD(GLData *gld);
 
  private:
     int imageToCloudIdx(int x, int y);
@@ -45,9 +45,9 @@ class FlatView : public QGLWidget {
  private:
    std::vector<int> cloud_idx_lookup_;
    std::weak_ptr<PointCloud> pc_;
-   std::shared_ptr<CloudList> cl_;
-   std::shared_ptr<LayerList> ll_;
-   std::shared_ptr<GLData> gld_;
+   CloudList * cl_;
+   LayerList * ll_;
+   GLData * gld_;
 
    QGLShaderProgram program_;
 

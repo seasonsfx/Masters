@@ -5,10 +5,9 @@
 #include <QApplication>
 #include <commands/select.h>
 
-CloudList::CloudList(QUndoStack * undostack, QObject *parent)
+CloudList::CloudList(QObject *parent)
     : QAbstractListModel(parent) {
     mtx_ = new std::mutex();
-    undostack_ = undostack;
 }
 
 CloudList::~CloudList(){
@@ -115,24 +114,4 @@ std::shared_ptr<PointCloud> CloudList::loadFile(QString filename){
     emit endNonDetJob();
 
     return pc;
-}
-
-void CloudList::deselectAllPoints(){
-    undostack_->beginMacro("Deselect All");
-    for(std::shared_ptr<PointCloud> cloud : clouds_){
-        std::shared_ptr<std::vector<int> > indices;
-        indices.reset(new std::vector<int>());
-
-        std::shared_ptr<std::vector<int> > empty;
-        empty.reset(new std::vector<int>());
-
-        for(int idx = 0; idx < cloud->flags_.size(); idx++){
-            PointFlags & flag =  cloud->flags_[idx];
-            if(uint8_t(PointFlags::selected) & uint8_t(flag))
-                indices->push_back(idx);
-        }
-
-        undostack_->push(new Select(cloud, empty, indices));
-    }
-    undostack_->endMacro();
 }

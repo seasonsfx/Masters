@@ -5,8 +5,8 @@
 #include <QApplication>
 #include "commands/select.h"
 
-FlatView::FlatView(QGLFormat & fmt, std::shared_ptr<CloudList> cl,
-                   std::shared_ptr<LayerList> ll, QWidget *parent, QGLWidget *sharing)
+FlatView::FlatView(QGLFormat & fmt, CloudList * cl,
+                   LayerList * ll, QWidget *parent, QGLWidget *sharing)
     : QGLWidget(fmt, parent, sharing) {
     cl_ = cl;
     ll_ = ll;
@@ -18,7 +18,7 @@ FlatView::FlatView(QGLFormat & fmt, std::shared_ptr<CloudList> cl,
     setMouseTracking(true); // Track mouse when up
 }
 
-void FlatView::setGLD(std::shared_ptr<GLData> gld){
+void FlatView::setGLD(GLData * gld){
     gld_ = gld;
 }
 
@@ -148,7 +148,7 @@ void FlatView::mouseMoveEvent(QMouseEvent * event) {
             }
         }
 
-        cl_->undostack_->push(new Select(pc, selected, deselected));
+        //cl_->undostack_->push(new Select(pc, selected, deselected));
 
     }
     else if(event->buttons() == Qt::RightButton){

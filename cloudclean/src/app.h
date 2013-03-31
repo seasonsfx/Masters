@@ -11,6 +11,7 @@
 #include "gui/layerlistview.h"
 #include "gui/cloudlistview.h"
 #include "gui/gldata.h"
+#include "core.h"
 
 class PluginManager;
 class QProgressBar;
@@ -48,7 +49,6 @@ class App : public QApplication
         bool notify(QObject *receiver, QEvent *event);
 
     private:
-        void initGUI();
         void printHelpMessage();
         void printVersionMessage();
         void printVersionTripletMessage();
@@ -64,22 +64,10 @@ class App : public QApplication
         
         static App* _instance;
         QString _invocation;
-        std::shared_ptr<CloudList> cl_;
-        std::shared_ptr<LayerList> ll_;
-        std::shared_ptr<GLData> gld_;
 
-        CloudListView * clv_;
-        LayerListView * llv_;
-
-        GLWidget * glwidget_;
-        MainWindow * mainwindow_;
-        QStatusBar * statusbar_;
-        QProgressBar *progressbar_;
-        QTabWidget * tabs_;
-        FlatView * flatview_;
         PluginManager * pm_;
-        QUndoStack * undostack_;
-        ActionManager * am_;
+        Core * core_;
+
 };
 
 #endif

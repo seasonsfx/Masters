@@ -13,7 +13,7 @@ class QItemSelection;
 class CloudList : public QAbstractListModel {
     Q_OBJECT
  public:
-    explicit CloudList(QUndoStack *undostack, QObject *parent = 0);
+    explicit CloudList(QObject *parent = 0);
     ~CloudList();
     int rowCount(const QModelIndex & parent = QModelIndex()) const;
     QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
@@ -36,7 +36,6 @@ class CloudList : public QAbstractListModel {
     void removeCloud();
     void selectionChanged(const QItemSelection &sel, const QItemSelection &des);
     std::shared_ptr<PointCloud> loadFile(QString filename);
-    void deselectAllPoints();
     
  private:
     std::mutex * mtx_;
@@ -45,7 +44,6 @@ class CloudList : public QAbstractListModel {
     std::vector<std::shared_ptr<PointCloud> > clouds_;
     std::vector<int> selection_;
     std::shared_ptr<PointCloud> active_;
-    QUndoStack * undostack_;
 };
 
 #endif // CLOUDLIST_H

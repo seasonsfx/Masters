@@ -7,8 +7,8 @@
 
 using namespace Eigen;
 
-GLWidget::GLWidget(QGLFormat &fmt, std::shared_ptr<CloudList> &cl,
-                   std::shared_ptr<LayerList> &ll, QWidget *parent)
+GLWidget::GLWidget(QGLFormat &fmt, CloudList *cl,
+                   LayerList *ll, QWidget *parent)
     : QGLWidget(fmt, parent) {
     setFocusPolicy(Qt::StrongFocus);
     translate_unit_ = 0.4;
@@ -22,7 +22,7 @@ GLWidget::GLWidget(QGLFormat &fmt, std::shared_ptr<CloudList> &cl,
 GLWidget::~GLWidget() {
 }
 
-void GLWidget::setGLD(std::shared_ptr<GLData> gld){
+void GLWidget::setGLD(GLData * gld){
     gld_ = gld;
 }
 

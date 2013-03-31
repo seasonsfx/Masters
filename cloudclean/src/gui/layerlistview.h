@@ -16,8 +16,8 @@ class LayerListView : public QDockWidget
     Q_OBJECT
     
  public:
-    explicit LayerListView(std::shared_ptr<LayerList> ll,
-                           std::shared_ptr<CloudList> cl, QWidget *parent = 0);
+    explicit LayerListView(QUndoStack *us, LayerList * ll,
+                           CloudList * cl, QWidget *parent = 0);
     ~LayerListView();
 
  public slots:
@@ -31,8 +31,9 @@ class LayerListView : public QDockWidget
     void setColor();
 
  private:
-    std::shared_ptr<LayerList> ll_;
-    std::shared_ptr<CloudList> cl_;
+    LayerList * ll_;
+    CloudList * cl_;
+    QUndoStack * us_;
     Ui::LayerListView *ui_;
 };
 

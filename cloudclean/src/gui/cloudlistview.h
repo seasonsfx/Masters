@@ -16,8 +16,8 @@ class CloudListView : public QDockWidget
     Q_OBJECT
     
  public:
-    explicit CloudListView(std::shared_ptr<LayerList> ll,
-                           std::shared_ptr<CloudList> cl,
+    CloudListView(QUndoStack *us, LayerList * ll,
+                           CloudList * cl,
                            QWidget *parent = 0);
     ~CloudListView();
 
@@ -26,10 +26,12 @@ class CloudListView : public QDockWidget
 
  public slots:
    void loadFile();
+   void deselectAllPoints();
 
  private:
-    std::shared_ptr<LayerList> ll_;
-    std::shared_ptr<CloudList> cl_;
+    LayerList * ll_;
+    CloudList * cl_;
+    QUndoStack *us_;
     Ui::CloudListView *ui_;
 };
 

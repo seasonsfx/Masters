@@ -1,7 +1,7 @@
 #include "gldata.h"
 #include <QDebug>
 
-GLData::GLData(QGLContext * glcontext, std::shared_ptr<CloudList> &cl, std::shared_ptr<LayerList> &ll, QObject *parent) : QObject(parent) {
+GLData::GLData(QGLContext * glcontext, CloudList *cl, LayerList *ll, QObject *parent) : QObject(parent) {
     ll_ = ll;
     cl_ = cl;
     glcontext_ = glcontext;
@@ -21,7 +21,7 @@ GLData::GLData(QGLContext * glcontext, std::shared_ptr<CloudList> &cl, std::shar
     color_lookup_buffer_->allocate(sizeof(float)*4); CE();
     color_lookup_buffer_->release(); CE();
 
-    CloudList * clp = cl_.get();
+    CloudList * clp = cl_;
     connect(clp, SIGNAL(deletingCloud(std::shared_ptr<PointCloud>)),
             this, SLOT(deleteCloud(std::shared_ptr<PointCloud>)));
 
@@ -102,6 +102,6 @@ void GLData::reloadColorLookupBuffer(){
 }
 
 GLData::~GLData(){
-    disconnect(cl_.get(), SIGNAL(deletingCloud(std::shared_ptr<PointCloud>)),
-            this, SLOT(deleteCloud(std::shared_ptr<PointCloud>)));
+    //disconnect(cl_, SIGNAL(deletingCloud(std::shared_ptr<PointCloud>)),
+    //        this, SLOT(deleteCloud(std::shared_ptr<PointCloud>)));
 }

@@ -3,23 +3,26 @@
 #include <QMenu>
 #include <QDebug>
 #include <QFileDialog>
+#include <QUndoStack>
 #include <thread>
 #include <functional>
+#include "commands/select.h"
 
-CloudListView::CloudListView(std::shared_ptr<LayerList> ll,
-                             std::shared_ptr<CloudList> cl, QWidget *parent)
+CloudListView::CloudListView(QUndoStack *us, LayerList * ll,
+                             CloudList * cl, QWidget *parent)
     : QDockWidget(parent),
     ui_(new Ui::CloudListView) {
     ll_ = ll;
     cl_ = cl;
+    us_ = us;
     ui_->setupUi(this);
-    ui_->tableView->setModel(cl_.get());
+    ui_->tableView->setModel(cl_);
     ui_->tableView->setSelectionMode(QAbstractItemView::SingleSelection);
 
     connect(ui_->tableView->selectionModel(),
             SIGNAL(selectionChanged(const QItemSelection &,
                                     const QItemSelection &)),
-            cl.get(),
+            cl,
             SLOT(selectionChanged(const QItemSelection &,
                                     const QItemSelection &)));
 
@@ -49,7 +52,7 @@ void CloudListView::contextMenu(const QPoint &pos) {
 
         QAction del("Delete", 0);
         del.setProperty("cloud_id", row);
-        connect(&del, SIGNAL(triggered()), cl_.get(), SLOT(removeCloud()));
+        connect(&del, SIGNAL(triggered()), cl_, SLOT(removeCloud()));
         menu.addAction(&del);
 
         menu.exec(ui_->tableView->mapToGlobal(pos));
@@ -62,6 +65,25 @@ void CloudListView::loadFile(){
     if (filename.length() == 0)
         return;
 
-    //auto func = std::bind(CloudList::loadFile, cl_.get());
-    std::thread(&CloudList::loadFile, cl_.get(), filename).detach();
+    std::thread(&CloudList::loadFile, cl_, filename).detach();
+}
+
+void CloudListView::deselectAllPoints(){
+    us_->beginMacro("Deselect All");
+    for(std::shared_ptr<PointCloud> cloud : cl_->clouds_){
+        std::shared_ptr<std::vector<int> > indices;
+        indices.reset(new std::vector<int>());
+
+        std::shared_ptr<std::vector<int> > empty;
+        empty.reset(new std::vector<int>());
+
+        for(int idx = 0; idx < cloud->flags_.size(); idx++){
+            PointFlags & flag =  cloud->flags_[idx];
+            if(uint8_t(PointFlags::selected) & uint8_t(flag))
+                indices->push_back(idx);
+        }
+
+        us_->push(new Select(cloud, empty, indices));
+    }
+    us_->endMacro();
 }

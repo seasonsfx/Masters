@@ -9,17 +9,18 @@
 #include "commands/layerfromlabels.h"
 #include "commands/layerdelete.h"
 
-LayerListView::LayerListView(std::shared_ptr<LayerList> ll,
-                             std::shared_ptr<CloudList> cl, QWidget *parent) :
+LayerListView::LayerListView(QUndoStack * us, LayerList * ll,
+                             CloudList * cl, QWidget *parent) :
         QDockWidget(parent), ui_(new Ui::LayerListView) {
     ll_ = ll;
     cl_ = cl;
+    us_ = us;
     ui_->setupUi(this);
-    ui_->tableView->setModel(ll_.get());
+    ui_->tableView->setModel(ll_);
 
     connect(ui_->tableView->selectionModel(),
             SIGNAL(selectionChanged(const QItemSelection &,
-                                 const QItemSelection &)), ll_.get(),
+                                 const QItemSelection &)), ll_,
             SLOT(selectionChanged(const QItemSelection &,
                                     const QItemSelection &)));
 
@@ -43,7 +44,7 @@ void LayerListView::selectLayer(std::shared_ptr<Layer> layer) {
 // This function is here because i do not want to put the layerlist in the
 // cloudlist
 void LayerListView::selectionToLayer(){
-    cl_->undostack_->beginMacro("Layer from selection");
+    us_->beginMacro("Layer from selection");
     // Remap all selected points
     for(std::shared_ptr<PointCloud> & pc : cl_->clouds_){
         std::shared_ptr<std::vector<int> > idxs;
@@ -59,11 +60,11 @@ void LayerListView::selectionToLayer(){
                 idxs->push_back(i);
         }
 
-        cl_->undostack_->push(new NewLayer(pc, idxs, ll_.get()));
-        cl_->undostack_->push(new Select(pc, empty, idxs));
+        us_->push(new NewLayer(pc, idxs, ll_));
+        us_->push(new Select(pc, empty, idxs));
 
     }
-    cl_->undostack_->endMacro();
+    us_->endMacro();
     emit update();
     ui_->tableView->selectRow(ll_->layers_.size()-1);
 }
@@ -108,9 +109,9 @@ void LayerListView::intersectSelectedLayers(){
         return;
     }
 
-    cl_->undostack_->beginMacro("Layer intersection");
-    cl_->undostack_->push(new LayerFromLabels(intersecting_labels, ll_.get(), true));
-    cl_->undostack_->endMacro();
+    us_->beginMacro("Layer intersection");
+    us_->push(new LayerFromLabels(intersecting_labels, ll_, true));
+    us_->endMacro();
 
     ui_->tableView->selectRow(ll_->layers_.size()-1);
 
@@ -139,17 +140,17 @@ void LayerListView::mergeSelectedLayers() {
     std::sort(labels->begin(), labels->end());
     labels->erase( unique(labels->begin(), labels->end()), labels->end());
 
-    cl_->undostack_->beginMacro("Merge layers");
-    cl_->undostack_->push(new LayerFromLabels(labels, ll_.get(), true));
+    us_->beginMacro("Merge layers");
+    us_->push(new LayerFromLabels(labels, ll_, true));
 
 
     // Delete marked labels
     for(std::shared_ptr<Layer> dl : merge_these) {
-        cl_->undostack_->push(new LayerDelete(dl, ll_.get()));
+        us_->push(new LayerDelete(dl, ll_));
     }
 
 
-    cl_->undostack_->endMacro();
+    us_->endMacro();
     ui_->tableView->selectRow(ll_->layers_.size()-1);
 }
 
@@ -174,7 +175,7 @@ void LayerListView::contextMenu(const QPoint &pos) {
 
         QAction del("Delete", 0);
         del.setProperty("layer_id", row);
-        connect(&del, SIGNAL(triggered()), ll_.get(), SLOT(deleteLayer()));
+        connect(&del, SIGNAL(triggered()), ll_, SLOT(deleteLayer()));
         menu.addAction(&del);
 
         QAction merge("Merge", 0);

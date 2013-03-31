@@ -42,9 +42,12 @@
 #include <QPluginLoader>
 #include <QDebug>
 #include <QDir>
+#include <QUndoStack>
+#include <gui/mainwindow.h>
 #include <model/layerlist.h>
 #include <model/cloudlist.h>
 #include "actionmanager.h"
+#include "core.h"
 
 static QString DLLExtension() {
 #if defined(Q_OS_WIN)
@@ -58,12 +61,8 @@ static QString DLLExtension() {
     return QString();
 }
 
-PluginManager::PluginManager(GLWidget * glwidget, FlatView * flatview, CloudList * cl, LayerList * ll, ActionManager *am) {
-    glwidget_ = glwidget;
-    flatview_ = flatview;
-    cl_ = cl;
-    ll_ = ll;
-    am_ = am;
+PluginManager::PluginManager(Core * core) {
+    core_ = core;
 }
 
 PluginManager::~PluginManager() {
@@ -128,6 +127,6 @@ void PluginManager::loadPlugins() {
 
 void PluginManager::initializePlugins() {
     for(IPlugin * plugin : plugins_){
-        plugin->initialize(this, am_, cl_, ll_, glwidget_, flatview_);
+        plugin->initialize(core_);
     }
 }

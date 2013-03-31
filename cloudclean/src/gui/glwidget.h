@@ -18,11 +18,11 @@ class GLWidget : public QGLWidget
     Q_OBJECT
 
 public:
-    GLWidget(QGLFormat & fmt, std::shared_ptr<CloudList> &cl,
-             std::shared_ptr<LayerList> &ll, QWidget *parent = 0);
+    GLWidget(QGLFormat & fmt, CloudList * cl,
+             LayerList * ll, QWidget *parent = 0);
     ~GLWidget();
 
-    void setGLD(std::shared_ptr<GLData> gld);
+    void setGLD(GLData *gld);
     QSize minimumSizeHint() const;
     QSize sizeHint() const;
 
@@ -64,9 +64,9 @@ protected:
    Camera camera_;
 
  private:
-    std::shared_ptr<CloudList> cl_;
-    std::shared_ptr<LayerList> ll_;
-    std::shared_ptr<GLData> gld_;
+    CloudList * cl_;
+    LayerList * ll_;
+    GLData * gld_;
 
     QGLShaderProgram program_;
 

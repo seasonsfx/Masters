@@ -15,8 +15,8 @@ class GLData : public QObject {
     Q_OBJECT
  public:
     GLData(QGLContext * glcontext,
-                    std::shared_ptr<CloudList> &cl,
-                    std::shared_ptr<LayerList> &ll,
+                    CloudList * cl,
+                    LayerList *ll,
                     QObject *parent = 0);
     ~GLData();
  signals:
@@ -34,8 +34,8 @@ class GLData : public QObject {
 
 
  private:
-    std::shared_ptr<CloudList> cl_;
-    std::shared_ptr<LayerList> ll_;
+    CloudList * cl_;
+    LayerList * ll_;
     QGLContext * glcontext_;
     std::mutex * clb_mutex_;
 };

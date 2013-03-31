@@ -13,13 +13,19 @@ class QKeyEvent;
 class QAction;
 class QGLShaderProgram;
 class QGLBuffer;
+class Core;
+class CloudList;
+class LayerList;
+class FlatView;
+class ActionManager;
+class GLWidget;
 
 class Brush3D : public IPlugin {
     Q_OBJECT
     Q_INTERFACES(IPlugin)
  public:
     QString getName();
-    void initialize(PluginManager *pm, ActionManager *am, CloudList * cl, LayerList *ll, GLWidget *glwidget, FlatView *flatview);
+    void initialize(Core * core);
     void cleanup();
 
     void initializeGL();
@@ -42,13 +48,13 @@ class Brush3D : public IPlugin {
     bool mouseReleaseEvent(QMouseEvent * event);
 
  private:
+    Core * core_;
     CloudList * cl_;
     LayerList * ll_;
     GLWidget * glwidget_;
     FlatView * flatview_;
     bool initialized_gl;
     ActionManager * am_;
-    PluginManager * pm_;
     QAction * enable_;
 
     Eigen::Vector2d last_mouse_pos_;

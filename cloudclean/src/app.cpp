@@ -161,48 +161,16 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
         std::exit(0);
     }
 
-    undostack_ = new QUndoStack();
+    core_ = new Core();
 
-    // initialise data model
-    ll_.reset(new LayerList());
-    cl_.reset(new CloudList(undostack_));
-
-    initGUI();
-
-    QAction * undo = undostack_->createUndoAction(0);
-    QAction * redo = undostack_->createRedoAction(0);
-    am_->addAction(undo, "Edit");
-    am_->addAction(redo, "Edit");
-
-    QAction * deselect = new QAction(tr("Deselect all"), mainwindow_);
-    connect(deselect, SIGNAL(triggered()), cl_.get(), SLOT(deselectAllPoints()));
-
-    am_->addAction(deselect, "Edit");
-
-
-    qRegisterMetaType<std::shared_ptr<PointCloud> >("std::shared_ptr<PointCloud>");
-    qRegisterMetaType<std::shared_ptr<Layer> >("std::shared_ptr<Layer>");
-    // link up signals to model
-    connect(cl_.get(), SIGNAL(cloudUpdate(std::shared_ptr<PointCloud>)), gld_.get(), SLOT(reloadCloud(std::shared_ptr<PointCloud>)));
-    connect(cl_.get(), SIGNAL(updated()), glwidget_, SLOT(update()));
-    connect(cl_.get(), SIGNAL(updatedActive(std::shared_ptr<PointCloud>)), flatview_, SLOT(setCloud(std::shared_ptr<PointCloud>)));
-    connect(cl_.get(), SIGNAL(progressUpdate(int)), progressbar_, SLOT(setValue(int)));
-    connect(gld_.get(), SIGNAL(update()), glwidget_, SLOT(update()));
-    connect(gld_.get(), SIGNAL(update()), flatview_, SLOT(update()));
-    connect(ll_.get(), SIGNAL(layerUpdate(std::shared_ptr<Layer>)), gld_.get(), SLOT(reloadColorLookupBuffer()));
-    connect(ll_.get(), SIGNAL(lookupTableUpdate()), gld_.get(), SLOT(reloadColorLookupBuffer()));
-
-    // reload the lookup table
-    gld_->reloadColorLookupBuffer();
-
-    pm_ = new PluginManager(glwidget_, flatview_, cl_.get(), ll_.get(), am_);
+    pm_ = new PluginManager(core_);
     pm_->loadPlugins();
     pm_->initializePlugins();
 
     // load a cloud
     std::function<void (const char *)> loadcloud = [&] (const char * fname) {
 
-        std::shared_ptr<PointCloud> pc = cl_->loadFile(fname);
+        std::shared_ptr<PointCloud> pc = core_->cl_->loadFile(fname);
 
         // make a selection
         std::vector<PointFlags> & flags = pc->flags_;
@@ -213,13 +181,13 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
 
         // create layers with colors
         std::shared_ptr<Layer> layers[3];
-        layers[0] = ll_->addLayer("Test1");
-        layers[1] = ll_->addLayer("Test2");
-        layers[2] = ll_->addLayer("Test3");
+        layers[0] = core_->ll_->addLayer("Test1");
+        layers[1] = core_->ll_->addLayer("Test2");
+        layers[2] = core_->ll_->addLayer("Test3");
 
         // make five labels
         for(int i = 0; i < 5; i++){
-            layers[i%3]->addLabel(ll_->newLabelId());
+            layers[i%3]->addLabel(core_->ll_->newLabelId());
         }
 
 
@@ -230,17 +198,8 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
             labels[i] = l;
         }
 
-        qRegisterMetaType<std::shared_ptr<PointCloud> >("std::shared_ptr<PointCloud>");
-        QMetaObject::invokeMethod(flatview_, "setCloud", Q_ARG(std::shared_ptr<PointCloud>, pc));
-
-        glwidget_->update();
-        QMetaObject::invokeMethod(progressbar_, "setRange", Q_ARG(int, 0), Q_ARG(int, 100));
-        QMetaObject::invokeMethod(progressbar_, "reset");
-
-
         qDebug() << "Loaded";
         qDebug() << "Size: " << pc->size();
-
 
     };
 
@@ -251,68 +210,10 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
 }
 
 App::~App() {
-    delete mainwindow_;
-    delete am_;
+    delete core_;
 }
 App* App::INSTANCE() {
     return _instance;
-}
-
-void App::initGUI() {
-    mainwindow_ = new MainWindow();
-    am_ = new ActionManager(mainwindow_->menuBar());
-    statusbar_ = mainwindow_->statusBar();
-
-    progressbar_ = new QProgressBar();
-    QLabel *size = new QLabel( tr("  999999kB  ") );
-
-    size->setMinimumSize( size->sizeHint() );
-    size->setAlignment( Qt::AlignRight | Qt::AlignVCenter );
-    size->setText( tr("%1kB ").arg(0) );
-    size->setToolTip( tr("The memory used for the current document.") );
-
-    progressbar_->setTextVisible( false );
-    progressbar_->setRange( 0, 100 );
-    statusbar_->addWidget( progressbar_, 1 );
-    statusbar_->addWidget( size );
-    statusbar_->showMessage( tr("Ready"), 2000 );
-
-    tabs_ = new QTabWidget(mainwindow_);
-
-
-    QGLFormat base_format;
-    base_format.setVersion(3, 3);
-    base_format.setProfile(QGLFormat::CompatibilityProfile);
-    base_format.setSampleBuffers(true);
-
-
-    glwidget_ = new GLWidget(base_format, cl_, ll_, tabs_);
-    flatview_ = new FlatView(base_format, cl_, ll_, tabs_, glwidget_);
-
-    QGLContext * ctx = const_cast<QGLContext *>(glwidget_->context());
-    gld_.reset(new GLData(ctx, cl_, ll_));
-    glwidget_->setGLD(gld_);
-    flatview_->setGLD(gld_);
-
-    clv_ = new CloudListView(ll_, cl_, mainwindow_);
-    mainwindow_->addDockWidget(Qt::RightDockWidgetArea, clv_);
-
-    llv_ = new LayerListView(ll_, cl_, mainwindow_);
-    mainwindow_->addDockWidget(Qt::RightDockWidgetArea, llv_);
-
-    //QAction * show_cloudlist = new QAction("Show Cloudlist", 0);
-    //QAction * show_layerlist = new QAction("Show Layerlist", 0);
-
-    //connect(show_cloudlist, SIGNAL(toggled(bool)), clv_, SLOT(show()));
-    //connect(show_layerlist, SIGNAL(toggled(bool)), llv_, SLOT(show()));
-
-    am_->addAction(clv_->toggleViewAction(), "View");
-    am_->addAction(llv_->toggleViewAction(), "View");
-
-    tabs_->addTab(glwidget_, "3D View");
-    tabs_->addTab(flatview_, "2D View");
-    mainwindow_->setCentralWidget(tabs_);
-    mainwindow_->setVisible(true);
 }
 
 void App::printHelpMessage() {

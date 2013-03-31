@@ -4,12 +4,7 @@
 #include <QObject>
 #include <QtPlugin>
 
-class GLWidget;
-class FlatView;
-class CloudList;
-class LayerList;
-class PluginManager;
-class ActionManager;
+class Core;
 
 // So plugins are created with the default constructor
 // This cannot take any parameters so use initialise method
@@ -25,9 +20,7 @@ class IPlugin: public QObject  {
     Q_OBJECT
  public:
     virtual QString getName() = 0;
-    virtual void initialize(PluginManager *pm, ActionManager * am,
-                            CloudList * cl, LayerList * ll,
-                            GLWidget * glwidget, FlatView * flatview) = 0;
+    virtual void initialize(Core * core) = 0;
     virtual void cleanup() = 0;
 };
 

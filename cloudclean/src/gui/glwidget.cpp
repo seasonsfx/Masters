@@ -17,6 +17,11 @@ GLWidget::GLWidget(QGLFormat &fmt, CloudList *cl,
     cl_ = cl;
     ll_ = ll;
     setMouseTracking(true);
+
+    connect(this, SIGNAL(customContextMenuRequested(const QPoint&)),
+            this, SLOT(contextMenu(const QPoint &)));
+
+    setContextMenuPolicy(Qt::CustomContextMenu);
 }
 
 GLWidget::~GLWidget() {
@@ -183,7 +188,7 @@ void GLWidget::mousePressEvent(QMouseEvent * event) {
 }
 
 void GLWidget::mouseReleaseEvent(QMouseEvent * event) {
-    float dist = (Eigen::Vector2d(event->x(), event->y()) - last_mouse_pos_).norm();
+    //float dist = (Eigen::Vector2d(event->x(), event->y()) - last_mouse_pos_).norm();
     last_mouse_pos_ << event->x(), event->y();
 
     update();
@@ -281,4 +286,12 @@ bool GLWidget::eventFilter(QObject *object, QEvent *event) {
         return true;
     }
     return false;
+}
+
+void GLWidget::contextMenu(const QPoint &pos) {
+
+}
+
+GLData * GLWidget::getGLData(){
+    return gld_;
 }

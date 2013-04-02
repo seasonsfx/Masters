@@ -1,0 +1,82 @@
+color clouds
+
+Background:
+	graph guts
+	multiple scans
+
+	worth starting because its tedious
+
+	start looking at background outline
+		bullet list of background
+		seperate high levek stuff from chapter specific background
+
+	exsititing systems
+		Intro and background
+
+
+	Background what other people have done.
+
+		Segmentation methods
+			Methods:
+				Markov
+				Features
+				Region growing
+
+			What is it
+			Its braod
+			Many types of datasets
+				We only look at pointsets
+
+			How am I different from other methods
+				Fodus on trees
+
+			Scanners
+				Technical background on scanners
+				Density variation
+				Reflectance
+				Normal estimation
+				Colour
+
+				Finding a survey paper on scanners
+					Laser scanners and what you get from them
+
+				Point out that scanners changed over the years
+				Medium range
+				Short range
+				Long ranges
+
+			Pointfeatures
+
+			Mention things that you may or may have not tried.
+
+			Method seems promising.... but
+				Not well suited to ...
+
+			Graph based segmentation methods
+
+
+			At the end:
+				Do a taxonomy of the methods
+				Categories to compare them on
+
+				Score them
+
+				No method will be good at everything...
+				So try X
+mnbv
+
+				I did not just arrive at graph cuts randomly:
+					How did I get there?
+					What is the logic
+					It was the most likely to be succesful
+					Has to score them correctly
+
+
+			Background:
+				What did I look at?
+				Why was graph cuts reasonable to look at?
+				People wanna see i used graph cuts for a reason
+
+				Taxonomy: no clearcut winner maybe?
+
+

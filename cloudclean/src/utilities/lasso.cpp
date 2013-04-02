@@ -70,13 +70,13 @@ bool pointInsidePolygon(std::vector<Eigen::Vector2f> polygon,
     {
         Eigen::Vector2f endPoint = randomLineSegment(point);
 
-        for(int i = 0; i < polygon.size(); ++i)
+        for(uint i = 0; i < polygon.size(); ++i)
             if(isPointOnLineSegment(point, endPoint, polygon[i]))
                 continue;
 
         int hits = 0;
 
-        for(int i = 0; i < polygon.size(); ++i){
+        for(uint i = 0; i < polygon.size(); ++i){
             if(intersects(polygon[i], polygon[(i + 1) % polygon.size()], point, endPoint)){
                 ++hits;
             }

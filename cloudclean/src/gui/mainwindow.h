@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QHash>
 #include <memory>
 
 class QUndoStack;
@@ -15,6 +16,7 @@ class LayerListView;
 class GLData;
 class ActionManager;
 class QUndoStack;
+class QMenuBar;
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -23,7 +25,8 @@ class MainWindow : public QMainWindow {
     explicit MainWindow(QUndoStack * us, CloudList *cl, LayerList *ll, QWidget *parent = 0);
     ~MainWindow();
 
-    ActionManager * getActionManager();
+    void addMenu(QAction * action, QString menu_name);
+    void removeMenu(QAction * action, QString menu_name);
     //const GLWidget getGLWidget();
     //const GLWidget getFlatView();
 
@@ -38,9 +41,11 @@ class MainWindow : public QMainWindow {
     CloudListView * clv_;
     LayerListView * llv_;
     GLData * gld_;
-    ActionManager * am_;
 
     QUndoStack * us_;
+
+    QMenuBar * mb_;
+    QHash<QString, QMenu *> menus_;
 
 };
 

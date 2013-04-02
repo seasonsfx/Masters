@@ -28,6 +28,7 @@ class CloudList : public QAbstractListModel {
     void changedSelection(std::vector<int> selection);
     void updatedActive(std::shared_ptr<PointCloud> pc);
     void deletingCloud(std::shared_ptr<PointCloud> cloud);
+
     void progressUpdate(int percentage);
     void startNonDetJob();
     void endNonDetJob();

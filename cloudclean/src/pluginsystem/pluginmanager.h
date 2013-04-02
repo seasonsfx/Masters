@@ -9,6 +9,7 @@ class QMouseEvent;
 class QWheelEvent;
 class QKeyEvent;
 class QUndoStack;
+class QDir;
 class ActionManager;
 class MainWindow;
 class Core;
@@ -22,8 +23,20 @@ class PluginManager : public QObject{
     PluginManager(Core * core);
     ~PluginManager();
 
+    bool loadPlugin(QString loc);
     void loadPlugins();
     void initializePlugins();
+
+    template <typename T>
+    T * findPlugin() {
+        T * plugin = nullptr;
+        for(IPlugin * aplugin : plugins_){
+            plugin = qobject_cast<T *>(aplugin);
+            if(plugin != nullptr)
+                return plugin;
+        }
+        return nullptr;
+    }
 
  signals:
     void endEdit();
@@ -31,7 +44,7 @@ class PluginManager : public QObject{
  private:
     std::vector<IPlugin *> plugins_;
     Core * core_;
-
+    QDir * plugins_dir_;
 };
 
 #endif // PLUGINMANAGER_H

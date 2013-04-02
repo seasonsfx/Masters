@@ -12,7 +12,6 @@
 #include "gui/glwidget.h"
 #include "gui/flatview.h"
 #include "gui/mainwindow.h"
-#include "actionmanager.h"
 #include "utilities/pointpicker.h"
 #include "commands/select.h"
 #include "core.h"
@@ -27,7 +26,7 @@ void Brush3D::initialize(Core *core){
     ll_ = core_->ll_;
     glwidget_ = core_->mw_->glwidget_;
     flatview_ = core_->mw_->flatview_;
-    am_ = core_->mw_->getActionManager();
+    mw_ = core_->mw_;
     initialized_gl = false;
 
     enable_ = new QAction("3d Brush Tool", 0);
@@ -39,7 +38,7 @@ void Brush3D::initialize(Core *core){
     connect(enable_, SIGNAL(triggered()), this, SLOT(enable()));
     connect(this, SIGNAL(enabling()), core_, SIGNAL(endEdit()));
 
-    am_->addAction(enable_, "Edit");
+    mw_->addMenu(enable_, "Edit");
 }
 
 void Brush3D::cleanup(){
@@ -212,6 +211,8 @@ bool Brush3D::eventFilter(QObject *object, QEvent *event){
         return mouseReleaseEvent(static_cast<QMouseEvent*>(event));
     case QEvent::MouseMove:
         return mouseMoveEvent(static_cast<QMouseEvent*>(event));
+    default:
+        return false;
     }
 
 
@@ -224,7 +225,6 @@ bool Brush3D::eventFilter(QObject *object, QEvent *event){
         return false;
     }
     */
-    return false;
 
 }
 

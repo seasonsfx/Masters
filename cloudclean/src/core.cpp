@@ -2,6 +2,7 @@
 #include <QAction>
 #include <QUndoStack>
 
+#include "glheaders.h"
 #include "gui/mainwindow.h"
 #include <model/cloudlist.h>
 #include <model/layerlist.h>

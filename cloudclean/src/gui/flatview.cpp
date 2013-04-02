@@ -15,7 +15,12 @@ FlatView::FlatView(QGLFormat & fmt, CloudList * cl,
     camera_.setIdentity();
     camera_(0,2) = -1;
     camera_(1,2) = -0.5;
-    setMouseTracking(true); // Track mouse when up
+    setMouseTracking(true);
+
+    connect(this, SIGNAL(customContextMenuRequested(const QPoint&)),
+            this, SLOT(contextMenu(const QPoint &)));
+
+    setContextMenuPolicy(Qt::CustomContextMenu);
 }
 
 void FlatView::setGLD(GLData * gld){
@@ -36,6 +41,9 @@ void FlatView::setGLD(GLData * gld){
  *           ********
  */
 
+const Eigen::Matrix3f FlatView::getCamera() {
+    return camera_;
+}
 
 int binary_search(std::vector<int> A, int key) {
     int imin = 0;
@@ -53,7 +61,7 @@ int binary_search(std::vector<int> A, int key) {
     return -1;
 }
 
-inline int FlatView::imageToCloudIdx(int x, int y){
+int FlatView::imageToCloudIdx(int x, int y){
     std::shared_ptr<PointCloud> pc = pc_.lock();
     if(x < 0 || x > pc->scan_width_){
         qDebug() << "x out of range";
@@ -113,45 +121,7 @@ void FlatView::mouseMoveEvent(QMouseEvent * event) {
     if(pc_.expired())
         return;
 
-    if(event->buttons() == Qt::LeftButton ){
-        std::shared_ptr<PointCloud> pc = pc_.lock();
-
-        Eigen::Vector3f coord;
-        coord << 2.0f* (event->x()/float(width()) - 0.5),
-            -2.0f* (event->y()/float(height()) - 0.5), 1;
-        coord = camera_.inverse() * coord;
-
-        coord[1] = pc->scan_height_-coord[1];
-
-        std::shared_ptr<std::vector<int> > selected;
-        selected.reset(new std::vector<int>());
-
-        std::shared_ptr<std::vector<int> > deselected;
-        deselected.reset(new std::vector<int>());
-
-        bool negative_select = QApplication::keyboardModifiers() == Qt::ControlModifier;
-
-        int size = 20;
-        for(int x = -size/2; x < size/2; x++){
-            for(int y = -size/2; y < size/2; y++){
-                if(x*x + y*y > (size/2.0f)*(size/2.0f) )
-                    continue;
-
-                int idx = imageToCloudIdx(int(coord.x() + x + 0.5),
-                                          int(coord.y() + y + 0.5));
-                if (idx != -1){
-                    if(negative_select)
-                        deselected->push_back(idx);
-                    else
-                        selected->push_back(idx);
-                }
-            }
-        }
-
-        //cl_->undostack_->push(new Select(pc, selected, deselected));
-
-    }
-    else if(event->buttons() == Qt::RightButton){
+    if(event->buttons()){
         QVector2D dist(event->pos() - drag_start_pos);
         dist.setX(2.0f*dist.x()/width());
         dist.setY(2.0f*-dist.y()/height());
@@ -340,4 +310,8 @@ void FlatView::resizeGL(int width, int height) {
     program_.bind(); CE();   
     glUniformMatrix3fv(uni_camera_, 1, GL_FALSE, camera_.data()); CE();
     program_.release(); CE();
+}
+
+void FlatView::contextMenu(const QPoint &pos) {
+
 }

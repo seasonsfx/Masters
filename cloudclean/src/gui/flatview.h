@@ -20,13 +20,16 @@ class FlatView : public QGLWidget {
              LayerList * ll, QWidget *parent = 0,
              QGLWidget * sharing = 0);
     void setGLD(GLData *gld);
+    const Eigen::Matrix3f getCamera();
 
- private:
     int imageToCloudIdx(int x, int y);
     QPoint cloudToImageCoord(int idx);
 
  public slots:
     void setCloud(std::shared_ptr<PointCloud> new_pc);
+
+ private slots:
+  void contextMenu(const QPoint &pos);
 
  signals:
   void flagUpdate();

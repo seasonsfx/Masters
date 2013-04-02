@@ -4,13 +4,14 @@
 #include <QStatusBar>
 #include <QAction>
 #include <QUndoStack>
+#include <QMenu>
+#include <QMenuBar>
 
 #include "gui/glwidget.h"
 #include "gui/flatview.h"
 #include "gui/gldata.h"
 #include "gui/cloudlistview.h"
 #include "gui/layerlistview.h"
-#include "actionmanager.h"
 #include "model/cloudlist.h"
 #include "model/layerlist.h"
 
@@ -19,9 +20,10 @@ MainWindow::MainWindow(QUndoStack *us, CloudList * cl, LayerList * ll, QWidget *
 
     us_ = us;
 
-    //
-    // Initialise gl stuff
-    //
+    progressbar_ = new QProgressBar();
+    statusbar_ = statusBar();
+    tabs_ = new QTabWidget(this);
+
     QGLFormat base_format;
     base_format.setVersion(3, 3);
     base_format.setProfile(QGLFormat::CompatibilityProfile);
@@ -37,9 +39,6 @@ MainWindow::MainWindow(QUndoStack *us, CloudList * cl, LayerList * ll, QWidget *
 
     clv_ = new CloudListView(us, ll, cl, this);
     llv_ = new LayerListView(us, ll, cl, this);
-    progressbar_ = new QProgressBar();
-    statusbar_ = statusBar();
-    tabs_ = new QTabWidget(this);
 
     progressbar_->setTextVisible( false );
     progressbar_->setRange( 0, 100 );
@@ -57,11 +56,7 @@ MainWindow::MainWindow(QUndoStack *us, CloudList * cl, LayerList * ll, QWidget *
     setCentralWidget(tabs_);
     setVisible(true);
 
-    // Action manager??
-    am_ = new ActionManager(menuBar());
-    am_->addAction(clv_->toggleViewAction(), "View");
-    am_->addAction(llv_->toggleViewAction(), "View");
-
+    mb_ = menuBar();
 
     // SIGNALS
     qRegisterMetaType<std::shared_ptr<PointCloud> >("std::shared_ptr<PointCloud>");
@@ -78,23 +73,43 @@ MainWindow::MainWindow(QUndoStack *us, CloudList * cl, LayerList * ll, QWidget *
 
     QAction * deselect = new QAction(tr("Deselect all"), this);
     connect(deselect, SIGNAL(triggered()), clv_, SLOT(deselectAllPoints()));
-    am_->addAction(deselect, "Edit");
+    addMenu(deselect, "Edit");
 
 
     QAction * undo = us_->createUndoAction(0);
     QAction * redo = us_->createRedoAction(0);
-
-    am_->addAction(undo, "Edit");
-    am_->addAction(redo, "Edit");
+    undo->setShortcut(QKeySequence::Undo);
+    redo->setShortcut(QKeySequence::Redo);
+    undo->setShortcutContext(Qt::ApplicationShortcut);
+    redo->setShortcutContext(Qt::ApplicationShortcut);
+    addMenu(undo, "Edit");
+    addMenu(redo, "Edit");
 
     gld_->reloadColorLookupBuffer();
 }
 
 MainWindow::~MainWindow() {
     delete gld_;
-    delete am_;
 }
 
-ActionManager * MainWindow::getActionManager() {
-    return am_;
+void MainWindow::addMenu(QAction * action, QString menu_name){
+    auto it = menus_.find(menu_name);
+    QMenu * menu;
+    if(it != menus_.end()){
+        menu = *it;
+    }
+    else {
+        menu = new QMenu(menu_name, mb_);
+        mb_->addMenu(menu);
+        menus_.insert(menu_name, menu);
+    }
+    menu->addAction(action);
+}
+
+void MainWindow::removeMenu(QAction * action, QString menu_name){
+    auto it = menus_.find(menu_name);
+    if(it != menus_.end()){
+        QMenu * menu = *it;
+        menu->removeAction(action);
+    }
 }

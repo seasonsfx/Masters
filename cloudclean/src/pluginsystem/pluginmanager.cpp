@@ -46,7 +46,7 @@
 #include <gui/mainwindow.h>
 #include <model/layerlist.h>
 #include <model/cloudlist.h>
-#include "actionmanager.h"
+
 #include "core.h"
 
 static QString DLLExtension() {
@@ -62,66 +62,75 @@ static QString DLLExtension() {
 }
 
 PluginManager::PluginManager(Core * core) {
+    // Add locations to load dynamic libraries from
+    qApp->addLibraryPath(qApp->applicationDirPath());
     core_ = core;
+
+    // Look for plugin directory
+    plugins_dir_ = new QDir(qApp->applicationDirPath());
+    bool succ = false;
+    if (!succ)
+        succ = plugins_dir_->cd("plugins");
+    if (!succ)
+        succ = plugins_dir_->cd("../plugins");
+    if (!succ)
+        succ = plugins_dir_->cd("../lib");
+    if (!succ)
+        succ = plugins_dir_->cd("../lib/plugins");
+    if (!succ)
+        succ = plugins_dir_->cd("/usr/lib/cloudclean/plugins");
+    if (!succ){
+        delete plugins_dir_;
+        plugins_dir_ = nullptr;
+        qDebug("Plugins directory not found!");
+    }
+
+    qApp->addLibraryPath(plugins_dir_->absolutePath());
+
 }
 
 PluginManager::~PluginManager() {
+    if(plugins_dir_ != nullptr)
+        delete plugins_dir_;
+}
 
+bool PluginManager::loadPlugin(QString loc){
+    QPluginLoader loader;
+    loader.setLoadHints(QLibrary::ExportExternalSymbolsHint);
+    loader.setFileName(loc);
+    bool loaded = loader.load();
+    if (!loaded) {
+        qDebug() << "Could not load plugin: " << loc;
+        qDebug() << "ERROR: " << loader.errorString();
+        return false;
+    }
+
+    QObject *plugin = loader.instance();
+
+    if (!loader.isLoaded()) {
+        qDebug() << "ERROR: " << loader.errorString();
+        qDebug() << "Could not instantiate: " << loc;
+        return false;
+    }
+
+    IPlugin * iplugin = qobject_cast<IPlugin *>(plugin);
+    if(!iplugin){
+        return false;
+        qDebug() << "Not iplugin";
+    }
+
+    plugins_.push_back(iplugin);
+    return true;
 }
 
 void PluginManager::loadPlugins() {
-    // Add locations to load dynamic libraries from
-    qApp->addLibraryPath(qApp->applicationDirPath());
-
-    // Look for plugin directory
-    QDir pluginsDir(qApp->applicationDirPath());
-    bool succ = false;
-    if (!succ)
-        succ = pluginsDir.cd("plugins");
-    if (!succ)
-        succ = pluginsDir.cd("../plugins");
-    if (!succ)
-        succ = pluginsDir.cd("../lib");
-    if (!succ)
-        succ = pluginsDir.cd("../lib/plugins");
-    if (!succ)
-        succ = pluginsDir.cd("/usr/lib/cloudclean/plugins");
-    if (!succ){
-        qDebug("Plugins directory not found!");
-        return;
-    }
 
     QStringList pluginfilters("*." + DLLExtension());
-    pluginsDir.setNameFilters(pluginfilters);
+    plugins_dir_->setNameFilters(pluginfilters);
 
-    for (QString fileName : pluginsDir.entryList(QDir::Files)) {
-        // Attempt to load library
-        QString absfilepath = pluginsDir.absoluteFilePath(fileName);
-        QPluginLoader loader;
-        loader.setFileName(absfilepath);
-        bool loaded = loader.load();
-        if (!loaded) {
-            qDebug() << "Could not load plugin: " << absfilepath;
-            qDebug() << "ERROR: " << loader.errorString();
-            continue;
-        }
-
-        // Load success, get instance
-        QObject *plugin = loader.instance();
-
-        if (!loader.isLoaded()) {
-            qDebug() << "ERROR: " << loader.errorString();
-            qDebug() << "Could not instantiate: " << absfilepath;
-            continue;
-        }
-
-        IPlugin * iplugin = qobject_cast<IPlugin *>(plugin);
-        if(iplugin){
-            plugins_.push_back(iplugin);
-        }
-        else {
-            qDebug() << "Not iplugin";
-        }
+    for (QString fileName : plugins_dir_->entryList(QDir::Files)) {
+        QString absfilepath = plugins_dir_->absoluteFilePath(fileName);
+        loadPlugin(absfilepath);
     }
 }
 
@@ -129,4 +138,10 @@ void PluginManager::initializePlugins() {
     for(IPlugin * plugin : plugins_){
         plugin->initialize(core_);
     }
+
+    for(IPlugin * plugin : plugins_){
+        plugin->initialize2(this);
+    }
 }
+
+

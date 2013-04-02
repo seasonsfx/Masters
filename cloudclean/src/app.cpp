@@ -15,7 +15,7 @@
 #include <QDesktopWidget>
 #include <QGridLayout>
 
-#include "actionmanager.h"
+
 #include "gui/mainwindow.h"
 #include "gui/glwidget.h"
 #include "gui/flatview.h"
@@ -162,7 +162,6 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
     }
 
     core_ = new Core();
-
     pm_ = new PluginManager(core_);
     pm_->loadPlugins();
     pm_->initializePlugins();

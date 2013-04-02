@@ -27,6 +27,7 @@ public:
     QSize sizeHint() const;
 
 	void resetRotationMatrix();
+    GLData *getGLData();
 
 protected:
     void initializeGL();
@@ -59,6 +60,9 @@ protected:
 
  signals:
    void pluginPaint(Eigen::Affine3f proj, Eigen::Affine3f mv);
+
+ private slots:
+  void contextMenu(const QPoint &pos);
 
  public:
    Camera camera_;

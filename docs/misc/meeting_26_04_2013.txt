@@ -63,7 +63,7 @@ Background:
 
 				No method will be good at everything...
 				So try X
-mnbv
+
 
 				I did not just arrive at graph cuts randomly:
 					How did I get there?
@@ -80,3 +80,24 @@ mnbv
 				Taxonomy: no clearcut winner maybe?
 
 
+-----------------------
+Flesh out other stuff
+Put bullet points where unsure
+
+
+
+UI
+	What fuctionality should be there?
+	Look at other software
+	Find whats common and so it famiiar
+	Also fair evaluation
+	Base on Zamani: Keen on 2d view
+
+Evaluation
+	
+
+When you have all the information in a reseasonal for
+	Sent patrick a draft.
+
+Flesh out as far as I can in 2 weeks.
+	AHHHHHH!

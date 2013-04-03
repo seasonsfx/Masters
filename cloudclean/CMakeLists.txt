@@ -24,7 +24,9 @@ SET (APPLICATION_ID "${APPLICATION_VENDOR_ID}.${PROJECT_NAME}")
 #
 # Debugging Options
 #
-SET (CMAKE_VERBOSE_MAKEFILE 1) # Use 1 for debugging, 0 for release
+SET(CMAKE_VERBOSE_MAKEFILE 1) # Use 1 for debugging, 0 for release
+SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall")
+SET(CMAKE_CSS_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall -03")
 
 #
 # Project Output Paths

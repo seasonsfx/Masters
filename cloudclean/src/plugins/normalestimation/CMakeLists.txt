@@ -9,7 +9,7 @@ include_directories(
 )
 
 FILE (GLOB plugin_SOURCE *.cpp *.cxx *.cc *.C *.c *.h *.hpp)
-add_library(normalestimator SHARED ${plugin_SOURCE} )
+add_library(normalestimator SHARED ${plugin_SOURCE} ../../pluginsystem/iplugin.h)
 target_link_libraries(normalestimator
     ${QT_LIBRARIES}
     ${OPENCL_LIBRARIES}

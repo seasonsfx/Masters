@@ -5,7 +5,7 @@ include_directories(
 )
 
 FILE (GLOB plugin_SOURCE *.cpp *.cxx *.cc *.C *.c *.h *.hpp)
-add_library(brush2d SHARED ${plugin_SOURCE})
+add_library(brush2d SHARED ${plugin_SOURCE} ../../pluginsystem/iplugin.h)
 target_link_libraries(brush2d
     ${QT_LIBRARIES}
     cloudclean_util

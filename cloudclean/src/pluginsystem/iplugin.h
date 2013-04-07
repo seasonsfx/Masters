@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QtPlugin>
+#include "pluginsystem/export.h"
 
 class Core;
 class PluginManager;

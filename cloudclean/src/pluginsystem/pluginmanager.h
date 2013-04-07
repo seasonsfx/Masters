@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <QObject>
+#include "pluginsystem/export.h"
 
 class QMouseEvent;
 class QWheelEvent;
@@ -18,7 +19,7 @@ class Core;
 #include "pluginsystem/core.h"
 #include "pluginsystem/iplugin.h"
 
-class PluginManager : public QObject{
+class DLLSPEC PluginManager : public QObject{
     Q_OBJECT
  public:
     PluginManager(Core * core);

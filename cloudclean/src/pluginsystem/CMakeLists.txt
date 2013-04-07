@@ -3,7 +3,7 @@ add_definitions(-Dpluginsystem_EXPORTS)
 FILE (GLOB pluginsystem_SRCS *.cpp *.cxx *.cc *.C *.c *.h *.hpp)
 
 add_library(
-    cloudclean_pluginsystem STATIC
+    cloudclean_pluginsystem SHARED
     ${pluginsystem_SRCS}
 )
 

@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <memory>
 #include <functional>
+#include <QGLWidget>
 #include <QGLBuffer>
 #include <QGLShaderProgram>
 #include "gui/camera.h"
@@ -12,8 +13,9 @@
 #include "model/cloudlist.h"
 #include "model/layerlist.h"
 #include "gui/gldata.h"
+#include "gui/export.h"
 
-class GLWidget : public QGLWidget
+class DLLSPEC GLWidget : public QGLWidget
 {
     Q_OBJECT
 
@@ -59,7 +61,7 @@ protected:
    bool eventFilter(QObject *object, QEvent *event);
 
  signals:
-   void pluginPaint(Eigen::Affine3f proj, Eigen::Affine3f mv);
+   void pluginPaint(const Eigen::Affine3f& proj, const Eigen::Affine3f& mv);
 
  private slots:
   void contextMenu(const QPoint &pos);

@@ -9,8 +9,9 @@
 #include <QAbstractListModel>
 #include <QItemSelection>
 #include "model/layer.h"
+#include "model/export.h"
 
-class LayerList : public QAbstractListModel {
+class DLLSPEC LayerList : public QAbstractListModel {
     Q_OBJECT
  public:
     explicit LayerList(QObject *parent = 0);

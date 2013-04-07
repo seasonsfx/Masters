@@ -6,11 +6,12 @@
 #include <memory>
 #include <QAbstractListModel>
 #include <model/pointcloud.h>
+#include "model/export.h"
 
 class QUndoStack;
 class QItemSelection;
 
-class CloudList : public QAbstractListModel {
+class DLLSPEC CloudList : public QAbstractListModel {
     Q_OBJECT
  public:
     explicit CloudList(QObject *parent = 0);

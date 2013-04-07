@@ -3,6 +3,7 @@
 
 #include <map>
 #include <string>
+#include <vector>
 #include <QObject>
 
 class QMouseEvent;
@@ -14,7 +15,7 @@ class ActionManager;
 class MainWindow;
 class Core;
 
-#include "core.h"
+#include "pluginsystem/core.h"
 #include "pluginsystem/iplugin.h"
 
 class PluginManager : public QObject{

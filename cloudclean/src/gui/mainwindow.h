@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QHash>
 #include <memory>
+#include "gui/export.h"
 
 class QUndoStack;
 class CloudList;
@@ -18,7 +19,7 @@ class ActionManager;
 class QUndoStack;
 class QMenuBar;
 
-class MainWindow : public QMainWindow {
+class DLLSPEC MainWindow : public QMainWindow {
     Q_OBJECT
     
  public:

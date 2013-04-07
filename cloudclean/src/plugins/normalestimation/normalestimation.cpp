@@ -4,11 +4,16 @@
 #include "gui/flatview.h"
 #include "gui/mainwindow.h"
 #include "commands/select.h"
-#include "core.h"
+#include "pluginsystem/core.h"
 
 #ifdef Q_WS_X11
     #include <GL/glx.h>
     #undef KeyPress  // Defined in X11/X.h, interferes with QEvent::KeyPress
+#endif
+
+#ifdef _MSC_VER
+    #define INFINITY (DBL_MAX+DBL_MAX)
+    #define NAN (INFINITY-INFINITY)
 #endif
 
 QString NormalEstimator::getName(){

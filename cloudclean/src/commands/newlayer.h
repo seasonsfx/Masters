@@ -7,12 +7,13 @@
 #include <QUndoCommand>
 #include <QColor>
 #include <QString>
+#include "commands/export.h"
 
 class LayerList;
 class PointCloud;
 class Layer;
 
-class NewLayer : public QUndoCommand
+class DLLSPEC NewLayer : public QUndoCommand
 {
  public:
     NewLayer(std::shared_ptr<PointCloud> pc,

@@ -1,6 +1,7 @@
 #include "glwidget.h"
-#include <QtOpenGL>
 #include <QResource>
+#include <QKeyEvent>
+#include <QCoreApplication>
 #include <cmath>
 #include <cstdlib>
 #include "utilities/pointpicker.h"

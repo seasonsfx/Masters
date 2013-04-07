@@ -1,9 +1,12 @@
 # Code
 *.autosave
 cloudclean/bin
+cloudclean/lib
 cloudclean/build
+cloudclean/build2
 cloudclean_bin
 build
+build2
 #Makefile
 CMakeCache.txt
 CMakeLists.txt.user*

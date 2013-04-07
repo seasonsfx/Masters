@@ -1,0 +1,60 @@
+\documentclass[a4paper,11pt, DIV=calc]{report}
+\usepackage{fullpage}
+\usepackage{cite}
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage{textcomp}
+\usepackage{xcolor,graphicx} % Future use
+\usepackage{caption}
+\usepackage{hyperref}
+\usepackage[all]{hypcap}
+\hypersetup{colorlinks=false, pdfborder={0 0 0}}
+\usepackage{multirow}
+\usepackage{amsmath}
+\usepackage{tikz}
+\usetikzlibrary{calc,backgrounds,positioning}
+\usepackage[numbers]{natbib}
+\usepackage{amsfonts}
+\newcommand{\tickYes}{\checkmark}
+\usepackage{pifont}
+\newcommand{\tickNo}{\hspace{1pt}\ding{55}}
+\usepackage{listings}
+%\usepackage{algorithmic}
+
+\begin{document}
+
+\pagestyle{plain} % just page numbers at the bottom
+\title{Pointcloud Cleaning}
+\author{Rickert Mulder}
+\maketitle
+
+\begin{abstract}
+Your abstract goes here, your abstract goes here, your abstract goes here, your abstract goes here, your abstract goes here, your abstract goes here, your abstract goes here, your abstract goes here, your abstract goes here.
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+\include{01-introduction}
+% Motivation & research question
+% Ethics
+\include{02-background}
+% Background we need to know
+\include{03-design}
+% What is needed to evaluate this question
+% research design
+\include{04-implementation}
+% Technical details of implementation
+\include{05-evaluation}
+% Evaluation procedure
+% First tried experts in participatory design
+% Its bad so we try technology probe (put this in design)
+% How participants were recruited
+% How bias was avoided
+
+\include{06-conclusion}
+
+\bibliography{thesis}{}
+\bibliographystyle{plainnat}
+
+\end{document}

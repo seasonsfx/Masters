@@ -14,7 +14,7 @@
 #include "gui/mainwindow.h"
 #include "utilities/pointpicker.h"
 #include "commands/select.h"
-#include "core.h"
+#include "pluginsystem/core.h"
 
 QString Brush3D::getName(){
     return "3D Brush Tool";
@@ -74,7 +74,7 @@ void Brush3D::initializeGL() {
     initialized_gl = true;
 }
 
-void Brush3D::paint(Eigen::Affine3f, Eigen::Affine3f){
+void Brush3D::paint(const Eigen::Affine3f& proj, const Eigen::Affine3f& mv){
     if(!initialized_gl) {
         initializeGL();
     }

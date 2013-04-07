@@ -2,13 +2,14 @@
 #define CORE_H
 
 #include <QObject>
+#include "pluginsystem/export.h"
 
 class CloudList;
 class LayerList;
 class MainWindow;
 class QUndoStack;
 
-class Core : public QObject{
+class DLLSPEC Core : public QObject{
     Q_OBJECT
  public:
     Core();

@@ -1,3 +1,5 @@
+add_definitions(-Dmodel_EXPORTS)
+
 include_directories(
     ${QT_QTCORE_INCLUDE_DIR}
     ${PCL_INCLUDE_DIRS}
@@ -6,6 +8,10 @@ include_directories(
 
 FILE (GLOB model_SOURCE *.cpp *.cxx *.cc *.C *.c *.h *.hpp)
 
-add_library(cloudclean_model STATIC ${model_SOURCE})
-target_link_libraries(cloudclean_model ${QT_LIBRARIES})
+add_library(cloudclean_model SHARED ${model_SOURCE})
+target_link_libraries(
+    cloudclean_model
+    ${QT_LIBRARIES}
+    ${PCL_LIBRARIES}
+)
 #qt5_use_modules(cloudclean_model Core)

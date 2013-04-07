@@ -1,0 +1,3 @@
+Introduction
+	Problem
+		Cleaning laser scans is time consuming

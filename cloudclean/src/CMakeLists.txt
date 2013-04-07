@@ -42,7 +42,7 @@ target_link_libraries(${project_BIN}
     cloudclean_model
     cloudclean_util
     cloudclean_commands
-    pluginsystem
+    cloudclean_pluginsystem
 )
 #QT5_USE_MODULES(${project_BIN} Widgets Gui OpenGL)
 

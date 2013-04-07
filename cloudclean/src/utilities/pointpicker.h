@@ -41,19 +41,19 @@
 #include <Eigen/Dense>
 #include <pcl/octree/octree.h>
 #include <set>
-//#include "glheaders.h"
+#include "utilities/export.h"
 
 class Camera;
 class PointCloud;
 class Layer;
 
-void screenToRay(int x, int y, int win_width, int win_height, Eigen::Affine3f mv,
-                              Eigen::Affine3f projPointToLine,
+DLLSPEC void screenToRay(int x, int y, int win_width, int win_height, const Eigen::Affine3f& mv,
+                              const Eigen::Affine3f& projPointToLine,
                               Eigen::Vector3f& p1,
                               Eigen::Vector3f& p2);
 
-int pick(int win_x, int win_y, int win_width, int win_height, float min_dist,
-        Eigen::Affine3f proj, Eigen::Affine3f cam_mv,
+DLLSPEC int pick(int win_x, int win_y, int win_width, int win_height, float min_dist,
+        const Eigen::Affine3f& proj, const Eigen::Affine3f& cam_mv,
         std::shared_ptr<PointCloud> pc,
         std::set<uint8_t> labels = std::set<uint8_t>());
 

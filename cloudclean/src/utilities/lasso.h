@@ -6,10 +6,11 @@
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include "glheaders.h"
+#include "utilities/export.h"
 
 class QPaintDevice;
 
-class Lasso
+class DLLSPEC Lasso
 {
 public:
     Lasso();

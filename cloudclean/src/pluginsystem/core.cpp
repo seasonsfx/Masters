@@ -1,4 +1,4 @@
-#include "core.h"
+#include "pluginsystem/core.h"
 #include <QAction>
 #include <QUndoStack>
 

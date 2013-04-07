@@ -8,13 +8,14 @@
 #include <future>
 #include <Eigen/Dense>
 #include <pcl/point_types.h>
-
+#include <PCL/point_cloud.h>
+#include "plugins/normalestimation/export.h"
 
 #include "glheaders.h"
 #ifdef __APPLE__
-#include <OpenCL/opencl.h>
+    #include <OpenCL/opencl.h>
 #else
-#include <CL/cl.h>
+    #include <CL/cl.h>
 #endif
 #include <CL/cl_gl.h>
 
@@ -30,7 +31,7 @@ typedef std::map<std::weak_ptr<PointCloud>,
     std::future<pcl::PointCloud<pcl::Normal>::Ptr>,
     std::owner_less<std::weak_ptr<PointCloud>>> FutureNormalMap;
 
-class NormalEstimator : public IPlugin {
+class DLLSPEC NormalEstimator : public IPlugin {
     Q_OBJECT
     Q_INTERFACES(IPlugin)
  public:

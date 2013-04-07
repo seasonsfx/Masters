@@ -1,0 +1,162 @@
+\chapter{Background} \label{ch2}
+
+\section{Cultural heritage preservation}
+	What is it and why is it important?
+	\subsection{Zamani project}
+	\subsection{CyArk Project}
+
+\section{Laser scanning}
+	\subsection{Processing pipeline}
+		\subsubsection{Data aquisition}
+			\begin{itemize}
+			\item Time of flight scanners
+			\item Triangulation scanners
+			\item Structure from motion
+			\item Scanner resolution increasing over time
+			\item Data
+			\begin{itemize}
+				\item Point coordinates
+				\item Non uniform density
+				\item Reflectance
+				\item RGB
+				\item Scanner position
+			\end{itemize}
+			\end{itemize}
+
+
+		\subsubsection{Registration}
+			\begin{itemize}
+			\item 2.5D to full 3D
+			\item Iterative closest points
+			\end{itemize}
+		
+		\subsubsection{Cleaning}
+			\begin{itemize}
+			\item Time consuming
+			\item Classification task
+			\item Types of noise
+				\begin{itemize}
+				\item Averaged pixel on edges
+				\item Static noise
+				\item Moving noise
+				\end{itemize}
+			\item No points are modified
+			\item Focus on interactivity and accuracy
+			\item Manual vs automated tools
+			\item Tradeoffs between cleaning before and after registration
+			\end{itemize}
+
+		\subsubsection{Final steps}
+			\begin{itemize}
+			\item Surface reconstruction (Mention)
+			\item Hole filling (Mention)
+			\item Texturing (Mention)
+			\end{itemize}
+
+
+\section{Pointcloud Cleaning}
+	\subsection{Existing systems}
+		\begin{itemize}
+		\item Z&Y
+		\item Cyclone
+		\item Pointools
+		\item Meshlab
+		\item VR Mesh Studio
+		\item Carlson Pointcloud
+		\item 3D Reshaper
+		\item Terrascan
+		\end{itemize}
+
+	\subsection{Evaluation of existing systems}
+		\begin{itemize}
+		\item None of the automated methods work well for trees
+		\item Proprietary with the exception of Meshlab
+		\end{itemize}		
+
+\section{Image segmentation}
+	Scans are simply a depth maps so 2D image techniques should be investigated
+	\subsection{Image gradients}
+	\subsection{Edge detection}
+	\subsection{Blob extraction}
+	\subsection{Controur extraction}
+
+\section{Laser scan segmentation}
+	\subsection{Point features}
+		\subsubsection{Normals}
+			Basic building block for other features
+			\begin{itemize}
+			\item Ways of performing normal estimation
+			\item Neighbour search
+				\begin{itemize}
+				\item KD Trees
+				\item Scan grid
+				\end{itemize}
+			\item Cost vs Quality
+			\item Dealing with noise
+			\item Used with machine learning algorithms
+			\end{itemize}
+				
+		\subsubsection{Fast point feature histograms (FPFH)}
+			\begin{itemize}
+			\item Good discrimination for primitive geometric objects
+			\item Costly to calculate
+			\end{itemize}
+			
+		\subsubsection{Principle components}
+			\begin{itemize}					
+			\item Good for finding edges and planes
+			\item Solves part of the inverse problem
+			\end{itemize}
+			
+
+	\subsection{Region growing}
+		\begin{itemize}
+		\item Grow neighbourhood from seedpoint
+		\item Add neighbour if it satisfies some similatrity criteria
+		\item Point feature can be used to determine similarity
+		\end{itemize}
+
+	\subsection{K-means clustering}
+		Problems with non uniform denisty
+
+	\subsection{Graph cuts}
+		\begin{itemize}
+		\item Binary classification
+		\item Encode point similatity edges
+		\item Shown to work well with arbitrary objects
+		\item Results are parameter dependend
+		\end{itemize}
+
+	\subsection{Machine learning}
+		\begin{itemize}
+		\item Used in navigation & aerial scans
+		\item Support vector machines
+		\item Markov models
+		\item Conditional random fields
+		\iten Requires training
+		\end{itemize}
+		
+	\subsection{Evaluation of literature}
+		\begin{itemize}
+		\item FPFH seems to discriminate well for primitive geometry. Might be a useful featature to use in tree classification.
+		\item Machine learning has been used to classify vegitation. It however requires training and classified datasets are rare. Possibility to train a classifier on the on scans in the application. Unpredictable accuracy.
+		\item Graph cuts have been shown be effective for automated object classification. Augmented with more edge information accuracty may be improved with minimal user interaction.
+		\end{itemize}
+
+\section{Evaluation techniques}
+\begin{itemize}
+	What was used in previous work and would it be suitable in this instance?
+\end{itemize}
+	
+\section{User interaction}
+	\begin{itemize}
+		\item Level of interactvity expected?
+		\item Characteristics of interfaces?
+		\item Basic expected functionality?
+		\item Suitable evaluation techniques
+	\end{itemize}
+		
+
+\section{Conclusion?}
+What do I conclude from all this and lead into the next chapter.		
+

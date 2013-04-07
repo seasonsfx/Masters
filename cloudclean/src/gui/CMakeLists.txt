@@ -1,5 +1,5 @@
 add_definitions(-DQT_SHARED)
-add_definitions(-DCloudClean_EXPORTS)
+add_definitions(-Dgui_EXPORTS)
 
 include_directories(
     ${QT_QTCORE_INCLUDE_DIR}
@@ -24,8 +24,6 @@ add_library(
 )
 
 if(WIN32)
-    find_package(GLEW REQUIRED)
-    include_directories( ${GLEW_INCLUDE_DIR} )
     target_link_libraries(cloudclean_gui ${GLEW_LIBRARIES})
 endif()
 
@@ -39,6 +37,8 @@ target_link_libraries(
     ${FLANN_LIBRARY}
     ${OPENCL_LIBRARIES}
     ${OPENGL_LIBRARIES}
+    cloudclean_model
+    cloudclean_commands
 )
 
 #qt5_use_modules(cloudclean_gui Widgets Gui OpenGL)

@@ -14,7 +14,7 @@
 #include "commands/select.h"
 #include "plugins/normalestimation/normalestimation.h"
 #include "pluginsystem/pluginmanager.h"
-#include "core.h"
+#include "pluginsystem/core.h"
 
 QString VisualiseNormals::getName(){
     return "3D Brush Tool";
@@ -129,7 +129,7 @@ void VisualiseNormals::initializeGL() {
     initialized_gl = true;
 }
 
-void VisualiseNormals::paint(Eigen::Affine3f, Eigen::Affine3f){
+void VisualiseNormals::paint(const Eigen::Affine3f& proj, const Eigen::Affine3f& mv){
     initializeGL();
     loadGLBuffers();
 

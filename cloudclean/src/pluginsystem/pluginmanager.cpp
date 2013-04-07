@@ -35,7 +35,7 @@
  *
  */
 
-#include "pluginmanager.h"
+#include "pluginsystem/pluginmanager.h"
 #include <cassert>
 #include <QString>
 #include <QApplication>
@@ -47,7 +47,7 @@
 #include <model/layerlist.h>
 #include <model/cloudlist.h>
 
-#include "core.h"
+#include "pluginsystem/core.h"
 
 static QString DLLExtension() {
 #if defined(Q_OS_WIN)

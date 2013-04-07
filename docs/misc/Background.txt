@@ -1,0 +1,100 @@
+Background
+	Cultural heritage preservation
+		Zamani project
+		CyArk Project
+
+	Laser scanning
+		Processing pipeline
+			Data aquisition
+				Time of flight scanners
+				Triangulation
+				Structure from motion
+
+				Scanner resolution keeps increasing
+				Non uniform density
+				Data: xyz, rgb, i, gps location
+
+
+			Registration
+				2.5D to full 3D
+				Itterative closest points
+					Needs close alignment
+			
+			Cleaning
+				Time consuming
+				Classification task
+					No points are modified
+				Focus on interactivity and accuracy
+				Manual vs automated
+				Cleaning before or after registration
+
+			Surface reconstruction (Mention)
+			Hole filling (Mention)
+			Texturing (Mention)
+
+
+	Cleaning
+		Existing systems
+			Z&Y
+			Cyclone
+			Meshlab
+			Pointools
+			VR Mesh Studio
+			Carlson Pointcloud
+			3D Reshaper
+			Terrascan
+
+		Evaluation of existing systems
+			None of the automated methods work well for trees
+
+			Proprietary with the exception of Meshlab
+
+	How to find trees
+		Point features
+			Normals
+				Ways of performing normal estimation
+					Neighbour search
+						KD Trees
+						Scan grid
+					Cost vs Quality
+					Dealing with noise
+
+				Basic building block for other features
+			Fast point feature histograms (FPFH)
+				Good discrimination for primitive geometric objects
+				Costly to calcutale
+
+			Principle components
+				Good for finding edges and planes
+				Solves part of the inverse problem
+
+
+		Region growing
+			Grow neighbourhood from seedpoint
+			Add neighbour if satisfies criteria
+				Similarity of features
+				Distance
+
+		K-means clustering
+			Problems with non uniform denisty
+
+		Graph cuts
+			Binary classification
+			Encode point similatity edges
+			Shown to work well with arbitrary objects
+			Results dependend parameters.
+
+		Machine learning
+			Support vector machines
+		 	Markov models
+		 	Probalistic graphical models
+		 	Conditional random fields
+
+
+	Evaluation of literature
+		FPFH seems to discriminate well for primitive geometry. Might be a useful featature to use in tree classification.
+
+		Machine learning has been used to classify vegitation. It however requires training and classified datasets are rare. Possibility to train a classifier on the on scans in the application. Unpredictable accuracy.
+
+		Graph cuts have been shown be effective for automated object classification. Augmented with more edge information accuracty may be improved with minimal user interaction.
+

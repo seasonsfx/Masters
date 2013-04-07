@@ -7,12 +7,13 @@
 #include <QUndoCommand>
 #include <QColor>
 #include <QString>
+#include "commands/export.h"
 
 class LayerList;
 class PointCloud;
 class Layer;
 
-class LayerGuiSelect : public QUndoCommand
+class DLLSPEC LayerGuiSelect : public QUndoCommand
 {
  public:
     LayerGuiSelect(std::shared_ptr<std::vector<uint16_t> > labels,

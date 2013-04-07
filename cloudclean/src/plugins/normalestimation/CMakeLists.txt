@@ -1,3 +1,4 @@
+add_definitions(-Dnormalestimator_EXPORTS)
 FIND_PACKAGE (OpenCL REQUIRED)
 
 include_directories(
@@ -8,5 +9,10 @@ include_directories(
 )
 
 FILE (GLOB plugin_SOURCE *.cpp *.cxx *.cc *.C *.c *.h *.hpp)
-add_library(normalestimation SHARED ${plugin_SOURCE} )
-target_link_libraries(normalestimation ${QT_LIBRARIES} ${OPENCL_LIBRARIES})
+add_library(normalestimator SHARED ${plugin_SOURCE} )
+target_link_libraries(normalestimator
+    ${QT_LIBRARIES}
+    ${OPENCL_LIBRARIES}
+    cloudclean_pluginsystem
+    cloudclean_model
+)

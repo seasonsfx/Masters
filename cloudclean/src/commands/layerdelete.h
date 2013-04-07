@@ -7,12 +7,13 @@
 #include <QUndoCommand>
 #include <QColor>
 #include <QString>
+#include "commands/export.h"
 
 class LayerList;
 class PointCloud;
 class Layer;
 
-class LayerDelete : public QUndoCommand {
+class DLLSPEC LayerDelete : public QUndoCommand {
  public:
     LayerDelete(std::shared_ptr<Layer> layer, LayerList * ll);
     QString actionText();

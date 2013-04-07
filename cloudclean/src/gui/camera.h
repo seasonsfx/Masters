@@ -39,7 +39,7 @@
 #define CLOUDCLEAN_SRC_CLOUDCLEAN_CAMERA_H_
 
 #include <Eigen/Geometry>
-#include "appexport.h"
+#include "gui/export.h"
 
 class GLWidget;
 

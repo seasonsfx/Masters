@@ -38,7 +38,7 @@ class VisualiseNormals : public IPlugin {
  public slots:
     void enable();
     void disable();
-    void paint(Eigen::Affine3f, Eigen::Affine3f);
+    void paint(const Eigen::Affine3f& proj, const Eigen::Affine3f& mv);
 
  private:
     Core * core_;

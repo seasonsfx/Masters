@@ -11,7 +11,7 @@
 #include "gui/layerlistview.h"
 #include "gui/cloudlistview.h"
 #include "gui/gldata.h"
-#include "core.h"
+#include "pluginsystem/core.h"
 
 class PluginManager;
 class QProgressBar;

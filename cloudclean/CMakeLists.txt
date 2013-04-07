@@ -68,8 +68,15 @@ FIND_PACKAGE (PCL 1.7 REQUIRED COMPONENTS
 
 FIND_PACKAGE (Boost COMPONENTS system REQUIRED)
 
-ADD_DEFINITIONS (${QT_DEFINITIONS})
-INCLUDE_DIRECTORIES (${QT_INCLUDE_DIR})
+#ADD_DEFINITIONS (${QT_DEFINITIONS})
+#INCLUDE_DIRECTORIES (${QT_INCLUDE_DIR})
+INCLUDE(${QT_USE_FILE})
+ADD_DEFINITIONS(${QT_DEFINITIONS})
+
+if(WIN32)
+    find_package(GLEW REQUIRED)
+    include_directories( ${GLEW_INCLUDE_DIR} )
+endif()
 
 #
 # HACKS
@@ -79,10 +86,15 @@ add_definitions(
     -DBOOST_TT_HAS_OPERATOR_HPP_INCLUDED
 )
 
+# VC11 needs this to run gtest
+if(WIN32)
+    add_definitions(-D_VARIADIC_MAX=10)
+endif()
+
 #
 # Compiler settings
 #
-if(CMAKE_BUILD_TOOL MATCHES "(msdev|devenv|nmake)")
+if(MSVC)
     SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} /W2") # Mute warnings in ms
     add_definitions(-DNOMINMAX) # Workaround for windows.h bug
 else()

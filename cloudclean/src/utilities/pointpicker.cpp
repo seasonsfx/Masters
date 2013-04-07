@@ -39,7 +39,6 @@
 #include <cfloat>
 #include <vector>
 
-#include <GL/glu.h>
 #include <QDebug>
 
 #include "utilities/compgeom.h"
@@ -49,9 +48,12 @@
 #include "model/layer.h"
 #include "gui/camera.h"
 
+#include "glheaders.h"
+#include <GL/glu.h>
+
 void screenToRay(int x, int y, int win_width, int win_height,
-                              Eigen::Affine3f mv,
-                              Eigen::Affine3f proj,
+                              const Eigen::Affine3f& mv,
+                              const Eigen::Affine3f& proj,
                               Eigen::Vector3f& p1,
                               Eigen::Vector3f& p2) {
     double dX, dY, dZ;
@@ -80,7 +82,7 @@ void screenToRay(int x, int y, int win_width, int win_height,
 }
 
 int pick(int win_x, int win_y, int win_width, int win_height, float max_dist,
-        Eigen::Affine3f proj, Eigen::Affine3f cam_mv,
+        const Eigen::Affine3f& proj, const Eigen::Affine3f& cam_mv,
         std::shared_ptr<PointCloud> pc,
         std::set<uint8_t> labels) {
 
@@ -123,7 +125,9 @@ int pick(int win_x, int win_y, int win_width, int win_height, float max_dist,
         pcl::PointXYZI & p = pc->points[i];
 
         // Save some memory by using map
+        // MSVC bug I think
         Eigen::Map<Eigen::Vector3f> point = Eigen::Vector3f::Map(p.data, 3);
+        //Eigen::Vector3f point(p.x(), p.y(), p.z());
 
         // Skip points to far from the line
         // Totod make parameter

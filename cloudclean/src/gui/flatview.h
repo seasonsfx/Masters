@@ -12,8 +12,9 @@
 #include "model/pointcloud.h"
 #include "gui/gldata.h"
 #include <Eigen/Dense>
+#include "gui/export.h"
 
-class FlatView : public QGLWidget {
+class DLLSPEC FlatView : public QGLWidget {
     Q_OBJECT
  public:
     FlatView(QGLFormat &fmt, CloudList * cl,

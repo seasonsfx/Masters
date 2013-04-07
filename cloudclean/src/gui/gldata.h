@@ -10,8 +10,9 @@
 #include "gui/cloudgldata.h"
 #include "model/cloudlist.h"
 #include "model/layerlist.h"
+#include "gui/export.h"
 
-class GLData : public QObject {
+class DLLSPEC GLData : public QObject {
     Q_OBJECT
  public:
     GLData(QGLContext * glcontext,

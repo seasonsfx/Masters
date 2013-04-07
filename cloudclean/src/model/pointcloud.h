@@ -10,12 +10,14 @@
 #include <pcl/point_cloud.h>
 #include <pcl/search/octree.h>
 #include <Eigen/Dense>
+#include "model/export.h"
+
 
 class PointCloud;
 
 typedef pcl::octree::OctreePointCloudSearch<pcl::PointXYZI> Octree;
 
-class EventDispatcher : public QObject {
+class DLLSPEC EventDispatcher : public QObject {
     Q_OBJECT
  public:
     EventDispatcher(PointCloud * pc);
@@ -43,7 +45,7 @@ class EventDispatcher : public QObject {
  friend class PointCloud;
 };
 
-enum class PointFlags : int8_t {
+enum class DLLSPEC PointFlags : int8_t {
     selected = 0x001,
     reserved1 = 0x002,
     reserved2 = 0x006,
@@ -53,12 +55,12 @@ enum class PointFlags : int8_t {
     reserved6 = 0x040
 };
 
-enum class CoordinateFrame: bool {
+enum class DLLSPEC CoordinateFrame: bool {
     Camera,
     Laser
 };
 
-class PointCloud : public pcl::PointCloud<pcl::PointXYZI> {
+class DLLSPEC PointCloud : public pcl::PointCloud<pcl::PointXYZI> {
  public:
     explicit PointCloud();
     bool save_ptx(const char* filename);

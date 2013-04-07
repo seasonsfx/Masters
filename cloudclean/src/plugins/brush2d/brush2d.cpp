@@ -8,7 +8,7 @@
 #include "gui/flatview.h"
 #include "gui/mainwindow.h"
 #include "commands/select.h"
-#include "core.h"
+#include "pluginsystem/core.h"
 
 QString Brush2D::getName(){
     return "2D Brush Tool";

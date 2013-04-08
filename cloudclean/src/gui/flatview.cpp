@@ -145,7 +145,14 @@ void FlatView::mouseReleaseEvent(QMouseEvent * event) {
 }
 
 void FlatView::wheelEvent(QWheelEvent * event) {
-    float delta = (event->delta()/120.0f) * 1.1;
+    auto sgn = [] (float val) {
+        if(val > 0)
+            return 1.0;
+        else
+            return -1.0;
+    };
+
+    float delta = sgn(event->delta())*1.0+(event->delta())/120.0;
     float s = 1.0f;
 
     // NDC translate
@@ -154,10 +161,15 @@ void FlatView::wheelEvent(QWheelEvent * event) {
     translate(0, 2) = 2.0f* ((event->x()/float(width())) - 0.5);
     translate(1, 2) = -2.0f* ((event->y()/float(height())) - 0.5);
 
-    if(delta > 0 && current_scale_ < 100)
+    if(delta > 0 && current_scale_ < 100) {
         s = delta;
-    else if (delta < 0 && current_scale_ > 0.01)
-        s = 1/-delta;
+    }
+    else if (delta < 0 && current_scale_ > 0.01) {
+        s = 1.0/-delta;
+    }
+
+    qDebug() << "Scale:" << s;
+    qDebug() << "Current scale:" << current_scale_;
 
     Eigen::Matrix3f scale;
     scale.setIdentity();

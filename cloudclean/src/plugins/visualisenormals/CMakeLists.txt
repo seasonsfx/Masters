@@ -8,7 +8,6 @@ include_directories(
 
 FILE (GLOB plugin_SOURCE *.cpp *.cxx *.cc *.C *.c *.h *.hpp)
 qt4_add_resources(VRESOURCES_RCC vresources.qrc)
-#add_library(visualisenormals SHARED ${plugin_SOURCE} ${VRESOURCES_RCC} ../normalestimation/normalestimation.h)
 add_library(visualisenormals SHARED ${plugin_SOURCE} ${VRESOURCES_RCC} ../../pluginsystem/iplugin.h)
 target_link_libraries(visualisenormals
     ${QT_LIBRARIES}
@@ -21,3 +20,5 @@ target_link_libraries(visualisenormals
 if(WIN32)
     target_link_libraries(visualisenormals ${GLEW_LIBRARIES})
 endif()
+
+INSTALL(TARGETS visualisenormals DESTINATION ${PLUGIN_INSTALL} COMPONENT "CloudClean_plugins")

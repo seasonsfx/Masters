@@ -18,3 +18,5 @@ target_link_libraries(brush3d
 if(WIN32)
     target_link_libraries(brush3d ${GLEW_LIBRARIES})
 endif()
+
+INSTALL(TARGETS brush3d DESTINATION ${PLUGIN_INSTALL} COMPONENT "CloudClean_plugins")

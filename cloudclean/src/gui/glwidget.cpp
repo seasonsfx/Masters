@@ -41,6 +41,18 @@ QSize GLWidget::sizeHint() const {
 }
 
 void GLWidget::initializeGL() {
+    #if defined(Q_OS_WIN32)
+        glewExperimental = true;
+        GLint GlewInitResult = glewInit();
+        if (GlewInitResult != GLEW_OK) {
+            const GLubyte* errorStr = glewGetErrorString(GlewInitResult);
+            int size = strlen(reinterpret_cast<const char*>(errorStr));
+            qDebug() << "Glew error "
+                     << QString::fromUtf8(
+                            reinterpret_cast<const char*>(errorStr), size);
+        }
+    #endif
+
     glClearColor(0.8, 0.8, 0.8, 1.0);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
@@ -73,18 +85,22 @@ void GLWidget::initializeGL() {
     uni_projection_ = program_.uniformLocation("projection"); RC(uni_projection_);
     uni_modelview_ = program_.uniformLocation("modelview"); RC(uni_modelview_);
     uni_select_color_ = program_.uniformLocation("select_color"); RC(uni_select_color_);
-    program_.release();
+
     //
+    // Selection color
+    //
+	glUniform4fv(uni_select_color_, 1, gld_->selection_color_);
+	GLenum err = glGetError();
+	std::cout << gluErrorString(err) << std::endl;
+	CE();
+    program_.release(); CE();
+
+	//
     // Set camera
     //
     camera_.setDepthRange(0.1f, 100.0f);
     camera_.setAspect(width() / static_cast<float>(height()));
-    //
-    // Selection color
-    //
-    program_.bind(); CE();
-    glUniform4fv(uni_select_color_, 1, gld_->selection_color_); CE();
-    program_.release(); CE();
+
     //
     // Set up textures & point size
     //

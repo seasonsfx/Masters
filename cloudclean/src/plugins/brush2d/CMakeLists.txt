@@ -16,3 +16,5 @@ target_link_libraries(brush2d
 if(WIN32)
     target_link_libraries(brush2d ${GLEW_LIBRARIES})
 endif()
+
+INSTALL(TARGETS brush2d DESTINATION ${PLUGIN_INSTALL} COMPONENT "CloudClean_plugins")

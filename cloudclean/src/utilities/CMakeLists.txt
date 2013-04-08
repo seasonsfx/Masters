@@ -17,4 +17,6 @@ target_link_libraries(
     cloudclean_model
 )
 
+INSTALL(TARGETS cloudclean_util DESTINATION ${LIB_INSTALL} COMPONENT CloudClean)
+
 #qt5_use_modules(cloudclean_model Core)

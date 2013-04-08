@@ -74,9 +74,9 @@ PluginManager::PluginManager(Core * core) {
     if (!succ)
         succ = plugins_dir_->cd("../plugins");
     if (!succ)
-        succ = plugins_dir_->cd("../lib");
-    if (!succ)
         succ = plugins_dir_->cd("../lib/plugins");
+    if (!succ)
+        succ = plugins_dir_->cd("../lib");
     if (!succ)
         succ = plugins_dir_->cd("/usr/lib/cloudclean/plugins");
     if (!succ){

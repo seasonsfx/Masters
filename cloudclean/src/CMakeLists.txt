@@ -1,4 +1,4 @@
-SET (CMAKE_AUTOMOC ON)
+SET(CMAKE_AUTOMOC ON)
 
 INCLUDE_DIRECTORIES(
     ${PCL_INCLUDE_DIRS}
@@ -20,12 +20,17 @@ add_subdirectory(commands)
 #
 # Build main binary
 #
-FILE (GLOB project_SRCS *.cpp *.cxx *.cc *.C *.c *.h *.hpp)
-SET (project_SRCS ${project_SRCS} )
-SET (project_LIBS ${QT_LIBRARIES} cloudclean_gui)
-SET (project_BIN ${PROJECT_NAME})
+FILE (GLOB project_SRCS *.cpp *.cxx *.cc *.C *.c *.h *.hpp *.rc)
+SET(project_SRCS ${project_SRCS} )
+SET(project_LIBS ${QT_LIBRARIES} cloudclean_gui)
+SET(project_BIN ${PROJECT_NAME})
 
-ADD_EXECUTABLE(${project_BIN} ${project_SRCS})
+IF(WIN32)
+    ADD_EXECUTABLE(${project_BIN} WIN32 ${project_SRCS})
+ELSE()
+    ADD_EXECUTABLE(${project_BIN} ${project_SRCS})
+ENDIF()
+
 TARGET_LINK_LIBRARIES(${project_BIN} ${project_LIBS})
 SET_TARGET_PROPERTIES(${project_BIN}
 	PROPERTIES VERSION
@@ -38,6 +43,7 @@ target_link_libraries(${project_BIN}
     ${QT_QTCORE_LIBRARY}
     ${QT_QTGUI_LIBRARY}
     ${QT_QTOPENGL_LIBRARY}
+    ${QT_QTMAIN_LIBRARY}
     ${Boost_LIBRARIES}
     cloudclean_model
     cloudclean_util
@@ -46,4 +52,4 @@ target_link_libraries(${project_BIN}
 )
 #QT5_USE_MODULES(${project_BIN} Widgets Gui OpenGL)
 
-INSTALL(TARGETS ${project_BIN} DESTINATION bin)
+INSTALL(TARGETS ${project_BIN} DESTINATION ${BIN_INSTALL})

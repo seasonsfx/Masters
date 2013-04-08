@@ -16,3 +16,5 @@ target_link_libraries(normalestimator
     cloudclean_pluginsystem
     cloudclean_model
 )
+
+INSTALL(TARGETS normalestimator DESTINATION ${PLUGIN_INSTALL} COMPONENT "CloudClean_plugins")

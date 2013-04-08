@@ -13,3 +13,5 @@ target_link_libraries(
     cloudclean_model
     cloudclean_gui
 )
+
+INSTALL(TARGETS cloudclean_pluginsystem DESTINATION ${LIB_INSTALL} COMPONENT CloudClean)

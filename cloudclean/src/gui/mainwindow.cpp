@@ -32,6 +32,14 @@ MainWindow::MainWindow(QUndoStack *us, CloudList * cl, LayerList * ll, QWidget *
     glwidget_ = new GLWidget(base_format, cl, ll, tabs_);
     flatview_ = new FlatView(base_format, cl, ll, tabs_, glwidget_);
 
+    // Important! Context invalidates when reparenting the glwidget
+    tabs_->addTab(glwidget_, "3D View");
+    tabs_->addTab(flatview_, "2D View");
+
+    qDebug() << "widget:" << glwidget_->context();
+    qDebug() << "flatview:" << flatview_->context();
+    qDebug() << "is sharing" << QGLContext::areSharing(flatview_->context(), glwidget_->context());
+
     QGLContext * ctx = const_cast<QGLContext *>(glwidget_->context());
     gld_ = new GLData(ctx, cl, ll);
     glwidget_->setGLD(gld_);
@@ -49,9 +57,6 @@ MainWindow::MainWindow(QUndoStack *us, CloudList * cl, LayerList * ll, QWidget *
 
     addDockWidget(Qt::RightDockWidgetArea, clv_);
     addDockWidget(Qt::RightDockWidgetArea, llv_);
-
-    tabs_->addTab(glwidget_, "3D View");
-    tabs_->addTab(flatview_, "2D View");
 
     setCentralWidget(tabs_);
     setVisible(true);

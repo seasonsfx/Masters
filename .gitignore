@@ -1,5 +1,7 @@
 # Code
 *.autosave
+*.dll.manifest
+*.exp
 cloudclean/bin
 cloudclean/lib
 cloudclean/build

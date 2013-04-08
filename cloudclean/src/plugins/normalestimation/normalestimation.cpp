@@ -29,32 +29,73 @@ void NormalEstimator::initialize(Core *core){
     // Setup OpenCL
     cl_uint num_platforms;
     cl_platform_id clPlatformIDs[20];
-    cl_platform_id platform;
+    cl_platform_id platform = nullptr;
     char chBuffer[1024];
     cl_device_id device;
 
-    cl_int result = clGetPlatformIDs (0, NULL, &num_platforms);
+    cl_device_id devices[100];
+    cl_uint devices_n = 0;
+
+    cl_int result;
+
+
+    result = clGetPlatformIDs (0, NULL, &num_platforms);
 
     if(num_platforms == 0) {
-        qDebug("No OpenCL platform found!\n\n");
+        qDebug("No OpenCL platform found!\n");
         return;
     }
 
     clGetPlatformIDs (num_platforms, clPlatformIDs, NULL);
 
-    /*
-    qDebug() << "Availible CL Platforms (MAX:20)";
+    cl_uint max_freq = 0;
+
+    qDebug() << "Availible CL Platforms:";
     for(uint i = 0; i < num_platforms && i < 20; ++i){
-        result = clGetPlatformInfo(clPlatformIDs[i], CL_PLATFORM_NAME, 1024, &chBuffer, NULL);
-        qDebug("platform %d: %s\n", i, chBuffer);
+        result = clGetPlatformInfo(clPlatformIDs[i], CL_PLATFORM_VENDOR, 1024, &chBuffer, NULL);
+        qDebug("platform %d: %s", i, chBuffer);
+
+        /*if(strstr(chBuffer, "NVIDIA") || strstr(chBuffer, "AMD")) {
+            platform = clPlatformIDs[i];
+            qDebug("Using platform: %s", chBuffer);
+        }*/
+
+        result = clGetDeviceIDs(clPlatformIDs[i], CL_DEVICE_TYPE_GPU, 100, devices, &devices_n);
+
+        qDebug("CL Devices on platform %s", chBuffer);
+        for (int i = 0; i < devices_n; i++) {
+            char buffer[10240];
+            char devicename[10240];
+            cl_uint buf_uint;
+            cl_ulong buf_ulong;
+
+            qDebug("  -- %d --", i);
+            clGetDeviceInfo(devices[i], CL_DEVICE_NAME, sizeof(devicename), devicename, NULL);
+            qDebug("  DEVICE_NAME = %s", devicename);
+            clGetDeviceInfo(devices[i], CL_DEVICE_VENDOR, sizeof(buffer), buffer, NULL);
+            qDebug("  DEVICE_VENDOR = %s", buffer);
+            clGetDeviceInfo(devices[i], CL_DEVICE_VERSION, sizeof(buffer), buffer, NULL);
+            qDebug("  DEVICE_VERSION = %s", buffer);
+            clGetDeviceInfo(devices[i], CL_DRIVER_VERSION, sizeof(buffer), buffer, NULL);
+            qDebug("  DRIVER_VERSION = %s", buffer);
+            clGetDeviceInfo(devices[i], CL_DEVICE_GLOBAL_MEM_SIZE, sizeof(buf_ulong), &buf_ulong, NULL);
+            qDebug("  DEVICE_GLOBAL_MEM_SIZE = %llu\n", (unsigned long long)buf_ulong);
+            clGetDeviceInfo(devices[i], CL_DEVICE_MAX_COMPUTE_UNITS, sizeof(buf_uint), &buf_uint, NULL);
+            qDebug("  DEVICE_MAX_COMPUTE_UNITS = %u", (unsigned int)buf_uint);
+
+            clGetDeviceInfo(devices[i], CL_DEVICE_MAX_CLOCK_FREQUENCY, sizeof(buf_uint), &buf_uint, NULL);
+            qDebug("  DEVICE_MAX_CLOCK_FREQUENCY = %u\n", (unsigned int)buf_uint);
+
+            if(buf_uint > max_freq) {
+                max_freq = buf_uint;
+                device = devices[i];
+                platform = clPlatformIDs[i];
+                qDebug("Using device %s on platform: %s", devicename, chBuffer);
+            }
+        }
+
+
     }
-    */
-
-    clGetPlatformInfo(clPlatformIDs[0], CL_PLATFORM_NAME, 1024, &chBuffer, NULL);
-    qDebug("Using platform: %s\n", chBuffer);
-    platform = clPlatformIDs[0];
-
-    result = clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 1, &device, NULL);
 
     if(result != CL_SUCCESS){
         qDebug("Failed to obtain an availible device");

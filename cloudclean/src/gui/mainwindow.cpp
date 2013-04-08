@@ -29,11 +29,10 @@ MainWindow::MainWindow(QUndoStack *us, CloudList * cl, LayerList * ll, QWidget *
     base_format.setProfile(QGLFormat::CompatibilityProfile);
     base_format.setSampleBuffers(true);
 
-    glwidget_ = new GLWidget(base_format, cl, ll, tabs_);
-    flatview_ = new FlatView(base_format, cl, ll, tabs_, glwidget_);
-
     // Important! Context invalidates when reparenting the glwidget
+    glwidget_ = new GLWidget(base_format, cl, ll, tabs_);
     tabs_->addTab(glwidget_, "3D View");
+    flatview_ = new FlatView(base_format, cl, ll, tabs_, glwidget_);
     tabs_->addTab(flatview_, "2D View");
 
     qDebug() << "widget:" << glwidget_->context();

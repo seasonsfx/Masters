@@ -8,7 +8,7 @@
 #include <future>
 #include <Eigen/Dense>
 #include <pcl/point_types.h>
-#include <PCL/point_cloud.h>
+#include <pcl/point_cloud.h>
 #include "plugins/normalestimation/export.h"
 
 #include "glheaders.h"

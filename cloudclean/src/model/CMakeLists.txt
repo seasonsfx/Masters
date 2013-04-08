@@ -13,6 +13,7 @@ target_link_libraries(
     cloudclean_model
     ${QT_LIBRARIES}
     ${PCL_LIBRARIES}
+    ${Boost_SYSTEM_LIBRARY}
 )
 
 INSTALL(TARGETS cloudclean_model DESTINATION ${LIB_INSTALL} COMPONENT CloudClean)

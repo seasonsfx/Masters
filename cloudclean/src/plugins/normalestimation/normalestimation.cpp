@@ -381,6 +381,7 @@ NormalEstimator::estimateNormals(std::shared_ptr<PointCloud> cloud) {
         normal_ref.data_n[1] = normal(1);
         normal_ref.data_n[2] = normal(2);
         normal_ref.data_n[3] = 1.0f;
+
     }
 
     // Deal with missing normals here

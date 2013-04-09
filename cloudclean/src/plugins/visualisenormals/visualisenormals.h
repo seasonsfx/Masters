@@ -52,10 +52,8 @@ class VisualiseNormals : public IPlugin {
     std::vector<QGLBuffer *> normal_buffers_;
 
     bool is_enabled_;
-    bool buffers_loaded_;
+    std::vector<bool> buffers_loaded_;
     bool initialized_gl;
-
-    float normal_length_;
 
     NormalEstimator * ne_;
 

@@ -27,9 +27,6 @@ void VisualiseNormals::initialize(Core *core){
     mw_ = core_->mw_;
 
     initialized_gl = false;
-    buffers_loaded_ = false;
-    normal_length_ = 0.1f;
-
 }
 
 void VisualiseNormals::initialize2(PluginManager * pm) {
@@ -60,19 +57,19 @@ void VisualiseNormals::cleanup(){
 }
 
 void VisualiseNormals::loadGLBuffers() {
-    if(buffers_loaded_)
-        return;
-
     normal_buffers_.resize(cl_->clouds_.size(), nullptr);
+    buffers_loaded_.resize(cl_->clouds_.size(), false);
 
     size_t point_size = 3*sizeof(float);
 
     for(uint i = 0; i < cl_->clouds_.size(); i++) {
+        if(buffers_loaded_[i])
+            continue;
         QGLBuffer * buff = new QGLBuffer();
         normal_buffers_[i] = buff;
-        buff->create();
-        buff->bind();
-        buff->allocate(point_size*cl_->clouds_[i]->points.size());
+        buff->create(); CE();
+        buff->bind(); CE();
+        buff->allocate(point_size*cl_->clouds_[i]->points.size()); CE();
 
         float * gbuff =
                 static_cast<float *>(glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY)); CE();
@@ -80,28 +77,27 @@ void VisualiseNormals::loadGLBuffers() {
         pcl::PointCloud<pcl::Normal>::Ptr normals = ne_->getNormals(cl_->clouds_[i]);
 
         for(uint j = 0; j < cl_->clouds_[i]->points.size(); j++){
-            gbuff[3*j] = normals->at(j).data_n[0] * normal_length_;
-            gbuff[3*j] = normals->at(j).data_n[1] * normal_length_;
-            gbuff[3*j] = normals->at(j).data_n[2] * normal_length_;
+            gbuff[3*j] = normals->at(j).data_n[0];
+            gbuff[3*j+1] = normals->at(j).data_n[1];
+            gbuff[3*j+2] = normals->at(j).data_n[2];
         }
 
-        glUnmapBuffer(GL_ARRAY_BUFFER);
+        glUnmapBuffer(GL_ARRAY_BUFFER); CE();
 
-        buff->release();
+        buff->release(); CE();
+        buffers_loaded_[i] = true;
     }
 
-    buffers_loaded_ = true;
 }
 
 void VisualiseNormals::unloadGLBuffers() {
-    if(!buffers_loaded_)
-        return;
-
     for(uint i = 0; i < normal_buffers_.size(); i++) {
+        if(!buffers_loaded_[i])
+            continue;
         delete normal_buffers_[i];
         normal_buffers_[i] = nullptr;
+        buffers_loaded_[i] = false;
     }
-    buffers_loaded_ = false;
 }
 
 void VisualiseNormals::initializeGL() {

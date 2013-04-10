@@ -2,10 +2,9 @@
 
 #include <limits>
 #include <string>
-#include <fstream>
-#include <sstream>
 #include <cstdlib>
 #include <cassert>
+#include <cstdio>
 
 #include <boost/serialization/shared_ptr.hpp>
 #include <boost/iostreams/device/mapped_file.hpp>
@@ -64,7 +63,7 @@ PointCloud::PointCloud()
 }
 
 bool PointCloud::save_ptx(const char* filename){
-    pc_mutex->lock();
+    /*pc_mutex->lock();
     std::ofstream ptx_file(filename);
     ptx_file << this->width << std::endl;
     ptx_file << this->height << std::endl;
@@ -117,6 +116,7 @@ bool PointCloud::save_ptx(const char* filename){
     ptx_file.close();
     pc_mutex->unlock();
     return true;
+    */
 }
 
 bool PointCloud::load_ptx(const char* filename, int decimation_factor) {
@@ -125,16 +125,15 @@ bool PointCloud::load_ptx(const char* filename, int decimation_factor) {
     assert(decimation_factor%2 == 0 || decimation_factor == 1);
 
     // Makes things faster apparently
-    std::cin.sync_with_stdio(false);
-    /*
-    std::ifstream ptx_file(filename, std::ios::binary);
+    /*std::cin.sync_with_stdio(false,  std::ios::binary);
+
+    std::ifstream ptx_file(filename);
     if (!ptx_file.is_open()) {
         return false;
     }
     */
 
-
-
+    /*
     boost::iostreams::mapped_file_source file;
     file.open(filename);
     if(!file.is_open())
@@ -142,39 +141,52 @@ bool PointCloud::load_ptx(const char* filename, int decimation_factor) {
     boost::iostreams::stream_buffer<boost::iostreams::mapped_file_source> file_stream;
     file_stream.open(file);
     std::istream ptx_file(&file_stream);
+    */
 
 
-	// Contains nans
-	this->is_dense = false;
+    FILE * pfile;
+    //char buffer [1024];
+    pfile = fopen (filename , "r");
+    if (pfile == NULL){
+        qDebug("Error opening file");
+        return false;
+    }
 
-	// Matrix dimentions
+    // Contains nans
+    this->is_dense = false;
+
+    // Matrix dimentions
     int file_width, file_height;
-    ptx_file >> file_width;
-    ptx_file >> file_height;
+    fscanf(pfile, "%d %d", &file_width, &file_height);
+    qDebug() << "dims" << file_width << file_height;
+    //ptx_file >> file_width;
+    //ptx_file >> file_height;
 
-	// Subsample
+    // Subsample
     this->scan_width_ =  file_width/decimation_factor;
     this->scan_height_ = file_height/decimation_factor;
 
-	// Camera offset
-	ptx_file >> this->sensor_origin_[0];
-	ptx_file >> this->sensor_origin_[1];
-	ptx_file >> this->sensor_origin_[2];
-	this->sensor_origin_[3] = 0.0f;
-	
+    // Camera offset
+    std::fscanf(pfile, "%f %f %f", &this->sensor_origin_[0], &this->sensor_origin_[1], &this->sensor_origin_[2]);
+    qDebug() << "yeah: " << this->sensor_origin_[0];
+    //ptx_file >> this->sensor_origin_[0];
+    //ptx_file >> this->sensor_origin_[1];
+    //ptx_file >> this->sensor_origin_[2];
+    this->sensor_origin_[3] = 0.0f;
+
     Eigen::Matrix3f orientation_mat;
     for(int row = 0; row < 3; row++ )
         for(int col = 0; col < 3; col++ )
-            ptx_file >> orientation_mat(row,col);
+            fscanf(pfile, "%f", &orientation_mat(row,col));
+            //ptx_file >> orientation_mat(row,col);
     this->sensor_orientation_ = Eigen::Quaternionf(orientation_mat.transpose());
 
     // Discard registration mat4
-	Eigen::Matrix4f reg_mat4;
-    for(int col = 0; col < 4; col++ )
-        for(int row = 0; row < 4; row++ )
-			ptx_file >> reg_mat4(row,col);
+    float ign;
+    for(int i = 0; i < 16; i++ )
+        fscanf(pfile, "%f", &ign);
 
-	ptx_file >> std::ws;
+    //ptx_file >> std::ws;
 
 
     unsigned int sampled_idx = 0;
@@ -187,7 +199,8 @@ bool PointCloud::load_ptx(const char* filename, int decimation_factor) {
     if(update_interval == 0)
         update_interval = 1;
 
-    char buff[1024];
+    //char buff[1024];
+    //string line;
     pcl::PointXYZI point;
     float & x = point.x;
     float & y = point.y;
@@ -205,15 +218,42 @@ bool PointCloud::load_ptx(const char* filename, int decimation_factor) {
         // Only process every decimation_factor-ith row and column
         if((row+1)%decimation_factor != 0 || (col+1)%decimation_factor != 0){
             //ptx_file >> x >> y >> z >> intensity;
-            ptx_file.getline(buff, 1024);
+            //ptx_file.getline(buff, 1024);
+            //getline(ptx_file, line);
+            for(int i = 0; i < 4; i++ )
+                fscanf(pfile, "%f", &ign);
             continue;
         }
 
         //ptx_file >> x >> y >> z >> intensity;
 
+        //char buff[] = "0.003313 0.805950 -1.675033 0.015869\0jabckjbckab";
 
-        ptx_file.getline(buff, 1024);
-        sscanf(buff, "%f %f %f %f\n", &x, &y, &z, &intensity);
+        //memset((void *)&buff, '\0', sizeof(buff));
+        //ptx_file >> ws;
+        //ptx_file.getline(buff, 1024);
+        //getline(ptx_file, line);
+
+        if(ferror (pfile))
+            return false;
+
+        float x, y, z, intensity;
+        int filled = fscanf(pfile, "%f %f %f %f", &x, &y, &z, &intensity);
+        if(filled != 4) {
+            qDebug() << "--------------";
+            qDebug() << x << y << z << intensity;
+            qDebug() << filled;
+            //qDebug() << line.c_str();
+            //printf("'%s'", buff);
+            qDebug() << "failed";
+            return false;
+        }
+        else {
+            qDebug() << "--------------";
+            //qDebug() << buff;
+            //qDebug() << line.c_str();
+            qDebug() << "success";
+        }
 
 
         sampled_idx++;
@@ -221,7 +261,7 @@ bool PointCloud::load_ptx(const char* filename, int decimation_factor) {
         // Skip points that are invalid
         if((x == 0) && (y == 0) && (z == 0)) {
             continue;
-		}
+        }
 
         // Set bounding box
         if(x < min_bounding_box_.x())
@@ -240,7 +280,7 @@ bool PointCloud::load_ptx(const char* filename, int decimation_factor) {
 
         this->points.push_back(point);
         this->cloud_to_grid_map_.push_back(sampled_idx);
-	}
+    }
 
     this->width = this->points.size();
     this->height = 1;
@@ -264,7 +304,8 @@ bool PointCloud::load_ptx(const char* filename, int decimation_factor) {
         return octree;
     });
 
-	return this;
+    fclose (pfile);
+    return this;
 }
 
 void PointCloud::translate(const Eigen::Vector3f& pos) {

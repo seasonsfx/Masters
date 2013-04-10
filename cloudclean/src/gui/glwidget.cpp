@@ -89,13 +89,13 @@ void GLWidget::initializeGL() {
     //
     // Selection color
     //
-	glUniform4fv(uni_select_color_, 1, gld_->selection_color_);
-	GLenum err = glGetError();
-	std::cout << gluErrorString(err) << std::endl;
-	CE();
+    glUniform4fv(uni_select_color_, 1, gld_->selection_color_);
+    GLenum err = glGetError();
+    std::cout << gluErrorString(err) << std::endl;
+    CE();
     program_.release(); CE();
 
-	//
+    //
     // Set camera
     //
     camera_.setDepthRange(0.1f, 100.0f);

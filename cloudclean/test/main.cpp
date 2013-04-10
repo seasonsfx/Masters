@@ -1,5 +1,6 @@
 #include "gtest/gtest.h"
 #include "utilities/pointpicker.h"
+#include "model/pointcloud.h"
 
 namespace {
 
@@ -49,6 +50,14 @@ TEST_F(FooTest, MethodBarDoesAbc) {
 // Tests that Foo does Xyz.
 TEST_F(FooTest, DoesXyz) {
   EXPECT_EQ(0, 0);
+  // Exercises the Xyz feature of Foo.
+}
+
+TEST_F(FooTest, DoesPtxReadWork) {
+  //EXPECT_EQ(0, 0);
+  PointCloud pc;
+  bool succ = pc.load_ptx("/home/rickert/Masters/utilities/ptxmaker/out.ptx");
+  EXPECT_EQ(succ, true);
   // Exercises the Xyz feature of Foo.
 }
 

@@ -28,7 +28,7 @@ public:
     QSize minimumSizeHint() const;
     QSize sizeHint() const;
 
-	void resetRotationMatrix();
+    void resetRotationMatrix();
     GLData *getGLData();
 
 protected:

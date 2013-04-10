@@ -16,7 +16,7 @@
 #include "model/layerlist.h"
 
 MainWindow::MainWindow(QUndoStack *us, CloudList * cl, LayerList * ll, QWidget *parent)
-	: QMainWindow(parent) {
+    : QMainWindow(parent) {
 
     us_ = us;
 

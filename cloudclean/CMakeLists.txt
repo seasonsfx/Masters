@@ -25,13 +25,14 @@ SET(APPLICATION_ID "${APPLICATION_VENDOR_ID}.${PROJECT_NAME}")
 # Debugging Options
 #
 SET(CMAKE_VERBOSE_MAKEFILE 1) # Use 1 for debugging, 0 for release
-SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall")
+SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -g")
 SET(CMAKE_CSS_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall -03")
 
 add_definitions(-DBOOST_ALL_NO_LIB)
 if (UNIX)
   message(status "Setting GCC flags")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fexceptions -g -Wall")
+  #set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fexceptions -g -Wall")
+  #set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_RELEASE} -fexceptions -g -Wall")
 else()
   message(status "Setting MSVC flags")
   # Boost system wont link without this

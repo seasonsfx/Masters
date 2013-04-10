@@ -1,6 +1,9 @@
+#ifndef PLUGINS_NORMALESTIMATION_EXPORT_H
+#define PLUGINS_NORMALESTIMATION_EXPORT_H
 #include <QtGlobal>
 #ifdef normalestimator_EXPORTS
 #define DLLSPEC Q_DECL_EXPORT
 #else
 #define DLLSPEC Q_DECL_IMPORT
 #endif
+#endif  // PLUGINS_NORMALESTIMATION_EXPORT_H

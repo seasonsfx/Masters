@@ -256,8 +256,8 @@ NormalEstimator::estimateNormals(std::shared_ptr<PointCloud> cloud) {
     // Keeps track of NAN indices
     std::vector<int> missing_normals;
 
-    int width = cloud->scan_width_;
-    int height = cloud->scan_height_;
+    int height = cloud->scan_width_;
+    int width = cloud->scan_height_;
     int length = width*height;
 
     // Relative point anticlockwise around (0,0)

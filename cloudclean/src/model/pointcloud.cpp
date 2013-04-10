@@ -125,9 +125,14 @@ bool PointCloud::load_ptx(const char* filename, int decimation_factor) {
     assert(decimation_factor%2 == 0 || decimation_factor == 1);
 
     // Makes things faster apparently
-    //std::cin.sync_with_stdio(false);
-    //std::ifstream ptx_file(filename, std::ios::binary);
-    //assert(ptx_file.is_open());
+    std::cin.sync_with_stdio(false);
+    /*
+    std::ifstream ptx_file(filename, std::ios::binary);
+    if (!ptx_file.is_open()) {
+        return false;
+    }
+    */
+
 
 
     boost::iostreams::mapped_file_source file;
@@ -136,7 +141,6 @@ bool PointCloud::load_ptx(const char* filename, int decimation_factor) {
         return false;
     boost::iostreams::stream_buffer<boost::iostreams::mapped_file_source> file_stream;
     file_stream.open(file);
-
     std::istream ptx_file(&file_stream);
 
 
@@ -172,7 +176,6 @@ bool PointCloud::load_ptx(const char* filename, int decimation_factor) {
 
 	ptx_file >> std::ws;
 
-	float x, y, z, intensity;
 
     unsigned int sampled_idx = 0;
     int file_sample_idx = 0;
@@ -184,6 +187,13 @@ bool PointCloud::load_ptx(const char* filename, int decimation_factor) {
     if(update_interval == 0)
         update_interval = 1;
 
+    char buff[1024];
+    pcl::PointXYZI point;
+    float & x = point.x;
+    float & y = point.y;
+    float & z = point.z;
+    float & intensity = point.intensity;
+
     while(file_sample_idx < line_count){
         if(file_sample_idx % update_interval == 0)
             ed_->updateProgress(100*file_sample_idx/static_cast<float>(line_count));
@@ -194,11 +204,18 @@ bool PointCloud::load_ptx(const char* filename, int decimation_factor) {
 
         // Only process every decimation_factor-ith row and column
         if((row+1)%decimation_factor != 0 || (col+1)%decimation_factor != 0){
-            ptx_file >> x >> y >> z >> intensity;
+            //ptx_file >> x >> y >> z >> intensity;
+            ptx_file.getline(buff, 1024);
             continue;
         }
 
-        ptx_file >> x >> y >> z >> intensity;
+        //ptx_file >> x >> y >> z >> intensity;
+
+
+        ptx_file.getline(buff, 1024);
+        sscanf(buff, "%f %f %f %f\n", &x, &y, &z, &intensity);
+
+
         sampled_idx++;
 
         // Skip points that are invalid
@@ -221,12 +238,6 @@ bool PointCloud::load_ptx(const char* filename, int decimation_factor) {
         if(z > max_bounding_box_.z())
             min_bounding_box_.z() = z;
 
-
-        pcl::PointXYZI point;
-        point.x = x;
-        point.y = y;
-        point.z = z;
-        point.intensity = intensity;;
         this->points.push_back(point);
         this->cloud_to_grid_map_.push_back(sampled_idx);
 	}

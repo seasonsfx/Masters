@@ -14,6 +14,7 @@ target_link_libraries(
     ${QT_LIBRARIES}
     ${PCL_LIBRARIES}
     ${Boost_SYSTEM_LIBRARY}
+    ${Boost_IOSTREAMS_LIBRARY}
 )
 
 INSTALL(TARGETS cloudclean_model DESTINATION ${LIB_INSTALL} COMPONENT CloudClean)

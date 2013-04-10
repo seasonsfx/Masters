@@ -375,7 +375,7 @@ NormalEstimator::estimateNormals(std::shared_ptr<PointCloud> cloud) {
         }
 
         Eigen::Vector3f normal = agregate_n.normalized();
-        pcl::flipNormalTowardsViewpoint(cloud->points[grid_to_cloud[i]], 0, 0, 0, normal);
+        //pcl::flipNormalTowardsViewpoint(cloud->points[grid_to_cloud[i]], 0, 0, 0, normal);
 
         normal_ref.data_n[0] = normal(0);
         normal_ref.data_n[1] = normal(1);

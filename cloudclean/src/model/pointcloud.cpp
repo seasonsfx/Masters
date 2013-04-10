@@ -8,12 +8,17 @@
 #include <cassert>
 
 #include <boost/serialization/shared_ptr.hpp>
+#include <boost/iostreams/device/mapped_file.hpp>
+#include <boost/iostreams/stream.hpp>
+#include <boost/iostreams/stream_buffer.hpp>
 #include <pcl/io/io.h>
 #include <Eigen/Dense>
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
 #include <QDebug>
+
+
 
 using namespace Eigen;
 
@@ -120,11 +125,20 @@ bool PointCloud::load_ptx(const char* filename, int decimation_factor) {
     assert(decimation_factor%2 == 0 || decimation_factor == 1);
 
     // Makes things faster apparently
-    std::cin.sync_with_stdio(false);
+    //std::cin.sync_with_stdio(false);
+    //std::ifstream ptx_file(filename, std::ios::binary);
+    //assert(ptx_file.is_open());
 
-	std::ifstream ptx_file(filename, std::ios::binary);
 
-    assert(ptx_file.is_open());
+    boost::iostreams::mapped_file_source file;
+    file.open(filename);
+    if(!file.is_open())
+        return false;
+    boost::iostreams::stream_buffer<boost::iostreams::mapped_file_source> file_stream;
+    file_stream.open(file);
+
+    std::istream ptx_file(&file_stream);
+
 
 	// Contains nans
 	this->is_dense = false;

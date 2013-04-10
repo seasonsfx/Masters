@@ -282,8 +282,8 @@ void GLWidget::keyPressEvent(QKeyEvent * event) {
     // Zoom
     //
     case Qt::Key_Equal:
-        if(event->modifiers() != Qt::ShiftModifier)
-            break;
+        //if(event->modifiers() != Qt::ShiftModifier)
+        //    break;
     case Qt::Key_Plus:
         if (point_render_size_ < 30)
             point_render_size_++;

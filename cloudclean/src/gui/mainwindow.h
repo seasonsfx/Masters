@@ -28,12 +28,14 @@ class DLLSPEC MainWindow : public QMainWindow {
 
     void addMenu(QAction * action, QString menu_name);
     void removeMenu(QAction * action, QString menu_name);
-    //const GLWidget getGLWidget();
-    //const GLWidget getFlatView();
 
  public:
     FlatView * flatview_;
     GLWidget * glwidget_;
+
+ public slots:
+    void loadFile();
+    void saveFile();
 
  private:
     QStatusBar * statusbar_;
@@ -42,6 +44,8 @@ class DLLSPEC MainWindow : public QMainWindow {
     CloudListView * clv_;
     LayerListView * llv_;
     GLData * gld_;
+    CloudList * cl_;
+    LayerList * ll_;
 
     QUndoStack * us_;
 

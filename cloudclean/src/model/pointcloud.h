@@ -63,7 +63,8 @@ enum class DLLSPEC CoordinateFrame: bool {
 class DLLSPEC PointCloud : public pcl::PointCloud<pcl::PointXYZI> {
  public:
     explicit PointCloud();
-    bool save_ptx(const char* filename);
+    bool point_matches_label(int idx, std::vector<uint16_t> & labels);
+    bool save_ptx(const char* filename, std::vector<uint16_t> labels);
     bool load_ptx(const char* filename, int decimation_factor = 1);
 
     void translate(const Eigen::Vector3f& pos);

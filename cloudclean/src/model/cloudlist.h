@@ -38,6 +38,7 @@ class DLLSPEC CloudList : public QAbstractListModel {
     void removeCloud();
     void selectionChanged(const QItemSelection &sel, const QItemSelection &des);
     std::shared_ptr<PointCloud> loadFile(QString filename);
+    bool saveFile(QString filename, std::vector<uint16_t> labels);
     
  private:
     std::mutex * mtx_;

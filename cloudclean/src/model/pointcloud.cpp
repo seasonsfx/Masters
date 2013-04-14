@@ -17,8 +17,6 @@
 
 #include <QDebug>
 
-
-
 using namespace Eigen;
 
 #ifdef _WIN32
@@ -62,61 +60,82 @@ PointCloud::PointCloud()
     max_bounding_box_ = Eigen::Vector3f(-INFINITY, -INFINITY, -INFINITY);
 }
 
-bool PointCloud::save_ptx(const char* filename){
-    /*pc_mutex->lock();
-    std::ofstream ptx_file(filename);
-    ptx_file << this->width << std::endl;
-    ptx_file << this->height << std::endl;
-    ptx_file << this->sensor_origin_[0] << " " << this->sensor_origin_[1]
-             << " "<< this->sensor_origin_[2] << std::endl;
+inline bool PointCloud::point_matches_label(int idx, std::vector<uint16_t> & labels) {
+        for(uint16_t l : labels) {
+            if(labels_[idx] == l)
+                return true;
+        }
+    return false;
+}
+
+bool PointCloud::save_ptx(const char* filename, std::vector<uint16_t> labels){
+    //pc_mutex->lock();
+    ed_->updateProgress(0);
+    setlocale(LC_NUMERIC,"C");
+
+    FILE * pfile;
+    pfile = fopen(filename , "w");
+    if (pfile == NULL){
+        qDebug("Error opening file");
+        return false;
+    }
+
+    fprintf(pfile, "%d\n%d\n", scan_width_, scan_height_);
+
+    fprintf(pfile, "%f %f %f\n", this->sensor_origin_[0],
+            this->sensor_origin_[1], this->sensor_origin_[2]);
 
     // File is column major
     Eigen::Matrix3f rmat(this->sensor_orientation_);
-    Eigen::Matrix4f tmat;
-    tmat << rmat(0, 0) , rmat(0, 1) , rmat(0, 2) , this->sensor_origin_[0] ,
-            rmat(1, 0) , rmat(1, 1) , rmat(1, 2) , this->sensor_origin_[1] ,
-            rmat(2, 0) , rmat(2, 1) , rmat(2, 2) , this->sensor_origin_[2] ,
-            0 , 0 , 0 , 1;
 
 
-    for(int c = 0; c < 3; c++){
-        for(int r = 0; r < 3; r++){
-            ptx_file << rmat(r, c);
-            if(r < 2)
-                ptx_file << " ";
-            else
-                ptx_file << std::endl;
-        }
-    }
+    fprintf(pfile, "%f %f %f\n", rmat(0, 0), rmat(1, 0), rmat(2, 0));
+    fprintf(pfile, "%f %f %f\n", rmat(0, 1), rmat(1, 1), rmat(2, 1));
+    fprintf(pfile, "%f %f %f\n", rmat(0, 2), rmat(1, 2), rmat(2, 2));
 
-    for(int c = 0; c < 4; c++){
-        for(int r = 0; r < 4; r++){
-            ptx_file << tmat(r, c);
-            if(r < 3)
-                ptx_file << " ";
-            else
-                ptx_file << std::endl;
-        }
-    }
+    fprintf(pfile, "%f %f %f %f\n", rmat(0, 0), rmat(1, 0), rmat(2, 0), 0.0f);
+    fprintf(pfile, "%f %f %f %f\n", rmat(0, 1), rmat(1, 1), rmat(2, 1), 0.0f);
+    fprintf(pfile, "%f %f %f %f\n", rmat(0, 2), rmat(1, 2), rmat(2, 2), 0.0f);
+    fprintf(pfile, "%f %f %f %f\n", this->sensor_origin_[0],
+            this->sensor_origin_[1], this->sensor_origin_[2], 1.0f);
 
     // Write points
-    for(unsigned int i = 0; i < this->points.size(); i++) {
-        if(isNaN(this->points[i].x) || isNaN(this->points[i].y)
-                || isNaN(this->points[i].z
-                || isNaN(this->points[i].intensity))){
-            ptx_file << "0 0 0 0.5" << std::endl;
+    uint point_count = scan_height_*scan_width_;
+    int update_interval = point_count/100;
+    if(update_interval == 0)
+        update_interval = 1;
+
+
+    uint cloud_idx = 0;
+    uint next_grid_idx = this->cloud_to_grid_map_[cloud_idx];
+
+    for(uint grid_idx = 0; grid_idx < point_count; grid_idx++) {
+        if(grid_idx % update_interval == 0)
+            ed_->updateProgress(100*grid_idx/static_cast<float>(point_count));
+
+        if(next_grid_idx != grid_idx) {
+            fprintf(pfile, "%f %f %f %f\n", 0.0f, 0.0f, 0.0f, 0.0f);
+            continue;
         }
-        else{
-            ptx_file << this->points[i].x << " " << this->points[i].y
-                     << " " << this->points[i].z << " "
-                     << this->points[i].intensity << std::endl;
+
+        next_grid_idx = this->cloud_to_grid_map_[++cloud_idx];
+
+        if(labels.size() != 0 && !point_matches_label(cloud_idx, labels)) {
+            fprintf(pfile, "%f %f %f %f\n", 0.0f, 0.0f, 0.0f, 0.0f);
+            continue;
         }
+
+        fprintf(pfile, "%f %f %f %f\n", this->points[cloud_idx].x,
+                this->points[cloud_idx].y, this->points[cloud_idx].z,
+                this->points[cloud_idx].intensity);
+
     }
 
-    ptx_file.close();
-    pc_mutex->unlock();
+    fclose(pfile);
+    ed_->updateProgress(100);
+    //pc_mutex->unlock();
     return true;
-    */
+
 }
 
 bool PointCloud::load_ptx(const char* filename, int decimation_factor) {
@@ -124,28 +143,10 @@ bool PointCloud::load_ptx(const char* filename, int decimation_factor) {
     ed_->updateProgress(0);
     assert(decimation_factor%2 == 0 || decimation_factor == 1);
 
-    // Makes things faster apparently
-    /*std::cin.sync_with_stdio(false,  std::ios::binary);
-
-    std::ifstream ptx_file(filename);
-    if (!ptx_file.is_open()) {
-        return false;
-    }
-    */
-
-    /*
-    boost::iostreams::mapped_file_source file;
-    file.open(filename);
-    if(!file.is_open())
-        return false;
-    boost::iostreams::stream_buffer<boost::iostreams::mapped_file_source> file_stream;
-    file_stream.open(file);
-    std::istream ptx_file(&file_stream);
-    */
-
+    // Avoid using a comma delimiter
+    setlocale(LC_NUMERIC,"C");
 
     FILE * pfile;
-    //char buffer [1024];
     pfile = fopen (filename , "r");
     if (pfile == NULL){
         qDebug("Error opening file");
@@ -158,36 +159,28 @@ bool PointCloud::load_ptx(const char* filename, int decimation_factor) {
     // Matrix dimentions
     int file_width, file_height;
     fscanf(pfile, "%d %d", &file_width, &file_height);
-    qDebug() << "dims" << file_width << file_height;
-    //ptx_file >> file_width;
-    //ptx_file >> file_height;
 
     // Subsample
     this->scan_width_ =  file_width/decimation_factor;
     this->scan_height_ = file_height/decimation_factor;
 
     // Camera offset
-    std::fscanf(pfile, "%f %f %f", &this->sensor_origin_[0], &this->sensor_origin_[1], &this->sensor_origin_[2]);
-    qDebug() << "yeah: " << this->sensor_origin_[0];
-    //ptx_file >> this->sensor_origin_[0];
-    //ptx_file >> this->sensor_origin_[1];
-    //ptx_file >> this->sensor_origin_[2];
+    std::fscanf(pfile, "%f %f %f", &this->sensor_origin_[0],
+            &this->sensor_origin_[1], &this->sensor_origin_[2]);
+
     this->sensor_origin_[3] = 0.0f;
 
     Eigen::Matrix3f orientation_mat;
     for(int row = 0; row < 3; row++ )
         for(int col = 0; col < 3; col++ )
             fscanf(pfile, "%f", &orientation_mat(row,col));
-            //ptx_file >> orientation_mat(row,col);
+
     this->sensor_orientation_ = Eigen::Quaternionf(orientation_mat.transpose());
 
-    // Discard registration mat4
+    // Discard redunadant matrix
     float ign;
     for(int i = 0; i < 16; i++ )
         fscanf(pfile, "%f", &ign);
-
-    //ptx_file >> std::ws;
-
 
     unsigned int sampled_idx = 0;
     int file_sample_idx = 0;
@@ -199,8 +192,6 @@ bool PointCloud::load_ptx(const char* filename, int decimation_factor) {
     if(update_interval == 0)
         update_interval = 1;
 
-    //char buff[1024];
-    //string line;
     pcl::PointXYZI point;
     float & x = point.x;
     float & y = point.y;
@@ -217,44 +208,19 @@ bool PointCloud::load_ptx(const char* filename, int decimation_factor) {
 
         // Only process every decimation_factor-ith row and column
         if((row+1)%decimation_factor != 0 || (col+1)%decimation_factor != 0){
-            //ptx_file >> x >> y >> z >> intensity;
-            //ptx_file.getline(buff, 1024);
-            //getline(ptx_file, line);
             for(int i = 0; i < 4; i++ )
                 fscanf(pfile, "%f", &ign);
             continue;
         }
 
-        //ptx_file >> x >> y >> z >> intensity;
-
-        //char buff[] = "0.003313 0.805950 -1.675033 0.015869\0jabckjbckab";
-
-        //memset((void *)&buff, '\0', sizeof(buff));
-        //ptx_file >> ws;
-        //ptx_file.getline(buff, 1024);
-        //getline(ptx_file, line);
-
         if(ferror (pfile))
             return false;
 
-        float x, y, z, intensity;
         int filled = fscanf(pfile, "%f %f %f %f", &x, &y, &z, &intensity);
         if(filled != 4) {
-            qDebug() << "--------------";
-            qDebug() << x << y << z << intensity;
-            qDebug() << filled;
-            //qDebug() << line.c_str();
-            //printf("'%s'", buff);
-            qDebug() << "failed";
+            qDebug() << "File read fail.";
             return false;
         }
-        else {
-            qDebug() << "--------------";
-            //qDebug() << buff;
-            //qDebug() << line.c_str();
-            qDebug() << "success";
-        }
-
 
         sampled_idx++;
 
@@ -304,7 +270,7 @@ bool PointCloud::load_ptx(const char* filename, int decimation_factor) {
         return octree;
     });
 
-    fclose (pfile);
+    fclose(pfile);
     return this;
 }
 

@@ -6,6 +6,7 @@
 #include <QUndoStack>
 #include <QMenu>
 #include <QMenuBar>
+#include <QFileDialog>
 
 #include "gui/glwidget.h"
 #include "gui/flatview.h"
@@ -19,6 +20,8 @@ MainWindow::MainWindow(QUndoStack *us, CloudList * cl, LayerList * ll, QWidget *
     : QMainWindow(parent) {
 
     us_ = us;
+    ll_ = ll;
+    cl_ = cl;
 
     progressbar_ = new QProgressBar();
     statusbar_ = statusBar();
@@ -89,6 +92,13 @@ MainWindow::MainWindow(QUndoStack *us, CloudList * cl, LayerList * ll, QWidget *
     addMenu(undo, "Edit");
     addMenu(redo, "Edit");
 
+    QAction * load = new QAction(tr("Load"), this);
+    QAction * save = new QAction(tr("Save"), this);
+    connect(load, SIGNAL(triggered()), this, SLOT(loadFile()));
+    connect(save, SIGNAL(triggered()), this, SLOT(saveFile()));
+    addMenu(load, "File");
+    addMenu(save, "File");
+
     gld_->reloadColorLookupBuffer();
 }
 
@@ -116,4 +126,35 @@ void MainWindow::removeMenu(QAction * action, QString menu_name){
         QMenu * menu = *it;
         menu->removeAction(action);
     }
+}
+
+void MainWindow::loadFile(){
+    QString filename = QFileDialog::getOpenFileName(
+                 this, tr("Open Scan"), "~", tr("PTX Files (*.ptx)"));
+    if (filename.length() == 0)
+        return;
+
+    std::thread(&CloudList::loadFile, cl_, filename).detach();
+}
+
+void MainWindow::saveFile(){
+    QString filename = QFileDialog::getOpenFileName(
+                 this, tr("Save Scan"), "~", tr("PTX Files (*.ptx)"));
+    if (filename.length() == 0)
+        return;
+
+    std::set<uint16_t> slabels;
+    for(std::weak_ptr<Layer> wl : ll_->selection_) {
+        std::shared_ptr<Layer> l = wl.lock();
+        for(uint16_t label : l->getLabelSet()){
+            slabels.insert(label);
+        }
+    }
+
+    std::vector<uint16_t> labels;
+    for(uint16_t label : slabels){
+        labels.push_back(label);
+    }
+
+    std::thread(&CloudList::saveFile, cl_, filename, labels).detach();
 }

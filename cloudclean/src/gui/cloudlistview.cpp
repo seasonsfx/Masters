@@ -31,7 +31,6 @@ CloudListView::CloudListView(QUndoStack *us, LayerList * ll,
 
     ui_->tableView->setContextMenuPolicy(Qt::CustomContextMenu);
 
-    connect(ui_->loadBtn, SIGNAL(clicked()), this, SLOT(loadFile()));
 }
 
 CloudListView::~CloudListView() {
@@ -57,15 +56,6 @@ void CloudListView::contextMenu(const QPoint &pos) {
 
         menu.exec(ui_->tableView->mapToGlobal(pos));
     }
-}
-
-void CloudListView::loadFile(){
-    QString filename = QFileDialog::getOpenFileName(
-                 this, tr("Open Scan"), "~", tr("PTX Files (*.ptx)"));
-    if (filename.length() == 0)
-        return;
-
-    std::thread(&CloudList::loadFile, cl_, filename).detach();
 }
 
 void CloudListView::deselectAllPoints(){

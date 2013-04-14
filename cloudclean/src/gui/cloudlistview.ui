@@ -31,13 +31,6 @@
       </attribute>
      </widget>
     </item>
-    <item>
-     <widget class="QPushButton" name="loadBtn">
-      <property name="text">
-       <string>Load Cloud</string>
-      </property>
-     </widget>
-    </item>
    </layout>
   </widget>
  </widget>

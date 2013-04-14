@@ -5,6 +5,7 @@
 
 #include <memory>
 #include <map>
+#include <unordered_map>
 #include <future>
 #include <Eigen/Dense>
 #include <pcl/point_types.h>
@@ -19,6 +20,24 @@
 #endif
 #include <CL/cl_gl.h>
 
+template<typename T>
+struct WeakPtrHash : public std::unary_function<std::weak_ptr<T>, size_t> {
+   size_t operator()(const std::weak_ptr<T>& wp) const
+   {
+      auto sp = wp.lock();
+      return std::hash<decltype(sp)>()(sp);
+   }
+};
+
+template<typename T>
+struct WeakPtrEqual : public std::unary_function<std::weak_ptr<T>, bool> {
+
+   bool operator()(const std::weak_ptr<T>& left, const std::weak_ptr<T>& right) const
+   {
+      return !left.owner_before(right) && !right.owner_before(left);
+   }
+};
+
 class Core;
 class CloudList;
 class QUndoStack;
@@ -26,6 +45,8 @@ class PointCloud;
 
 typedef std::map<std::weak_ptr<PointCloud>, pcl::PointCloud<pcl::Normal>::Ptr,
     std::owner_less<std::weak_ptr<PointCloud>>> NormalMap;
+
+//typedef std::unordered_map<std::weak_ptr<PointCloud>, pcl::PointCloud<pcl::Normal>::Ptr, WeakPtrHash<PointCloud>, WeakPtrEqual<PointCloud>> NormalMap;
 
 typedef std::map<std::weak_ptr<PointCloud>,
     std::future<pcl::PointCloud<pcl::Normal>::Ptr>,

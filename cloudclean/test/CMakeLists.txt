@@ -12,7 +12,7 @@ INCLUDE_DIRECTORIES(
 
 ADD_EXECUTABLE(${test_BIN} ${test_SRCS})
 ADD_DEPENDENCIES(${test_BIN} googletest)
-TARGET_LINK_LIBRARIES(${test_BIN} ${test_LIBS} ${Boost_LIBRARIES} cloudclean_model)
+TARGET_LINK_LIBRARIES(${test_BIN} ${test_LIBS} ${Boost_LIBRARIES} cloudclean_model ${QT_LIBRARIES})
 #QT5_USE_MODULES(${test_BIN} Widgets Gui OpenGL)
 
 ADD_CUSTOM_TARGET(check ALL "${MAINFOLDER}/bin/${test_BIN}" DEPENDS ${test_BIN} COMMENT "Executing unit tests..." VERBATIM SOURCES ${test_SRCS})

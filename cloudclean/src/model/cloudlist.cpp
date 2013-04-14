@@ -115,3 +115,10 @@ std::shared_ptr<PointCloud> CloudList::loadFile(QString filename){
 
     return pc;
 }
+
+bool CloudList::saveFile(QString filename, std::vector<uint16_t> labels) {
+    connect(active_->ed_.get(), SIGNAL(progress(int)), this, SIGNAL(progressUpdate(int)));
+    active_->save_ptx(filename.toLocal8Bit().constData(), labels);
+    connect(active_->ed_.get(), SIGNAL(progress(int)), this, SIGNAL(progressUpdate(int)));
+    emit progressUpdate(0);
+}

@@ -194,7 +194,8 @@ void NormalEstimator::removingCloud(std::shared_ptr<PointCloud> cloud) {
     // Todo stop future calc
     // delete data
     std::weak_ptr<PointCloud> wpc = cloud;
-    normal_map_.erase(normal_map_.find(wpc));
+    const auto it = normal_map_.find(wpc); // TODO: Bug! Freezes on delete
+    normal_map_.erase(it);
 }
 
 class PointIdx {

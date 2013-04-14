@@ -25,7 +25,6 @@ class CloudListView : public QDockWidget
    void contextMenu(const QPoint &pos);
 
  public slots:
-   void loadFile();
    void deselectAllPoints();
 
  private:

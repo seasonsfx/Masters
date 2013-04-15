@@ -91,9 +91,7 @@ void GLWidget::initializeGL() {
     // Selection color
     //
     glUniform4fv(uni_select_color_, 1, gld_->selection_color_);
-    GLenum err = glGetError();
-    std::cout << gluErrorString(err) << std::endl;
-    CE();
+    GLenum err = glGetError(); CE();
     program_.release(); CE();
 
     //

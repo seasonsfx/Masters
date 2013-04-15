@@ -29,7 +29,9 @@ MainWindow::MainWindow(QUndoStack *us, CloudList * cl, LayerList * ll, QWidget *
 
     QGLFormat base_format;
     base_format.setVersion(3, 3);
-    base_format.setProfile(QGLFormat::CompatibilityProfile);
+    // Compatibility profile breaks gl context sharing on AMD cards
+    //base_format.setProfile(QGLFormat::CompatibilityProfile);
+    base_format.setProfile(QGLFormat::CoreProfile);
     base_format.setSampleBuffers(true);
 
     // Important! Context invalidates when reparenting the glwidget
@@ -65,6 +67,13 @@ MainWindow::MainWindow(QUndoStack *us, CloudList * cl, LayerList * ll, QWidget *
 
     mb_ = menuBar();
 
+    QAction * load = new QAction(tr("Load"), this);
+    QAction * save = new QAction(tr("Save"), this);
+    connect(load, SIGNAL(triggered()), this, SLOT(loadFile()));
+    connect(save, SIGNAL(triggered()), this, SLOT(saveFile()));
+    addMenu(load, "File");
+    addMenu(save, "File");
+
     // SIGNALS
     qRegisterMetaType<std::shared_ptr<PointCloud> >("std::shared_ptr<PointCloud>");
     qRegisterMetaType<std::shared_ptr<Layer> >("std::shared_ptr<Layer>");
@@ -92,12 +101,6 @@ MainWindow::MainWindow(QUndoStack *us, CloudList * cl, LayerList * ll, QWidget *
     addMenu(undo, "Edit");
     addMenu(redo, "Edit");
 
-    QAction * load = new QAction(tr("Load"), this);
-    QAction * save = new QAction(tr("Save"), this);
-    connect(load, SIGNAL(triggered()), this, SLOT(loadFile()));
-    connect(save, SIGNAL(triggered()), this, SLOT(saveFile()));
-    addMenu(load, "File");
-    addMenu(save, "File");
 
     gld_->reloadColorLookupBuffer();
 }

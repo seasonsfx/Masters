@@ -4,7 +4,7 @@ layout (points) in;
 layout (triangle_strip, max_vertices=4) out;
 //layout (points, max_vertices=1) out;
 
-uniform int width;
+//uniform int width;
 uniform int height;
 uniform mat3 camera;
 
@@ -30,5 +30,9 @@ void main(void){
     gl_Position = point + vec4(pd.x, -pd.y, 0, 0);
     EmitVertex();
 
-
+    /*
+    fcolour = vec4(1, 1, 1, 1);
+    gl_Position = vec4(0, 0, 0, 1);
+    EmitVertex();
+*/
 }

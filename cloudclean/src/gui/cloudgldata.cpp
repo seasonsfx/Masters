@@ -216,7 +216,7 @@ void CloudGLData::draw(GLint vao){
         dirty_grid_ = false;
     }
 
-    glBindVertexArray(vao);
+    glBindVertexArray(vao); CE();
     glDrawArrays(GL_POINTS, 0, pc_->size()); CE();
-    glBindVertexArray(vao);
+    glBindVertexArray(0); CE();
 }

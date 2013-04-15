@@ -3,6 +3,8 @@
 #include <QDebug>
 #include <QMouseEvent>
 #include <QApplication>
+#include <QLabel>
+#include <QMessageBox>
 #include "commands/select.h"
 
 FlatView::FlatView(QGLFormat & fmt, CloudList * cl,
@@ -64,11 +66,9 @@ int binary_search(std::vector<int> A, int key) {
 int FlatView::imageToCloudIdx(int x, int y){
     std::shared_ptr<PointCloud> pc = pc_.lock();
     if(x < 0 || x > pc->scan_width_){
-        qDebug() << "x out of range";
         return -1;
     }
     else if(y < 0 || y > pc->scan_height_){
-        qDebug() << "y out of range";
         return -1;
     }
 
@@ -86,8 +86,6 @@ inline QPoint FlatView::cloudToImageCoord(int idx){
 }
 
 void FlatView::setCloud(std::shared_ptr<PointCloud> new_pc) {
-    qDebug("set 2d cloudview");
-
     if(new_pc == pc_.lock())
         return;
 
@@ -168,9 +166,6 @@ void FlatView::wheelEvent(QWheelEvent * event) {
         s = 1.0/-delta;
     }
 
-    qDebug() << "Scale:" << s;
-    qDebug() << "Current scale:" << current_scale_;
-
     Eigen::Matrix3f scale;
     scale.setIdentity();
     scale(0, 0) = s;
@@ -202,6 +197,7 @@ void FlatView::initializeGL() {
                 QGLShader::Geometry, ":/flatview.gs.glsl"); CE();
     if (!succ)
         qWarning() << "Shader compile log:" << program_.log();
+
     succ = program_.link(); CE();
     if (!succ) {
         qWarning() << "Could not link shader program_:" << program_.log();
@@ -214,7 +210,7 @@ void FlatView::initializeGL() {
     //
     program_.bind(); CE();
     uni_sampler_ = program_.uniformLocation("sampler"); RC(uni_sampler_);
-    uni_width_ = program_.uniformLocation("width"); RC(uni_width_);
+    //uni_width_ = program_.uniformLocation("width"); RC(uni_width_);
     uni_height_ = program_.uniformLocation("height"); RC(uni_height_);
     uni_select_color_ = program_.uniformLocation("select_color"); RC(uni_select_color_);
     uni_camera_ = program_.uniformLocation("camera"); RC(uni_camera_);
@@ -249,19 +245,18 @@ void FlatView::paintGL() {
     std::shared_ptr<CloudGLData> cd = gld_->cloudgldata_[pc];
 
     program_.bind(); CE();
-
     glUniformMatrix3fv(uni_camera_, 1, GL_FALSE, camera_.data()); CE();
-    glUniform1i(uni_width_, pc->scan_width_); CE();
+    //glUniform1i(uni_width_, pc->scan_width_); CE();
     glUniform1i(uni_height_, pc->scan_height_); CE();
     glUniform1i(uni_sampler_, 0); CE();
     glBindTexture(GL_TEXTURE_BUFFER, texture_id_); CE();
     glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, gld_->color_lookup_buffer_->bufferId()); CE();
 
 
-    glBindVertexArray(vao_);
+    glBindVertexArray(vao_);CE();
 
     // Point intensity buffer
-    cd->point_buffer_->bind(); CE();
+    IF_FAIL("buffer bind") = cd->point_buffer_->bind(); CE();
     glEnableVertexAttribArray(1); CE();
     int offset = sizeof(float)*3;
     glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(float)*4,
@@ -269,26 +264,26 @@ void FlatView::paintGL() {
     cd->point_buffer_->release(); CE();
 
     // Label buffer
-    cd->label_buffer_->bind(); CE();
+    IF_FAIL("buffer bind") = cd->label_buffer_->bind(); CE();
     glEnableVertexAttribArray(2); CE(); CE();
     glVertexAttribIPointer(2, 1, GL_SHORT, 0, 0); CE();
     cd->label_buffer_->release(); CE();
 
     // Flag buffer
-    cd->flag_buffer_->bind(); CE();
+    IF_FAIL("buffer bind") = cd->flag_buffer_->bind(); CE();
     glEnableVertexAttribArray(3); CE();
     glVertexAttribIPointer(3, 1, GL_BYTE, 0, 0); CE();
     cd->flag_buffer_->release(); CE();
 
     // Grid buffer
-    cd->grid_buffer_->bind(); CE();
+    IF_FAIL("buffer bind") = cd->grid_buffer_->bind(); CE();
     glEnableVertexAttribArray(4); CE();
     glVertexAttribIPointer(4, 1, GL_INT, 0, 0); CE();
     cd->grid_buffer_->release(); CE();
 
-    cd->draw(vao_);
+    cd->draw(vao_); CE();
 
-    glBindVertexArray(0);
+    glBindVertexArray(0); CE();
     glBindTexture(GL_TEXTURE_BUFFER, 0); CE();
 
     program_.release();
@@ -312,9 +307,6 @@ void FlatView::resizeGL(int width, int height) {
         aspect_ratio_ = QVector2D(1.0f/pc->scan_width_, 1.0/(cfx*pc->scan_height_));
     else
         aspect_ratio_ = QVector2D(1.0/(cfy*pc->scan_width_), 1.0f/pc->scan_height_);
-
-    //qDebug() << "screen: " << width << height;
-    //qDebug() << "scan: " << pc->scan_width_ << pc->scan_height_;
 
     camera_(0, 0) = current_scale_*aspect_ratio_.x();
     camera_(1, 1) = current_scale_*aspect_ratio_.y();

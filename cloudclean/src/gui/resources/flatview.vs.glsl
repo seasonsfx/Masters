@@ -7,7 +7,7 @@ layout(location = 4) in int position;
 
 uniform samplerBuffer sampler;
 uniform vec4 select_color;
-uniform int width;
+//uniform int width;
 uniform int height;
 uniform mat3 camera;
 

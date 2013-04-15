@@ -55,8 +55,9 @@ void GLWidget::initializeGL() {
 
     glClearColor(0.8, 0.8, 0.8, 1.0);
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
+    //glEnable(GL_CULL_FACE);
     glEnable(GL_MULTISAMPLE);
+    glEnable(GL_POINT_SMOOTH);
     
     //
     // Load shader program

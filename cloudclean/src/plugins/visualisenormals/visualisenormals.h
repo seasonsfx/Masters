@@ -57,6 +57,8 @@ class VisualiseNormals : public IPlugin {
 
     NormalEstimator * ne_;
 
+    GLuint vao_;
+
 };
 
 #endif  // VISUALISE_NORMALS_H

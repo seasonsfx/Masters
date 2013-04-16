@@ -122,6 +122,8 @@ void VisualiseNormals::initializeGL() {
         abort();
     }
 
+    glGenVertexArrays(1, &vao_);
+
     initialized_gl = true;
 }
 
@@ -136,6 +138,8 @@ void VisualiseNormals::paint(const Eigen::Affine3f& proj, const Eigen::Affine3f&
 
     float col[3] = {0, 1, 0};
     glUniform3fv(program_->uniformLocation("line_colour"), 1, col); CE();
+
+    glBindVertexArray(vao_);
 
     for(uint i = 0; i < cl_->clouds_.size(); i++){
         std::shared_ptr<PointCloud> pc = cl_->clouds_[i];
@@ -156,6 +160,8 @@ void VisualiseNormals::paint(const Eigen::Affine3f& proj, const Eigen::Affine3f&
 
         glDrawArrays(GL_POINTS, 0, cl_->clouds_[i]->size()); CE();
     }
+
+    glBindVertexArray(0);
 
     program_->release();
 }

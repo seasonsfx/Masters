@@ -195,7 +195,10 @@ void NormalEstimator::removingCloud(std::shared_ptr<PointCloud> cloud) {
     // delete data
     std::weak_ptr<PointCloud> wpc = cloud;
     const auto it = normal_map_.find(wpc); // TODO: Bug! Freezes on delete
-    normal_map_.erase(it);
+    if(it != normal_map_.end())
+        normal_map_.erase(it);
+    else
+        qDebug() << "Not deleting weak pointer as it was not found";
 }
 
 class PointIdx {

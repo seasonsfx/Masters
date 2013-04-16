@@ -167,8 +167,8 @@ ENDFOREACH(CONFIGINPUT ${CONFIGINPUTS})
 # Add Build Targets
 #
 ADD_SUBDIRECTORY(src)
-ADD_SUBDIRECTORY(thirdparty/gtest ${CMAKE_CURRENT_BINARY_DIR}/gtest)
-ADD_SUBDIRECTORY(test)
+#ADD_SUBDIRECTORY(thirdparty/gtest ${CMAKE_CURRENT_BINARY_DIR}/gtest)
+#ADD_SUBDIRECTORY(test)
 
 #
 # Add Documentation Targets

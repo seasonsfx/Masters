@@ -116,7 +116,6 @@ void CloudGLData::copyCloud(){
 
     glUnmapBuffer(GL_ARRAY_BUFFER);
     point_buffer_->release(); CE();
-    qDebug() << "Synced cloud";
 }
 
 void CloudGLData::copyLabels(){
@@ -136,7 +135,6 @@ void CloudGLData::copyLabels(){
     }
     glUnmapBuffer(GL_ARRAY_BUFFER);
     label_buffer_->release(); CE();
-    qDebug() << "Synced labels";
 }
 
 void CloudGLData::copyFlags(){
@@ -154,7 +152,6 @@ void CloudGLData::copyFlags(){
 
     glUnmapBuffer(GL_ARRAY_BUFFER);
     flag_buffer_->release(); CE();
-    qDebug() << "Synced flags";
 }
 
 void CloudGLData::copyGrid(){
@@ -166,7 +163,6 @@ void CloudGLData::copyGrid(){
     }
     glUnmapBuffer(GL_ARRAY_BUFFER);
     grid_buffer_->release(); CE();
-    qDebug() << "Synced grid";
 }
 
 void CloudGLData::syncCloud() {

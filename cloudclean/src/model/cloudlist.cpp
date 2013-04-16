@@ -121,4 +121,5 @@ bool CloudList::saveFile(QString filename, std::vector<uint16_t> labels) {
     active_->save_ptx(filename.toLocal8Bit().constData(), labels);
     connect(active_->ed_.get(), SIGNAL(progress(int)), this, SIGNAL(progressUpdate(int)));
     emit progressUpdate(0);
+    return true;
 }

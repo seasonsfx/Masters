@@ -198,9 +198,40 @@ bool PointCloud::load_ptx(const char* filename, int decimation_factor) {
     float & z = point.z;
     float & intensity = point.intensity;
 
+    // Tokenize the first line
+    char buff[1024];
+    char * ch;
+    fgets(buff, 1024, pfile); // skip newline
+    long file_pos = ftell(pfile); // Save restart pos
+    fgets(buff, 1024, pfile);
+    int tokens = 0;
+
+    ch = strtok(buff, " ");
+    while (ch != NULL) {
+        ++tokens;
+
+        if(ch == NULL)
+            break;
+        ch = strtok(NULL, " ");
+    }
+
+    // Check if rgb channels are present
+    bool has_rgb = false;
+    if(tokens == 7)
+        has_rgb = true;
+
+    // Move reset the reading pos in file
+    fseek(pfile, file_pos, SEEK_SET);
+
+    // TEST
+    fgets(buff, 1024, pfile);
+
     while(file_sample_idx < line_count){
-        if(file_sample_idx % update_interval == 0)
-            ed_->updateProgress(100*file_sample_idx/static_cast<float>(line_count));
+        if(file_sample_idx % update_interval == 0) {
+            double prog = 100.0*file_sample_idx/static_cast<double>(line_count);
+            qDebug("%f%% done.", prog);
+            ed_->updateProgress(prog);
+        }
 
         row = file_sample_idx / file_width;
         col = file_sample_idx % file_width;
@@ -208,18 +239,57 @@ bool PointCloud::load_ptx(const char* filename, int decimation_factor) {
 
         // Only process every decimation_factor-ith row and column
         if((row+1)%decimation_factor != 0 || (col+1)%decimation_factor != 0){
-            for(int i = 0; i < 4; i++ )
-                fscanf(pfile, "%f", &ign);
+            //for(int i = 0; i < tokens; i++ )
+            //    fscanf(pfile, "%f", &ign);
+            fgets(buff, 1024, pfile);
             continue;
         }
 
-        if(ferror (pfile))
+        if(ferror (pfile)){
+            qDebug() << "File read fail at line " << line_count << "with " << file_sample_idx << "samples";
             return false;
+        }
 
         int filled = fscanf(pfile, "%f %f %f %f", &x, &y, &z, &intensity);
+
         if(filled != 4) {
-            qDebug() << "File read fail.";
+            qDebug() << "File parse fail at line " << line_count << "with " << file_sample_idx << "samples";
+
+            if(ferror(pfile))
+                qDebug() << "File read fail.";
+            else {
+                fgets(buff, 1024, pfile);
+                qDebug() << "After:" << buff;
+                file_pos = ftell(pfile);
+                fseek(pfile, file_pos-40, SEEK_SET);
+                fgets(buff, 1024, pfile);
+                fgets(buff, 1024, pfile);
+                qDebug() << "Context:" << buff;
+                fgets(buff, 1024, pfile);
+                qDebug() << "Context:" << buff;
+                fgets(buff, 1024, pfile);
+                qDebug() << "Context:" << buff;
+                fgets(buff, 1024, pfile);
+                qDebug() << "Context:" << buff;
+                fgets(buff, 1024, pfile);
+                qDebug() << "Context:" << buff;
+                fgets(buff, 1024, pfile);
+                qDebug() << "Context:" << buff;
+                qDebug() << "Ignoring error";
+                continue;
+            }
+
+            points.clear();
+            width = 0;
+            height = 0;
+            scan_width_ = 0;
+            scan_height_ = 0;
             return false;
+        }
+
+        // skip the rest of the line
+        if(has_rgb) {
+            fgets(buff, 1024, pfile);
         }
 
         sampled_idx++;
@@ -251,8 +321,8 @@ bool PointCloud::load_ptx(const char* filename, int decimation_factor) {
     this->width = this->points.size();
     this->height = 1;
     this->is_dense = true;
-    labels_.resize(this->width * this->height, 0);
-    flags_.resize(this->width * this->height, PointFlags(0));
+    labels_.resize(this->points.size(), 0);
+    flags_.resize(this->points.size(), PointFlags(0));
 
     ed_->updateProgress(100);
     pc_mutex->unlock();

@@ -62,6 +62,7 @@ Camera::Camera() {
 }
 
 Camera::~Camera() {
+    delete mtx_;
 }
 
 void Camera::setFoV(float fov) {

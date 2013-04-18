@@ -7,6 +7,14 @@
 #include <QGLBuffer>
 #include <QTabWidget>
 #include <QApplication>
+#include <QToolBar>
+#include <QVBoxLayout>
+#include <QDoubleSpinBox>
+#include <QLabel>
+#include <QSpacerItem>
+#include <QStackedWidget>
+#include <QSlider>
+#include <QDockWidget>
 #include "model/layerlist.h"
 #include "model/cloudlist.h"
 #include "gui/glwidget.h"
@@ -29,16 +37,55 @@ void Brush3D::initialize(Core *core){
     mw_ = core_->mw_;
     initialized_gl = false;
 
-    enable_ = new QAction("3d Brush Tool", 0);
+    enable_ = new QAction(QIcon(":/images/brush3d.png"), "3d Brush Tool", 0);
     enable_->setCheckable(true);
     enable_->setChecked(false);
 
     is_enabled_ = false;
+    radius_ = 0.5f;
 
     connect(enable_, SIGNAL(triggered()), this, SLOT(enable()));
     connect(this, SIGNAL(enabling()), core_, SIGNAL(endEdit()));
 
     mw_->addMenu(enable_, "Edit");
+    mw_->toolbar_->addAction(enable_);
+
+    settings_ = new QWidget();
+    QVBoxLayout * layout = new QVBoxLayout(settings_);
+    settings_->setLayout(layout);
+
+    mw_->tooloptions_->addWidget(settings_);
+
+    QHBoxLayout * hb = new QHBoxLayout(settings_);
+    layout->addItem(hb);
+    layout->addItem(new QSpacerItem(0, 0, QSizePolicy::Maximum, QSizePolicy::Maximum));
+
+
+    QSlider * slider = new QSlider(settings_);
+    slider->setOrientation(Qt::Horizontal);
+    slider->setRange(1, 300);
+    slider->setSingleStep(1);
+    slider->setToolTip("Radius in cm");
+    slider->setValue(radius_*100);
+    slider->setTickPosition(QSlider::TicksBelow);
+
+    QLabel * label = new QLabel("Radius", settings_);
+
+    hb->addWidget(label);
+    hb->addWidget(slider);
+
+    connect(slider, SIGNAL(valueChanged(int)), this, SLOT(setRad(int)));
+
+    QDockWidget * settings_dock =
+            ((QDockWidget *) mw_->tooloptions_->parent());
+
+    //connect(enable_, SIGNAL(toggled(bool)),
+    //        settings_dock->toggleViewAction(), SLOT(trigger()));
+
+}
+
+void Brush3D::setRad(int val) {
+    radius_ = val/100.0;
 }
 
 void Brush3D::cleanup(){
@@ -131,7 +178,7 @@ void Brush3D::select(QMouseEvent * event){
     empty.reset(new std::vector<int>());
 
     std::vector<float> distsq;
-    cl_->active_->getOctree()->radiusSearch(idx, 0.5, *indices, distsq);
+    cl_->active_->getOctree()->radiusSearch(idx, radius_, *indices, distsq);
 
     bool negative_select = QApplication::keyboardModifiers() == Qt::ControlModifier;
 
@@ -180,6 +227,10 @@ void Brush3D::enable() {
     QTabWidget * tabs = qobject_cast<QTabWidget *>(glwidget_->parent()->parent());
     tabs->setCurrentWidget(glwidget_);
     enable_->setChecked(true);
+    settings_->raise();
+
+    mw_->options_dock_->show();
+
     emit enabling();
     //connect(glwidget_, SIGNAL(pluginPaint(Eigen::Affine3f, Eigen::Affine3f)),
     //        this, SLOT(paint(Eigen::Affine3f, Eigen::Affine3f)),
@@ -214,18 +265,6 @@ bool Brush3D::eventFilter(QObject *object, QEvent *event){
     default:
         return false;
     }
-
-
-    /*
-    if (event->type() == QEvent::KeyPress) {
-        QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
-        qDebug() << "Ate key press" << keyEvent->key();
-        return true;
-    } else {
-        return false;
-    }
-    */
-
 }
 
 Q_EXPORT_PLUGIN2(pnp_brush3d, Brush3D)

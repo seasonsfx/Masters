@@ -2,5 +2,6 @@
     <qresource prefix="/">
         <file>basic.frag</file>
         <file>basic.vert</file>
+        <file>images/brush3d.png</file>
     </qresource>
 </RCC>

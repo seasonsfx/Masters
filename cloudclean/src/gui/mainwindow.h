@@ -18,6 +18,8 @@ class GLData;
 class ActionManager;
 class QUndoStack;
 class QMenuBar;
+class QStackedWidget;
+class QToolBox;
 
 class DLLSPEC MainWindow : public QMainWindow {
     Q_OBJECT
@@ -29,13 +31,26 @@ class DLLSPEC MainWindow : public QMainWindow {
     void addMenu(QAction * action, QString menu_name);
     void removeMenu(QAction * action, QString menu_name);
 
- public:
-    FlatView * flatview_;
-    GLWidget * glwidget_;
-
  public slots:
     void loadFile();
     void saveFile();
+
+ private slots:
+    void contextMenu(const QPoint &pos);
+
+
+ public:
+   FlatView * flatview_;
+   GLWidget * glwidget_;
+   QToolBar * toolbar_;
+   QStackedWidget * tooloptions_;
+
+   QMenu * file_menu_;
+   QMenu * edit_menu_;
+   QMenu * view_menu_;
+   QMenu * window_menu_;
+
+   QDockWidget * options_dock_;
 
  private:
     QStatusBar * statusbar_;

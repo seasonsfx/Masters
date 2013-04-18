@@ -7,6 +7,14 @@
 #include <QMenu>
 #include <QMenuBar>
 #include <QFileDialog>
+#include <QStackedWidget>
+#include <QToolBox>
+#include <QToolButton>
+#include <QToolBar>
+#include <QStyle>
+#include <QApplication>
+#include <QGridLayout>
+#include <QBoxLayout>
 
 #include "gui/glwidget.h"
 #include "gui/flatview.h"
@@ -40,10 +48,6 @@ MainWindow::MainWindow(QUndoStack *us, CloudList * cl, LayerList * ll, QWidget *
     flatview_ = new FlatView(base_format, cl, ll, tabs_, glwidget_);
     tabs_->addTab(flatview_, "2D View");
 
-    qDebug() << "widget:" << glwidget_->context();
-    qDebug() << "flatview:" << flatview_->context();
-    qDebug() << "is sharing" << QGLContext::areSharing(flatview_->context(), glwidget_->context());
-
     QGLContext * ctx = const_cast<QGLContext *>(glwidget_->context());
     gld_ = new GLData(ctx, cl, ll);
     glwidget_->setGLD(gld_);
@@ -59,20 +63,63 @@ MainWindow::MainWindow(QUndoStack *us, CloudList * cl, LayerList * ll, QWidget *
     statusbar_->showMessage( tr("Ready"), 2000 );
 
 
+    QStyle * style = QApplication::style();
+    QAction * undo = us_->createUndoAction(0);
+    undo->setIcon(style->standardIcon(QStyle::SP_ArrowLeft));
+    QAction * redo = us_->createRedoAction(0);
+    redo->setIcon(style->standardIcon(QStyle::SP_ArrowRight));
+
+    options_dock_ = new QDockWidget(this);
+    options_dock_->setWindowTitle(tr("Tool options"));
+    tooloptions_ = new QStackedWidget(options_dock_);
+    options_dock_->setWidget(tooloptions_);
+
+    toolbar_ = new QToolBar(this);
+    addToolBar(Qt::LeftToolBarArea, toolbar_);
+    toolbar_->setToolButtonStyle(Qt::ToolButtonIconOnly);
+
+    toolbar_->addAction(undo);
+    toolbar_->addAction(redo);
+
     addDockWidget(Qt::RightDockWidgetArea, clv_);
     addDockWidget(Qt::RightDockWidgetArea, llv_);
+    tabifyDockWidget(clv_, llv_);
+    clv_->raise();
+
+    addDockWidget(Qt::RightDockWidgetArea, options_dock_);
+    options_dock_->hide();
 
     setCentralWidget(tabs_);
     setVisible(true);
 
     mb_ = menuBar();
 
+    file_menu_ = new QMenu(tr("File"));
+    edit_menu_ = new QMenu(tr("Edit"));
+    view_menu_ = new QMenu(tr("View"));
+    window_menu_ = new QMenu(tr("Window"));
+
+    mb_->addMenu(file_menu_);
+    mb_->addMenu(edit_menu_);
+    mb_->addMenu(view_menu_);
+    mb_->addMenu(window_menu_);
+
+    menus_.insert(tr("File"), file_menu_);
+    menus_.insert(tr("Edit"), edit_menu_);
+    menus_.insert(tr("View"), view_menu_);
+    menus_.insert(tr("Window"), window_menu_);
+
     QAction * load = new QAction(tr("Load"), this);
     QAction * save = new QAction(tr("Save"), this);
     connect(load, SIGNAL(triggered()), this, SLOT(loadFile()));
     connect(save, SIGNAL(triggered()), this, SLOT(saveFile()));
-    addMenu(load, "File");
-    addMenu(save, "File");
+
+    file_menu_->addAction(load);
+    file_menu_->addAction(save);
+
+    window_menu_->addAction(clv_->toggleViewAction());
+    window_menu_->addAction(llv_->toggleViewAction());
+    window_menu_->addAction(options_dock_->toggleViewAction());
 
     // SIGNALS
     qRegisterMetaType<std::shared_ptr<PointCloud> >("std::shared_ptr<PointCloud>");
@@ -89,20 +136,29 @@ MainWindow::MainWindow(QUndoStack *us, CloudList * cl, LayerList * ll, QWidget *
 
     QAction * deselect = new QAction(tr("Deselect all"), this);
     connect(deselect, SIGNAL(triggered()), clv_, SLOT(deselectAllPoints()));
-    addMenu(deselect, "Edit");
+    edit_menu_->addAction(deselect);
 
+    QAction * select = new QAction(tr("Select all"), this);
+    connect(select, SIGNAL(triggered()), clv_, SLOT(selectAllPoints()));
+    edit_menu_->addAction(select);
 
-    QAction * undo = us_->createUndoAction(0);
-    QAction * redo = us_->createRedoAction(0);
     undo->setShortcut(QKeySequence::Undo);
     redo->setShortcut(QKeySequence::Redo);
     undo->setShortcutContext(Qt::ApplicationShortcut);
     redo->setShortcutContext(Qt::ApplicationShortcut);
-    addMenu(undo, "Edit");
-    addMenu(redo, "Edit");
 
+    edit_menu_->addAction(undo);
+    edit_menu_->addAction(redo);
 
     gld_->reloadColorLookupBuffer();
+
+
+    connect(glwidget_, SIGNAL(customContextMenuRequested(const QPoint&)),
+            this, SLOT(contextMenu(const QPoint &)));
+
+    connect(flatview_, SIGNAL(customContextMenuRequested(const QPoint&)),
+            this, SLOT(contextMenu(const QPoint &)));
+
 }
 
 MainWindow::~MainWindow() {
@@ -160,4 +216,16 @@ void MainWindow::saveFile(){
     }
 
     std::thread(&CloudList::saveFile, cl_, filename, labels).detach();
+}
+
+void MainWindow::contextMenu(const QPoint &pos) {
+    QMenu menu;
+
+    menu.addAction("Layer from selection", llv_,
+                   SLOT(selectionToLayer()));
+
+    menu.addAction("Deselect all", clv_, SLOT(deselectAllPoints()));
+    menu.addAction("Select all", clv_, SLOT(selectAllPoints()));
+
+    menu.exec(glwidget_->mapToGlobal(pos));
 }

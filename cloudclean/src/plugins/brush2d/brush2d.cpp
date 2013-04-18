@@ -5,6 +5,14 @@
 #include <QAction>
 #include <QTabWidget>
 #include <QApplication>
+#include <QToolBar>
+#include <QVBoxLayout>
+#include <QDoubleSpinBox>
+#include <QLabel>
+#include <QSpacerItem>
+#include <QStackedWidget>
+#include <QSlider>
+#include <QDockWidget>
 #include "gui/flatview.h"
 #include "gui/mainwindow.h"
 #include "commands/select.h"
@@ -21,7 +29,7 @@ void Brush2D::initialize(Core *core){
     mw_ = core_->mw_;
     us_ = core->us_;
 
-    enable_ = new QAction("2d Brush Tool", 0);
+    enable_ = new QAction(QIcon(":/images/brush.png"), "2d Brush Tool", 0);
     enable_->setCheckable(true);
     enable_->setChecked(false);
 
@@ -31,8 +39,40 @@ void Brush2D::initialize(Core *core){
     connect(this, SIGNAL(enabling()), core_, SIGNAL(endEdit()));
 
     mw_->addMenu(enable_, "Edit");
+    mw_->toolbar_->addAction(enable_);
 
-    radius = 20;
+    radius_ = 20;
+
+    QWidget * settings_ = new QWidget();
+    QVBoxLayout * layout = new QVBoxLayout(settings_);
+    settings_->setLayout(layout);
+
+    mw_->tooloptions_->addWidget(settings_);
+
+    QHBoxLayout * hb = new QHBoxLayout(settings_);
+    layout->addItem(hb);
+    layout->addItem(new QSpacerItem(0, 0, QSizePolicy::Maximum, QSizePolicy::Maximum));
+
+
+    QSlider * slider = new QSlider(settings_);
+    slider->setOrientation(Qt::Horizontal);
+    slider->setRange(1, 1000);
+    slider->setSingleStep(1);
+    slider->setToolTip("Radius in pixels");
+    slider->setValue(radius_);
+    slider->setTickPosition(QSlider::TicksBelow);
+
+    QLabel * label = new QLabel("Radius", settings_);
+
+    hb->addWidget(label);
+    hb->addWidget(slider);
+
+    connect(slider, SIGNAL(valueChanged(int)), this, SLOT(setRad(int)));
+
+}
+
+void Brush2D::setRad(int val) {
+    radius_ = val;
 }
 
 void Brush2D::cleanup(){
@@ -59,9 +99,9 @@ void Brush2D::select(QMouseEvent * event){
     std::shared_ptr<std::vector<int> > deselected;
     deselected.reset(new std::vector<int>());
 
-    for(int x = -radius/2; x < radius/2; x++){
-        for(int y = -radius/2; y < radius/2; y++){
-            if(x*x + y*y > (radius/2.0f)*(radius/2.0f) )
+    for(int x = -radius_/2; x < radius_/2; x++){
+        for(int y = -radius_/2; y < radius_/2; y++){
+            if(x*x + y*y > (radius_/2.0f)*(radius_/2.0f) )
                 continue;
 
             int idx = flatview_->imageToCloudIdx(int(coord.x() + x + 0.5),
@@ -81,6 +121,9 @@ void Brush2D::select(QMouseEvent * event){
 
 
 bool Brush2D::mouseMoveEvent(QMouseEvent * event) {
+    if(cl_->active_.get() == nullptr)
+        return false;
+
     if(event->buttons())
         select(event);
     last_mouse_pos_ << event->x(), event->y();
@@ -88,6 +131,9 @@ bool Brush2D::mouseMoveEvent(QMouseEvent * event) {
 }
 
 bool Brush2D::mousePressEvent(QMouseEvent * event) {
+    if(cl_->active_.get() == nullptr)
+        return false;
+
     core_->us_->beginMacro("2d Select");
     select(event);
     last_mouse_pos_ << event->x(), event->y();
@@ -105,13 +151,13 @@ bool Brush2D::mouseReleaseEvent(QMouseEvent * event){
 bool Brush2D::mouseWheelEvent(QWheelEvent * event){
     int delta = event->delta()/120;
 
-    bool valid_upscale = delta > 0 && radius < cl_->active_->scan_height_ &&
-            radius < cl_->active_->scan_width_;
+    bool valid_upscale = delta > 0 && radius_ < cl_->active_->scan_height_ &&
+            radius_ < cl_->active_->scan_width_;
 
-    bool valid_downscale = delta < 0 && radius > 1;
+    bool valid_downscale = delta < 0 && radius_ > 1;
 
     if(valid_upscale || valid_downscale){
-        radius += delta;
+        radius_ += delta;
     }
     return true;
 }
@@ -121,6 +167,7 @@ void Brush2D::enable() {
         disable();
         return;
     }
+    mw_->options_dock_->show();
     QTabWidget * tabs = qobject_cast<QTabWidget *>(flatview_->parent()->parent());
     tabs->setCurrentWidget(flatview_);
     enable_->setChecked(true);

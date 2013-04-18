@@ -30,10 +30,10 @@ class DLLSPEC CloudGLData : public QObject{
 
  public:
     std::shared_ptr<PointCloud> pc_;
-    std::shared_ptr<QGLBuffer> label_buffer_;
-    std::shared_ptr<QGLBuffer> point_buffer_;
-    std::shared_ptr<QGLBuffer> flag_buffer_;
-    std::shared_ptr<QGLBuffer> grid_buffer_;
+    std::unique_ptr<QGLBuffer> label_buffer_;
+    std::unique_ptr<QGLBuffer> point_buffer_;
+    std::unique_ptr<QGLBuffer> flag_buffer_;
+    std::unique_ptr<QGLBuffer> grid_buffer_;
 
  private:
     bool dirty_labels_;

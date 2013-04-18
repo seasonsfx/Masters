@@ -19,6 +19,8 @@ class LayerList;
 class FlatView;
 class GLWidget;
 class MainWindow;
+class QSpinbox;
+class QLabel;
 
 class Brush3D : public IPlugin {
     Q_OBJECT
@@ -34,6 +36,9 @@ class Brush3D : public IPlugin {
 
  signals:
     void enabling();
+
+ private slots:
+    void setRad(int val);
 
  public slots:
     void enable();
@@ -66,7 +71,9 @@ class Brush3D : public IPlugin {
     QGLBuffer * line_;
 
     bool is_enabled_;
+    float radius_;
 
+    QWidget * settings_;
 };
 
 #endif  // BRUSH_3D_H

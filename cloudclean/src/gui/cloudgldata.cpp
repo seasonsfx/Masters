@@ -60,6 +60,7 @@ CloudGLData::CloudGLData(std::shared_ptr<PointCloud> pc) {
 }
 
 CloudGLData::~CloudGLData() {
+    qDebug() << "CloudGLData deleted";
     disconnect(pc_->ed_.get(), SIGNAL(flagUpdate(std::shared_ptr<std::vector<int> >)),
                this, SLOT(syncFlags(std::shared_ptr<std::vector<int> >)));
     disconnect(pc_->ed_.get(), SIGNAL(labelUpdate(std::shared_ptr<std::vector<int> >)),

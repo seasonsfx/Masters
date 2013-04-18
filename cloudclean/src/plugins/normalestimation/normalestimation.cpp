@@ -162,6 +162,7 @@ pcl::PointCloud<pcl::Normal>::Ptr NormalEstimator::getNormals(std::shared_ptr<Po
     if(it2 != future_normal_map_.end()){
         std::future<pcl::PointCloud<pcl::Normal>::Ptr> & fut = it2->second;
         normal_map_[wcloud] = fut.get();
+        future_normal_map_.erase(it2);
         return normal_map_[wcloud];
     }
 
@@ -195,10 +196,29 @@ void NormalEstimator::removingCloud(std::shared_ptr<PointCloud> cloud) {
     // delete data
     std::weak_ptr<PointCloud> wpc = cloud;
     const auto it = normal_map_.find(wpc); // TODO: Bug! Freezes on delete
-    if(it != normal_map_.end())
+    if(it != normal_map_.end()) {
         normal_map_.erase(it);
-    else
-        qDebug() << "Not deleting weak pointer as it was not found";
+        return;
+    }
+
+    auto it2 = future_normal_map_.find(wpc);
+    if(it2 != future_normal_map_.end()){
+        std::future<pcl::PointCloud<pcl::Normal>::Ptr> & fut = it2->second;
+
+        auto async_del_future = [&fut, &wpc, this] () {
+            if(fut.valid())
+                fut.get(); // Once ref count drops to 0 it should delete
+
+            //auto it2 = future_normal_map_.find(wpc);
+            // TODO: Bad future in map
+            //if(it2 != future_normal_map_.end())
+            //    future_normal_map_.erase(it2);
+        };
+
+        std::thread(async_del_future).detach();
+        return;
+    }
+
 }
 
 class PointIdx {

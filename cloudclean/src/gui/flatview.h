@@ -30,11 +30,11 @@ class DLLSPEC FlatView : public QGLWidget {
     void setCloud(std::shared_ptr<PointCloud> new_pc);
 
  private slots:
-  void contextMenu(const QPoint &pos);
+    void contextMenu(const QPoint &pos);
 
  signals:
-  void flagUpdate();
-  void labelUpdate();
+    void flagUpdate();
+    void labelUpdate();
 
  protected:
     void initializeGL();
@@ -47,28 +47,28 @@ class DLLSPEC FlatView : public QGLWidget {
     void wheelEvent(QWheelEvent * event);
 
  private:
-   std::vector<int> cloud_idx_lookup_;
-   std::weak_ptr<PointCloud> pc_;
-   CloudList * cl_;
-   LayerList * ll_;
-   GLData * gld_;
+    std::vector<int> cloud_idx_lookup_;
+    std::weak_ptr<PointCloud> pc_;
+    CloudList * cl_;
+    LayerList * ll_;
+    GLData * gld_;
 
-   QGLShaderProgram program_;
+    QGLShaderProgram program_;
 
-   int uni_sampler_;
-   int uni_select_color_;
-   int uni_width_;
-   int uni_height_;
-   int uni_camera_;
-   GLuint texture_id_;
-   GLuint vao_;
+    int uni_sampler_;
+    int uni_select_color_;
+    int uni_width_;
+    int uni_height_;
+    int uni_camera_;
+    GLuint texture_id_;
+    GLuint vao_;
 
-   float current_scale_;
-   QVector2D saved_offset_;
-   QVector2D aspect_ratio_;
+    float current_scale_;
+    QVector2D saved_offset_;
+    QVector2D aspect_ratio_;
 
-   QPoint drag_start_pos;
-   Eigen::Matrix3f camera_;
+    QPoint drag_start_pos;
+    Eigen::Matrix3f camera_;
 
 };
 

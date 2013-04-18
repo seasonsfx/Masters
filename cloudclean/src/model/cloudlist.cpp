@@ -83,6 +83,7 @@ void CloudList::removeCloud(int idx){
     beginRemoveRows(QModelIndex(), idx, idx);
     clouds_.erase(clouds_.begin()+idx);
     endRemoveRows();
+    active_.reset();
     emit updated();
 }
 

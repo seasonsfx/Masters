@@ -22,9 +22,9 @@ class LayerListView : public QDockWidget
 
  public slots:
     void selectLayer(std::shared_ptr<Layer> layer);
+    void selectionToLayer();
 
  private slots:
-    void selectionToLayer();
     void intersectSelectedLayers();
     void mergeSelectedLayers();
     void contextMenu(const QPoint &pos);

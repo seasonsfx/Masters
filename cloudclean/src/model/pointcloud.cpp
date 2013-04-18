@@ -60,6 +60,10 @@ PointCloud::PointCloud()
     max_bounding_box_ = Eigen::Vector3f(-INFINITY, -INFINITY, -INFINITY);
 }
 
+PointCloud::~PointCloud() {
+    qDebug() << "Cloud deleted";
+}
+
 inline bool PointCloud::point_matches_label(int idx, std::vector<uint16_t> & labels) {
         for(uint16_t l : labels) {
             if(labels_[idx] == l)

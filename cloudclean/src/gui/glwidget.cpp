@@ -18,10 +18,6 @@ GLWidget::GLWidget(QGLFormat &fmt, CloudList *cl,
     cl_ = cl;
     ll_ = ll;
     setMouseTracking(true);
-
-    connect(this, SIGNAL(customContextMenuRequested(const QPoint&)),
-            this, SLOT(contextMenu(const QPoint &)));
-
     setContextMenuPolicy(Qt::CustomContextMenu);
 }
 

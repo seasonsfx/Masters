@@ -31,6 +31,9 @@ class Brush2D : public IPlugin {
  signals:
     void enabling();
 
+ private slots:
+    void setRad(int val);
+
  public slots:
     void enable();
     void disable();
@@ -55,7 +58,7 @@ class Brush2D : public IPlugin {
     Eigen::Vector2d mouse_down_pos_;
 
     bool is_enabled_;
-    int radius;
+    int radius_;
 
 };
 

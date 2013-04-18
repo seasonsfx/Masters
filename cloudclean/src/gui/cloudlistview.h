@@ -22,10 +22,12 @@ class CloudListView : public QDockWidget
     ~CloudListView();
 
  private slots:
+   void dataChanged();
    void contextMenu(const QPoint &pos);
 
  public slots:
    void deselectAllPoints();
+   void selectAllPoints();
 
  private:
     LayerList * ll_;

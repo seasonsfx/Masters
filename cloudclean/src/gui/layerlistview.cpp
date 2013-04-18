@@ -28,6 +28,7 @@ LayerListView::LayerListView(QUndoStack * us, LayerList * ll,
     ui_->tableView->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui_->tableView, SIGNAL(customContextMenuRequested(const QPoint&)),
             this, SLOT(contextMenu(const QPoint &)));
+    ui_->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
 }
 
 LayerListView::~LayerListView() {

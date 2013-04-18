@@ -19,8 +19,8 @@ FlatView::FlatView(QGLFormat & fmt, CloudList * cl,
     camera_(1,2) = -0.5;
     setMouseTracking(true);
 
-    connect(this, SIGNAL(customContextMenuRequested(const QPoint&)),
-            this, SLOT(contextMenu(const QPoint &)));
+    //connect(this, SIGNAL(customContextMenuRequested(const QPoint&)),
+    //        this, SLOT(contextMenu(const QPoint &)));
 
     setContextMenuPolicy(Qt::CustomContextMenu);
 }

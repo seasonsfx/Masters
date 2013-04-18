@@ -21,7 +21,7 @@ add_subdirectory(commands)
 # Build main binary
 #
 FILE (GLOB project_SRCS *.cpp *.cxx *.cc *.C *.c *.h *.hpp *.rc)
-SET(project_SRCS ${project_SRCS} )
+SET(project_SRCS ${project_SRCS})
 SET(project_LIBS ${QT_LIBRARIES} cloudclean_gui)
 SET(project_BIN ${PROJECT_NAME})
 

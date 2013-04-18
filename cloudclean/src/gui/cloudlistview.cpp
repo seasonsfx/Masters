@@ -29,6 +29,9 @@ CloudListView::CloudListView(QUndoStack *us, LayerList * ll,
     connect(ui_->tableView, SIGNAL(customContextMenuRequested(const QPoint&)),
             this, SLOT(contextMenu(const QPoint &)));
 
+    connect(ui_->tableView->model(), SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(dataChanged()));
+
+    ui_->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui_->tableView->setContextMenuPolicy(Qt::CustomContextMenu);
 
 }
@@ -37,6 +40,10 @@ CloudListView::~CloudListView() {
     delete ui_;
 }
 
+void CloudListView::dataChanged() {
+    if(cl_->active_.get() == nullptr && cl_->clouds_.size() != 0)
+        ui_->tableView->selectRow(0);
+}
 
 void CloudListView::contextMenu(const QPoint &pos) {
     QMenu menu;
@@ -74,6 +81,26 @@ void CloudListView::deselectAllPoints(){
         }
 
         us_->push(new Select(cloud, empty, indices));
+    }
+    us_->endMacro();
+}
+
+void CloudListView::selectAllPoints(){
+    us_->beginMacro("Select All");
+    for(std::shared_ptr<PointCloud> cloud : cl_->clouds_){
+        std::shared_ptr<std::vector<int> > indices;
+        indices.reset(new std::vector<int>());
+
+        std::shared_ptr<std::vector<int> > empty;
+        empty.reset(new std::vector<int>());
+
+        for(int idx = 0; idx < cloud->flags_.size(); idx++){
+            PointFlags & flag =  cloud->flags_[idx];
+            if(!(uint8_t(PointFlags::selected) & uint8_t(flag)))
+                indices->push_back(idx);
+        }
+
+        us_->push(new Select(cloud, indices, empty));
     }
     us_->endMacro();
 }

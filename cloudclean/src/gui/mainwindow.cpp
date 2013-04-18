@@ -65,7 +65,7 @@ MainWindow::MainWindow(QUndoStack *us, CloudList * cl, LayerList * ll, QWidget *
 
     QStyle * style = QApplication::style();
     QAction * undo = us_->createUndoAction(0);
-    undo->setIcon(style->standardIcon(QStyle::SP_ArrowLeft));
+    undo->setIcon(style->standardIcon(QStyle::SP_FileDialogBack));
     QAction * redo = us_->createRedoAction(0);
     redo->setIcon(style->standardIcon(QStyle::SP_ArrowRight));
 
@@ -78,8 +78,6 @@ MainWindow::MainWindow(QUndoStack *us, CloudList * cl, LayerList * ll, QWidget *
     addToolBar(Qt::LeftToolBarArea, toolbar_);
     toolbar_->setToolButtonStyle(Qt::ToolButtonIconOnly);
 
-    toolbar_->addAction(undo);
-    toolbar_->addAction(redo);
 
     addDockWidget(Qt::RightDockWidgetArea, clv_);
     addDockWidget(Qt::RightDockWidgetArea, llv_);
@@ -110,12 +108,27 @@ MainWindow::MainWindow(QUndoStack *us, CloudList * cl, LayerList * ll, QWidget *
     menus_.insert(tr("Window"), window_menu_);
 
     QAction * load = new QAction(tr("Load"), this);
+    load->setIcon(style->standardIcon(QStyle::SP_DirIcon));
     QAction * save = new QAction(tr("Save"), this);
+    save->setIcon(style->standardIcon(QStyle::SP_FileIcon));
     connect(load, SIGNAL(triggered()), this, SLOT(loadFile()));
     connect(save, SIGNAL(triggered()), this, SLOT(saveFile()));
 
+    toolbar_->addAction(load);
+    toolbar_->addAction(save);
     file_menu_->addAction(load);
     file_menu_->addAction(save);
+
+    QAction * exitAct = new QAction(tr("E&xit"), this);
+    exitAct->setShortcuts(QKeySequence::Quit);
+    exitAct->setStatusTip(tr("Exit the application"));
+    exitAct->setIcon(QIcon(style->standardIcon(QStyle::SP_DialogCloseButton)));
+    connect(exitAct, SIGNAL(triggered()), qApp, SLOT(closeAllWindows()));
+    file_menu_->addAction(exitAct);
+
+
+    toolbar_->addAction(undo);
+    toolbar_->addAction(redo);
 
     window_menu_->addAction(clv_->toggleViewAction());
     window_menu_->addAction(llv_->toggleViewAction());

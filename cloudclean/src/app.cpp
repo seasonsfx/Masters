@@ -166,6 +166,12 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
     pm_->loadPlugins();
     pm_->initializePlugins();
 
+    QAction * disable_plugins = new QAction(this);
+    core_->mw_->addAction(disable_plugins);
+    connect(disable_plugins, SIGNAL(toggled(bool)), pm_, SIGNAL(endEdit()));
+    disable_plugins->setShortcut(QKeySequence(Qt::Key_Escape));
+    //disable_plugins->setShortcutContext(Qt::ApplicationShortcut);
+
     // load a cloud
     std::function<void (const char *)> loadcloud = [&] (const char * fname) {
 

@@ -43,7 +43,7 @@ void Brush2D::initialize(Core *core){
 
     radius_ = 20;
 
-    QWidget * settings_ = new QWidget();
+    settings_ = new QWidget();
     QVBoxLayout * layout = new QVBoxLayout(settings_);
     settings_->setLayout(layout);
 
@@ -167,6 +167,7 @@ void Brush2D::enable() {
         disable();
         return;
     }
+    mw_->tooloptions_->setCurrentWidget(settings_);
     mw_->options_dock_->show();
     QTabWidget * tabs = qobject_cast<QTabWidget *>(flatview_->parent()->parent());
     tabs->setCurrentWidget(flatview_);

@@ -217,10 +217,6 @@ void GLWidget::wheelEvent(QWheelEvent * event) {
 void GLWidget::keyPressEvent(QKeyEvent * event) {
     switch (event->key()) {
 
-    case Qt::Key_Escape:
-        QCoreApplication::instance()->quit();
-        break;
-
     //
     // Translations:
     //

@@ -24,7 +24,6 @@ LayerListView::LayerListView(QUndoStack * us, LayerList * ll,
             SLOT(selectionChanged(const QItemSelection &,
                                     const QItemSelection &)));
 
-    connect(ui_->saveSelectionBtn, SIGNAL(clicked()), this, SLOT(selectionToLayer()));
     ui_->tableView->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui_->tableView, SIGNAL(customContextMenuRequested(const QPoint&)),
             this, SLOT(contextMenu(const QPoint &)));

@@ -29,7 +29,7 @@ CloudListView::CloudListView(QUndoStack *us, LayerList * ll,
     connect(ui_->tableView, SIGNAL(customContextMenuRequested(const QPoint&)),
             this, SLOT(contextMenu(const QPoint &)));
 
-    connect(ui_->tableView->model(), SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(dataChanged()));
+    connect(cl_, SIGNAL(cloudUpdate(std::shared_ptr<PointCloud>)), this, SLOT(dataChanged()));
 
     ui_->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui_->tableView->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -41,7 +41,8 @@ CloudListView::~CloudListView() {
 }
 
 void CloudListView::dataChanged() {
-    if(cl_->active_.get() == nullptr && cl_->clouds_.size() != 0)
+    bool selected = ui_->tableView->selectionModel()->selectedRows().size() != 0;
+    if(!selected && cl_->clouds_.size() != 0)
         ui_->tableView->selectRow(0);
 }
 

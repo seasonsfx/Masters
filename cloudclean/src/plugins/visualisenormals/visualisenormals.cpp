@@ -210,4 +210,4 @@ void VisualiseNormals::disable() {
     is_enabled_ = false;
 }
 
-Q_EXPORT_PLUGIN2(pnp_brush3d, VisualiseNormals)
+Q_PLUGIN_METADATA(IID "za.co.circlingthesun.cloudclean.iplugin")

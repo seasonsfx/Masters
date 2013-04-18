@@ -13,8 +13,8 @@ include_directories(
 FILE (GLOB app_SRCS *.cpp *.cxx *.cc *.C *.c *.h *.hpp)
 FILE (GLOB app_FORMS *.ui)
 
-QT4_WRAP_UI(app_FORMS_HEADERS ${app_FORMS})
-QT4_ADD_RESOURCES(app_RESOURCES_RCC resources/resources.qrc)
+QT5_WRAP_UI(app_FORMS_HEADERS ${app_FORMS})
+QT5_ADD_RESOURCES(app_RESOURCES_RCC resources/resources.qrc)
 
 add_library(
     cloudclean_gui SHARED
@@ -29,10 +29,6 @@ endif()
 
 target_link_libraries(
     cloudclean_gui
-    ${QT_LIBRARIES}
-    ${QT_QTCORE_LIBRARY}
-    ${QT_QTGUI_LIBRARY}
-    ${QT_QTOPENGL_LIBRARY}
     ${PCL_LIBRARIES}
     ${FLANN_LIBRARY}
     ${OPENCL_LIBRARIES}
@@ -41,7 +37,6 @@ target_link_libraries(
     cloudclean_commands
 )
 
+QT5_USE_MODULES(cloudclean_gui Widgets Gui OpenGL)
+
 INSTALL(TARGETS cloudclean_gui DESTINATION ${LIB_INSTALL} COMPONENT CloudClean)
-
-
-#qt5_use_modules(cloudclean_gui Widgets Gui OpenGL)

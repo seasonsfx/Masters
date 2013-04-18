@@ -18,8 +18,9 @@ class MainWindow;
 class NormalEstimator;
 
 class VisualiseNormals : public IPlugin {
-    Q_OBJECT
     Q_INTERFACES(IPlugin)
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID "za.co.circlingthesun.cloudclean.iplugin" FILE "visualisenormals.json")
  public:
     QString getName();
     void initialize(Core * core);

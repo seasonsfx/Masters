@@ -205,4 +205,4 @@ bool Brush2D::eventFilter(QObject *object, QEvent *event){
     }
 }
 
-Q_EXPORT_PLUGIN2(pnp_brush2d, Brush2D)
+Q_PLUGIN_METADATA(IID "za.co.circlingthesun.cloudclean.iplugin")

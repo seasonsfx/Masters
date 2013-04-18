@@ -14,6 +14,7 @@
 #include <QUndoStack>
 #include <QDesktopWidget>
 #include <QGridLayout>
+#include <QAction>
 
 
 #include "gui/mainwindow.h"

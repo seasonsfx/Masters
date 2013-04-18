@@ -9,14 +9,14 @@
     #include <Windows.h>
 #endif
 
-void customMessageHandler(QtMsgType type, const char *msg)
+void customMessageHandler(QtMsgType type, const QMessageLogContext& context, const QString &msg)
 {
     QString txt;
+    /*
     switch (type) {
     case QtDebugMsg:
         txt = QString("Debug: %1").arg(msg);
         break;
-
     case QtWarningMsg:
         txt = QString("Warning: %1").arg(msg);
     break;
@@ -27,6 +27,10 @@ void customMessageHandler(QtMsgType type, const char *msg)
         txt = QString("Fatal: %1").arg(msg);
         abort();
     }
+    */
+
+    txt = txt.sprintf("MESSAGE (%s:%u %s): %s\n",
+                           context.file, context.line, context.function, msg.constData());
 
     QFile outFile("debuglog.txt");
     outFile.open(QIODevice::WriteOnly | QIODevice::Append);
@@ -36,7 +40,8 @@ void customMessageHandler(QtMsgType type, const char *msg)
 #ifdef WIN32
     OutputDebugString(txt.toLocal8Bit().constData());
 #else
-    printf("%s\n", txt.toLocal8Bit().constData());
+    printf("MESSAGE (%s:%u %s): %s\n", context.file, context.line, context.function, msg.constData());
+    //printf("%s\n", txt.toLocal8Bit().constData());
     fflush(stdout);
 #endif
 
@@ -46,7 +51,7 @@ void customMessageHandler(QtMsgType type, const char *msg)
 int main(int argc, char* argv[])
 {
     srand (time(NULL));
-    qInstallMsgHandler(customMessageHandler);
+    qInstallMessageHandler(customMessageHandler);
     App app(argc,argv);
     int exit_code = app.exec();
     qDebug() << exit_code;

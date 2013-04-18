@@ -27,6 +27,6 @@ class IPlugin: public QObject  {
     virtual void cleanup() = 0;
 };
 
-Q_DECLARE_INTERFACE(IPlugin, "za.co.circlingthesun.cloudclean.plugininterface/1.0")
+Q_DECLARE_INTERFACE(IPlugin, "za.co.circlingthesun.cloudclean.iplugin")
 
 #endif // IPLUGIN_H

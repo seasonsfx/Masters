@@ -9,9 +9,11 @@ add_library(
 
 target_link_libraries(
     cloudclean_pluginsystem
-    ${QT_LIBRARIES}
+    #${QT_LIBRARIES}
     cloudclean_model
     cloudclean_gui
 )
+
+QT5_USE_MODULES(cloudclean_pluginsystem Core Widgets)
 
 INSTALL(TARGETS cloudclean_pluginsystem DESTINATION ${LIB_INSTALL} COMPONENT CloudClean)

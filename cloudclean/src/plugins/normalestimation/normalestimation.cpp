@@ -6,7 +6,7 @@
 #include "commands/select.h"
 #include "pluginsystem/core.h"
 
-#ifdef Q_WS_X11
+#ifdef Q_OS_UNIX
     #include <GL/glx.h>
     #undef KeyPress  // Defined in X11/X.h, interferes with QEvent::KeyPress
 #endif
@@ -421,4 +421,4 @@ NormalEstimator::estimateNormals(std::shared_ptr<PointCloud> cloud) {
     return normals;
 }
 
-Q_EXPORT_PLUGIN2(pnp_normals, NormalEstimator)
+Q_PLUGIN_METADATA(IID "za.co.circlingthesun.cloudclean.iplugin")

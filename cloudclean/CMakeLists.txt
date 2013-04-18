@@ -29,15 +29,12 @@ SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -g")
 SET(CMAKE_CSS_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall -02")
 
 add_definitions(-DBOOST_ALL_NO_LIB)
-if (UNIX)
-  message(status "Setting GCC flags")
-  #set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fexceptions -g -Wall")
-  #set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_RELEASE} -fexceptions -g -Wall")
-else()
-  message(status "Setting MSVC flags")
+
+if(MSVC)
   # Boost system wont link without this
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
 endif()
+
 message(status "** CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
 
 #
@@ -81,10 +78,11 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/thirdparty/include)
 #
 # Locate Project Prerequisites 
 #
-FIND_PACKAGE(Qt4 REQUIRED COMPONENTS QtCore QtGui QtOpenGL)
-#FIND_PACKAGE(Qt5Widgets REQUIRED)
-#FIND_PACKAGE(Qt5Gui REQUIRED)
-#FIND_PACKAGE(Qt5OpenGL REQUIRED)
+#FIND_PACKAGE(Qt4 REQUIRED COMPONENTS QtCore QtGui QtOpenGL)
+FIND_PACKAGE(Qt5Core REQUIRED)
+FIND_PACKAGE(Qt5Widgets REQUIRED)
+FIND_PACKAGE(Qt5Gui REQUIRED)
+FIND_PACKAGE(Qt5OpenGL REQUIRED)
 
 FIND_PACKAGE(OpenGL REQUIRED)
 FIND_PACKAGE(PCL 1.7 REQUIRED COMPONENTS
@@ -102,8 +100,8 @@ FIND_PACKAGE (Boost COMPONENTS system iostreams REQUIRED)
 
 #ADD_DEFINITIONS (${QT_DEFINITIONS})
 #INCLUDE_DIRECTORIES (${QT_INCLUDE_DIR})
-INCLUDE(${QT_USE_FILE})
-ADD_DEFINITIONS(${QT_DEFINITIONS})
+#INCLUDE(${QT_USE_FILE})
+#ADD_DEFINITIONS(${QT_DEFINITIONS})
 
 IF(WIN32)
     find_package(GLEW REQUIRED)
@@ -111,26 +109,15 @@ IF(WIN32)
 ENDIF()
 
 #
-# HACKS
-#
-add_definitions(
-    -DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET
-    -DBOOST_TT_HAS_OPERATOR_HPP_INCLUDED
-)
-
-#
-# MSVC11 needs this to run gtest
-#
-IF(WIN32)
-    add_definitions(-D_VARIADIC_MAX=10)
-ENDIF()
-
-#
 # Compiler settings
 #
+add_definitions(-DEIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET)
+add_definitions(-DBOOST_TT_HAS_OPERATOR_HPP_INCLUDED)
+
 IF(MSVC)
     SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} /W2") # Mute warnings in ms
     add_definitions(-DNOMINMAX) # Workaround for windows.h bug
+    add_definitions(-D_VARIADIC_MAX=10) # MSVC11 needs this to run gtest
 ELSE()
     SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -Wall")
     SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -std=c++0x")
@@ -183,6 +170,19 @@ IF (EXISTS "${MAINFOLDER}/include/${PROJECT_NAME}" AND IS_DIRECTORY "${MAINFOLDE
 ENDIF (EXISTS "${MAINFOLDER}/include/${PROJECT_NAME}" AND IS_DIRECTORY "${MAINFOLDER}/include/${PROJECT_NAME}")
 
 #
+# Resolve QT libraries for packaging
+#
+get_target_property(QtCore_LIBRARY_PATH ${Qt5Core_LIBRARIES} LOCATION)
+get_target_property(QtWidgets_LIBRARY_PATH ${Qt5Widgets_LIBRARIES} LOCATION)
+get_target_property(QtGui_LIBRARY_PATH ${Qt5Gui_LIBRARIES} LOCATION)
+get_target_property(QtOpenGL_LIBRARY_PATH ${Qt5OpenGL_LIBRARIES} LOCATION)
+set(QT_LIBRARIES ${QtCore_LIBRARY_PATH}
+    ${QtWidgets_LIBRARY_PATH}
+    ${QtGui_LIBRARY_PATH}
+    ${QtOpenGL_LIBRARY_PATH}
+)
+
+#
 #   Helper function to resolve dll's for .lib files
 #
 FUNCTION(FIND_DLLS LIB_LIST DLL_PATH DLL_LIST_OUT)
@@ -223,7 +223,7 @@ FUNCTION(FIND_DLLS LIB_LIST DLL_PATH DLL_LIST_OUT)
         LIST(REMOVE_DUPLICATES DLL_FILE_NAME_LIST)
     ENDIF()
     SET(${DLL_LIST_OUT} ${DLL_FILE_NAME_LIST} PARENT_SCOPE)
-    MESSAGE("FOUNDDDD: ${DLL_FILE_NAME_LIST}")
+    MESSAGE("FOUND: ${DLL_FILE_NAME_LIST}")
 ENDFUNCTION()
 
 #

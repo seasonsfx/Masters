@@ -23,8 +23,9 @@ class QSpinbox;
 class QLabel;
 
 class Brush3D : public IPlugin {
-    Q_OBJECT
     Q_INTERFACES(IPlugin)
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID "za.co.circlingthesun.cloudclean.iplugin" FILE "brush3d.json")
  public:
     QString getName();
     void initialize(Core * core);

@@ -75,13 +75,6 @@ void Brush3D::initialize(Core *core){
     hb->addWidget(slider);
 
     connect(slider, SIGNAL(valueChanged(int)), this, SLOT(setRad(int)));
-
-    QDockWidget * settings_dock =
-            ((QDockWidget *) mw_->tooloptions_->parent());
-
-    //connect(enable_, SIGNAL(toggled(bool)),
-    //        settings_dock->toggleViewAction(), SLOT(trigger()));
-
 }
 
 void Brush3D::setRad(int val) {
@@ -149,7 +142,7 @@ void Brush3D::paint(const Eigen::Affine3f& proj, const Eigen::Affine3f& mv){
     glUniform3fv(program_->uniformLocation("colour"), 1, col); CE();
 
     glEnableVertexAttribArray(0); CE();
-    glVertexAttribPointer(0, 3, GL_FLOAT, FALSE, 0, 0); CE();
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0); CE();
 
     glLineWidth(2);
     glDrawArrays(GL_LINES, 0, 2); CE();
@@ -272,4 +265,4 @@ bool Brush3D::eventFilter(QObject *object, QEvent *event){
     }
 }
 
-Q_EXPORT_PLUGIN2(pnp_brush3d, Brush3D)
+Q_PLUGIN_METADATA(IID "za.co.circlingthesun.cloudclean.iplugin")

@@ -1,0 +1,5 @@
+{
+            "name" : "visualisenormals",
+         "version" : "0.0.1",
+    "dependencies" : [{ "name" : "normalestimation", "version" : "0.0.1" }]
+}

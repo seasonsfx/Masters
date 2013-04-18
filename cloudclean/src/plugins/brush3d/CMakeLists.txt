@@ -1,14 +1,12 @@
 include_directories(
-    ${QT_QTCORE_INCLUDE_DIR}
     ${PCL_INCLUDE_DIRS}
     ${FLANN_INCLUDE_DIRS}
 )
 
 FILE (GLOB plugin_SOURCE *.cpp *.cxx *.cc *.C *.c *.h *.hpp)
-qt4_add_resources(brush3d_RESOURCES_RCC brush3d_resources.qrc)
+QT5_ADD_RESOURCES(brush3d_RESOURCES_RCC brush3d_resources.qrc)
 add_library(brush3d SHARED ${plugin_SOURCE} ${brush3d_RESOURCES_RCC} ../../pluginsystem/iplugin.h)
 target_link_libraries(brush3d
-    ${QT_LIBRARIES}
     cloudclean_util
     cloudclean_pluginsystem
     cloudclean_model
@@ -19,4 +17,6 @@ if(WIN32)
     target_link_libraries(brush3d ${GLEW_LIBRARIES})
 endif()
 
-INSTALL(TARGETS brush3d DESTINATION ${PLUGIN_INSTALL} COMPONENT "CloudClean_plugins")
+QT5_USE_MODULES(brush3d Core Gui OpenGL)
+
+INSTALL(TARGETS brush3d DESTINATION ${PLUGIN_INSTALL} COMPONENT CloudClean_plugins)

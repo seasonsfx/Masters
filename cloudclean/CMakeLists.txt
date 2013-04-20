@@ -33,6 +33,8 @@ add_definitions(-DBOOST_ALL_NO_LIB)
 if(MSVC)
   # Boost system wont link without this
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
+  # Compiler needs moar memories!
+  #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zm2000")
 endif()
 
 message(status "** CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
@@ -106,6 +108,7 @@ FIND_PACKAGE (Boost COMPONENTS system iostreams REQUIRED)
 IF(WIN32)
     find_package(GLEW REQUIRED)
     include_directories(${GLEW_INCLUDE_DIR})
+    add_definitions(-DQT_NO_OPENGL_ES_2)
 ENDIF()
 
 #
@@ -239,7 +242,7 @@ FUNCTION(RESOLVE_SYMLINKS _files real_files)
 ENDFUNCTION()
 
 IF(WIN32)
-    FIND_DLLS("${QT_LIBRARIES} ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY} ${QT_QTOPENGL_LIBRARY}" ${QT_BINARY_DIR} qt_DLL_LIST_OUT)
+    FIND_DLLS("${QT_LIBRARIES} "${QT_QTCORE_LIBRARY}" ${QT_QTGUI_LIBRARY} ${QT_QTOPENGL_LIBRARY}" ${QT_BINARY_DIR} qt_DLL_LIST_OUT)
     INSTALL(FILES ${qt_DLL_LIST_OUT} DESTINATION ${LIB_INSTALL} COMPONENT QT)
 
     FIND_DLLS("${PCL_LIBRARIES}" $ENV{PROGRAMW6432}/PCL/bin pcl_DLL_LIST_OUT)

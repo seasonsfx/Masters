@@ -9,7 +9,7 @@ class LayerList;
 class MainWindow;
 class QUndoStack;
 
-class DLLSPEC Core : public QObject{
+class PLUGINSYS_DLLSPEC Core : public QObject{
     Q_OBJECT
  public:
     Core();

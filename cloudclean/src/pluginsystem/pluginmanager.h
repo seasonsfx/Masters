@@ -19,7 +19,7 @@ class Core;
 #include "pluginsystem/core.h"
 #include "pluginsystem/iplugin.h"
 
-class DLLSPEC PluginManager : public QObject{
+class PLUGINSYS_DLLSPEC PluginManager : public QObject{
     Q_OBJECT
  public:
     PluginManager(Core * core);

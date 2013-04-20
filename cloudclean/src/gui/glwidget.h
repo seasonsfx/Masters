@@ -15,7 +15,7 @@
 #include "gui/gldata.h"
 #include "gui/export.h"
 
-class DLLSPEC GLWidget : public QGLWidget
+class GUI_DLLSPEC GLWidget : public QGLWidget
 {
     Q_OBJECT
 

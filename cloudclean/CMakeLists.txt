@@ -106,7 +106,7 @@ FIND_PACKAGE (Boost COMPONENTS system iostreams REQUIRED)
 IF(WIN32)
     find_package(GLEW REQUIRED)
     include_directories(${GLEW_INCLUDE_DIR})
-    add_definitions(-DQT_NO_OPENGL_ES_2)
+    #add_definitions(-DQT_NO_OPENGL_ES_2)
 ENDIF()
 
 #

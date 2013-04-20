@@ -17,7 +17,6 @@
         const char* err_str = reinterpret_cast<const char *>(gluErrorString(gl_err));\
         QString errString(err_str);\
         qDebug() << "GL Error:" << errString << "on line" << __LINE__ << "of" << __FILE__;\
-        abort();\
     }
 #else
     #define CE()

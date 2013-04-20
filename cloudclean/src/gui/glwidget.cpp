@@ -40,15 +40,17 @@ QSize GLWidget::sizeHint() const {
 void GLWidget::initializeGL() {
     #if defined(Q_OS_WIN32)
         glewExperimental = true;
-        GLint GlewInitResult = glewInit();
+        GLenum GlewInitResult = glewInit();
         if (GlewInitResult != GLEW_OK) {
             const GLubyte* errorStr = glewGetErrorString(GlewInitResult);
-            int size = strlen(reinterpret_cast<const char*>(errorStr));
+            size_t size = strlen(reinterpret_cast<const char*>(errorStr));
             qDebug() << "Glew error "
                      << QString::fromUtf8(
                             reinterpret_cast<const char*>(errorStr), size);
         }
     #endif
+
+    CE();
 
     glClearColor(0.8, 0.8, 0.8, 1.0);
     glEnable(GL_DEPTH_TEST);

@@ -145,7 +145,7 @@ void Lasso::getIndices(Eigen::Matrix4f & ndc_mat,
 
     //float * matdata = ndc_mat.data();
 
-    for(int idx : source_indices){
+    for(int idx : *source_indices){
 
         pcl::PointXYZI & p = cloud->points[idx];
 
@@ -161,8 +161,8 @@ void Lasso::getIndices(Eigen::Matrix4f & ndc_mat,
         /// do lasso test
         bool in_lasso = pointInsidePolygon(points, p_2);
 
-        if(in_lasso) {
-            dest.push_back(idx);
+        if(!in_lasso) {
+            removed_indices->push_back(idx);
         }
     }
 }

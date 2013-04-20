@@ -42,11 +42,15 @@ MainWindow::MainWindow(QUndoStack *us, CloudList * cl, LayerList * ll, QWidget *
     base_format.setProfile(QGLFormat::CoreProfile);
     base_format.setSampleBuffers(true);
 
+    QGLFormat::setDefaultFormat(base_format);
+
     // Important! Context invalidates when reparenting the glwidget
     glwidget_ = new GLWidget(base_format, cl, ll, tabs_);
     tabs_->addTab(glwidget_, "3D View");
     flatview_ = new FlatView(base_format, cl, ll, tabs_, glwidget_);
     tabs_->addTab(flatview_, "2D View");
+
+    qDebug() << "Format: " << glwidget_->format().majorVersion() << glwidget_->format().minorVersion();
 
     QGLContext * ctx = const_cast<QGLContext *>(glwidget_->context());
     gld_ = new GLData(ctx, cl, ll);

@@ -4,7 +4,7 @@ INCLUDE_DIRECTORIES(
     ${PCL_INCLUDE_DIRS}
 )
 
-add_definitions(-DCC_GL_DEBUG_)
+#add_definitions(-DCC_GL_DEBUG_)
 
 #
 # Build sub projects

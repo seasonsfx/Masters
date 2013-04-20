@@ -16,14 +16,16 @@ public:
     Lasso();
 
     // add a new point in normalised screen coordinates
+    void addPoint(int x, int y, QPaintDevice *device);
     void addPoint(Eigen::Vector2f point);
+    void drawLasso(int x, int y, QPaintDevice *device);
     void drawLasso(Eigen::Vector2f mouseLoc, QPaintDevice *device);
     void clear();
     std::vector<Eigen::Vector2f> getPolygon();
     void getIndices(Eigen::Matrix4f & ndc_mat,
                     pcl::PointCloud<pcl::PointXYZI> *cloud,
-                    std::vector<int> & source,
-                    std::vector<int> & dest);
+                    std::shared_ptr<std::vector<int> > source_indices,
+                    std::shared_ptr<std::vector<int> > removed_indices);
 
 private:
     // Points normalised

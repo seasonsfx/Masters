@@ -29,8 +29,7 @@ void customMessageHandler(QtMsgType type, const QMessageLogContext& context, con
     }
     */
 
-    txt = txt.sprintf("MESSAGE (%s:%u %s): %s\n",
-                           context.file, context.line, context.function, msg.constData());
+    txt = QString("MESSAGE (%1:%2 %3): %4\n").arg(context.file).arg(context.line).arg(context.function).arg(msg);
 
     QFile outFile("debuglog.txt");
     outFile.open(QIODevice::WriteOnly | QIODevice::Append);
@@ -40,8 +39,8 @@ void customMessageHandler(QtMsgType type, const QMessageLogContext& context, con
 #ifdef WIN32
     OutputDebugString(txt.toLocal8Bit().constData());
 #else
-    printf("MESSAGE (%s:%u %s): %s\n", context.file, context.line, context.function, msg.constData());
-    //printf("%s\n", txt.toLocal8Bit().constData());
+    //printf("MESSAGE (%s:%u %s): %s\n", context.file, context.line, context.function, msg.constData());
+    printf("%s", txt.toLocal8Bit().constData());
     fflush(stdout);
 #endif
 

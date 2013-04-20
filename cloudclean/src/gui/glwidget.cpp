@@ -19,6 +19,7 @@ GLWidget::GLWidget(QGLFormat &fmt, CloudList *cl,
     ll_ = ll;
     setMouseTracking(true);
     setContextMenuPolicy(Qt::CustomContextMenu);
+    setAutoFillBackground(false);
 }
 
 GLWidget::~GLWidget() {
@@ -60,7 +61,6 @@ void GLWidget::initializeGL() {
     //
     bool succ = program_.addShaderFromSourceFile(
                 QGLShader::Vertex, ":/points.vert"); CE();
-    qWarning() << program_.log();
     if (!succ) qWarning() << "Shader compile log:" << program_.log();
     succ = program_.addShaderFromSourceFile(
                 QGLShader::Fragment, ":/points.frag"); CE();
@@ -86,8 +86,7 @@ void GLWidget::initializeGL() {
     //
     // Selection color
     //
-    glUniform4fv(uni_select_color_, 1, gld_->selection_color_);
-    GLenum err = glGetError(); CE();
+    glUniform4fv(uni_select_color_, 1, gld_->selection_color_); CE();
     program_.release(); CE();
 
     //

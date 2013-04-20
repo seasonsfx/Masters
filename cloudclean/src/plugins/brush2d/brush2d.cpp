@@ -121,16 +121,19 @@ void Brush2D::select(QMouseEvent * event){
 
 
 bool Brush2D::mouseMoveEvent(QMouseEvent * event) {
+    last_mouse_pos_ << event->x(), event->y();
+    if(event->buttons() != Qt::LeftButton)
+        return false;
     if(cl_->active_.get() == nullptr)
         return false;
 
-    if(event->buttons())
-        select(event);
-    last_mouse_pos_ << event->x(), event->y();
+    select(event);
     return true;
 }
 
 bool Brush2D::mousePressEvent(QMouseEvent * event) {
+    if(event->buttons() != Qt::LeftButton)
+        return false;
     if(cl_->active_.get() == nullptr)
         return false;
 
@@ -198,8 +201,8 @@ bool Brush2D::eventFilter(QObject *object, QEvent *event){
         return mouseReleaseEvent(static_cast<QMouseEvent*>(event));
     case QEvent::MouseMove:
         return mouseMoveEvent(static_cast<QMouseEvent*>(event));
-    case QEvent::Wheel:
-        return mouseWheelEvent(static_cast<QWheelEvent*>(event));
+    //case QEvent::Wheel:
+    //    return mouseWheelEvent(static_cast<QWheelEvent*>(event));
     default:
         return false;
     }

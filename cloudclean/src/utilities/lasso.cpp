@@ -86,15 +86,27 @@ bool pointInsidePolygon(std::vector<Eigen::Vector2f> polygon,
 }
 
 
-void Lasso::addPoint(Eigen::Vector2f point){
+void Lasso::addPoint(Eigen::Vector2f point) {
     qDebug("New point: (%f, %f)", point.x(), point.y());
     points.push_back(point);
+}
+
+void Lasso::addPoint(int x, int y, QPaintDevice *device) {
+    float fx = 2.0*float(x)/device->width()-1.0f;
+    float fy = -2.0*float(y)/device->height()+1.0f;
+    addPoint(Eigen::Vector2f(fx, fy));
 }
 
 inline QPointF screenPoint(Eigen::Vector2f & p, int width, int height){
     float x = (p.x()+1)*(width/2.0f);
     float y = (-p.y()+1)*(height/2.0f);
     return QPointF(x, y);
+}
+
+void Lasso::drawLasso(int x, int y, QPaintDevice *device) {
+    float fx = 2.0*float(x)/device->width()-1.0f;
+    float fy = -2.0*float(y)/device->height()+1.0f;
+    drawLasso(Eigen::Vector2f(fx, fy), device);
 }
 
 void Lasso::drawLasso(Eigen::Vector2f mouseLoc, QPaintDevice * device){
@@ -127,16 +139,13 @@ std::vector<Eigen::Vector2f> Lasso::getPolygon(){
 
 void Lasso::getIndices(Eigen::Matrix4f & ndc_mat,
                 pcl::PointCloud<pcl::PointXYZI> * cloud,
-                std::vector<int> & source,
-                std::vector<int> & dest){
+                std::shared_ptr<std::vector<int> > source_indices,
+                std::shared_ptr<std::vector<int> > removed_indices){
 
 
     //float * matdata = ndc_mat.data();
 
-    for(int idx : source){
-
-        if(idx == -1)
-            continue;
+    for(int idx : source_indices){
 
         pcl::PointXYZI & p = cloud->points[idx];
 

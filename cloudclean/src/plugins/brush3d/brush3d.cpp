@@ -187,16 +187,21 @@ bool Brush3D::mouseClickEvent(QMouseEvent * event){
 }
 
 bool Brush3D::mouseMoveEvent(QMouseEvent * event) {
+    last_mouse_pos_ << event->x(), event->y();
+    if(event->buttons() != Qt::LeftButton)
+        return false;
     if(cl_->clouds_.size() == 0)
         return false;
 
     if(event->buttons())
         select(event);
-    last_mouse_pos_ << event->x(), event->y();
+
     return true;
 }
 
 bool Brush3D::mousePressEvent(QMouseEvent * event) {
+    if(event->buttons() != Qt::LeftButton)
+        return false;
     if(cl_->clouds_.size() == 0)
         return false;
     core_->us_->beginMacro("3d Select");

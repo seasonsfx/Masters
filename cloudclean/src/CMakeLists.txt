@@ -2,10 +2,9 @@ SET(CMAKE_AUTOMOC ON)
 
 INCLUDE_DIRECTORIES(
     ${PCL_INCLUDE_DIRS}
-    #${QT_QTCORE_INCLUDE_DIR}
-    #${QT_QTGUI_INCLUDE_DIR}
-    #${QT_QTOPENGL_INCLUDE_DIR}
 )
+
+add_definitions(-DCC_GL_DEBUG_)
 
 #
 # Build sub projects
@@ -36,14 +35,7 @@ SET_TARGET_PROPERTIES(${project_BIN}
     CLEAN_DIRECT_OUTPUT 1
 )
 
-
-
 TARGET_LINK_LIBRARIES(${project_BIN}
-    #${QT_LIBRARIES}
-    #${QT_QTCORE_LIBRARY}
-    #${QT_QTGUI_LIBRARY}
-    #${QT_QTOPENGL_LIBRARY}
-    #${QT_QTMAIN_LIBRARY}
     ${Qt5Core_QTMAIN_LIBRARIES}
     ${Boost_LIBRARIES}
     cloudclean_gui

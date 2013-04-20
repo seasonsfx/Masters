@@ -12,7 +12,7 @@ class Layer;
 class LayerList;
 typedef std::set<Layer *> LayerSet;
 
-class DLLSPEC Layer : public QObject {
+class MODEL_DLLSPEC Layer : public QObject {
     Q_OBJECT
  private:
     Layer(std::map<uint16_t, LayerSet> & layer_lookup_table);

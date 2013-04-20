@@ -52,7 +52,7 @@ typedef std::map<std::weak_ptr<PointCloud>,
     std::future<pcl::PointCloud<pcl::Normal>::Ptr>,
     std::owner_less<std::weak_ptr<PointCloud>>> FutureNormalMap;
 
-class DLLSPEC NormalEstimator : public IPlugin {
+class NE_DLLSPEC NormalEstimator : public IPlugin {
     Q_INTERFACES(IPlugin)
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "za.co.circlingthesun.cloudclean.iplugin" FILE "normalestimation.json")

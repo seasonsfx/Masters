@@ -13,7 +13,7 @@ class LayerList;
 class PointCloud;
 class Layer;
 
-class DLLSPEC LayerGuiSelect : public QUndoCommand
+class COMMAND_DLLSPEC LayerGuiSelect : public QUndoCommand
 {
  public:
     LayerGuiSelect(std::shared_ptr<std::vector<uint16_t> > labels,

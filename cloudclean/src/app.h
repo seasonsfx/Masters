@@ -2,6 +2,7 @@
 #ifndef HEADER_SRC_APP_H_INCLUDED
 #define HEADER_SRC_APP_H_INCLUDED
 
+#include "glheaders.h"
 #include <QtCore>
 #include <QtGui>
 #include <QApplication>

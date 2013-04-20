@@ -13,7 +13,7 @@ class LayerList;
 class PointCloud;
 class Layer;
 
-class DLLSPEC LayerDelete : public QUndoCommand {
+class COMMAND_DLLSPEC LayerDelete : public QUndoCommand {
  public:
     LayerDelete(std::shared_ptr<Layer> layer, LayerList * ll);
     QString actionText();

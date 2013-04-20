@@ -16,7 +16,6 @@
 #include <QGridLayout>
 #include <QAction>
 
-
 #include "gui/mainwindow.h"
 #include "gui/glwidget.h"
 #include "gui/flatview.h"

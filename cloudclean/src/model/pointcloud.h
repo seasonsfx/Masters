@@ -17,7 +17,7 @@ class PointCloud;
 
 typedef pcl::octree::OctreePointCloudSearch<pcl::PointXYZI> Octree;
 
-class DLLSPEC EventDispatcher : public QObject {
+class MODEL_DLLSPEC EventDispatcher : public QObject {
     Q_OBJECT
  public:
     EventDispatcher(PointCloud * pc);
@@ -45,7 +45,7 @@ class DLLSPEC EventDispatcher : public QObject {
  friend class PointCloud;
 };
 
-enum class DLLSPEC PointFlags : int8_t {
+enum class MODEL_DLLSPEC PointFlags : int8_t {
     selected = 0x001,
     reserved1 = 0x002,
     reserved2 = 0x006,
@@ -55,12 +55,12 @@ enum class DLLSPEC PointFlags : int8_t {
     reserved6 = 0x040
 };
 
-enum class DLLSPEC CoordinateFrame: bool {
+enum class MODEL_DLLSPEC CoordinateFrame: bool {
     Camera,
     Laser
 };
 
-class DLLSPEC PointCloud : public pcl::PointCloud<pcl::PointXYZI> {
+class MODEL_DLLSPEC PointCloud : public pcl::PointCloud<pcl::PointXYZI> {
  public:
     explicit PointCloud();
     ~PointCloud();

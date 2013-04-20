@@ -21,7 +21,7 @@ class QMenuBar;
 class QStackedWidget;
 class QToolBox;
 
-class DLLSPEC MainWindow : public QMainWindow {
+class GUI_DLLSPEC MainWindow : public QMainWindow {
     Q_OBJECT
     
  public:

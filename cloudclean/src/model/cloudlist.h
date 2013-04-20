@@ -11,7 +11,7 @@
 class QUndoStack;
 class QItemSelection;
 
-class DLLSPEC CloudList : public QAbstractListModel {
+class MODEL_DLLSPEC CloudList : public QAbstractListModel {
     Q_OBJECT
  public:
     explicit CloudList(QObject *parent = 0);

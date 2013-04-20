@@ -1,0 +1,17 @@
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:63 virtual void GLWidget::initializeGL()): "" 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/gldata.cpp:100 void GLData::reloadColorLookupBuffer()): Color lookup buffer synced 
+
+MESSAGE (kernel/qlayout.cpp:143 QLayout::QLayout(QLayoutPrivate&, QLayout*, QWidget*)): QLayout: Attempting to add QLayout "" to QWidget "", which already has a layout
+
+MESSAGE (kernel/qlayout.cpp:143 QLayout::QLayout(QLayoutPrivate&, QLayout*, QWidget*)): QLayout: Attempting to add QLayout "" to QWidget "", which already has a layout
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/plugins/normalestimation/normalestimation.cpp:45 virtual void NormalEstimator::initialize(Core*)): No OpenCL platform found!
+
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+

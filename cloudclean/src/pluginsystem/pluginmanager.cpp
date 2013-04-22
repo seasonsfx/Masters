@@ -67,7 +67,7 @@ PluginManager::PluginManager(Core * core) {
     core_ = core;
 
     // Look for plugin directory
-    plugins_dir_ = new QDir(qApp->applicationDirPath());
+    plugins_dir_.reset(new QDir(qApp->applicationDirPath()));
     bool succ = false;
     if (!succ)
         succ = plugins_dir_->cd("plugins");
@@ -80,9 +80,9 @@ PluginManager::PluginManager(Core * core) {
     if (!succ)
         succ = plugins_dir_->cd("/usr/lib/cloudclean/plugins");
     if (!succ){
-        delete plugins_dir_;
-        plugins_dir_ = nullptr;
+		plugins_dir_.reset();
         qDebug("Plugins directory not found!");
+		return;
     }
 
     qApp->addLibraryPath(plugins_dir_->absolutePath());
@@ -90,8 +90,7 @@ PluginManager::PluginManager(Core * core) {
 }
 
 PluginManager::~PluginManager() {
-    if(plugins_dir_ != nullptr)
-        delete plugins_dir_;
+
 }
 
 bool PluginManager::loadPlugin(QString loc){
@@ -124,6 +123,8 @@ bool PluginManager::loadPlugin(QString loc){
 }
 
 void PluginManager::loadPlugins() {
+    if(!plugins_dir_)
+		return;
 
     QStringList pluginfilters("*." + DLLExtension());
     plugins_dir_->setNameFilters(pluginfilters);

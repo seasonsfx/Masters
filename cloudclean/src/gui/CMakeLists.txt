@@ -39,4 +39,4 @@ target_link_libraries(
 
 QT5_USE_MODULES(cloudclean_gui Widgets Gui OpenGL)
 
-INSTALL(TARGETS cloudclean_gui DESTINATION ${LIB_INSTALL} COMPONENT CloudClean)
+INSTALL(TARGETS cloudclean_gui RUNTIME DESTINATION ${LIB_INSTALL} COMPONENT CloudClean)

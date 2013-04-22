@@ -38,7 +38,8 @@ include(FindPackageHandleStandardArgs)
 #set a suffix based on project name and version
 set(PCL_SUFFIX pcl-1.7)
 #set a suffix for debug libraries
-set(PCL_DEBUG_SUFFIX "-gd")
+#set(PCL_DEBUG_SUFFIX "-gd")
+set(PCL_DEBUG_SUFFIX "_debug")
 
 #set all pcl component and their account into variables
 set(pcl_all_components io common kdtree keypoints filters range_image registration sample_consensus segmentation features surface octree visualization )
@@ -452,6 +453,11 @@ foreach(component ${PCL_TO_FIND_COMPONENTS})
   if(NOT ${PCL_COMPONENT_LIBRARY}_DEBUG AND ${PCL_COMPONENT_LIBRARY})
     set(${PCL_COMPONENT_LIBRARY}_DEBUG ${${PCL_COMPONENT_LIBRARY}})
   endif(NOT ${PCL_COMPONENT_LIBRARY}_DEBUG AND ${PCL_COMPONENT_LIBRARY})
+
+  # Rickert: If only debug is found, let it be release
+  if(NOT ${PCL_COMPONENT_LIBRARY} AND ${PCL_COMPONENT_LIBRARY}_DEBUG)
+    set(${PCL_COMPONENT_LIBRARY} ${${PCL_COMPONENT_LIBRARY}_DEBUG})
+  endif(NOT ${PCL_COMPONENT_LIBRARY} AND ${PCL_COMPONENT_LIBRARY}_DEBUG)
 
   get_filename_component(${component}_library_path_debug 
     ${${PCL_COMPONENT_LIBRARY}_DEBUG}

@@ -19,4 +19,4 @@ target_link_libraries(
 
 QT5_USE_MODULES(cloudclean_util Core Gui)
 
-INSTALL(TARGETS cloudclean_util DESTINATION ${LIB_INSTALL} COMPONENT CloudClean)
+INSTALL(TARGETS cloudclean_util RUNTIME DESTINATION ${LIB_INSTALL} COMPONENT CloudClean)

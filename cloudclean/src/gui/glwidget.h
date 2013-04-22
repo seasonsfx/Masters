@@ -33,7 +33,8 @@ public:
 
 protected:
     void initializeGL();
-    void paintGL();
+    //void paintGL();
+    void paintEvent(QPaintEvent *event);
     void resizeGL(int width, int height);
 
 protected:

@@ -21,4 +21,4 @@ endif()
 
 QT5_USE_MODULES(visualisenormals Core OpenGL)
 
-INSTALL(TARGETS visualisenormals DESTINATION ${PLUGIN_INSTALL} COMPONENT CloudClean_plugins)
+INSTALL(TARGETS visualisenormals RUNTIME DESTINATION ${PLUGIN_INSTALL} COMPONENT CloudClean_plugins)

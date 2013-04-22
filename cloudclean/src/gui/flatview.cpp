@@ -18,6 +18,8 @@ FlatView::FlatView(QGLFormat & fmt, CloudList * cl,
     camera_(0,2) = -1;
     camera_(1,2) = -0.5;
     setMouseTracking(true);
+    setAutoFillBackground(false);
+    setAutoBufferSwap(false);
 
     //connect(this, SIGNAL(customContextMenuRequested(const QPoint&)),
     //        this, SLOT(contextMenu(const QPoint &)));
@@ -232,9 +234,27 @@ void FlatView::initializeGL() {
 }
 
 
-void FlatView::paintGL() {
-    resizeGL(width(), height());
+void FlatView::paintEvent(QPaintEvent *event) {
+    makeCurrent();
+    //resizeGL(width(), height());
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    QRadialGradient gradient;
+    gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
+    gradient.setCenter(0.45, 0.50);
+    gradient.setFocalPoint(0.40, 0.45);
+    gradient.setColorAt(0.0, QColor(105, 146, 182));
+    gradient.setColorAt(0.4, QColor(81, 113, 150));
+    gradient.setColorAt(0.8, QColor(16, 56, 121));
+
+    QPainter p(this);
+    p.setRenderHint(QPainter::Antialiasing);
+    p.setPen(Qt::NoPen);
+    p.setPen(Qt::NoPen);
+    p.setBrush(gradient);
+    p.drawRect(0, 0, size().width(), size().height());
+
+    //p.beginNativePainting();
 
     if(pc_.expired()){
         qDebug() << "Nothing to paint on flatview";
@@ -287,6 +307,10 @@ void FlatView::paintGL() {
     glBindTexture(GL_TEXTURE_BUFFER, 0); CE();
 
     program_.release();
+
+    //p.endNativePainting();
+
+    swapBuffers();
 }
 
 void FlatView::resizeGL(int width, int height) {

@@ -73,6 +73,7 @@ void CloudList::removeCloud(int idx){
     if(pc == active_)
         active_.reset();
 
+    pc->deleting_ = true;
     emit deletingCloud(pc);
 
     disconnect(pc->ed_.get(), SIGNAL(flagUpdate()), this, SIGNAL(updated()));

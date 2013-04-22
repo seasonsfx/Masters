@@ -44,15 +44,7 @@ void Brush2D::initialize(Core *core){
     radius_ = 20;
 
     settings_ = new QWidget();
-    QVBoxLayout * layout = new QVBoxLayout(settings_);
-    settings_->setLayout(layout);
-
-    mw_->tooloptions_->addWidget(settings_);
-
-    QHBoxLayout * hb = new QHBoxLayout(settings_);
-    layout->addItem(hb);
-    layout->addItem(new QSpacerItem(0, 0, QSizePolicy::Maximum, QSizePolicy::Maximum));
-
+    settings_->setLayout(new QHBoxLayout(settings_));
 
     QSlider * slider = new QSlider(settings_);
     slider->setOrientation(Qt::Horizontal);
@@ -64,8 +56,10 @@ void Brush2D::initialize(Core *core){
 
     QLabel * label = new QLabel("Radius", settings_);
 
-    hb->addWidget(label);
-    hb->addWidget(slider);
+    settings_->layout()->addWidget(label);
+    settings_->layout()->addWidget(slider);
+
+    mw_->tooloptions_->addWidget(settings_);
 
     connect(slider, SIGNAL(valueChanged(int)), this, SLOT(setRad(int)));
 

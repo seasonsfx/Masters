@@ -17,6 +17,7 @@ public:
 
     // add a new point in normalised screen coordinates
     void addPoint(int x, int y, QPaintDevice *device);
+    void movePoint(int x, int y, QPaintDevice *device);
     void addPoint(Eigen::Vector2f point);
     void drawLasso(int x, int y, QPaintDevice *device);
     void drawLasso(Eigen::Vector2f mouseLoc, QPaintDevice *device);

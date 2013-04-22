@@ -52,8 +52,6 @@ int main(int argc, char* argv[])
     srand (time(NULL));
     qInstallMessageHandler(customMessageHandler);
     App app(argc,argv);
-    int exit_code = app.exec();
-    qDebug() << exit_code;
-    return exit_code;
+    return app.exec();
 }
 

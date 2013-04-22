@@ -58,6 +58,7 @@ PointCloud::PointCloud()
 
     min_bounding_box_ = Eigen::Vector3f(INFINITY, INFINITY, INFINITY);
     max_bounding_box_ = Eigen::Vector3f(-INFINITY, -INFINITY, -INFINITY);
+    deleting_ = false;
 }
 
 PointCloud::~PointCloud() {
@@ -181,10 +182,12 @@ bool PointCloud::load_ptx(const char* filename, int decimation_factor) {
 
     this->sensor_orientation_ = Eigen::Quaternionf(orientation_mat.transpose());
 
-    // Discard redunadant matrix
-    float ign;
-    for(int i = 0; i < 16; i++ )
-        fscanf(pfile, "%f", &ign);
+    // Discard newline and redunadant matrix
+    char buff[1024];
+    for(int i = 0; i < 5; i++ ){
+        fgets(buff, 1024, pfile);
+        qDebug("Skipped Mat '%s'", buff);
+    }
 
     unsigned int sampled_idx = 0;
     int file_sample_idx = 0;
@@ -203,9 +206,7 @@ bool PointCloud::load_ptx(const char* filename, int decimation_factor) {
     float & intensity = point.intensity;
 
     // Tokenize the first line
-    char buff[1024];
     char * ch;
-    fgets(buff, 1024, pfile); // skip newline
     long file_pos = ftell(pfile); // Save restart pos
     fgets(buff, 1024, pfile);
     int tokens = 0;
@@ -227,9 +228,6 @@ bool PointCloud::load_ptx(const char* filename, int decimation_factor) {
     // Move reset the reading pos in file
     fseek(pfile, file_pos, SEEK_SET);
 
-    // TEST
-    fgets(buff, 1024, pfile);
-
     while(file_sample_idx < line_count){
         if(file_sample_idx % update_interval == 0) {
             double prog = 100.0*file_sample_idx/static_cast<double>(line_count);
@@ -245,41 +243,27 @@ bool PointCloud::load_ptx(const char* filename, int decimation_factor) {
         if((row+1)%decimation_factor != 0 || (col+1)%decimation_factor != 0){
             //for(int i = 0; i < tokens; i++ )
             //    fscanf(pfile, "%f", &ign);
+            qDebug() << "Skiped point";
             fgets(buff, 1024, pfile);
             continue;
         }
 
-        if(ferror (pfile)){
-            qDebug() << "File read fail at line " << line_count << "with " << file_sample_idx << "samples";
+        if(ferror (pfile) || feof(pfile)){
+            qDebug() << "File read fail at line " << file_sample_idx << "with sample idx:" << sampled_idx;
             return false;
         }
 
-        int filled = fscanf(pfile, "%f %f %f %f", &x, &y, &z, &intensity);
+        //file_pos = ftell(pfile);
+        int filled = fscanf(pfile, "%f %f %f %f\n", &x, &y, &z, &intensity);
 
         if(filled != 4) {
-            qDebug() << "File parse fail at line " << line_count << "with " << file_sample_idx << "samples";
-
+            qDebug() << "File parse fail at line " << file_sample_idx << "with sample idx" << sampled_idx;
+            qDebug() << "File pos: " << file_pos;
             if(ferror(pfile))
                 qDebug() << "File read fail.";
             else {
-                fgets(buff, 1024, pfile);
-                qDebug() << "After:" << buff;
-                file_pos = ftell(pfile);
-                fseek(pfile, file_pos-40, SEEK_SET);
-                fgets(buff, 1024, pfile);
-                fgets(buff, 1024, pfile);
-                qDebug() << "Context:" << buff;
-                fgets(buff, 1024, pfile);
-                qDebug() << "Context:" << buff;
-                fgets(buff, 1024, pfile);
-                qDebug() << "Context:" << buff;
-                fgets(buff, 1024, pfile);
-                qDebug() << "Context:" << buff;
-                fgets(buff, 1024, pfile);
-                qDebug() << "Context:" << buff;
-                fgets(buff, 1024, pfile);
-                qDebug() << "Context:" << buff;
-                qDebug() << "Ignoring error";
+                //fgets(buff, 1024, pfile);
+                //qDebug("Could not parse '%s'", buff);
                 continue;
             }
 
@@ -332,7 +316,7 @@ bool PointCloud::load_ptx(const char* filename, int decimation_factor) {
     pc_mutex->unlock();
 
     // Start loading octree
-    fut_octree = std::async(std::launch::async, [this](){
+    fut_octree = std::async(std::launch::async, [&, this](){
         double resolution = 0.2;
         qDebug() << "Start octree";
         Octree::Ptr octree = Octree::Ptr(new Octree(resolution));

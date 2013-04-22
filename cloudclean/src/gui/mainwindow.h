@@ -52,6 +52,9 @@ class GUI_DLLSPEC MainWindow : public QMainWindow {
 
    QDockWidget * options_dock_;
 
+ protected:
+   void closeEvent(QCloseEvent *event);
+
  private:
     QStatusBar * statusbar_;
     QProgressBar *progressbar_;

@@ -48,7 +48,7 @@ using Eigen::Vector2f;
 using Eigen::AngleAxis;
 
 Camera::Camera() {
-    mtx_ = new std::mutex();
+    //mtx_ = new std::mutex();
     fov_ = 60.0f;
     aspect_ = 1.0f;
     depth_near_ = 1.0f;
@@ -62,7 +62,7 @@ Camera::Camera() {
 }
 
 Camera::~Camera() {
-    delete mtx_;
+    //delete mtx_;
 }
 
 void Camera::setFoV(float fov) {

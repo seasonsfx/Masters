@@ -20,6 +20,7 @@ GLWidget::GLWidget(QGLFormat &fmt, CloudList *cl,
     setMouseTracking(true);
     setContextMenuPolicy(Qt::CustomContextMenu);
     setAutoFillBackground(false);
+    setAutoBufferSwap(false);
 }
 
 GLWidget::~GLWidget() {
@@ -108,12 +109,29 @@ void GLWidget::initializeGL() {
 }
 
 
-void GLWidget::paintGL() {
-
+void GLWidget::paintEvent(QPaintEvent *event) {
+    makeCurrent();
     // Make sure the labels are updates
     // Make sure nothing has changed
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    QRadialGradient gradient;
+    gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
+    gradient.setCenter(0.45, 0.50);
+    gradient.setFocalPoint(0.40, 0.45);
+    gradient.setColorAt(0.0, QColor(105, 146, 182));
+    gradient.setColorAt(0.4, QColor(81, 113, 150));
+    gradient.setColorAt(0.8, QColor(16, 56, 121));
+
+    QPainter p(this);
+    p.setRenderHint(QPainter::Antialiasing);
+    p.setPen(Qt::NoPen);
+    p.setPen(Qt::NoPen);
+    p.setBrush(gradient);
+    p.drawRect(0, 0, size().width(), size().height());
+
+    p.beginNativePainting();
 
     program_.bind(); CE();
 
@@ -165,7 +183,11 @@ void GLWidget::paintGL() {
 
     glBindTexture(GL_TEXTURE_BUFFER, 0); CE();
 
+    p.endNativePainting();
+    p.end();
+
     emit pluginPaint(camera_.projectionMatrix(), camera_.modelviewMatrix());
+    swapBuffers();
 }
 
 void GLWidget::resizeGL(int width, int height) {

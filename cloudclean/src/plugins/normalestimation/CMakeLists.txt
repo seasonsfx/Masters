@@ -19,4 +19,4 @@ target_link_libraries(normalestimator
 
 QT5_USE_MODULES(normalestimator Core Gui OpenGL)
 
-INSTALL(TARGETS normalestimator DESTINATION ${PLUGIN_INSTALL} COMPONENT CloudClean_plugins)
+INSTALL(TARGETS normalestimator RUNTIME DESTINATION ${PLUGIN_INSTALL} COMPONENT CloudClean_plugins)

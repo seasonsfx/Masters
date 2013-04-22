@@ -38,7 +38,7 @@ class GUI_DLLSPEC FlatView : public QGLWidget {
 
  protected:
     void initializeGL();
-    void paintGL();
+    void paintEvent(QPaintEvent *event);
     void resizeGL(int width, int height);
 
     void mouseMoveEvent(QMouseEvent * event);

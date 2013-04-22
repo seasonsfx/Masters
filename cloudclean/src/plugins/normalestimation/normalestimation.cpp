@@ -297,6 +297,9 @@ NormalEstimator::estimateNormals(std::shared_ptr<PointCloud> cloud) {
     };
 
     for (int i = 0; i < length; ++i) {
+        if(cloud->deleting_)
+            return normals;
+
         // Skip values that dont exist
         if (grid_to_cloud[i] == -1) {
             continue;

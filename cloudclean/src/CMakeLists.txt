@@ -4,7 +4,7 @@ INCLUDE_DIRECTORIES(
     ${PCL_INCLUDE_DIRS}
 )
 
-#add_definitions(-DCC_GL_DEBUG_)
+add_definitions(-DCC_GL_DEBUG_)
 
 #
 # Build sub projects
@@ -47,4 +47,4 @@ TARGET_LINK_LIBRARIES(${project_BIN}
 
 QT5_USE_MODULES(${project_BIN} Core Widgets Gui OpenGL)
 
-INSTALL(TARGETS ${project_BIN} DESTINATION ${BIN_INSTALL})
+INSTALL(TARGETS ${project_BIN} RUNTIME DESTINATION ${BIN_INSTALL})

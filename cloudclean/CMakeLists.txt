@@ -86,27 +86,21 @@ FIND_PACKAGE(Qt5OpenGL REQUIRED)
 
 FIND_PACKAGE(OpenGL REQUIRED)
 FIND_PACKAGE(PCL 1.7 REQUIRED COMPONENTS
-    common
-    io
+#    common
+#    io
     octree
-    kdtree
-    search
-    features
-    filters
-    segmentation
+#    kdtree
+#    search
+#    features
+#    filters
+#    segmentation
 )
 
-FIND_PACKAGE (Boost COMPONENTS system iostreams REQUIRED)
-
-#ADD_DEFINITIONS (${QT_DEFINITIONS})
-#INCLUDE_DIRECTORIES (${QT_INCLUDE_DIR})
-#INCLUDE(${QT_USE_FILE})
-#ADD_DEFINITIONS(${QT_DEFINITIONS})
+FIND_PACKAGE(Boost COMPONENTS system iostreams REQUIRED)
 
 IF(WIN32)
     find_package(GLEW REQUIRED)
     include_directories(${GLEW_INCLUDE_DIR})
-    #add_definitions(-DQT_NO_OPENGL_ES_2)
 ENDIF()
 
 #
@@ -173,10 +167,10 @@ ENDIF (EXISTS "${MAINFOLDER}/include/${PROJECT_NAME}" AND IS_DIRECTORY "${MAINFO
 #
 # Resolve QT libraries for packaging
 #
-get_target_property(QtCore_LIBRARY_PATH ${Qt5Core_LIBRARIES} LOCATION)
-get_target_property(QtWidgets_LIBRARY_PATH ${Qt5Widgets_LIBRARIES} LOCATION)
-get_target_property(QtGui_LIBRARY_PATH ${Qt5Gui_LIBRARIES} LOCATION)
-get_target_property(QtOpenGL_LIBRARY_PATH ${Qt5OpenGL_LIBRARIES} LOCATION)
+get_target_property(QtCore_LIBRARY_PATH Qt5::Core LOCATION)
+get_target_property(QtWidgets_LIBRARY_PATH Qt5::Widgets LOCATION)
+get_target_property(QtGui_LIBRARY_PATH Qt5::Gui LOCATION)
+get_target_property(QtOpenGL_LIBRARY_PATH Qt5::OpenGL LOCATION)
 set(QT_LIBRARIES ${QtCore_LIBRARY_PATH}
     ${QtWidgets_LIBRARY_PATH}
     ${QtGui_LIBRARY_PATH}
@@ -184,7 +178,7 @@ set(QT_LIBRARIES ${QtCore_LIBRARY_PATH}
 )
 
 #
-#   Helper function to resolve dll's for .lib files
+#   Windows helper function to resolve dll's for .lib files
 #
 FUNCTION(FIND_DLLS LIB_LIST DLL_PATH DLL_LIST_OUT)
 
@@ -239,28 +233,59 @@ FUNCTION(RESOLVE_SYMLINKS _files real_files)
     SET(${real_files} ${_resolvedFiles} PARENT_SCOPE)
 ENDFUNCTION()
 
+get_target_property(QT_LIB_PATH Qt5::Core LOCATION)
+get_filename_component(QT_LIB_PATH ${QT_LIB_PATH} PATH)
+
+
 IF(WIN32)
-    FIND_DLLS("${QT_LIBRARIES} "${QT_QTCORE_LIBRARY}" ${QT_QTGUI_LIBRARY} ${QT_QTOPENGL_LIBRARY}" ${QT_BINARY_DIR} qt_DLL_LIST_OUT)
-    INSTALL(FILES ${qt_DLL_LIST_OUT} DESTINATION ${LIB_INSTALL} COMPONENT QT)
-
+    #FIND_DLLS("${QT_LIBRARIES}" "${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY} ${QT_QTOPENGL_LIBRARY}" ${QT_LIB_PATH} qt_DLL_LIST_OUT)
     FIND_DLLS("${PCL_LIBRARIES}" $ENV{PROGRAMW6432}/PCL/bin pcl_DLL_LIST_OUT)
-    INSTALL(FILES ${pcl_DLL_LIST_OUT} DESTINATION ${LIB_INSTALL} COMPONENT PCL)
-
     FIND_DLLS("${GLEW_LIBRARIES}" $ENV{GLEWROOT}/bin glew_DLL_LIST_OUT)
+
+    INSTALL(FILES ${QT_LIBRARIES} DESTINATION ${LIB_INSTALL} COMPONENT QT)
+    INSTALL(FILES ${pcl_DLL_LIST_OUT} DESTINATION ${LIB_INSTALL} COMPONENT PCL)
     INSTALL(FILES ${glew_DLL_LIST_OUT} DESTINATION ${LIB_INSTALL} COMPONENT GLEW)
 
-    MESSAGE("Installing ${glew_DLL_LIST_OUT} to ${LIB_INSTALL}")
+    INSTALL(FILES   ${QT_LIB_PATH}/../plugins/platforms/qminimal.dll
+                    ${QT_LIB_PATH}/../plugins/platforms/qwindows.dll
+                    DESTINATION ${LIB_INSTALL}/platforms
+                    COMPONENT QT
+    )
 
 ELSE()
-    INSTALL(FILES dist/cloudclean.png DESTINATION share/pixmaps/)
-    INSTALL(FILES dist/cloudclean.desktop DESTINATION share/applications/)
+
+    FIND_LIBRARY(LIB_QLINUX "qlinuxfb"
+                HINTS ${QT_LIB_PATH}/../plugins/platforms
+                PATHS $ENV{QTDIR} ${QT_LIB_PATH}
+                PATH_SUFFIXES /../plugins/platforms /plugins/platforms
+    )
+
+    FIND_LIBRARY(LIB_QXCB "qxcb"
+                HINTS ${QT_LIB_PATH}/../plugins/platforms
+                PATHS $ENV{QTDIR} ${QT_LIB_PATH}
+                PATH_SUFFIXES /../plugins/platforms /plugins/platforms
+    )
+
+    FIND_LIBRARY(LIB_QMINIMAL qminimal
+                HINTS ${QT_LIB_PATH}/../plugins/platforms
+                PATHS $ENV{QTDIR} ${QT_LIB_PATH}
+                PATH_SUFFIXES /../plugins/platforms /plugins/platforms
+    )
+
+    MESSAGE("STUFF FOUND: ${LIB_QLINUX} , ${LIB_QXCB}, ${LIB_QMINIMAL}")
 
     LIST(REMOVE_ITEM PCL_LIBRARIES debug optimized)
     RESOLVE_SYMLINKS("${PCL_LIBRARIES}" PCL_LIBRARIES)
     RESOLVE_SYMLINKS("${QT_LIBRARIES};${QT_QTCORE_LIBRARY};${QT_QTGUI_LIBRARY};${QT_QTOPENGL_LIBRARY}" QT_LIBRARIES)
+
+    INSTALL(FILES dist/cloudclean.png DESTINATION share/pixmaps/)
+    INSTALL(FILES dist/cloudclean.desktop DESTINATION share/applications/)
     INSTALL(FILES ${PCL_LIBRARIES} DESTINATION ${LIB_INSTALL} COMPONENT PCL)
     INSTALL(FILES ${QT_LIBRARIES} ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY} ${QT_QTOPENGL_LIBRARY} DESTINATION ${LIB_INSTALL} COMPONENT QT)
 
+    INSTALL(FILES ${LIB_QLINUX} DESTINATION ${LIB_INSTALL}/platforms COMPONENT QT)
+    INSTALL(FILES ${LIB_QXCB} DESTINATION ${LIB_INSTALL}/platforms COMPONENT QT)
+    INSTALL(FILES ${LIB_QMINIMAL} DESTINATION ${LIB_INSTALL}/platforms COMPONENT QT)
 ENDIF()
 
 #

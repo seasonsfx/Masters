@@ -87,8 +87,15 @@ bool pointInsidePolygon(std::vector<Eigen::Vector2f> polygon,
 
 
 void Lasso::addPoint(Eigen::Vector2f point) {
-    qDebug("New point: (%f, %f)", point.x(), point.y());
     points.push_back(point);
+}
+
+void Lasso::movePoint(int x, int y, QPaintDevice *device) {
+    float fx = 2.0*float(x)/device->width()-1.0f;
+    float fy = -2.0*float(y)/device->height()+1.0f;
+    if(points.size() != 0)
+        points.pop_back();
+    addPoint(Eigen::Vector2f(fx, fy));
 }
 
 void Lasso::addPoint(int x, int y, QPaintDevice *device) {
@@ -123,10 +130,11 @@ void Lasso::drawLasso(Eigen::Vector2f mouseLoc, QPaintDevice * device){
 
 
     QPainter painter(device);
-    painter.beginNativePainting();
+    painter.endNativePainting();
     painter.setPen(Qt::green);
     painter.drawPolygon(polygon); CE();
-    painter.endNativePainting();
+    painter.beginNativePainting();
+
 }
 
 void Lasso::clear(){
@@ -142,13 +150,9 @@ void Lasso::getIndices(Eigen::Matrix4f & ndc_mat,
                 std::shared_ptr<std::vector<int> > source_indices,
                 std::shared_ptr<std::vector<int> > removed_indices){
 
+    float * matdata = ndc_mat.data();
 
-    //float * matdata = ndc_mat.data();
-
-    for(int idx : *source_indices){
-
-        pcl::PointXYZI & p = cloud->points[idx];
-
+    auto inside_lasso = [&, matdata] (pcl::PointXYZI & p) {
         /// project point
         Eigen::Vector4f p_4;
         p_4 << p.x, p.y, p.z, 1;
@@ -159,10 +163,21 @@ void Lasso::getIndices(Eigen::Matrix4f & ndc_mat,
         p_2 /= p_4.z();
 
         /// do lasso test
-        bool in_lasso = pointInsidePolygon(points, p_2);
+        return  pointInsidePolygon(points, p_2);
+    };
 
-        if(!in_lasso) {
-            removed_indices->push_back(idx);
+    if(source_indices->size() == 0) {
+        for (int idx = 0; idx < cloud->size(); idx++) {
+            if(inside_lasso(cloud->points[idx])) {
+                source_indices->push_back(idx);
+            }
+        }
+    } else {
+        for(int idx : *source_indices){
+            if(!inside_lasso(cloud->points[idx])) {
+                removed_indices->push_back(idx);
+            }
         }
     }
+
 }

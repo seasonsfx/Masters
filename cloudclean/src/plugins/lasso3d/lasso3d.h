@@ -40,7 +40,6 @@ class Lasso3D : public IPlugin {
     void enabling();
 
  private slots:
-    void setRad(int val);
 
  public slots:
     void enable();
@@ -61,20 +60,13 @@ class Lasso3D : public IPlugin {
     LayerList * ll_;
     GLWidget * glwidget_;
     FlatView * flatview_;
-    bool initialized_gl;
     MainWindow * mw_;
     QAction * enable_;
 
     Eigen::Vector2d last_mouse_pos_;
     Eigen::Vector2d mouse_down_pos_;
 
-    Eigen::Vector3f p1;
-    Eigen::Vector3f p2;
-    QGLShaderProgram * program_;
-    QGLBuffer * line_;
-
     bool is_enabled_;
-    float radius_;
 
     QWidget * settings_;
     Lasso * lasso_;

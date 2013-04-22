@@ -166,12 +166,15 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
     pm_->loadPlugins();
     pm_->initializePlugins();
 
+
+
     QAction * disable_plugins = new QAction(this);
     core_->mw_->addAction(disable_plugins);
     connect(disable_plugins, SIGNAL(toggled(bool)), pm_, SIGNAL(endEdit()));
     disable_plugins->setShortcut(QKeySequence(Qt::Key_Escape));
-    //disable_plugins->setShortcutContext(Qt::ApplicationShortcut);
+    disable_plugins->setShortcutContext(Qt::ApplicationShortcut);
 
+    // TODO add commandline
     // load a cloud
     std::function<void (const char *)> loadcloud = [&] (const char * fname) {
 
@@ -212,9 +215,10 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
     //std::thread(loadcloud, "/home/rickert/Workspace/uscans/2011.06.11-10.23.54.zfs_cy.ptx").detach();
     //std::thread(loadcloud, "/home/rickert/Workspace/uscans/Petra_Top_xf.ptx").detach();
     //std::thread(loadcloud, "/home/rickert/Petra_Top_xf.ptx").detach();
+
 }
 
-App::~App() {
+App::~App() {    
     delete core_;
     delete pm_;
 }

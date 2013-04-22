@@ -94,7 +94,7 @@ class GUI_DLLSPEC Camera {
     bool projection_dirty_;
     bool modelview_dirty_;
 
-    std::mutex * mtx_;
+    //std::mutex * mtx_;
 
     friend class GLWidget;
 };

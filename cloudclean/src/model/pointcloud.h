@@ -91,12 +91,13 @@ class MODEL_DLLSPEC PointCloud : public pcl::PointCloud<pcl::PointXYZI> {
     std::vector<PointFlags> flags_;
 
     CoordinateFrame frame_;
-    // What needs to be in here?
-    // Should normals be a default requirement
-    // Maybe store attributes in a map and generate on the fly
 
+    // yeah... i think this is in the octree
     Eigen::Vector3f min_bounding_box_;
     Eigen::Vector3f max_bounding_box_;
+
+    bool deleting_;
+
 };
 
 #endif // MODEL_CPOINTCLOUD_H_

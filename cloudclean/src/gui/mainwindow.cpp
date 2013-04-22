@@ -15,6 +15,7 @@
 #include <QApplication>
 #include <QGridLayout>
 #include <QBoxLayout>
+#include <QSettings>
 
 #include "gui/glwidget.h"
 #include "gui/flatview.h"
@@ -27,6 +28,8 @@
 MainWindow::MainWindow(QUndoStack *us, CloudList * cl, LayerList * ll, QWidget *parent)
     : QMainWindow(parent) {
 
+    this->setObjectName("mainwindow");
+
     us_ = us;
     ll_ = ll;
     cl_ = cl;
@@ -38,13 +41,14 @@ MainWindow::MainWindow(QUndoStack *us, CloudList * cl, LayerList * ll, QWidget *
     QGLFormat base_format;
     base_format.setVersion(3, 3);
     // Compatibility profile breaks gl context sharing on AMD cards
-    //base_format.setProfile(QGLFormat::CompatibilityProfile);
-    base_format.setProfile(QGLFormat::CoreProfile);
+    base_format.setProfile(QGLFormat::CompatibilityProfile);
+    // Core profile breaks qpainter on windows
+    // base_format.setProfile(QGLFormat::CoreProfile);
     base_format.setSampleBuffers(true);
 
     QGLFormat::setDefaultFormat(base_format);
 
-    // Important! Context invalidates when reparenting the glwidget
+    // Important! Context invalidates when reparenting the glwidget on windows
     glwidget_ = new GLWidget(base_format, cl, ll, tabs_);
     tabs_->addTab(glwidget_, "3D View");
     flatview_ = new FlatView(base_format, cl, ll, tabs_, glwidget_);
@@ -74,11 +78,13 @@ MainWindow::MainWindow(QUndoStack *us, CloudList * cl, LayerList * ll, QWidget *
     redo->setIcon(style->standardIcon(QStyle::SP_ArrowRight));
 
     options_dock_ = new QDockWidget(this);
+    options_dock_->setObjectName("options_dock");
     options_dock_->setWindowTitle(tr("Tool options"));
     tooloptions_ = new QStackedWidget(options_dock_);
     options_dock_->setWidget(tooloptions_);
 
     toolbar_ = new QToolBar(this);
+    toolbar_->setObjectName("toolbar");
     addToolBar(Qt::LeftToolBarArea, toolbar_);
     toolbar_->setToolButtonStyle(Qt::ToolButtonIconOnly);
 
@@ -114,7 +120,7 @@ MainWindow::MainWindow(QUndoStack *us, CloudList * cl, LayerList * ll, QWidget *
     QAction * load = new QAction(tr("Load"), this);
     load->setIcon(style->standardIcon(QStyle::SP_DirIcon));
     QAction * save = new QAction(tr("Save"), this);
-    save->setIcon(style->standardIcon(QStyle::SP_FileIcon));
+    save->setIcon(style->standardIcon(QStyle::SP_DialogSaveButton));
     connect(load, SIGNAL(triggered()), this, SLOT(loadFile()));
     connect(save, SIGNAL(triggered()), this, SLOT(saveFile()));
 
@@ -175,6 +181,14 @@ MainWindow::MainWindow(QUndoStack *us, CloudList * cl, LayerList * ll, QWidget *
 
     connect(flatview_, SIGNAL(customContextMenuRequested(const QPoint&)),
             this, SLOT(contextMenu(const QPoint &)));
+
+    // Restore state
+    QSettings settings;
+    if(!restoreGeometry(settings.value("mainwindow/geometry").toByteArray())){
+        setGeometry(50, 50, 1280, 700);
+    }
+
+    restoreState(settings.value("mainwindow/windowState").toByteArray());
 
 }
 
@@ -245,4 +259,10 @@ void MainWindow::contextMenu(const QPoint &pos) {
     menu.addAction("Select all", clv_, SLOT(selectAllPoints()));
 
     menu.exec(glwidget_->mapToGlobal(pos));
+}
+
+void MainWindow::closeEvent(QCloseEvent *event) {
+    QSettings settings;
+    settings.setValue("mainwindow/geometry", saveGeometry());
+    settings.setValue("mainwindow/windowState", saveState());
 }

@@ -4,6 +4,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <memory>
 #include <QObject>
 #include "pluginsystem/export.h"
 
@@ -46,7 +47,7 @@ class PLUGINSYS_DLLSPEC PluginManager : public QObject{
  private:
     std::vector<IPlugin *> plugins_;
     Core * core_;
-    QDir * plugins_dir_;
+    std::unique_ptr<QDir> plugins_dir_;
 };
 
 #endif // PLUGINMANAGER_H

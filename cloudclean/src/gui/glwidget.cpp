@@ -114,8 +114,7 @@ void GLWidget::paintEvent(QPaintEvent *event) {
     // Make sure the labels are updates
     // Make sure nothing has changed
 
-    glEnable(GL_DEPTH_TEST);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    QPainter p(this);
 
     QRadialGradient gradient;
     gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
@@ -125,7 +124,6 @@ void GLWidget::paintEvent(QPaintEvent *event) {
     gradient.setColorAt(0.4, QColor(81, 113, 150));
     gradient.setColorAt(0.8, QColor(16, 56, 121));
 
-    QPainter p(this);
     p.setRenderHint(QPainter::Antialiasing);
     p.setPen(Qt::NoPen);
     p.setPen(Qt::NoPen);
@@ -133,6 +131,10 @@ void GLWidget::paintEvent(QPaintEvent *event) {
     p.drawRect(0, 0, size().width(), size().height());
 
     p.beginNativePainting();
+
+    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_DEPTH_BUFFER_BIT);
+    glEnable(GL_DEPTH_TEST);
 
     program_.bind(); CE();
 
@@ -188,6 +190,7 @@ void GLWidget::paintEvent(QPaintEvent *event) {
     p.end();
 
     emit pluginPaint(camera_.projectionMatrix(), camera_.modelviewMatrix());
+    glFinish();
     swapBuffers();
 }
 

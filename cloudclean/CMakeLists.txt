@@ -254,24 +254,26 @@ IF(WIN32)
 
 ELSE()
 
+
     FIND_LIBRARY(LIB_QLINUX "qlinuxfb"
-                HINTS ${QT_LIB_PATH}/../plugins/platforms
+                HINTS ${QT_LIB_PATH}/qt5/plugins/platforms
                 PATHS $ENV{QTDIR} ${QT_LIB_PATH}
                 PATH_SUFFIXES /../plugins/platforms /plugins/platforms
     )
 
     FIND_LIBRARY(LIB_QXCB "qxcb"
-                HINTS ${QT_LIB_PATH}/../plugins/platforms
+                HINTS ${QT_LIB_PATH}/qt5/plugins/platforms
                 PATHS $ENV{QTDIR} ${QT_LIB_PATH}
                 PATH_SUFFIXES /../plugins/platforms /plugins/platforms
     )
 
     FIND_LIBRARY(LIB_QMINIMAL qminimal
-                HINTS ${QT_LIB_PATH}/../plugins/platforms
+                HINTS ${QT_LIB_PATH}/qt5/plugins/platforms
                 PATHS $ENV{QTDIR} ${QT_LIB_PATH}
                 PATH_SUFFIXES /../plugins/platforms /plugins/platforms
     )
 
+    MESSAGE("${QT_LIB_PATH}")
     MESSAGE("STUFF FOUND: ${LIB_QLINUX} , ${LIB_QXCB}, ${LIB_QMINIMAL}")
 
     LIST(REMOVE_ITEM PCL_LIBRARIES debug optimized)

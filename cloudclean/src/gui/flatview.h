@@ -28,6 +28,12 @@ class GUI_DLLSPEC FlatView : public QGLWidget {
 
  public slots:
     void setCloud(std::shared_ptr<PointCloud> new_pc);
+    void rotate90() {
+        rotate(M_PI/2.0f);
+    }
+
+    void rotate(float angle);
+
 
  private slots:
     void contextMenu(const QPoint &pos);
@@ -63,12 +69,15 @@ class GUI_DLLSPEC FlatView : public QGLWidget {
     GLuint texture_id_;
     GLuint vao_;
 
-    float current_scale_;
-    QVector2D saved_offset_;
-    QVector2D aspect_ratio_;
+    float scale_;
+    //QVector2D saved_offset_;
 
-    QPoint drag_start_pos;
-    Eigen::Matrix3f camera_;
+    Eigen::Vector2f start_translation_;
+    Eigen::Vector2f translation_;
+    float rotation_;
+    Eigen::Vector2f aspect_;
+
+    Eigen::Vector2f last_mouse_pos_;
 
 };
 

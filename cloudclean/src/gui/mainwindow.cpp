@@ -258,6 +258,10 @@ void MainWindow::contextMenu(const QPoint &pos) {
     menu.addAction("Deselect all", clv_, SLOT(deselectAllPoints()));
     menu.addAction("Select all", clv_, SLOT(selectAllPoints()));
 
+    if(flatview_->isVisible())
+        menu.addAction("Rotate", flatview_, SLOT(rotate90()));
+
+
     menu.exec(glwidget_->mapToGlobal(pos));
 }
 

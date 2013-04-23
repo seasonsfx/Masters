@@ -9,14 +9,17 @@
 
 FlatView::FlatView(QGLFormat & fmt, CloudList * cl,
                    LayerList * ll, QWidget *parent, QGLWidget *sharing)
-    : QGLWidget(fmt, parent, sharing) {
+    : QGLWidget(fmt, parent, sharing), rotation_(0.0f) {
     cl_ = cl;
     ll_ = ll;
-    current_scale_ = 2;
-    aspect_ratio_ = QVector2D(-1, -1);
-    camera_.setIdentity();
-    camera_(0,2) = -1;
-    camera_(1,2) = -0.5;
+    scale_ = 2;
+    translation_ = Eigen::Vector2f(0, 0);
+    //aspect_ratio_ = QVector2D(-1, -1);
+    //camera_.setIdentity();
+    //camera_(0,2) = -1;
+    //camera_(1,2) = -0.5;
+    //camera_(0,2) = -0.5;
+    //camera_(1,2) = -1.0;
     setMouseTracking(true);
     setAutoFillBackground(false);
     setAutoBufferSwap(false);
@@ -46,7 +49,17 @@ void FlatView::setGLD(GLData * gld){
  */
 
 const Eigen::Matrix3f FlatView::getCamera() {
-    return camera_;
+
+
+    return
+            //Eigen::Translation2f(translation_) *
+            //Eigen::AlignedScaling2f(scale_, scale_) *
+
+            Eigen::AlignedScaling2f(scale_ * aspect_) *
+            Eigen::Rotation2Df(rotation_) *
+            Eigen::Translation2f(translation_) *
+            Eigen::Translation2f(start_translation_) *
+            Eigen::Matrix3f::Identity();
 }
 
 int binary_search(std::vector<int> A, int key) {
@@ -118,25 +131,20 @@ void FlatView::setCloud(std::shared_ptr<PointCloud> new_pc) {
 }
 
 void FlatView::mouseMoveEvent(QMouseEvent * event) {
+    Eigen::Vector2f delta = Eigen::Vector2f(event->x(), event->y()) - last_mouse_pos_;
+    last_mouse_pos_ = Eigen::Vector2f(event->x(), event->y());
     if(pc_.expired())
         return;
 
     if(event->buttons()){
-        QVector2D dist(event->pos() - drag_start_pos);
-        dist.setX(2.0f*dist.x()/width());
-        dist.setY(2.0f*-dist.y()/height());
-        dist += saved_offset_;
-
-        camera_(0, 2) = dist.x();
-        camera_(1, 2) = dist.y();
-
+        qDebug() << "Delta " << delta.x() << delta.y();
+        translation_+= delta.cwiseProduct(Eigen::Vector2f(2.0f/width(), -2.0f/height()));
         update();
     }
 }
 
 void FlatView::mousePressEvent(QMouseEvent * event) {
-    drag_start_pos = event->pos();
-    saved_offset_ = QVector2D(camera_(0,2), camera_(1,2));
+    last_mouse_pos_ = Eigen::Vector2f(event->x(), event->y());
 }
 
 void FlatView::mouseReleaseEvent(QMouseEvent * event) {
@@ -155,27 +163,22 @@ void FlatView::wheelEvent(QWheelEvent * event) {
     float delta = sgn(event->delta())*1.0+(event->delta())/120.0;
     float s = 1.0f;
 
-    // NDC translate
-    Eigen::Matrix3f translate;
-    translate.setIdentity();
-    translate(0, 2) = 2.0f* ((event->x()/float(width())) - 0.5);
-    translate(1, 2) = -2.0f* ((event->y()/float(height())) - 0.5);
-
-    if(delta > 0 && current_scale_ < 100) {
+    if(delta > 0 && scale_ < 100) {
         s = delta;
     }
-    else if (delta < 0 && current_scale_ > 0.01) {
+    else if (delta < 0 && scale_ > 0.01) {
         s = 1.0/-delta;
     }
 
-    Eigen::Matrix3f scale;
-    scale.setIdentity();
-    scale(0, 0) = s;
-    scale(1, 1) = s;
+    // NDC translate
+    float tr_x = 1.0f* ((event->x()/float(width())) - 0.5);
+    float tr_y = 1.0f* ((event->y()/float(height())) - 0.5);
 
-    camera_ = translate * scale * translate.inverse() * camera_;
+    Eigen::Translation2f tr(tr_x, tr_y);
 
-    current_scale_ *= s;
+    translation_ = tr.inverse() * Eigen::Scaling(s) * tr * translation_;
+
+    scale_ *= s;
     update();
 }
 
@@ -212,7 +215,6 @@ void FlatView::initializeGL() {
     //
     program_.bind(); CE();
     uni_sampler_ = program_.uniformLocation("sampler"); RC(uni_sampler_);
-    //uni_width_ = program_.uniformLocation("width"); RC(uni_width_);
     uni_height_ = program_.uniformLocation("height"); RC(uni_height_);
     uni_select_color_ = program_.uniformLocation("select_color"); RC(uni_select_color_);
     uni_camera_ = program_.uniformLocation("camera"); RC(uni_camera_);
@@ -236,10 +238,11 @@ void FlatView::initializeGL() {
 
 void FlatView::paintEvent(QPaintEvent *event) {
     makeCurrent();
+    glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     //resizeGL(width(), height());
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    QRadialGradient gradient;
+    QPainter p(this);
+    /*QRadialGradient gradient;
     gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
     gradient.setCenter(0.45, 0.50);
     gradient.setFocalPoint(0.40, 0.45);
@@ -247,14 +250,17 @@ void FlatView::paintEvent(QPaintEvent *event) {
     gradient.setColorAt(0.4, QColor(81, 113, 150));
     gradient.setColorAt(0.8, QColor(16, 56, 121));
 
-    QPainter p(this);
     p.setRenderHint(QPainter::Antialiasing);
     p.setPen(Qt::NoPen);
     p.setPen(Qt::NoPen);
     p.setBrush(gradient);
     p.drawRect(0, 0, size().width(), size().height());
+    */
+    p.beginNativePainting();
 
-    //p.beginNativePainting();
+    //glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+    //glClear(GL_DEPTH_BUFFER_BIT);
+    glEnable(GL_DEPTH_TEST);
 
     if(pc_.expired()){
         qDebug() << "Nothing to paint on flatview";
@@ -265,13 +271,11 @@ void FlatView::paintEvent(QPaintEvent *event) {
     std::shared_ptr<CloudGLData> cd = gld_->cloudgldata_[pc];
 
     program_.bind(); CE();
-    glUniformMatrix3fv(uni_camera_, 1, GL_FALSE, camera_.data()); CE();
-    //glUniform1i(uni_width_, pc->scan_width_); CE();
+    glUniformMatrix3fv(uni_camera_, 1, GL_FALSE, getCamera().data()); CE();
     glUniform1i(uni_height_, pc->scan_height_); CE();
     glUniform1i(uni_sampler_, 0); CE();
     glBindTexture(GL_TEXTURE_BUFFER, texture_id_); CE();
     glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, gld_->color_lookup_buffer_->bufferId()); CE();
-
 
     glBindVertexArray(vao_);CE();
 
@@ -308,8 +312,10 @@ void FlatView::paintEvent(QPaintEvent *event) {
 
     program_.release();
 
-    //p.endNativePainting();
+    p.endNativePainting();
+    //p.end();
 
+    //glFinish();
     swapBuffers();
 }
 
@@ -327,17 +333,24 @@ void FlatView::resizeGL(int width, int height) {
     float cfy = (1/sar)/(1/war);
 
     // if wider than scan
-    if(war <  sar)
-        aspect_ratio_ = QVector2D(1.0f/pc->scan_width_, 1.0/(cfx*pc->scan_height_));
-    else
-        aspect_ratio_ = QVector2D(1.0/(cfy*pc->scan_width_), 1.0f/pc->scan_height_);
-
-    camera_(0, 0) = current_scale_*aspect_ratio_.x();
-    camera_(1, 1) = current_scale_*aspect_ratio_.y();
+    if(war <  sar){
+        aspect_ = Eigen::Vector2f(1.0f/pc->scan_width_, 1.0/(cfx*pc->scan_height_));
+        start_translation_ = Eigen::Vector2f(-0.5, -0.25);
+    } else {
+        aspect_ = Eigen::Vector2f(1.0/(cfy*pc->scan_width_), 1.0f/pc->scan_height_);
+        start_translation_ = Eigen::Vector2f(-0.25, -0.5);
+    }
 
     program_.bind(); CE();   
-    glUniformMatrix3fv(uni_camera_, 1, GL_FALSE, camera_.data()); CE();
+    glUniformMatrix3fv(uni_camera_, 1, GL_FALSE, getCamera().data()); CE();
     program_.release(); CE();
+}
+
+void FlatView::rotate(float angle) {
+    //Eigen::Transform<float, 2> tr = camera_;
+    //camera_ = tr.translation() * Eigen::Rotation2D<float>(angle) * tr.rotation();
+    rotation_ = angle;
+    update();
 }
 
 void FlatView::contextMenu(const QPoint &pos) {

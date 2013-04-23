@@ -114,6 +114,7 @@ void GLWidget::paintEvent(QPaintEvent *event) {
     // Make sure the labels are updates
     // Make sure nothing has changed
 
+    glEnable(GL_DEPTH_TEST);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     QRadialGradient gradient;
@@ -208,9 +209,9 @@ void GLWidget::mouseMoveEvent(QMouseEvent * event) {
     if(event->buttons() == Qt::LeftButton && event->modifiers() != Qt::ControlModifier){
         camera_.rotate2D(rot.x(), rot.y());
     }
-    else if(event->buttons() ==  Qt::RightButton || event->modifiers() == Qt::ControlModifier){
+    else if(event->buttons() /* ==  Qt::RightButton */ ||   event->modifiers() == Qt::ControlModifier){
         std::shared_ptr<PointCloud> pc = cl_->active_;
-        pc->rotate2D(rot.x(), rot.y());
+        pc->rotate2D(rot.x(), -rot.y());
     }
 
     if(event->buttons())

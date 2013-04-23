@@ -186,7 +186,7 @@ bool PointCloud::load_ptx(const char* filename, int decimation_factor) {
     char buff[1024];
     for(int i = 0; i < 5; i++ ){
         fgets(buff, 1024, pfile);
-        qDebug("Skipped Mat '%s'", buff);
+        //qDebug("Skipped Mat '%s'", buff);
     }
 
     unsigned int sampled_idx = 0;
@@ -231,7 +231,7 @@ bool PointCloud::load_ptx(const char* filename, int decimation_factor) {
     while(file_sample_idx < line_count){
         if(file_sample_idx % update_interval == 0) {
             double prog = 100.0*file_sample_idx/static_cast<double>(line_count);
-            qDebug("%f%% done.", prog);
+            //qDebug("%f%% done.", prog);
             ed_->updateProgress(prog);
         }
 
@@ -344,7 +344,13 @@ void PointCloud::rotate2D(float x, float y) {
 
 Eigen::Affine3f PointCloud::modelview() {
     Translation3f tr(sensor_origin_.x(), sensor_origin_.y(), sensor_origin_.z());
-    return Affine3f::Identity() * sensor_orientation_ * tr;
+
+    AngleAxis<float> rotation;
+    if(frame_ == CoordinateFrame::Camera){
+        rotation = AngleAxis<float>(-M_PI/2, Vector3f(1, 0, 0));
+    }
+
+    return  rotation * sensor_orientation_ * tr * Affine3f::Identity();
 }
 
 const Octree::Ptr PointCloud::getOctree() {

@@ -52,7 +52,7 @@ Camera::Camera() {
     fov_ = 60.0f;
     aspect_ = 1.0f;
     depth_near_ = 1.0f;
-    depth_far_ = 100.0f;
+    depth_far_ = 10000.0f;
 
     rotation_ = AngleAxis<float>(-M_PI/2, Vector3f(1, 0, 0));
 

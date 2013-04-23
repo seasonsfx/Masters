@@ -9,12 +9,13 @@
 #include "commands/select.h"
 
 CloudListView::CloudListView(QUndoStack *us, LayerList * ll,
-                             CloudList * cl, QWidget *parent)
+                             CloudList * cl, GLWidget * glwidget, QWidget *parent)
     : QDockWidget(parent),
     ui_(new Ui::CloudListView) {
     ll_ = ll;
     cl_ = cl;
     us_ = us;
+    glwidget_ = glwidget;
     ui_->setupUi(this);
     ui_->tableView->setModel(cl_);
     ui_->tableView->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -61,6 +62,30 @@ void CloudListView::contextMenu(const QPoint &pos) {
         del.setProperty("cloud_id", row);
         connect(&del, SIGNAL(triggered()), cl_, SLOT(removeCloud()));
         menu.addAction(&del);
+
+        QAction fly("Fly to cloud", 0);
+        fly.setProperty("cloud_id", row);
+        connect(&fly, &QAction::triggered, [=] () {
+            auto pos = cl_->clouds_[row]->sensor_origin_;
+            glwidget_->camera_.setPosition(-pos.x(), -pos.y(), -pos.z());
+            //qDebug() << "Flying to: " << -pos.x() << -pos.y() << -pos.z();
+            glwidget_->update();
+        });
+        menu.addAction(&fly);
+
+
+        QAction tfc("Change coordinate frame", 0);
+        tfc.setProperty("cloud_id", row);
+        connect(&tfc, &QAction::triggered, [=] () {
+            if(cl_->clouds_[row]->frame_ == CoordinateFrame::Camera)
+                cl_->clouds_[row]->frame_ = CoordinateFrame::Laser;
+            else
+                cl_->clouds_[row]->frame_ =CoordinateFrame::Camera;
+
+            glwidget_->update();
+        });
+        menu.addAction(&tfc);
+
 
         menu.exec(ui_->tableView->mapToGlobal(pos));
     }

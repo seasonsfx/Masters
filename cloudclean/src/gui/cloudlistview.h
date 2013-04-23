@@ -6,6 +6,7 @@
 #include <QItemSelection>
 #include "model/layerlist.h"
 #include "model/cloudlist.h"
+#include "gui/glwidget.h"
 
 namespace Ui {
 class CloudListView;
@@ -17,7 +18,7 @@ class CloudListView : public QDockWidget
     
  public:
     CloudListView(QUndoStack *us, LayerList * ll,
-                           CloudList * cl,
+                           CloudList * cl, GLWidget *glwidget,
                            QWidget *parent = 0);
     ~CloudListView();
 
@@ -33,6 +34,7 @@ class CloudListView : public QDockWidget
     LayerList * ll_;
     CloudList * cl_;
     QUndoStack *us_;
+    GLWidget * glwidget_;
     Ui::CloudListView *ui_;
 };
 

@@ -61,7 +61,7 @@ MainWindow::MainWindow(QUndoStack *us, CloudList * cl, LayerList * ll, QWidget *
     glwidget_->setGLD(gld_);
     flatview_->setGLD(gld_);
 
-    clv_ = new CloudListView(us, ll, cl, this);
+    clv_ = new CloudListView(us, ll, cl, glwidget_, this);
     llv_ = new LayerListView(us, ll, cl, this);
 
     progressbar_->setTextVisible( false );
@@ -228,7 +228,7 @@ void MainWindow::loadFile(){
 }
 
 void MainWindow::saveFile(){
-    QString filename = QFileDialog::getOpenFileName(
+    QString filename = QFileDialog::getSaveFileName(
                  this, tr("Save Scan"), "~", tr("PTX Files (*.ptx)"));
     if (filename.length() == 0)
         return;

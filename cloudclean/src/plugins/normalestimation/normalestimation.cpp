@@ -418,7 +418,7 @@ NormalEstimator::estimateNormals(std::shared_ptr<PointCloud> cloud) {
 
     qDebug() << "Completed normal estimation";
     qDebug() << "Normals missing" << missing_normals.size();
-    qDebug() << "Normals missing" <<
+    qDebug() << " % Normals missing" <<
                 missing_normals.size()/(float)normals->size();
 
     return normals;

@@ -14,6 +14,21 @@ CloudList::~CloudList(){
     delete mtx_;
 }
 
+Qt::ItemFlags CloudList::flags(const QModelIndex & index) const {
+    int col = index.column();
+
+    if (col == 0) {
+        return Qt::ItemIsUserCheckable | Qt::ItemIsEnabled
+                | Qt::ItemIsSelectable;
+    }
+
+    return Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled;
+}
+
+int CloudList::columnCount(const QModelIndex &) const {
+    return 2;
+}
+
 int CloudList::rowCount(const QModelIndex &) const {
     return clouds_.size();
 }
@@ -22,7 +37,7 @@ QVariant CloudList::data(const QModelIndex & index, int role) const {
     int row = index.row();
     int col = index.column();
 
-    if (col == 0) {
+    if (col == 1) {
         switch (role) {
             case Qt::DisplayRole:
             {
@@ -31,8 +46,27 @@ QVariant CloudList::data(const QModelIndex & index, int role) const {
                 return re;
             }
         }
+    } else if (col == 0) {
+        switch (role) {
+        case Qt::CheckStateRole:
+                return clouds_[row]->isVisible() ? Qt::Checked : Qt::Unchecked;
+        }
     }
+
     return QVariant();
+}
+
+bool CloudList::setData(const QModelIndex & index, const QVariant & value,
+                        int role) {
+    int row = index.row();
+    int col = index.column();
+
+    if (role == Qt::CheckStateRole && col == 0) {
+        clouds_[row]->toggleVisible();
+        emit dataChanged(index, index);
+        emit updated();
+    }
+    return true;
 }
 
 std::shared_ptr<PointCloud> CloudList::addCloud() {

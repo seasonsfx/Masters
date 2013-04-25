@@ -15,6 +15,21 @@ LayerList::~LayerList(){
     delete mtx_;
 }
 
+Qt::ItemFlags LayerList::flags(const QModelIndex & index) const {
+    int col = index.column();
+
+    if (col == 0) {
+        return Qt::ItemIsUserCheckable | Qt::ItemIsEnabled
+                | Qt::ItemIsSelectable;
+    }
+
+    return Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled;
+}
+
+int LayerList::columnCount(const QModelIndex &) const {
+    return 2;
+}
+
 int LayerList::rowCount(const QModelIndex &) const {
     return layers_.size();
 }
@@ -23,7 +38,7 @@ QVariant LayerList::data(const QModelIndex & index, int role) const {
     int row = index.row();
     int col = index.column();
 
-    if (col == 0) {
+    if (col == 1) {
         switch (role) {
         case Qt::DisplayRole:
         {
@@ -34,8 +49,27 @@ QVariant LayerList::data(const QModelIndex & index, int role) const {
         case Qt::DecorationRole:
             return layers_[row]->color_;
         }
+    } else if (col == 0) {
+        switch (role) {
+        case Qt::CheckStateRole:
+                return layers_[row]->isVisible() ? Qt::Checked : Qt::Unchecked;
+        }
     }
+
     return QVariant();
+}
+
+bool LayerList::setData(const QModelIndex & index, const QVariant & value,
+                        int role) {
+    int row = index.row();
+    int col = index.column();
+
+    if (role == Qt::CheckStateRole && col == 0) {
+        layers_[row]->toggleVisible();
+        emit dataChanged(index, index);
+        emit lookupTableUpdate();
+    }
+    return true;
 }
 
 std::shared_ptr<Layer> LayerList::addLayer(std::shared_ptr<Layer> layer){

@@ -16,8 +16,11 @@ class MODEL_DLLSPEC LayerList : public QAbstractListModel {
  public:
     explicit LayerList(QObject *parent = 0);
     ~LayerList();
+    Qt::ItemFlags flags(const QModelIndex & index) const;
+    int columnCount(const QModelIndex &) const;
     int rowCount(const QModelIndex & parent = QModelIndex()) const;
     QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
+    bool setData(const QModelIndex & index, const QVariant & value, int role);
     std::shared_ptr<Layer> addLayer(std::shared_ptr<Layer> layer);
     std::shared_ptr<Layer> addLayerWithId(uint id);
     std::shared_ptr<Layer> addLayer();

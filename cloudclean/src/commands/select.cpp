@@ -5,6 +5,7 @@
 Select::Select(std::shared_ptr<PointCloud> pc,
         std::shared_ptr<std::vector<int> > selected,
         std::shared_ptr<std::vector<int> > deselected,
+        std::shared_ptr<std::vector<uint16_t> > exclude_labels,
         QUndoCommand *parent)
         : QUndoCommand(parent) {
     selected_.reset(new std::vector<int>());
@@ -17,13 +18,21 @@ Select::Select(std::shared_ptr<PointCloud> pc,
         return bool((uint8_t)PointFlags::selected & uint8_t(pc->flags_[idx]));
     };
 
+    auto is_excluded = [&exclude_labels, &pc] (int idx) {
+        for(uint16_t elabel : *exclude_labels) {
+            if(elabel == pc->labels_[idx])
+                return true;
+        }
+        return false;
+    };
+
     for(int idx : *deselected) {
-        if(is_selected(idx))
+    if(is_selected(idx) && !is_excluded(idx))
             deselected_->push_back(idx);
     }
 
     for(int idx : *selected) {
-        if(!is_selected(idx))
+        if(!is_selected(idx) && !is_excluded(idx))
             selected_->push_back(idx);
     }
 

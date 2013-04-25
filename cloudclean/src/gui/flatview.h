@@ -21,7 +21,7 @@ class GUI_DLLSPEC FlatView : public QGLWidget {
              LayerList * ll, QWidget *parent = 0,
              QGLWidget * sharing = 0);
     void setGLD(GLData *gld);
-    const Eigen::Matrix3f getCamera();
+    const Eigen::Affine2f getCamera();
 
     int imageToCloudIdx(int x, int y);
     QPoint cloudToImageCoord(int idx);
@@ -69,11 +69,11 @@ class GUI_DLLSPEC FlatView : public QGLWidget {
     GLuint texture_id_;
     GLuint vao_;
 
-    float scale_;
-    //QVector2D saved_offset_;
 
-    Eigen::Vector2f start_translation_;
-    Eigen::Vector2f translation_;
+    Eigen::Affine2f transform_;
+
+    float current_scale_;
+
     float rotation_;
     Eigen::Vector2f aspect_;
 

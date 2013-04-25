@@ -34,7 +34,12 @@ CloudListView::CloudListView(QUndoStack *us, LayerList * ll,
 
     ui_->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui_->tableView->setContextMenuPolicy(Qt::CustomContextMenu);
-
+    ui_->tableView->setColumnWidth(0, 30);
+    ui_->tableView->horizontalHeader()->setStretchLastSection(true);
+    ui_->tableView->setStyleSheet(
+        "QTableView::indicator:unchecked {image: url(:/eye_closed.png);}"
+        "QTableView::indicator:checked {image: url(:/eye_open.png);}"
+    );
 }
 
 CloudListView::~CloudListView() {

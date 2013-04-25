@@ -179,39 +179,11 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
     std::function<void (const char *)> loadcloud = [&] (const char * fname) {
 
         std::shared_ptr<PointCloud> pc = core_->cl_->loadFile(fname);
-
-        // make a selection
-        std::vector<PointFlags> & flags = pc->flags_;
-        for(uint i = 0; i < flags.size()/5; i++){
-            flags[i] = PointFlags::selected;
-        }
-
-
-        // create layers with colors
-        std::shared_ptr<Layer> layers[3];
-        layers[0] = core_->ll_->addLayer("Test1");
-        layers[1] = core_->ll_->addLayer("Test2");
-        layers[2] = core_->ll_->addLayer("Test3");
-
-        // make five labels
-        for(int i = 0; i < 5; i++){
-            layers[i%3]->addLabel(core_->ll_->newLabelId());
-        }
-
-
-        // label the cloud
-        std::vector<int16_t> & labels = pc->labels_;
-        for(uint i = 1; i <= labels.size(); i++){
-            int l = 1+5*(float(i)/labels.size());
-            labels[i] = l;
-        }
-
-        qDebug() << "Loaded";
-        qDebug() << "Size: " << pc->size();
-
     };
 
-    //std::thread(loadcloud, "/home/rickert/trees.ptx").detach();
+    if(argc == 2)
+        std::thread(loadcloud, argv[1]).detach();
+
     //std::thread(loadcloud, "/home/rickert/Workspace/uscans/2011.06.11-10.23.54.zfs_cy.ptx").detach();
     //std::thread(loadcloud, "/home/rickert/Workspace/uscans/Petra_Top_xf.ptx").detach();
     //std::thread(loadcloud, "/home/rickert/Petra_Top_xf.ptx").detach();

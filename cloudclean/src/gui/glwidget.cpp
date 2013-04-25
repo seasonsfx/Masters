@@ -152,6 +152,9 @@ void GLWidget::paintEvent(QPaintEvent *event) {
         std::shared_ptr<PointCloud> pc = pair.first;
         std::shared_ptr<CloudGLData> cd = pair.second;
 
+        if(!pc->isVisible())
+            continue;
+
         glBindVertexArray(vao_);
 
         // Point buffer

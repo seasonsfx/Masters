@@ -59,6 +59,7 @@ PointCloud::PointCloud()
     min_bounding_box_ = Eigen::Vector3f(INFINITY, INFINITY, INFINITY);
     max_bounding_box_ = Eigen::Vector3f(-INFINITY, -INFINITY, -INFINITY);
     deleting_ = false;
+    visible_ = true;
 }
 
 PointCloud::~PointCloud() {
@@ -359,4 +360,12 @@ const Octree::Ptr PointCloud::getOctree() {
 
     octree = fut_octree.get();
     return octree;
+}
+
+bool PointCloud::isVisible() {
+    return visible_;
+}
+
+void PointCloud::toggleVisible() {
+    visible_ = !visible_;
 }

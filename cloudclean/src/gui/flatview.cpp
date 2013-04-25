@@ -12,20 +12,11 @@ FlatView::FlatView(QGLFormat & fmt, CloudList * cl,
     : QGLWidget(fmt, parent, sharing), rotation_(0.0f) {
     cl_ = cl;
     ll_ = ll;
-    scale_ = 2;
-    translation_ = Eigen::Vector2f(0, 0);
-    //aspect_ratio_ = QVector2D(-1, -1);
-    //camera_.setIdentity();
-    //camera_(0,2) = -1;
-    //camera_(1,2) = -0.5;
-    //camera_(0,2) = -0.5;
-    //camera_(1,2) = -1.0;
+    current_scale_ = 1;
+    transform_.setIdentity();
     setMouseTracking(true);
     setAutoFillBackground(false);
     setAutoBufferSwap(false);
-
-    //connect(this, SIGNAL(customContextMenuRequested(const QPoint&)),
-    //        this, SLOT(contextMenu(const QPoint &)));
 
     setContextMenuPolicy(Qt::CustomContextMenu);
 }
@@ -48,18 +39,15 @@ void FlatView::setGLD(GLData * gld){
  *           ********
  */
 
-const Eigen::Matrix3f FlatView::getCamera() {
-
+const Eigen::Affine2f FlatView::getCamera() {
+    auto pc = pc_.lock();
 
     return
-            //Eigen::Translation2f(translation_) *
-            //Eigen::AlignedScaling2f(scale_, scale_) *
-
-            Eigen::AlignedScaling2f(scale_ * aspect_) *
+            transform_ *
+            Eigen::AlignedScaling2f(aspect_) *
             Eigen::Rotation2Df(rotation_) *
-            Eigen::Translation2f(translation_) *
-            Eigen::Translation2f(start_translation_) *
-            Eigen::Matrix3f::Identity();
+            Eigen::Translation2f(-pc->scan_width_*0.5, -pc->scan_height_*0.5)  *
+            Eigen::Affine2f::Identity();
 }
 
 int binary_search(std::vector<int> A, int key) {
@@ -127,6 +115,7 @@ void FlatView::setCloud(std::shared_ptr<PointCloud> new_pc) {
 
     connect(pc->ed_.get(), SIGNAL(flagUpdate()), this, SLOT(update()));
     connect(pc->ed_.get(), SIGNAL(labelUpdate()), this, SLOT(update()));
+    resizeGL(width(), height());
     update();
 }
 
@@ -137,8 +126,9 @@ void FlatView::mouseMoveEvent(QMouseEvent * event) {
         return;
 
     if(event->buttons()){
+        delta = delta.cwiseProduct(Eigen::Vector2f(2.0f/width(), -2.0f/height()));
         qDebug() << "Delta " << delta.x() << delta.y();
-        translation_+= delta.cwiseProduct(Eigen::Vector2f(2.0f/width(), -2.0f/height()));
+        transform_ = Eigen::Translation2f(delta) * transform_;
         update();
     }
 }
@@ -162,29 +152,28 @@ void FlatView::wheelEvent(QWheelEvent * event) {
 
     float delta = sgn(event->delta())*1.0+(event->delta())/120.0;
     float s = 1.0f;
-
-    if(delta > 0 && scale_ < 100) {
+    if(delta > 0 && current_scale_ < 100)
         s = delta;
-    }
-    else if (delta < 0 && scale_ > 0.01) {
+    else if (delta < 0 && current_scale_ > 0.01)
         s = 1.0/-delta;
-    }
 
-    // NDC translate
-    float tr_x = 1.0f* ((event->x()/float(width())) - 0.5);
-    float tr_y = 1.0f* ((event->y()/float(height())) - 0.5);
+
+    float w = width();
+    float h = height();
+
+    float tr_x = -2.0 * (event->x()/w - 0.5);
+    float tr_y = -2.0 * ((height()-event->y())/h - 0.5);
 
     Eigen::Translation2f tr(tr_x, tr_y);
 
-    translation_ = tr.inverse() * Eigen::Scaling(s) * tr * translation_;
+    transform_ =  tr.inverse() * Eigen::Scaling(s) * tr * transform_;
 
-    scale_ *= s;
     update();
 }
 
 void FlatView::initializeGL() {
     glClearColor(0.0, 0.0, 0.0, 1.0);
-    glEnable(GL_CULL_FACE);
+    //glEnable(GL_CULL_FACE);
     glEnable(GL_MULTISAMPLE);
 
     //
@@ -332,13 +321,11 @@ void FlatView::resizeGL(int width, int height) {
     float cfx = sar/war;
     float cfy = (1/sar)/(1/war);
 
-    // if wider than scan
+    // screen if wider than scan
     if(war <  sar){
-        aspect_ = Eigen::Vector2f(1.0f/pc->scan_width_, 1.0/(cfx*pc->scan_height_));
-        start_translation_ = Eigen::Vector2f(-0.5, -0.25);
+        aspect_ = Eigen::Vector2f(2.0f/pc->scan_width_, 2.0/(cfx*pc->scan_height_));
     } else {
-        aspect_ = Eigen::Vector2f(1.0/(cfy*pc->scan_width_), 1.0f/pc->scan_height_);
-        start_translation_ = Eigen::Vector2f(-0.25, -0.5);
+        aspect_ = Eigen::Vector2f(2.0/(cfy*pc->scan_width_), 2.0f/pc->scan_height_);
     }
 
     program_.bind(); CE();   
@@ -347,9 +334,7 @@ void FlatView::resizeGL(int width, int height) {
 }
 
 void FlatView::rotate(float angle) {
-    //Eigen::Transform<float, 2> tr = camera_;
-    //camera_ = tr.translation() * Eigen::Rotation2D<float>(angle) * tr.rotation();
-    rotation_ = angle;
+    rotation_ += angle;
     update();
 }
 

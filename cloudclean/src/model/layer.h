@@ -26,6 +26,9 @@ class MODEL_DLLSPEC Layer : public QObject {
     void removeLabel(uint16_t id);
     const std::set<uint16_t> &getLabelSet();
 
+    bool isVisible() const;
+    void toggleVisible();
+
  signals:
     void colorChanged();
     void nameChanged();
@@ -35,6 +38,8 @@ class MODEL_DLLSPEC Layer : public QObject {
     std::set<uint16_t> labels_;
 
     static uint last_id_;
+
+    bool visible_;
 
  public:
     QString name_;

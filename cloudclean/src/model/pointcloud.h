@@ -77,9 +77,13 @@ class MODEL_DLLSPEC PointCloud : public pcl::PointCloud<pcl::PointXYZI> {
     Eigen::Affine3f modelview();
     const Octree::Ptr getOctree();
 
+    bool isVisible();
+    void toggleVisible();
+
  private:
     std::future<Octree::Ptr> fut_octree;
     Octree::Ptr octree;
+    bool visible_;
 
  public:
     std::shared_ptr<EventDispatcher> ed_;

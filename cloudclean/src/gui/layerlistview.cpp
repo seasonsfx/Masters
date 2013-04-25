@@ -28,6 +28,12 @@ LayerListView::LayerListView(QUndoStack * us, LayerList * ll,
     connect(ui_->tableView, SIGNAL(customContextMenuRequested(const QPoint&)),
             this, SLOT(contextMenu(const QPoint &)));
     ui_->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui_->tableView->setColumnWidth(0, 30);
+    ui_->tableView->horizontalHeader()->setStretchLastSection(true);
+    ui_->tableView->setStyleSheet(
+        "QTableView::indicator:unchecked {image: url(:/eye_closed.png);}"
+        "QTableView::indicator:checked {image: url(:/eye_open.png);}"
+    );
 }
 
 LayerListView::~LayerListView() {
@@ -188,8 +194,35 @@ void LayerListView::contextMenu(const QPoint &pos) {
                 SLOT(intersectSelectedLayers()));
         menu.addAction(&inter);
 
-        QAction selectLayer("Select", 0);
-        menu.addAction(&selectLayer);
+        QAction select_layer("Select points", 0);
+        connect(&select_layer, &QAction::triggered, [=] () {
+
+            std::set<uint16_t> selected_labels;
+            for(std::weak_ptr<Layer> wl : ll_->selection_) {
+                std::shared_ptr<Layer> l = wl.lock();
+                for(uint16_t label  : l->getLabelSet()) {
+                    selected_labels.insert(label);
+                }
+            }
+
+            us_->beginMacro("Select layer");
+            for(std::shared_ptr<PointCloud> pc : cl_->clouds_){
+                std::shared_ptr<std::vector<int>> points = std::make_shared<std::vector<int>>();
+                for(int idx = 0; idx < pc->size(); ++idx) {
+                    for(uint16_t slabel : selected_labels) {
+                        if(slabel == pc->labels_[idx]){
+                            points->push_back(idx);
+                            break;
+                        }
+                    }
+                }
+
+                us_->push(new Select(pc, points));
+
+            }
+            us_->endMacro();
+        });
+        menu.addAction(&select_layer);
 
         menu.exec(ui_->tableView->mapToGlobal(pos));
     }

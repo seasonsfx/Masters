@@ -7,5 +7,7 @@
         <file>flatview.vs.glsl</file>
         <file>basic.frag</file>
         <file>basic.vert</file>
+        <file>eye_closed.png</file>
+        <file>eye_open.png</file>
     </qresource>
 </RCC>

@@ -58,6 +58,9 @@ void GLData::reloadColorLookupBuffer(){
         std::vector<const Layer *> selected;
 
         for(const Layer * layer : layerset) {
+            if(!layer->isVisible())
+                return QColor(0, 0, 0, 0);
+
             for(std::weak_ptr<Layer> l : ll_->selection_){
                 std::shared_ptr<Layer> selected_layer = l.lock();
                 if(layer == selected_layer.get()){

@@ -14,6 +14,7 @@ public:
     explicit Select(std::shared_ptr<PointCloud> pc,
                            std::shared_ptr<std::vector<int> > selected,
                            std::shared_ptr<std::vector<int> > deselected = std::shared_ptr<std::vector<int> >(new std::vector<int>()),
+                           std::shared_ptr<std::vector<uint16_t> > exclude_labels = std::shared_ptr<std::vector<uint16_t> >(new std::vector<uint16_t>()),
                            QUndoCommand *parent = 0);
     QString actionText();
     virtual void undo();

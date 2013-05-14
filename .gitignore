@@ -10,6 +10,7 @@ cloudclean/build2
 cloudclean_bin
 build
 build2
+build-debug
 #Makefile
 CMakeCache.txt
 CMakeLists.txt.user*

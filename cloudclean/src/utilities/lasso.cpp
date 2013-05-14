@@ -158,9 +158,14 @@ void Lasso::getIndices(Eigen::Matrix4f & ndc_mat,
         p_4 << p.x, p.y, p.z, 1;
         p_4 = ndc_mat * p_4;
 
-        if(p_4.z() < -1.0f || p_4.z() > 1.0f)
+        // Limit to clipping area
+        //if(p_4.z() < -1.0f || p_4.z() > 1.0f)
+        //    return false;
+
+        if(p_4.z() < 0.0f)
             return false;
 
+        // Perspective divide
         Eigen::Vector2f p_2;
         p_2 << p_4.x(), p_4.y();
         p_2 /= p_4.z();
@@ -170,7 +175,7 @@ void Lasso::getIndices(Eigen::Matrix4f & ndc_mat,
     };
 
     if(source_indices->size() == 0) {
-        for (int idx = 0; idx < cloud->size(); idx++) {
+        for (uint idx = 0; idx < cloud->size(); idx++) {
             if(inside_lasso(cloud->points[idx])) {
                 source_indices->push_back(idx);
             }

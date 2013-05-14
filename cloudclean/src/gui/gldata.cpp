@@ -100,7 +100,7 @@ void GLData::reloadColorLookupBuffer(){
 
     glUnmapBuffer(GL_ARRAY_BUFFER);
     color_lookup_buffer_->release(); CE();
-    qDebug() << "Color lookup buffer synced";
+    //qDebug() << "Color lookup buffer synced";
     emit update();
 }
 

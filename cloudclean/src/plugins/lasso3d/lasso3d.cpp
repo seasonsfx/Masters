@@ -36,7 +36,7 @@ void Lasso3D::initialize(Core *core){
     flatview_ = core_->mw_->flatview_;
     mw_ = core_->mw_;
 
-    enable_ = new QAction(QIcon(":/images/lasso.png"), "3d polygon lasso tool", 0);
+    enable_ = new QAction(QIcon(":/images/lasso_3d.png"), "3d polygon lasso tool", 0);
     enable_->setCheckable(true);
     enable_->setChecked(false);
 

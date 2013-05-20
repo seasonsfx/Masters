@@ -1,17 +1,1678 @@
-MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:63 virtual void GLWidget::initializeGL()): "" 
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/mainwindow.cpp:57 MainWindow::MainWindow(QUndoStack*, CloudList*, LayerList*, QWidget*)): Format:  3 0 
 
-MESSAGE (/home/rickert/Masters/cloudclean/src/gui/gldata.cpp:100 void GLData::reloadColorLookupBuffer()): Color lookup buffer synced 
+MESSAGE (qglshaderprogram.cpp:295 bool QGLShaderPrivate::compile(QGLShader*)): QGLShader::compile(Vertex): 0:1(10): error: GLSL 3.30 is not supported. Supported versions are: 1.00 ES, 1.10, 1.20, and 1.30
+
+0:6(1): error: syntax error, unexpected IDENTIFIER
+
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:67 virtual void GLWidget::initializeGL()): Shader compile log: "0:1(10): error: GLSL 3.30 is not supported. Supported versions are: 1.00 ES, 1.10, 1.20, and 1.30
+
+0:6(1): error: syntax error, unexpected IDENTIFIER
+" 
+
+MESSAGE (qglshaderprogram.cpp:295 bool QGLShaderPrivate::compile(QGLShader*)): QGLShader::compile(Fragment): 0:1(10): error: GLSL 3.30 is not supported. Supported versions are: 1.00 ES, 1.10, 1.20, and 1.30
+
+0:6(1): error: syntax error, unexpected IDENTIFIER
+
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:70 virtual void GLWidget::initializeGL()): Shader compile log: "0:1(10): error: GLSL 3.30 is not supported. Supported versions are: 1.00 ES, 1.10, 1.20, and 1.30
+
+0:6(1): error: syntax error, unexpected IDENTIFIER
+" 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:84 virtual void GLWidget::initializeGL()): Function call failed on line 84 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:85 virtual void GLWidget::initializeGL()): Function call failed on line 85 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:86 virtual void GLWidget::initializeGL()): Function call failed on line 86 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:87 virtual void GLWidget::initializeGL()): Function call failed on line 87 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:166 IPlugin* PluginManager::loadPlugin(QString)): Err load?  
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:166 IPlugin* PluginManager::loadPlugin(QString)): Err load?  
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:166 IPlugin* PluginManager::loadPlugin(QString)): Err load?  
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:166 IPlugin* PluginManager::loadPlugin(QString)): Err load?  
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:166 IPlugin* PluginManager::loadPlugin(QString)): Err load?  
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:166 IPlugin* PluginManager::loadPlugin(QString)): Err load?  
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:168 IPlugin* PluginManager::loadPlugin(QString)): Could not load plugin:  "/home/rickert/Masters/cloudclean/lib/plugins/libnormalestimator.so" 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:169 IPlugin* PluginManager::loadPlugin(QString)): ERROR:  "Cannot load library /home/rickert/Masters/cloudclean/lib/plugins/libnormalestimator.so: (libOpenCL.so.1: cannot open shared object file: No such file or directory)" 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:166 IPlugin* PluginManager::loadPlugin(QString)): Err load?  
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:168 IPlugin* PluginManager::loadPlugin(QString)): Could not load plugin:  "/home/rickert/Masters/cloudclean/lib/plugins/libvisualisenormals.so" 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:169 IPlugin* PluginManager::loadPlugin(QString)): ERROR:  "Cannot load library /home/rickert/Masters/cloudclean/lib/plugins/libvisualisenormals.so: (libOpenCL.so.1: cannot open shared object file: No such file or directory)" 
 
 MESSAGE (kernel/qlayout.cpp:143 QLayout::QLayout(QLayoutPrivate&, QLayout*, QWidget*)): QLayout: Attempting to add QLayout "" to QWidget "", which already has a layout
 
+MESSAGE (qglshaderprogram.cpp:295 bool QGLShaderPrivate::compile(QGLShader*)): QGLShader::compile(Vertex): 0:1(10): error: GLSL 3.30 is not supported. Supported versions are: 1.00 ES, 1.10, 1.20, and 1.30
+
+0:5(1): error: syntax error, unexpected IDENTIFIER
+
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:185 virtual void FlatView::initializeGL()): Shader compile log: "0:1(10): error: GLSL 3.30 is not supported. Supported versions are: 1.00 ES, 1.10, 1.20, and 1.30
+
+0:5(1): error: syntax error, unexpected IDENTIFIER
+" 
+
+MESSAGE (qglshaderprogram.cpp:295 bool QGLShaderPrivate::compile(QGLShader*)): QGLShader::compile(Fragment): 0:1(10): error: GLSL 3.30 is not supported. Supported versions are: 1.00 ES, 1.10, 1.20, and 1.30
+
+0:6(1): error: syntax error, unexpected IDENTIFIER
+
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:189 virtual void FlatView::initializeGL()): Shader compile log: "0:1(10): error: GLSL 3.30 is not supported. Supported versions are: 1.00 ES, 1.10, 1.20, and 1.30
+
+0:6(1): error: syntax error, unexpected IDENTIFIER
+" 
+
+MESSAGE (qglshaderprogram.cpp:250 bool QGLShaderPrivate::create()): bool QGLShaderPrivate::create(): Could not create shader of type 4.
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:191 virtual void FlatView::initializeGL()): GL Error: "invalid enumerant" on line 191 of /home/rickert/Masters/cloudclean/src/gui/flatview.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:193 virtual void FlatView::initializeGL()): Shader compile log: "" 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:206 virtual void FlatView::initializeGL()): Function call failed on line 206 of /home/rickert/Masters/cloudclean/src/gui/flatview.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:207 virtual void FlatView::initializeGL()): Function call failed on line 207 of /home/rickert/Masters/cloudclean/src/gui/flatview.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:208 virtual void FlatView::initializeGL()): Function call failed on line 208 of /home/rickert/Masters/cloudclean/src/gui/flatview.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:209 virtual void FlatView::initializeGL()): Function call failed on line 209 of /home/rickert/Masters/cloudclean/src/gui/flatview.cpp 
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/mainwindow.cpp:57 MainWindow::MainWindow(QUndoStack*, CloudList*, LayerList*, QWidget*)): Format:  3 0 
+
+MESSAGE (qglshaderprogram.cpp:295 bool QGLShaderPrivate::compile(QGLShader*)): QGLShader::compile(Vertex): 0:1(10): error: GLSL 3.30 is not supported. Supported versions are: 1.00 ES, 1.10, 1.20, and 1.30
+
+0:6(1): error: syntax error, unexpected IDENTIFIER
+
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:67 virtual void GLWidget::initializeGL()): Shader compile log: "0:1(10): error: GLSL 3.30 is not supported. Supported versions are: 1.00 ES, 1.10, 1.20, and 1.30
+
+0:6(1): error: syntax error, unexpected IDENTIFIER
+" 
+
+MESSAGE (qglshaderprogram.cpp:295 bool QGLShaderPrivate::compile(QGLShader*)): QGLShader::compile(Fragment): 0:1(10): error: GLSL 3.30 is not supported. Supported versions are: 1.00 ES, 1.10, 1.20, and 1.30
+
+0:6(1): error: syntax error, unexpected IDENTIFIER
+
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:70 virtual void GLWidget::initializeGL()): Shader compile log: "0:1(10): error: GLSL 3.30 is not supported. Supported versions are: 1.00 ES, 1.10, 1.20, and 1.30
+
+0:6(1): error: syntax error, unexpected IDENTIFIER
+" 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:84 virtual void GLWidget::initializeGL()): Function call failed on line 84 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:85 virtual void GLWidget::initializeGL()): Function call failed on line 85 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:86 virtual void GLWidget::initializeGL()): Function call failed on line 86 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:87 virtual void GLWidget::initializeGL()): Function call failed on line 87 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:166 IPlugin* PluginManager::loadPlugin(QString)): Err load?  
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:166 IPlugin* PluginManager::loadPlugin(QString)): Err load?  
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:166 IPlugin* PluginManager::loadPlugin(QString)): Err load?  
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:166 IPlugin* PluginManager::loadPlugin(QString)): Err load?  
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:166 IPlugin* PluginManager::loadPlugin(QString)): Err load?  
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:168 IPlugin* PluginManager::loadPlugin(QString)): Could not load plugin:  "/home/rickert/Masters/cloudclean/lib/plugins/libnormalestimator.so" 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:169 IPlugin* PluginManager::loadPlugin(QString)): ERROR:  "Cannot load library /home/rickert/Masters/cloudclean/lib/plugins/libnormalestimator.so: (libOpenCL.so.1: cannot open shared object file: No such file or directory)" 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:166 IPlugin* PluginManager::loadPlugin(QString)): Err load?  
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:168 IPlugin* PluginManager::loadPlugin(QString)): Could not load plugin:  "/home/rickert/Masters/cloudclean/lib/plugins/libvisualisenormals.so" 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:169 IPlugin* PluginManager::loadPlugin(QString)): ERROR:  "Cannot load library /home/rickert/Masters/cloudclean/lib/plugins/libvisualisenormals.so: (libOpenCL.so.1: cannot open shared object file: No such file or directory)" 
+
 MESSAGE (kernel/qlayout.cpp:143 QLayout::QLayout(QLayoutPrivate&, QLayout*, QWidget*)): QLayout: Attempting to add QLayout "" to QWidget "", which already has a layout
 
-MESSAGE (/home/rickert/Masters/cloudclean/src/plugins/normalestimation/normalestimation.cpp:45 virtual void NormalEstimator::initialize(Core*)): No OpenCL platform found!
+MESSAGE (qglshaderprogram.cpp:295 bool QGLShaderPrivate::compile(QGLShader*)): QGLShader::compile(Vertex): 0:1(10): error: GLSL 3.30 is not supported. Supported versions are: 1.00 ES, 1.10, 1.20, and 1.30
 
+0:5(1): error: syntax error, unexpected IDENTIFIER
+
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:185 virtual void FlatView::initializeGL()): Shader compile log: "0:1(10): error: GLSL 3.30 is not supported. Supported versions are: 1.00 ES, 1.10, 1.20, and 1.30
+
+0:5(1): error: syntax error, unexpected IDENTIFIER
+" 
+
+MESSAGE (qglshaderprogram.cpp:295 bool QGLShaderPrivate::compile(QGLShader*)): QGLShader::compile(Fragment): 0:1(10): error: GLSL 3.30 is not supported. Supported versions are: 1.00 ES, 1.10, 1.20, and 1.30
+
+0:6(1): error: syntax error, unexpected IDENTIFIER
+
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:189 virtual void FlatView::initializeGL()): Shader compile log: "0:1(10): error: GLSL 3.30 is not supported. Supported versions are: 1.00 ES, 1.10, 1.20, and 1.30
+
+0:6(1): error: syntax error, unexpected IDENTIFIER
+" 
+
+MESSAGE (qglshaderprogram.cpp:250 bool QGLShaderPrivate::create()): bool QGLShaderPrivate::create(): Could not create shader of type 4.
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:191 virtual void FlatView::initializeGL()): GL Error: "invalid enumerant" on line 191 of /home/rickert/Masters/cloudclean/src/gui/flatview.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:193 virtual void FlatView::initializeGL()): Shader compile log: "" 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:206 virtual void FlatView::initializeGL()): Function call failed on line 206 of /home/rickert/Masters/cloudclean/src/gui/flatview.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:207 virtual void FlatView::initializeGL()): Function call failed on line 207 of /home/rickert/Masters/cloudclean/src/gui/flatview.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:208 virtual void FlatView::initializeGL()): Function call failed on line 208 of /home/rickert/Masters/cloudclean/src/gui/flatview.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:209 virtual void FlatView::initializeGL()): Function call failed on line 209 of /home/rickert/Masters/cloudclean/src/gui/flatview.cpp 
 
 MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
 
 MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
 
 MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:166 IPlugin* PluginManager::loadPlugin(QString)): Err load?  
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:166 IPlugin* PluginManager::loadPlugin(QString)): Err load?  
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:168 IPlugin* PluginManager::loadPlugin(QString)): Could not load plugin:  "" 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:169 IPlugin* PluginManager::loadPlugin(QString)): ERROR:  "The shared library was not found." 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/mainwindow.cpp:57 MainWindow::MainWindow(QUndoStack*, CloudList*, LayerList*, QWidget*)): Format:  3 0 
+
+MESSAGE (qglshaderprogram.cpp:295 bool QGLShaderPrivate::compile(QGLShader*)): QGLShader::compile(Vertex): 0:1(10): error: GLSL 3.30 is not supported. Supported versions are: 1.00 ES, 1.10, 1.20, and 1.30
+
+0:6(1): error: syntax error, unexpected IDENTIFIER
+
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:67 virtual void GLWidget::initializeGL()): Shader compile log: "0:1(10): error: GLSL 3.30 is not supported. Supported versions are: 1.00 ES, 1.10, 1.20, and 1.30
+
+0:6(1): error: syntax error, unexpected IDENTIFIER
+" 
+
+MESSAGE (qglshaderprogram.cpp:295 bool QGLShaderPrivate::compile(QGLShader*)): QGLShader::compile(Fragment): 0:1(10): error: GLSL 3.30 is not supported. Supported versions are: 1.00 ES, 1.10, 1.20, and 1.30
+
+0:6(1): error: syntax error, unexpected IDENTIFIER
+
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:70 virtual void GLWidget::initializeGL()): Shader compile log: "0:1(10): error: GLSL 3.30 is not supported. Supported versions are: 1.00 ES, 1.10, 1.20, and 1.30
+
+0:6(1): error: syntax error, unexpected IDENTIFIER
+" 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:84 virtual void GLWidget::initializeGL()): Function call failed on line 84 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:85 virtual void GLWidget::initializeGL()): Function call failed on line 85 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:86 virtual void GLWidget::initializeGL()): Function call failed on line 86 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:87 virtual void GLWidget::initializeGL()): Function call failed on line 87 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:166 IPlugin* PluginManager::loadPlugin(QString)): Err load?  
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:166 IPlugin* PluginManager::loadPlugin(QString)): Err load?  
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:166 IPlugin* PluginManager::loadPlugin(QString)): Err load?  
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:166 IPlugin* PluginManager::loadPlugin(QString)): Err load?  
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:166 IPlugin* PluginManager::loadPlugin(QString)): Err load?  
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:166 IPlugin* PluginManager::loadPlugin(QString)): Err load?  
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:168 IPlugin* PluginManager::loadPlugin(QString)): Could not load plugin:  "/home/rickert/Masters/cloudclean/lib/plugins/libnormalestimator.so" 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:169 IPlugin* PluginManager::loadPlugin(QString)): ERROR:  "Cannot load library /home/rickert/Masters/cloudclean/lib/plugins/libnormalestimator.so: (libOpenCL.so.1: cannot open shared object file: No such file or directory)" 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:166 IPlugin* PluginManager::loadPlugin(QString)): Err load?  
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:168 IPlugin* PluginManager::loadPlugin(QString)): Could not load plugin:  "/home/rickert/Masters/cloudclean/lib/plugins/libvisualisenormals.so" 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:169 IPlugin* PluginManager::loadPlugin(QString)): ERROR:  "Cannot load library /home/rickert/Masters/cloudclean/lib/plugins/libvisualisenormals.so: (libOpenCL.so.1: cannot open shared object file: No such file or directory)" 
+
+MESSAGE (kernel/qlayout.cpp:143 QLayout::QLayout(QLayoutPrivate&, QLayout*, QWidget*)): QLayout: Attempting to add QLayout "" to QWidget "", which already has a layout
+
+MESSAGE (qglshaderprogram.cpp:295 bool QGLShaderPrivate::compile(QGLShader*)): QGLShader::compile(Vertex): 0:1(10): error: GLSL 3.30 is not supported. Supported versions are: 1.00 ES, 1.10, 1.20, and 1.30
+
+0:5(1): error: syntax error, unexpected IDENTIFIER
+
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:185 virtual void FlatView::initializeGL()): Shader compile log: "0:1(10): error: GLSL 3.30 is not supported. Supported versions are: 1.00 ES, 1.10, 1.20, and 1.30
+
+0:5(1): error: syntax error, unexpected IDENTIFIER
+" 
+
+MESSAGE (qglshaderprogram.cpp:295 bool QGLShaderPrivate::compile(QGLShader*)): QGLShader::compile(Fragment): 0:1(10): error: GLSL 3.30 is not supported. Supported versions are: 1.00 ES, 1.10, 1.20, and 1.30
+
+0:6(1): error: syntax error, unexpected IDENTIFIER
+
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:189 virtual void FlatView::initializeGL()): Shader compile log: "0:1(10): error: GLSL 3.30 is not supported. Supported versions are: 1.00 ES, 1.10, 1.20, and 1.30
+
+0:6(1): error: syntax error, unexpected IDENTIFIER
+" 
+
+MESSAGE (qglshaderprogram.cpp:250 bool QGLShaderPrivate::create()): bool QGLShaderPrivate::create(): Could not create shader of type 4.
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:191 virtual void FlatView::initializeGL()): GL Error: "invalid enumerant" on line 191 of /home/rickert/Masters/cloudclean/src/gui/flatview.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:193 virtual void FlatView::initializeGL()): Shader compile log: "" 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:206 virtual void FlatView::initializeGL()): Function call failed on line 206 of /home/rickert/Masters/cloudclean/src/gui/flatview.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:207 virtual void FlatView::initializeGL()): Function call failed on line 207 of /home/rickert/Masters/cloudclean/src/gui/flatview.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:208 virtual void FlatView::initializeGL()): Function call failed on line 208 of /home/rickert/Masters/cloudclean/src/gui/flatview.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:209 virtual void FlatView::initializeGL()): Function call failed on line 209 of /home/rickert/Masters/cloudclean/src/gui/flatview.cpp 
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:135 bool PluginManager::unloadPlugin(IPlugin*)): Err unload?  
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:166 IPlugin* PluginManager::loadPlugin(QString)): Err load?  
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:168 IPlugin* PluginManager::loadPlugin(QString)): Could not load plugin:  "" 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:169 IPlugin* PluginManager::loadPlugin(QString)): ERROR:  "The shared library was not found." 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/mainwindow.cpp:57 MainWindow::MainWindow(QUndoStack*, CloudList*, LayerList*, QWidget*)): Format:  3 0 
+
+MESSAGE (qglshaderprogram.cpp:295 bool QGLShaderPrivate::compile(QGLShader*)): QGLShader::compile(Vertex): 0:1(10): error: GLSL 3.30 is not supported. Supported versions are: 1.00 ES, 1.10, 1.20, and 1.30
+
+0:6(1): error: syntax error, unexpected IDENTIFIER
+
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:67 virtual void GLWidget::initializeGL()): Shader compile log: "0:1(10): error: GLSL 3.30 is not supported. Supported versions are: 1.00 ES, 1.10, 1.20, and 1.30
+
+0:6(1): error: syntax error, unexpected IDENTIFIER
+" 
+
+MESSAGE (qglshaderprogram.cpp:295 bool QGLShaderPrivate::compile(QGLShader*)): QGLShader::compile(Fragment): 0:1(10): error: GLSL 3.30 is not supported. Supported versions are: 1.00 ES, 1.10, 1.20, and 1.30
+
+0:6(1): error: syntax error, unexpected IDENTIFIER
+
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:70 virtual void GLWidget::initializeGL()): Shader compile log: "0:1(10): error: GLSL 3.30 is not supported. Supported versions are: 1.00 ES, 1.10, 1.20, and 1.30
+
+0:6(1): error: syntax error, unexpected IDENTIFIER
+" 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:84 virtual void GLWidget::initializeGL()): Function call failed on line 84 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:85 virtual void GLWidget::initializeGL()): Function call failed on line 85 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:86 virtual void GLWidget::initializeGL()): Function call failed on line 86 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:87 virtual void GLWidget::initializeGL()): Function call failed on line 87 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:166 IPlugin* PluginManager::loadPlugin(QString)): Err load?  
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:166 IPlugin* PluginManager::loadPlugin(QString)): Err load?  
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:166 IPlugin* PluginManager::loadPlugin(QString)): Err load?  
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:166 IPlugin* PluginManager::loadPlugin(QString)): Err load?  
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:166 IPlugin* PluginManager::loadPlugin(QString)): Err load?  
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:166 IPlugin* PluginManager::loadPlugin(QString)): Err load?  
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:168 IPlugin* PluginManager::loadPlugin(QString)): Could not load plugin:  "/home/rickert/Masters/cloudclean/lib/plugins/libnormalestimator.so" 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:169 IPlugin* PluginManager::loadPlugin(QString)): ERROR:  "Cannot load library /home/rickert/Masters/cloudclean/lib/plugins/libnormalestimator.so: (libOpenCL.so.1: cannot open shared object file: No such file or directory)" 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:166 IPlugin* PluginManager::loadPlugin(QString)): Err load?  
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:168 IPlugin* PluginManager::loadPlugin(QString)): Could not load plugin:  "/home/rickert/Masters/cloudclean/lib/plugins/libvisualisenormals.so" 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:169 IPlugin* PluginManager::loadPlugin(QString)): ERROR:  "Cannot load library /home/rickert/Masters/cloudclean/lib/plugins/libvisualisenormals.so: (libOpenCL.so.1: cannot open shared object file: No such file or directory)" 
+
+MESSAGE (kernel/qlayout.cpp:143 QLayout::QLayout(QLayoutPrivate&, QLayout*, QWidget*)): QLayout: Attempting to add QLayout "" to QWidget "", which already has a layout
+
+MESSAGE (qglshaderprogram.cpp:295 bool QGLShaderPrivate::compile(QGLShader*)): QGLShader::compile(Vertex): 0:1(10): error: GLSL 3.30 is not supported. Supported versions are: 1.00 ES, 1.10, 1.20, and 1.30
+
+0:5(1): error: syntax error, unexpected IDENTIFIER
+
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:185 virtual void FlatView::initializeGL()): Shader compile log: "0:1(10): error: GLSL 3.30 is not supported. Supported versions are: 1.00 ES, 1.10, 1.20, and 1.30
+
+0:5(1): error: syntax error, unexpected IDENTIFIER
+" 
+
+MESSAGE (qglshaderprogram.cpp:295 bool QGLShaderPrivate::compile(QGLShader*)): QGLShader::compile(Fragment): 0:1(10): error: GLSL 3.30 is not supported. Supported versions are: 1.00 ES, 1.10, 1.20, and 1.30
+
+0:6(1): error: syntax error, unexpected IDENTIFIER
+
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:189 virtual void FlatView::initializeGL()): Shader compile log: "0:1(10): error: GLSL 3.30 is not supported. Supported versions are: 1.00 ES, 1.10, 1.20, and 1.30
+
+0:6(1): error: syntax error, unexpected IDENTIFIER
+" 
+
+MESSAGE (qglshaderprogram.cpp:250 bool QGLShaderPrivate::create()): bool QGLShaderPrivate::create(): Could not create shader of type 4.
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:191 virtual void FlatView::initializeGL()): GL Error: "invalid enumerant" on line 191 of /home/rickert/Masters/cloudclean/src/gui/flatview.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:193 virtual void FlatView::initializeGL()): Shader compile log: "" 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:206 virtual void FlatView::initializeGL()): Function call failed on line 206 of /home/rickert/Masters/cloudclean/src/gui/flatview.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:207 virtual void FlatView::initializeGL()): Function call failed on line 207 of /home/rickert/Masters/cloudclean/src/gui/flatview.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:208 virtual void FlatView::initializeGL()): Function call failed on line 208 of /home/rickert/Masters/cloudclean/src/gui/flatview.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:209 virtual void FlatView::initializeGL()): Function call failed on line 209 of /home/rickert/Masters/cloudclean/src/gui/flatview.cpp 
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:135 bool PluginManager::unloadPlugin(IPlugin*)): Err unload?  
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:166 IPlugin* PluginManager::loadPlugin(QString)): Err load?  
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:135 bool PluginManager::unloadPlugin(IPlugin*)): Err unload?  
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:166 IPlugin* PluginManager::loadPlugin(QString)): Err load?  
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:135 bool PluginManager::unloadPlugin(IPlugin*)): Err unload?  
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/mainwindow.cpp:57 MainWindow::MainWindow(QUndoStack*, CloudList*, LayerList*, QWidget*)): Format:  3 0 
+
+MESSAGE (qglshaderprogram.cpp:295 bool QGLShaderPrivate::compile(QGLShader*)): QGLShader::compile(Vertex): 0:1(10): error: GLSL 3.30 is not supported. Supported versions are: 1.00 ES, 1.10, 1.20, and 1.30
+
+0:6(1): error: syntax error, unexpected IDENTIFIER
+
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:67 virtual void GLWidget::initializeGL()): Shader compile log: "0:1(10): error: GLSL 3.30 is not supported. Supported versions are: 1.00 ES, 1.10, 1.20, and 1.30
+
+0:6(1): error: syntax error, unexpected IDENTIFIER
+" 
+
+MESSAGE (qglshaderprogram.cpp:295 bool QGLShaderPrivate::compile(QGLShader*)): QGLShader::compile(Fragment): 0:1(10): error: GLSL 3.30 is not supported. Supported versions are: 1.00 ES, 1.10, 1.20, and 1.30
+
+0:6(1): error: syntax error, unexpected IDENTIFIER
+
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:70 virtual void GLWidget::initializeGL()): Shader compile log: "0:1(10): error: GLSL 3.30 is not supported. Supported versions are: 1.00 ES, 1.10, 1.20, and 1.30
+
+0:6(1): error: syntax error, unexpected IDENTIFIER
+" 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:84 virtual void GLWidget::initializeGL()): Function call failed on line 84 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:85 virtual void GLWidget::initializeGL()): Function call failed on line 85 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:86 virtual void GLWidget::initializeGL()): Function call failed on line 86 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:87 virtual void GLWidget::initializeGL()): Function call failed on line 87 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:166 IPlugin* PluginManager::loadPlugin(QString)): Err load?  
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:166 IPlugin* PluginManager::loadPlugin(QString)): Err load?  
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:166 IPlugin* PluginManager::loadPlugin(QString)): Err load?  
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:166 IPlugin* PluginManager::loadPlugin(QString)): Err load?  
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:166 IPlugin* PluginManager::loadPlugin(QString)): Err load?  
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:168 IPlugin* PluginManager::loadPlugin(QString)): Could not load plugin:  "/home/rickert/Masters/cloudclean/lib/plugins/libnormalestimator.so" 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:169 IPlugin* PluginManager::loadPlugin(QString)): ERROR:  "Cannot load library /home/rickert/Masters/cloudclean/lib/plugins/libnormalestimator.so: (libOpenCL.so.1: cannot open shared object file: No such file or directory)" 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:166 IPlugin* PluginManager::loadPlugin(QString)): Err load?  
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:168 IPlugin* PluginManager::loadPlugin(QString)): Could not load plugin:  "/home/rickert/Masters/cloudclean/lib/plugins/libvisualisenormals.so" 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:169 IPlugin* PluginManager::loadPlugin(QString)): ERROR:  "Cannot load library /home/rickert/Masters/cloudclean/lib/plugins/libvisualisenormals.so: (libOpenCL.so.1: cannot open shared object file: No such file or directory)" 
+
+MESSAGE (kernel/qlayout.cpp:143 QLayout::QLayout(QLayoutPrivate&, QLayout*, QWidget*)): QLayout: Attempting to add QLayout "" to QWidget "", which already has a layout
+
+MESSAGE (qglshaderprogram.cpp:295 bool QGLShaderPrivate::compile(QGLShader*)): QGLShader::compile(Vertex): 0:1(10): error: GLSL 3.30 is not supported. Supported versions are: 1.00 ES, 1.10, 1.20, and 1.30
+
+0:5(1): error: syntax error, unexpected IDENTIFIER
+
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:185 virtual void FlatView::initializeGL()): Shader compile log: "0:1(10): error: GLSL 3.30 is not supported. Supported versions are: 1.00 ES, 1.10, 1.20, and 1.30
+
+0:5(1): error: syntax error, unexpected IDENTIFIER
+" 
+
+MESSAGE (qglshaderprogram.cpp:295 bool QGLShaderPrivate::compile(QGLShader*)): QGLShader::compile(Fragment): 0:1(10): error: GLSL 3.30 is not supported. Supported versions are: 1.00 ES, 1.10, 1.20, and 1.30
+
+0:6(1): error: syntax error, unexpected IDENTIFIER
+
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:189 virtual void FlatView::initializeGL()): Shader compile log: "0:1(10): error: GLSL 3.30 is not supported. Supported versions are: 1.00 ES, 1.10, 1.20, and 1.30
+
+0:6(1): error: syntax error, unexpected IDENTIFIER
+" 
+
+MESSAGE (qglshaderprogram.cpp:250 bool QGLShaderPrivate::create()): bool QGLShaderPrivate::create(): Could not create shader of type 4.
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:191 virtual void FlatView::initializeGL()): GL Error: "invalid enumerant" on line 191 of /home/rickert/Masters/cloudclean/src/gui/flatview.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:193 virtual void FlatView::initializeGL()): Shader compile log: "" 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:206 virtual void FlatView::initializeGL()): Function call failed on line 206 of /home/rickert/Masters/cloudclean/src/gui/flatview.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:207 virtual void FlatView::initializeGL()): Function call failed on line 207 of /home/rickert/Masters/cloudclean/src/gui/flatview.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:208 virtual void FlatView::initializeGL()): Function call failed on line 208 of /home/rickert/Masters/cloudclean/src/gui/flatview.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:209 virtual void FlatView::initializeGL()): Function call failed on line 209 of /home/rickert/Masters/cloudclean/src/gui/flatview.cpp 
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/mainwindow.cpp:57 MainWindow::MainWindow(QUndoStack*, CloudList*, LayerList*, QWidget*)): Format:  3 0 
+
+MESSAGE (qglshaderprogram.cpp:295 bool QGLShaderPrivate::compile(QGLShader*)): QGLShader::compile(Vertex): 0:1(10): error: GLSL 3.30 is not supported. Supported versions are: 1.00 ES, 1.10, 1.20, and 1.30
+
+0:6(1): error: syntax error, unexpected IDENTIFIER
+
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:67 virtual void GLWidget::initializeGL()): Shader compile log: "0:1(10): error: GLSL 3.30 is not supported. Supported versions are: 1.00 ES, 1.10, 1.20, and 1.30
+
+0:6(1): error: syntax error, unexpected IDENTIFIER
+" 
+
+MESSAGE (qglshaderprogram.cpp:295 bool QGLShaderPrivate::compile(QGLShader*)): QGLShader::compile(Fragment): 0:1(10): error: GLSL 3.30 is not supported. Supported versions are: 1.00 ES, 1.10, 1.20, and 1.30
+
+0:6(1): error: syntax error, unexpected IDENTIFIER
+
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:70 virtual void GLWidget::initializeGL()): Shader compile log: "0:1(10): error: GLSL 3.30 is not supported. Supported versions are: 1.00 ES, 1.10, 1.20, and 1.30
+
+0:6(1): error: syntax error, unexpected IDENTIFIER
+" 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:84 virtual void GLWidget::initializeGL()): Function call failed on line 84 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:85 virtual void GLWidget::initializeGL()): Function call failed on line 85 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:86 virtual void GLWidget::initializeGL()): Function call failed on line 86 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:87 virtual void GLWidget::initializeGL()): Function call failed on line 87 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:166 IPlugin* PluginManager::loadPlugin(QString)): Err load?  
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:166 IPlugin* PluginManager::loadPlugin(QString)): Err load?  
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:166 IPlugin* PluginManager::loadPlugin(QString)): Err load?  
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:166 IPlugin* PluginManager::loadPlugin(QString)): Err load?  
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:166 IPlugin* PluginManager::loadPlugin(QString)): Err load?  
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:168 IPlugin* PluginManager::loadPlugin(QString)): Could not load plugin:  "/home/rickert/Masters/cloudclean/lib/plugins/libnormalestimator.so" 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:169 IPlugin* PluginManager::loadPlugin(QString)): ERROR:  "Cannot load library /home/rickert/Masters/cloudclean/lib/plugins/libnormalestimator.so: (libOpenCL.so.1: cannot open shared object file: No such file or directory)" 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:166 IPlugin* PluginManager::loadPlugin(QString)): Err load?  
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:168 IPlugin* PluginManager::loadPlugin(QString)): Could not load plugin:  "/home/rickert/Masters/cloudclean/lib/plugins/libvisualisenormals.so" 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:169 IPlugin* PluginManager::loadPlugin(QString)): ERROR:  "Cannot load library /home/rickert/Masters/cloudclean/lib/plugins/libvisualisenormals.so: (libOpenCL.so.1: cannot open shared object file: No such file or directory)" 
+
+MESSAGE (kernel/qlayout.cpp:143 QLayout::QLayout(QLayoutPrivate&, QLayout*, QWidget*)): QLayout: Attempting to add QLayout "" to QWidget "", which already has a layout
+
+MESSAGE (qglshaderprogram.cpp:295 bool QGLShaderPrivate::compile(QGLShader*)): QGLShader::compile(Vertex): 0:1(10): error: GLSL 3.30 is not supported. Supported versions are: 1.00 ES, 1.10, 1.20, and 1.30
+
+0:5(1): error: syntax error, unexpected IDENTIFIER
+
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:185 virtual void FlatView::initializeGL()): Shader compile log: "0:1(10): error: GLSL 3.30 is not supported. Supported versions are: 1.00 ES, 1.10, 1.20, and 1.30
+
+0:5(1): error: syntax error, unexpected IDENTIFIER
+" 
+
+MESSAGE (qglshaderprogram.cpp:295 bool QGLShaderPrivate::compile(QGLShader*)): QGLShader::compile(Fragment): 0:1(10): error: GLSL 3.30 is not supported. Supported versions are: 1.00 ES, 1.10, 1.20, and 1.30
+
+0:6(1): error: syntax error, unexpected IDENTIFIER
+
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:189 virtual void FlatView::initializeGL()): Shader compile log: "0:1(10): error: GLSL 3.30 is not supported. Supported versions are: 1.00 ES, 1.10, 1.20, and 1.30
+
+0:6(1): error: syntax error, unexpected IDENTIFIER
+" 
+
+MESSAGE (qglshaderprogram.cpp:250 bool QGLShaderPrivate::create()): bool QGLShaderPrivate::create(): Could not create shader of type 4.
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:191 virtual void FlatView::initializeGL()): GL Error: "invalid enumerant" on line 191 of /home/rickert/Masters/cloudclean/src/gui/flatview.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:193 virtual void FlatView::initializeGL()): Shader compile log: "" 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:206 virtual void FlatView::initializeGL()): Function call failed on line 206 of /home/rickert/Masters/cloudclean/src/gui/flatview.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:207 virtual void FlatView::initializeGL()): Function call failed on line 207 of /home/rickert/Masters/cloudclean/src/gui/flatview.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:208 virtual void FlatView::initializeGL()): Function call failed on line 208 of /home/rickert/Masters/cloudclean/src/gui/flatview.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:209 virtual void FlatView::initializeGL()): Function call failed on line 209 of /home/rickert/Masters/cloudclean/src/gui/flatview.cpp 
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:166 IPlugin* PluginManager::loadPlugin(QString)): Err load?  
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:135 bool PluginManager::unloadPlugin(IPlugin*)): Err unload?  
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:166 IPlugin* PluginManager::loadPlugin(QString)): Err load?  
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:135 bool PluginManager::unloadPlugin(IPlugin*)): Err unload?  
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:147 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 147 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:148 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid operation" on line 148 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/glwidget.cpp:190 virtual void GLWidget::paintEvent(QPaintEvent*)): GL Error: "invalid enumerant" on line 190 of /home/rickert/Masters/cloudclean/src/gui/glwidget.cpp 
 

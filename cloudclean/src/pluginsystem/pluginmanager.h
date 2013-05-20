@@ -16,6 +16,7 @@ class QDir;
 class ActionManager;
 class MainWindow;
 class Core;
+class QPluginLoader;
 
 #include "pluginsystem/core.h"
 #include "pluginsystem/iplugin.h"
@@ -26,7 +27,10 @@ class PLUGINSYS_DLLSPEC PluginManager : public QObject{
     PluginManager(Core * core);
     ~PluginManager();
 
-    bool loadPlugin(QString loc);
+    IPlugin * findPluginByName(QString name);
+    QString getFileName(IPlugin * plugin);
+    IPlugin * loadPlugin(QString loc);
+    bool unloadPlugin(IPlugin * plugin);
     void loadPlugins();
     void initializePlugins();
 
@@ -46,6 +50,7 @@ class PLUGINSYS_DLLSPEC PluginManager : public QObject{
 
  private:
     std::vector<IPlugin *> plugins_;
+    std::vector<QPluginLoader *> plugin_loaders_;
     Core * core_;
     std::unique_ptr<QDir> plugins_dir_;
 };

@@ -41,6 +41,7 @@ class GUI_DLLSPEC FlatView : public QGLWidget {
  signals:
     void flagUpdate();
     void labelUpdate();
+    void pluginPaint();
 
  protected:
     void initializeGL();

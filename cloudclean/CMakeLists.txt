@@ -121,6 +121,7 @@ ELSE()
     SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -Wno-unknown-pragmas")
     SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -fstack-protector-all")
     SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -fPIC")
+    #SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -Bsymbolic")
     SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -pipe") # makes things faster
 ENDIF()
 

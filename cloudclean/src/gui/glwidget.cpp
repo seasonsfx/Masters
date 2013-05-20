@@ -75,7 +75,7 @@ void GLWidget::initializeGL() {
         abort();
     }
 
-    emit pluginPaint(camera_.projectionMatrix(), camera_.modelviewMatrix());
+    //emit pluginPaint(camera_.projectionMatrix(), camera_.modelviewMatrix());
 
     //
     // Resolve uniforms
@@ -218,6 +218,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent * event) {
     else if(event->buttons() /* ==  Qt::RightButton */ ||   event->modifiers() == Qt::ControlModifier){
         std::shared_ptr<PointCloud> pc = cl_->active_;
         pc->rotate2D(rot.x(), -rot.y());
+        //qDebug() << "Why?";
     }
 
     if(event->buttons())

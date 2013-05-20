@@ -158,10 +158,7 @@ void Lasso::getIndices(Eigen::Matrix4f & ndc_mat,
         p_4 << p.x, p.y, p.z, 1;
         p_4 = ndc_mat * p_4;
 
-        // Limit to clipping area
-        //if(p_4.z() < -1.0f || p_4.z() > 1.0f)
-        //    return false;
-
+        // Limit to front of camera
         if(p_4.z() < 0.0f)
             return false;
 
@@ -183,6 +180,36 @@ void Lasso::getIndices(Eigen::Matrix4f & ndc_mat,
     } else {
         for(int idx : *source_indices){
             if(!inside_lasso(cloud->points[idx])) {
+                removed_indices->push_back(idx);
+            }
+        }
+    }
+
+}
+
+void Lasso::getIndices2D(int height, const Eigen::Affine2f & cam,
+                std::vector<int> & cloud_to_grid_map,
+                std::shared_ptr<std::vector<int> > source_indices,
+                std::shared_ptr<std::vector<int> > removed_indices) {
+
+    auto inside_lasso = [&] (int idx) {
+        /// do lasso test
+        int i = cloud_to_grid_map[idx];
+
+        Eigen::Vector2f point = cam * Eigen::Vector2f(i/height, i%height);
+
+        return  pointInsidePolygon(points, point);
+    };
+
+    if(source_indices->size() == 0) {
+        for (uint idx = 0; idx < cloud_to_grid_map.size(); idx++) {
+            if(inside_lasso(idx)) {
+                source_indices->push_back(idx);
+            }
+        }
+    } else {
+        for(int idx : *source_indices){
+            if(!inside_lasso(idx)) {
                 removed_indices->push_back(idx);
             }
         }

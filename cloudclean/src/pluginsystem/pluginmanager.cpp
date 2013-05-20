@@ -46,6 +46,7 @@
 #include <gui/mainwindow.h>
 #include <model/layerlist.h>
 #include <model/cloudlist.h>
+#include <dlfcn.h>
 
 #include "pluginsystem/core.h"
 
@@ -90,36 +91,98 @@ PluginManager::PluginManager(Core * core) {
 }
 
 PluginManager::~PluginManager() {
-
+    /*
+    for(IPlugin * plugin: plugins_){
+        plugin->cleanup();
+        delete plugin;
+    }
+    for(QPluginLoader * loader: plugin_loaders_){
+        loader->unload();
+        delete loader;
+    }
+    */
 }
 
-bool PluginManager::loadPlugin(QString loc){
-    QPluginLoader loader;
-    loader.setLoadHints(QLibrary::ExportExternalSymbolsHint);
-    loader.setFileName(loc);
-    bool loaded = loader.load();
+IPlugin * PluginManager::findPluginByName(QString name) {
+    for(IPlugin * plugin: plugins_) {
+        if(plugin != nullptr && plugin->getName() == name)
+            return plugin;
+    }
+    return nullptr;
+}
+
+bool PluginManager::unloadPlugin(IPlugin * plugin){
+    int pos = -1;
+    for(int idx = 0; idx < plugins_.size(); idx++) {
+        if(plugins_[idx] == plugin) {
+            pos = idx;
+            break;
+        }
+    }
+
+    if(pos == -1) {
+        qDebug() << "Could not find plugin!";
+        return false;
+    }
+
+    // Remove instance
+    plugins_[pos]->cleanup();
+    delete plugins_[pos];
+    plugins_.erase(plugins_.begin() + pos);
+
+    // Unload plugin
+    bool unloaded = plugin_loaders_[pos]->unload();
+    qDebug() << "Err unload?" << dlerror();
+    if(!unloaded)
+        qDebug() << "Could not unload library";
+    delete plugin_loaders_[pos];
+    plugin_loaders_.erase(plugin_loaders_.begin() + pos);
+}
+
+QString PluginManager::getFileName(IPlugin * plugin){
+    int pos = -1;
+    for(int idx = 0; idx < plugins_.size(); idx++) {
+        if(plugins_[idx] == plugin) {
+            pos = idx;
+            break;
+        }
+    }
+
+    if(pos == -1) {
+        qDebug() << "Could not find plugin!";
+        return "";
+    }
+
+
+    return plugin_loaders_[pos]->fileName();
+}
+
+IPlugin * PluginManager::loadPlugin(QString loc){
+    QPluginLoader * loader = new QPluginLoader();
+
+    loader->setLoadHints(QLibrary::ExportExternalSymbolsHint|QLibrary::ResolveAllSymbolsHint);
+    loader->setFileName(loc);
+    bool loaded = loader->load();
+    qDebug() << "Err load?" << dlerror();
     if (!loaded) {
         qDebug() << "Could not load plugin: " << loc;
-        qDebug() << "ERROR: " << loader.errorString();
-        return false;
+        qDebug() << "ERROR: " << loader->errorString();
+        delete loader;
+        return nullptr;
     }
 
-    QObject *plugin = loader.instance();
-
-    if (!loader.isLoaded()) {
-        qDebug() << "ERROR: " << loader.errorString();
-        qDebug() << "Could not instantiate: " << loc;
-        return false;
-    }
+    QObject *plugin = loader->instance();
 
     IPlugin * iplugin = qobject_cast<IPlugin *>(plugin);
     if(!iplugin){
-        return false;
-        qDebug() << "Not iplugin";
+        qDebug() << "Not a valid plugin";
+        delete loader;
+        return nullptr;
     }
 
+    plugin_loaders_.push_back(loader);
     plugins_.push_back(iplugin);
-    return true;
+    return iplugin;
 }
 
 void PluginManager::loadPlugins() {

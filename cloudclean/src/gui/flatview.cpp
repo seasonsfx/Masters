@@ -230,8 +230,8 @@ void FlatView::paintEvent(QPaintEvent *event) {
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     //resizeGL(width(), height());
 
-    QPainter p(this);
-    /*QRadialGradient gradient;
+    /*QPainter p(this);
+    QRadialGradient gradient;
     gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
     gradient.setCenter(0.45, 0.50);
     gradient.setFocalPoint(0.40, 0.45);
@@ -244,8 +244,9 @@ void FlatView::paintEvent(QPaintEvent *event) {
     p.setPen(Qt::NoPen);
     p.setBrush(gradient);
     p.drawRect(0, 0, size().width(), size().height());
-    */
+
     p.beginNativePainting();
+    */
 
     //glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     //glClear(GL_DEPTH_BUFFER_BIT);
@@ -301,9 +302,9 @@ void FlatView::paintEvent(QPaintEvent *event) {
 
     program_.release();
 
-    p.endNativePainting();
-    //p.end();
+    //p.endNativePainting();
 
+    emit pluginPaint();
     //glFinish();
     swapBuffers();
 }

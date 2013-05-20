@@ -15,6 +15,7 @@
 #include <QDesktopWidget>
 #include <QGridLayout>
 #include <QAction>
+#include <QFileDialog>
 
 #include "gui/mainwindow.h"
 #include "gui/glwidget.h"
@@ -166,7 +167,39 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
     pm_->loadPlugins();
     pm_->initializePlugins();
 
+    // Testing reload:
+    QAction * reload_graphcut = new QAction("Unload graphcuts", core_->mw_);
+    connect(reload_graphcut, &QAction::triggered, [this] (bool checked) {
+        IPlugin * plugin = pm_->findPluginByName("graph_cut");
+        if(plugin == nullptr)
+            return;
+        QString loc = pm_->getFileName(plugin);
+        pm_->unloadPlugin(plugin);
+        /*
+        plugin = pm_->loadPlugin(loc);
 
+        plugin->initialize(core_);
+        plugin->initialize2(pm_);
+        */
+
+    });
+    core_->mw_->addMenu(reload_graphcut, "Reload");
+
+    // Load plugin
+    QAction * load_plugin = new QAction("Load plugin", core_->mw_);
+    connect(load_plugin, &QAction::triggered, [this] (bool checked) {
+        QString fileName = QFileDialog::getOpenFileName(core_->mw_,
+            tr("Open Plugin"), "", tr("Plugins (*.so *.dll *.dynlib)"));
+
+        if(fileName == "")
+            return;
+
+        IPlugin * plugin = pm_->loadPlugin(fileName);
+        plugin->initialize(core_);
+        plugin->initialize2(pm_);
+
+    });
+    core_->mw_->addMenu(load_plugin, "Reload");
 
     QAction * disable_plugins = new QAction(this);
     core_->mw_->addAction(disable_plugins);

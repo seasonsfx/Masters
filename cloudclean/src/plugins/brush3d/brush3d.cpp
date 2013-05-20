@@ -188,8 +188,10 @@ bool Brush3D::mouseClickEvent(QMouseEvent * event){
 
 bool Brush3D::mouseMoveEvent(QMouseEvent * event) {
     last_mouse_pos_ << event->x(), event->y();
-    if(event->buttons() != Qt::LeftButton)
+    if(event->buttons() != Qt::LeftButton && !event->modifiers())
         return false;
+    if(event->buttons() != Qt::LeftButton && event->modifiers() == Qt::Key_Control)
+        return true;
     if(cl_->clouds_.size() == 0)
         return false;
 
@@ -265,6 +267,9 @@ bool Brush3D::eventFilter(QObject *object, QEvent *event){
         return mouseReleaseEvent(static_cast<QMouseEvent*>(event));
     case QEvent::MouseMove:
         return mouseMoveEvent(static_cast<QMouseEvent*>(event));
+    case QEvent::KeyPress:
+        if(static_cast<QKeyEvent*>(event)->key() == Qt::Key_Control)
+            return true;
     default:
         return false;
     }

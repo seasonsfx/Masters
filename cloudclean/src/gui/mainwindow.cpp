@@ -67,8 +67,8 @@ MainWindow::MainWindow(QUndoStack *us, CloudList * cl, LayerList * ll, QWidget *
     progressbar_->setTextVisible( false );
     progressbar_->setRange( 0, 100 );
 
-    statusbar_->addWidget( progressbar_, 1 );
-    statusbar_->showMessage( tr("Ready"), 2000 );
+    statusbar_->addPermanentWidget( progressbar_, 0 );
+    statusbar_->showMessage( tr("Ready") );
 
 
     QStyle * style = QApplication::style();
@@ -148,14 +148,14 @@ MainWindow::MainWindow(QUndoStack *us, CloudList * cl, LayerList * ll, QWidget *
     qRegisterMetaType<std::shared_ptr<PointCloud> >("std::shared_ptr<PointCloud>");
     qRegisterMetaType<std::shared_ptr<Layer> >("std::shared_ptr<Layer>");
 
-    connect(gld_, SIGNAL(update()), glwidget_, SLOT(update()));
-    connect(gld_, SIGNAL(update()), flatview_, SLOT(update()));
-    connect(cl, SIGNAL(cloudUpdate(std::shared_ptr<PointCloud>)), gld_, SLOT(reloadCloud(std::shared_ptr<PointCloud>)));
-    connect(cl, SIGNAL(updated()), glwidget_, SLOT(update()));
-    connect(cl, SIGNAL(updatedActive(std::shared_ptr<PointCloud>)), flatview_, SLOT(setCloud(std::shared_ptr<PointCloud>)));
-    connect(cl, SIGNAL(progressUpdate(int)), progressbar_, SLOT(setValue(int)));
-    connect(ll, SIGNAL(layerUpdate(std::shared_ptr<Layer>)), gld_, SLOT(reloadColorLookupBuffer()));
-    connect(ll, SIGNAL(lookupTableUpdate()), gld_, SLOT(reloadColorLookupBuffer()));
+    connect(gld_, &GLData::update, glwidget_, (void (GLWidget:: *)(void)) &GLWidget::update);
+    connect(gld_, &GLData::update, flatview_, (void (FlatView:: *)(void)) &FlatView::update);
+    connect(cl, &CloudList::cloudUpdate, gld_, &GLData::reloadCloud);
+    connect(cl, &CloudList::updated, glwidget_, (void (GLWidget:: *)(void)) &GLWidget::update);
+    connect(cl, &CloudList::updatedActive, flatview_, &FlatView::setCloud);
+    connect(cl, &CloudList::progressUpdate, progressbar_, &QProgressBar::setValue);
+    connect(ll, &LayerList::layerUpdate, gld_, &GLData::reloadColorLookupBuffer);
+    connect(ll, &LayerList::lookupTableUpdate, gld_, &GLData::reloadColorLookupBuffer);
 
     QAction * deselect = new QAction(tr("Deselect all"), this);
     connect(deselect, SIGNAL(triggered()), clv_, SLOT(deselectAllPoints()));
@@ -247,6 +247,24 @@ void MainWindow::saveFile(){
     }
 
     std::thread(&CloudList::saveFile, cl_, filename, labels).detach();
+}
+
+void MainWindow::startBgAction(QString name, bool deterministic) {
+    if(!deterministic) {
+        progressbar_->setRange(0,0);
+    }
+    progressbar_->setValue(0);
+    statusbar_->showMessage(name);
+}
+
+void MainWindow::stopBgAction(QString name) {
+    progressbar_->setRange(0,100);
+    progressbar_->setValue(0);
+    statusbar_->showMessage("Completed:" + name, 2000);
+}
+
+void MainWindow::progBgAction(QString name, int prog) {
+    progressbar_->setValue(prog);
 }
 
 void MainWindow::contextMenu(const QPoint &pos) {

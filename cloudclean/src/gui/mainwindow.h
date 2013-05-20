@@ -35,6 +35,10 @@ class GUI_DLLSPEC MainWindow : public QMainWindow {
     void loadFile();
     void saveFile();
 
+    void startBgAction(QString name, bool deterministic = false);
+    void stopBgAction(QString name);
+    void progBgAction(QString name, int prog);
+
  private slots:
     void contextMenu(const QPoint &pos);
 

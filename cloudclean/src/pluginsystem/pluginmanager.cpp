@@ -46,7 +46,6 @@
 #include <gui/mainwindow.h>
 #include <model/layerlist.h>
 #include <model/cloudlist.h>
-#include <dlfcn.h>
 
 #include "pluginsystem/core.h"
 
@@ -132,7 +131,9 @@ bool PluginManager::unloadPlugin(IPlugin * plugin){
 
     // Unload plugin
     bool unloaded = plugin_loaders_[pos]->unload();
-    qDebug() << "Err unload?" << dlerror();
+
+    qDebug() << "Still loaded? " << plugin_loaders_[pos]->isLoaded();
+
     if(!unloaded)
         qDebug() << "Could not unload library";
     delete plugin_loaders_[pos];
@@ -163,7 +164,7 @@ IPlugin * PluginManager::loadPlugin(QString loc){
     loader->setLoadHints(QLibrary::ExportExternalSymbolsHint|QLibrary::ResolveAllSymbolsHint);
     loader->setFileName(loc);
     bool loaded = loader->load();
-    qDebug() << "Err load?" << dlerror();
+
     if (!loaded) {
         qDebug() << "Could not load plugin: " << loc;
         qDebug() << "ERROR: " << loader->errorString();

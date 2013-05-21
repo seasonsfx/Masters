@@ -24,6 +24,7 @@
 #include "model/cloudlist.h"
 
 #include "pluginsystem/pluginmanager.h"
+#include "pluginsystem/pluginviewer.h"
 
 #ifdef _WIN32
 #   define INFINITY (DBL_MAX+DBL_MAX)
@@ -168,22 +169,27 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
     pm_->initializePlugins();
 
     // Testing reload:
-    QAction * reload_graphcut = new QAction("Unload graphcuts", core_->mw_);
-    connect(reload_graphcut, &QAction::triggered, [this] (bool checked) {
+    QAction * unload_graphcut = new QAction("Unload graohcut", core_->mw_);
+    connect(unload_graphcut, &QAction::triggered, [this] (bool checked) {
         IPlugin * plugin = pm_->findPluginByName("graph_cut");
         if(plugin == nullptr)
             return;
-        QString loc = pm_->getFileName(plugin);
+
         pm_->unloadPlugin(plugin);
-        /*
-        plugin = pm_->loadPlugin(loc);
-
-        plugin->initialize(core_);
-        plugin->initialize2(pm_);
-        */
-
+        qDebug() << "Unload called on graphcut";
     });
-    core_->mw_->addMenu(reload_graphcut, "Reload");
+    core_->mw_->addMenu(unload_graphcut, "Reload");
+
+    QAction * unload = new QAction("Unload stub", core_->mw_);
+    connect(unload, &QAction::triggered, [this] (bool checked) {
+        IPlugin * plugin = pm_->findPluginByName("stub");
+        if(plugin == nullptr)
+            return;
+
+        pm_->unloadPlugin(plugin);
+        qDebug() << "Unload called on stub";
+    });
+    core_->mw_->addMenu(unload, "Reload");
 
     // Load plugin
     QAction * load_plugin = new QAction("Load plugin", core_->mw_);
@@ -200,6 +206,14 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
 
     });
     core_->mw_->addMenu(load_plugin, "Reload");
+
+    // Plugin viewer
+    QAction * pluginviewer = new QAction("Plugin viewer ", core_->mw_);
+    core_->mw_->addMenu(pluginviewer, "Reload");
+    connect(pluginviewer, &QAction::triggered, [this] (bool checked) {
+        PluginViewer * pv = new PluginViewer();
+        pv->show();
+    });
 
     QAction * disable_plugins = new QAction(this);
     core_->mw_->addAction(disable_plugins);

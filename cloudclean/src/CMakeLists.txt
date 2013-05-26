@@ -5,6 +5,7 @@ INCLUDE_DIRECTORIES(
 )
 
 add_definitions(-DCC_GL_DEBUG_)
+SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Bsymbolic" )
 
 #
 # Build sub projects

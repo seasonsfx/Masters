@@ -12,7 +12,7 @@
 #include "model/layerlist.h"
 #include "gui/export.h"
 
-class GUI_DLLSPEC GLData : public QObject {
+class GUI_API GLData : public QObject {
     Q_OBJECT
  public:
     GLData(QGLContext * glcontext,

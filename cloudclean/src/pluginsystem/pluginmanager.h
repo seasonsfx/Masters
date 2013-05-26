@@ -21,7 +21,7 @@ class QPluginLoader;
 #include "pluginsystem/core.h"
 #include "pluginsystem/iplugin.h"
 
-class PLUGINSYS_DLLSPEC PluginManager : public QObject{
+class PLUGINSYS_API PluginManager : public QObject{
     Q_OBJECT
  public:
     PluginManager(Core * core);

@@ -14,7 +14,7 @@
 #include <Eigen/Dense>
 #include "gui/export.h"
 
-class GUI_DLLSPEC FlatView : public QGLWidget {
+class GUI_API FlatView : public QGLWidget {
     Q_OBJECT
  public:
     FlatView(QGLFormat &fmt, CloudList * cl,

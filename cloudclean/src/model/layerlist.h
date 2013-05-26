@@ -11,7 +11,7 @@
 #include "model/layer.h"
 #include "model/export.h"
 
-class MODEL_DLLSPEC LayerList : public QAbstractListModel {
+class MODEL_API LayerList : public QAbstractListModel {
     Q_OBJECT
  public:
     explicit LayerList(QObject *parent = 0);

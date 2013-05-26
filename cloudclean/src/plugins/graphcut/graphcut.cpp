@@ -34,6 +34,10 @@ QString GraphCut::getName(){
     return "graph_cut";
 }
 
+GraphCut::~GraphCut(){
+    qDebug() << "Destroyed graph cut";
+}
+
 void GraphCut::initialize(Core *core){
     core_= core;
     cl_ = core_->cl_;

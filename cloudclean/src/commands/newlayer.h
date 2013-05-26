@@ -13,7 +13,7 @@ class LayerList;
 class PointCloud;
 class Layer;
 
-class COMMAND_DLLSPEC NewLayer : public QUndoCommand
+class COMMAND_API NewLayer : public QUndoCommand
 {
  public:
     NewLayer(std::shared_ptr<PointCloud> pc,

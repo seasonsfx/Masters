@@ -7,7 +7,7 @@
 #include <QGLBuffer>
 #include "gui/export.h"
 
-class GUI_DLLSPEC CloudGLData : public QObject{
+class GUI_API CloudGLData : public QObject{
     Q_OBJECT
  public:
     CloudGLData(std::shared_ptr<PointCloud> pc);

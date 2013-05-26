@@ -8,7 +8,7 @@
 #include "model/pointcloud.h"
 #include "commands/export.h"
 
-class COMMAND_DLLSPEC Select : public QUndoCommand
+class COMMAND_API Select : public QUndoCommand
 {
 public:
     explicit Select(std::shared_ptr<PointCloud> pc,

@@ -47,12 +47,12 @@ class Camera;
 class PointCloud;
 class Layer;
 
-UTIL_DLLSPEC void screenToRay(int x, int y, int win_width, int win_height, const Eigen::Affine3f& mv,
+UTIL_API void screenToRay(int x, int y, int win_width, int win_height, const Eigen::Affine3f& mv,
                               const Eigen::Affine3f& projPointToLine,
                               Eigen::Vector3f& p1,
                               Eigen::Vector3f& p2);
 
-UTIL_DLLSPEC int pick(int win_x, int win_y, int win_width, int win_height, float min_dist,
+UTIL_API int pick(int win_x, int win_y, int win_width, int win_height, float min_dist,
         const Eigen::Affine3f& proj, const Eigen::Affine3f& cam_mv,
         std::shared_ptr<PointCloud> pc,
         std::set<uint8_t> labels = std::set<uint8_t>());

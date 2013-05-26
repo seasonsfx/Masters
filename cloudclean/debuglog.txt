@@ -1888,3 +1888,243 @@ MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&
 
 MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
 
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/mainwindow.cpp:57 MainWindow::MainWindow(QUndoStack*, CloudList*, LayerList*, QWidget*)): Format:  4 3 
+
+MESSAGE (kernel/qlayout.cpp:143 QLayout::QLayout(QLayoutPrivate&, QLayout*, QWidget*)): QLayout: Attempting to add QLayout "" to QWidget "", which already has a layout
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/plugins/normalestimation/normalestimation.cpp:45 virtual void NormalEstimator::initialize(Core*)): No OpenCL platform found!
+
+
+MESSAGE (kernel/qobject.cpp:2078 void err_method_notfound(const QObject*, const char*, const char*)): QObject::connect: No such signal Stub::enabling() in /home/rickert/Masters/cloudclean/src/plugins/stub/stub.cpp:34
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/plugins/stub/stub.cpp:30 Stub::initialize(Core*)::<lambda(bool)>): Click! 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/plugins/stub/stub.cpp:52 void Stub::myFunc()): Myfunc 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/plugins/stub/stub.cpp:30 Stub::initialize(Core*)::<lambda(bool)>): Click! 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/plugins/stub/stub.cpp:52 void Stub::myFunc()): Myfunc 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:256 virtual void FlatView::paintEvent(QPaintEvent*)): Nothing to paint on flatview 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:256 virtual void FlatView::paintEvent(QPaintEvent*)): Nothing to paint on flatview 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:256 virtual void FlatView::paintEvent(QPaintEvent*)): Nothing to paint on flatview 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:256 virtual void FlatView::paintEvent(QPaintEvent*)): Nothing to paint on flatview 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:256 virtual void FlatView::paintEvent(QPaintEvent*)): Nothing to paint on flatview 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:256 virtual void FlatView::paintEvent(QPaintEvent*)): Nothing to paint on flatview 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:256 virtual void FlatView::paintEvent(QPaintEvent*)): Nothing to paint on flatview 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:256 virtual void FlatView::paintEvent(QPaintEvent*)): Nothing to paint on flatview 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:256 virtual void FlatView::paintEvent(QPaintEvent*)): Nothing to paint on flatview 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:256 virtual void FlatView::paintEvent(QPaintEvent*)): Nothing to paint on flatview 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:256 virtual void FlatView::paintEvent(QPaintEvent*)): Nothing to paint on flatview 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:256 virtual void FlatView::paintEvent(QPaintEvent*)): Nothing to paint on flatview 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/plugins/stub/stub.cpp:30 Stub::initialize(Core*)::<lambda(bool)>): Click! 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/plugins/stub/stub.cpp:52 void Stub::myFunc()): Myfunc 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:256 virtual void FlatView::paintEvent(QPaintEvent*)): Nothing to paint on flatview 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:256 virtual void FlatView::paintEvent(QPaintEvent*)): Nothing to paint on flatview 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:256 virtual void FlatView::paintEvent(QPaintEvent*)): Nothing to paint on flatview 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:256 virtual void FlatView::paintEvent(QPaintEvent*)): Nothing to paint on flatview 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:256 virtual void FlatView::paintEvent(QPaintEvent*)): Nothing to paint on flatview 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:256 virtual void FlatView::paintEvent(QPaintEvent*)): Nothing to paint on flatview 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:256 virtual void FlatView::paintEvent(QPaintEvent*)): Nothing to paint on flatview 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:256 virtual void FlatView::paintEvent(QPaintEvent*)): Nothing to paint on flatview 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:135 bool PluginManager::unloadPlugin(IPlugin*)): Still loaded?  false 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/app.cpp:181 App::App(int&, char**)::<lambda(bool)>): Unload called on graphcut 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:256 virtual void FlatView::paintEvent(QPaintEvent*)): Nothing to paint on flatview 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/mainwindow.cpp:57 MainWindow::MainWindow(QUndoStack*, CloudList*, LayerList*, QWidget*)): Format:  4 3 
+
+MESSAGE (kernel/qlayout.cpp:143 QLayout::QLayout(QLayoutPrivate&, QLayout*, QWidget*)): QLayout: Attempting to add QLayout "" to QWidget "", which already has a layout
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/plugins/normalestimation/normalestimation.cpp:45 virtual void NormalEstimator::initialize(Core*)): No OpenCL platform found!
+
+
+MESSAGE (kernel/qobject.cpp:2078 void err_method_notfound(const QObject*, const char*, const char*)): QObject::connect: No such signal Stub::enabling() in /home/rickert/Masters/cloudclean/src/plugins/stub/stub.cpp:34
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:256 virtual void FlatView::paintEvent(QPaintEvent*)): Nothing to paint on flatview 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:256 virtual void FlatView::paintEvent(QPaintEvent*)): Nothing to paint on flatview 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:256 virtual void FlatView::paintEvent(QPaintEvent*)): Nothing to paint on flatview 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:256 virtual void FlatView::paintEvent(QPaintEvent*)): Nothing to paint on flatview 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:256 virtual void FlatView::paintEvent(QPaintEvent*)): Nothing to paint on flatview 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:256 virtual void FlatView::paintEvent(QPaintEvent*)): Nothing to paint on flatview 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/plugins/stub/stub.cpp:30 Stub::initialize(Core*)::<lambda(bool)>): Click! 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/plugins/stub/stub.cpp:52 void Stub::myFunc()): Myfunc 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/plugins/stub/stub.cpp:30 Stub::initialize(Core*)::<lambda(bool)>): Click! 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/plugins/stub/stub.cpp:52 void Stub::myFunc()): Myfunc 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:256 virtual void FlatView::paintEvent(QPaintEvent*)): Nothing to paint on flatview 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:256 virtual void FlatView::paintEvent(QPaintEvent*)): Nothing to paint on flatview 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:256 virtual void FlatView::paintEvent(QPaintEvent*)): Nothing to paint on flatview 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:256 virtual void FlatView::paintEvent(QPaintEvent*)): Nothing to paint on flatview 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:256 virtual void FlatView::paintEvent(QPaintEvent*)): Nothing to paint on flatview 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:256 virtual void FlatView::paintEvent(QPaintEvent*)): Nothing to paint on flatview 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:256 virtual void FlatView::paintEvent(QPaintEvent*)): Nothing to paint on flatview 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:256 virtual void FlatView::paintEvent(QPaintEvent*)): Nothing to paint on flatview 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:256 virtual void FlatView::paintEvent(QPaintEvent*)): Nothing to paint on flatview 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/flatview.cpp:256 virtual void FlatView::paintEvent(QPaintEvent*)): Nothing to paint on flatview 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/mainwindow.cpp:57 MainWindow::MainWindow(QUndoStack*, CloudList*, LayerList*, QWidget*)): Format:  4 3 
+
+MESSAGE (kernel/qlayout.cpp:143 QLayout::QLayout(QLayoutPrivate&, QLayout*, QWidget*)): QLayout: Attempting to add QLayout "" to QWidget "", which already has a layout
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/plugins/normalestimation/normalestimation.cpp:45 virtual void NormalEstimator::initialize(Core*)): No OpenCL platform found!
+
+
+MESSAGE (kernel/qobject.cpp:2078 void err_method_notfound(const QObject*, const char*, const char*)): QObject::connect: No such signal Stub::enabling() in /home/rickert/Masters/cloudclean/src/plugins/stub/stub.cpp:34
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/plugins/stub/stub.cpp:48 virtual Stub::~Stub()): Stub deleted 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:135 bool PluginManager::unloadPlugin(IPlugin*)): Still loaded?  false 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/app.cpp:192 App::App(int&, char**)::<lambda(bool)>): Unload called on stub 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:135 bool PluginManager::unloadPlugin(IPlugin*)): Still loaded?  false 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/app.cpp:181 App::App(int&, char**)::<lambda(bool)>): Unload called on graphcut 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/gui/mainwindow.cpp:57 MainWindow::MainWindow(QUndoStack*, CloudList*, LayerList*, QWidget*)): Format:  4 3 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:173 IPlugin* PluginManager::loadPlugin(QString)): Exporting 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:173 IPlugin* PluginManager::loadPlugin(QString)): Exporting 
+
+MESSAGE (kernel/qlayout.cpp:143 QLayout::QLayout(QLayoutPrivate&, QLayout*, QWidget*)): QLayout: Attempting to add QLayout "" to QWidget "", which already has a layout
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/plugins/normalestimation/normalestimation.cpp:45 virtual void NormalEstimator::initialize(Core*)): No OpenCL platform found!
+
+
+MESSAGE (kernel/qobject.cpp:2078 void err_method_notfound(const QObject*, const char*, const char*)): QObject::connect: No such signal Stub::enabling() in /home/rickert/Masters/cloudclean/src/plugins/stub/stub.cpp:70
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (painting/qbackingstore.cpp:101 void QBackingStore::flush(const QRegion&, QWindow*, const QPoint&)): QBackingStore::flush() called with non-exposed window, behavior is undefined
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/plugins/stub/stub.cpp:88 virtual Stub::~Stub()): Stub deleted 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:137 bool PluginManager::unloadPlugin(IPlugin*)): Still loaded?  false 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/app.cpp:190 App::App(int&, char**)::<lambda(bool)>): Unload called on stub 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/plugins/graphcut/graphcut.cpp:38 virtual GraphCut::~GraphCut()): Destroyed graph cut 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/pluginsystem/pluginmanager.cpp:137 bool PluginManager::unloadPlugin(IPlugin*)): Still loaded?  false 
+
+MESSAGE (/home/rickert/Masters/cloudclean/src/app.cpp:179 App::App(int&, char**)::<lambda(bool)>): Unload called on graphcut 
+

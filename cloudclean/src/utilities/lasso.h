@@ -10,7 +10,7 @@
 
 class QPaintDevice;
 
-class UTIL_DLLSPEC Lasso
+class UTIL_API Lasso
 {
 public:
     Lasso();

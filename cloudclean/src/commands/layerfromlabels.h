@@ -13,7 +13,7 @@ class LayerList;
 class PointCloud;
 class Layer;
 
-class COMMAND_DLLSPEC LayerFromLabels : public QUndoCommand
+class COMMAND_API LayerFromLabels : public QUndoCommand
 {
  public:
     LayerFromLabels(std::shared_ptr<std::vector<uint16_t> > labels,

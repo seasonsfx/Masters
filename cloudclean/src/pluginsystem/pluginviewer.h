@@ -2,8 +2,9 @@
 #define PLUGINVIEWER_H
 
 #include <QWidget>
+#include "pluginsystem/export.h"
 
-class PluginViewer : public QWidget {
+class PLUGINSYS_API PluginViewer : public QWidget {
     Q_OBJECT
  public:
     explicit PluginViewer(QWidget *parent = 0);

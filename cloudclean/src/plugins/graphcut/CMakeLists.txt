@@ -14,6 +14,8 @@ FIND_PACKAGE(PCL 1.7 REQUIRED COMPONENTS
 #    segmentation
 )
 
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Bsymbolic")
+
 FILE (GLOB plugin_SOURCE *.cpp *.cxx *.cc *.C *.c *.h *.hpp)
 QT5_ADD_RESOURCES(graphcut_RESOURCES_RCC graphcut_resources.qrc)
 add_library(graphcut SHARED ${plugin_SOURCE} ${graphcut_RESOURCES_RCC} ../../pluginsystem/iplugin.h)

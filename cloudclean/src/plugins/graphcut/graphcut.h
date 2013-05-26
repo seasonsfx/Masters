@@ -30,6 +30,7 @@ class GraphCut : public IPlugin {
     Q_PLUGIN_METADATA(IID "za.co.circlingthesun.cloudclean.iplugin" FILE "graphcut.json")
  public:
     QString getName();
+    ~GraphCut();
     void initialize(Core * core);
     void cleanup();
     bool eventFilter(QObject *object, QEvent *event);

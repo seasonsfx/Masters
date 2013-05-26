@@ -38,6 +38,7 @@
 #include "pluginsystem/pluginmanager.h"
 #include <cassert>
 #include <QString>
+#include <QJsonObject>
 #include <QApplication>
 #include <QPluginLoader>
 #include <QDebug>
@@ -48,6 +49,7 @@
 #include <model/cloudlist.h>
 
 #include "pluginsystem/core.h"
+#include "pluginsystem/plugindeps.h"
 
 static QString DLLExtension() {
 #if defined(Q_OS_WIN)
@@ -161,8 +163,17 @@ QString PluginManager::getFileName(IPlugin * plugin){
 IPlugin * PluginManager::loadPlugin(QString loc){
     QPluginLoader * loader = new QPluginLoader();
 
-    loader->setLoadHints(QLibrary::ExportExternalSymbolsHint|QLibrary::ResolveAllSymbolsHint);
     loader->setFileName(loc);
+    QJsonObject meta = loader->metaData().find("MetaData").value().toObject();
+    QJsonObject::Iterator export_symbols = meta.find("export_symbols");
+    bool found = export_symbols != meta.end();
+
+    if(found && export_symbols.value().toBool()){
+        loader->setLoadHints(QLibrary::ExportExternalSymbolsHint);
+        qDebug() << "Exporting";
+    }
+
+
     bool loaded = loader->load();
 
     if (!loaded) {

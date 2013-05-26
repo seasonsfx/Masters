@@ -48,7 +48,7 @@ namespace std {
     class mutex;
 }
 
-class GUI_DLLSPEC Camera {
+class GUI_API Camera {
  public:
     Camera();
 

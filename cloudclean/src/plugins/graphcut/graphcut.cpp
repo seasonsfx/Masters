@@ -251,7 +251,7 @@ void GraphCut::enable() {
 
     // Let the user know what to do
     QMessageBox::information(nullptr, tr("Make a selection"),
-                    tr("Select the center of an object..."),
+                    tr("Select the center of an object!"),
                     QMessageBox::Ok, QMessageBox::Ok);
 
 }

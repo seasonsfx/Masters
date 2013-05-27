@@ -24,7 +24,6 @@
 #include "model/cloudlist.h"
 
 #include "pluginsystem/pluginmanager.h"
-#include "pluginsystem/pluginviewer.h"
 
 #ifdef _WIN32
 #   define INFINITY (DBL_MAX+DBL_MAX)
@@ -206,14 +205,6 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
 
     });
     core_->mw_->addMenu(load_plugin, "Reload");
-
-    // Plugin viewer
-    QAction * pluginviewer = new QAction("Plugin viewer ", core_->mw_);
-    core_->mw_->addMenu(pluginviewer, "Reload");
-    connect(pluginviewer, &QAction::triggered, [this] (bool checked) {
-        PluginViewer * pv = new PluginViewer();
-        pv->show();
-    });
 
     QAction * disable_plugins = new QAction(this);
     core_->mw_->addAction(disable_plugins);

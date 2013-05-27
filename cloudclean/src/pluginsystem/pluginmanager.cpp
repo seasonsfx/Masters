@@ -44,6 +44,8 @@
 #include <QDebug>
 #include <QDir>
 #include <QUndoStack>
+#include <QFileSystemWatcher>
+#include <QTimer>
 #include <gui/mainwindow.h>
 #include <model/layerlist.h>
 #include <model/cloudlist.h>
@@ -61,6 +63,88 @@ static QString DLLExtension() {
 #endif
     assert(0 && "Unknown Operative System. Please Define the appropriate dynamic library extension");
     return QString();
+}
+
+PluginResource::PluginResource(QString path, Core * core, PluginManager * pm) {
+    load(path);
+
+    timer = new QTimer(0);
+    timer->setInterval(1000);
+    timer->setTimerType(Qt::VeryCoarseTimer);
+
+    watcher_ = new QFileSystemWatcher(0);
+    watcher_->addPath(path);
+
+    watcher_->connect(watcher_, &QFileSystemWatcher::fileChanged, [this, core, pm] (QString path) {
+        timer->connect(timer, &QTimer::timeout, [this, core, pm, path] () {
+            timer->disconnect();
+            timer->stop();
+
+            if(instance_ != nullptr) {
+                instance_->cleanup();
+                delete instance_;
+            }
+            instance_ = nullptr;
+
+            if(loader_ != nullptr) {
+                watcher_->removePath(loader_->fileName());
+                loader_->unload();
+                if(loader_->isLoaded()) {
+                    qDebug() << "Could not unload plugin: " << path;
+                }
+                delete loader_;
+            }
+            loader_ = nullptr;
+
+            if(load(path)) {
+                qDebug() << "Reloaded plugin: " << instance_->getName();
+                instance_->initialize(core);
+                instance_->initialize2(pm);
+            }
+            watcher_->addPath(path);
+        });
+        timer->start();
+    });
+}
+
+PluginResource::~PluginResource(){
+    if(watcher_ != nullptr)
+        delete watcher_;
+    if(loader_ != nullptr)
+        delete loader_;
+    if(timer != nullptr)
+        delete timer;
+    // Instance is deleted when unloaded?
+}
+
+bool PluginResource::load(QString path) {
+    loader_ = new QPluginLoader();
+    loader_->setFileName(path);
+    QJsonObject meta = loader_->metaData().find("MetaData").value().toObject();
+    QJsonObject::Iterator export_symbols = meta.find("export_symbols");
+    bool found = export_symbols != meta.end();
+
+    if(found && export_symbols.value().toBool()){
+        loader_->setLoadHints(QLibrary::ExportExternalSymbolsHint);
+        qDebug() << "Exporting";
+    }
+
+    bool loaded = loader_->load();
+
+    if (!loaded) {
+        qDebug() << "Could not load plugin: " << path;
+        qDebug() << "ERROR: " << loader_->errorString();
+        return false;
+    }
+
+    QObject *plugin = loader_->instance();
+
+    instance_ = qobject_cast<IPlugin *>(plugin);
+    if(!instance_){
+        qDebug() << "Not a valid plugin";
+        return false;
+    }
+    return true;
 }
 
 PluginManager::PluginManager(Core * core) {
@@ -88,113 +172,51 @@ PluginManager::PluginManager(Core * core) {
     }
 
     qApp->addLibraryPath(plugins_dir_->absolutePath());
-
 }
 
 PluginManager::~PluginManager() {
-    /*
-    for(IPlugin * plugin: plugins_){
-        plugin->cleanup();
-        delete plugin;
-    }
-    for(QPluginLoader * loader: plugin_loaders_){
-        loader->unload();
-        delete loader;
-    }
-    */
+
 }
 
 IPlugin * PluginManager::findPluginByName(QString name) {
-    for(IPlugin * plugin: plugins_) {
-        if(plugin != nullptr && plugin->getName() == name)
-            return plugin;
+    for(PluginResource * plugin_resource: plugins_) {
+        if(plugin_resource != nullptr && plugin_resource->instance_->getName() == name)
+            return plugin_resource->instance_;
     }
     return nullptr;
 }
 
 bool PluginManager::unloadPlugin(IPlugin * plugin){
-    int pos = -1;
     for(int idx = 0; idx < plugins_.size(); idx++) {
-        if(plugins_[idx] == plugin) {
-            pos = idx;
-            break;
+        PluginResource * plugin_resource = plugins_[idx];
+        if(plugin_resource->instance_ == plugin) {
+            plugin_resource->instance_->cleanup();
+            plugin_resource->loader_->unload();
+            delete plugin_resource;
+            plugins_.erase(plugins_.begin() + idx);
+            return true;
         }
     }
 
-    if(pos == -1) {
-        qDebug() << "Could not find plugin!";
-        return false;
-    }
-
-    // Remove instance
-    plugins_[pos]->cleanup();
-    delete plugins_[pos];
-    plugins_.erase(plugins_.begin() + pos);
-
-    // Unload plugin
-    bool unloaded = plugin_loaders_[pos]->unload();
-
-    qDebug() << "Still loaded? " << plugin_loaders_[pos]->isLoaded();
-
-    if(!unloaded)
-        qDebug() << "Could not unload library";
-    delete plugin_loaders_[pos];
-    plugin_loaders_.erase(plugin_loaders_.begin() + pos);
+    qDebug() << "Could not find plugin!";
+    return false;
 }
 
 QString PluginManager::getFileName(IPlugin * plugin){
-    int pos = -1;
-    for(int idx = 0; idx < plugins_.size(); idx++) {
-        if(plugins_[idx] == plugin) {
-            pos = idx;
-            break;
+    for(PluginResource * pr : plugins_){
+        if(pr->instance_ == plugin){
+            return pr->loader_->fileName();
         }
     }
-
-    if(pos == -1) {
-        qDebug() << "Could not find plugin!";
-        return "";
-    }
-
-
-    return plugin_loaders_[pos]->fileName();
+    return "";
 }
 
-IPlugin * PluginManager::loadPlugin(QString loc){
-    QPluginLoader * loader = new QPluginLoader();
-
-    loader->setFileName(loc);
-    QJsonObject meta = loader->metaData().find("MetaData").value().toObject();
-    QJsonObject::Iterator export_symbols = meta.find("export_symbols");
-    bool found = export_symbols != meta.end();
-
-    if(found && export_symbols.value().toBool()){
-        loader->setLoadHints(QLibrary::ExportExternalSymbolsHint);
-        qDebug() << "Exporting";
+IPlugin * PluginManager::loadPlugin(QString path){
+    PluginResource * pr = new PluginResource(path, core_, this);
+    if(pr->instance_ != nullptr) {
+        plugins_.push_back(pr);
     }
-
-
-    bool loaded = loader->load();
-
-    if (!loaded) {
-        qDebug() << "Could not load plugin: " << loc;
-        qDebug() << "ERROR: " << loader->errorString();
-        delete loader;
-        return nullptr;
-    }
-
-    QObject *plugin = loader->instance();
-
-    IPlugin * iplugin = qobject_cast<IPlugin *>(plugin);
-    if(!iplugin){
-        qDebug() << "Not a valid plugin";
-        delete loader;
-        return nullptr;
-    }
-
-    plugin_loaders_.push_back(loader);
-    plugins_.push_back(iplugin);
-    return iplugin;
+    return pr->instance_;
 }
 
 void PluginManager::loadPlugins() {
@@ -211,12 +233,12 @@ void PluginManager::loadPlugins() {
 }
 
 void PluginManager::initializePlugins() {
-    for(IPlugin * plugin : plugins_){
-        plugin->initialize(core_);
+    for(PluginResource * pr : plugins_){
+        pr->instance_->initialize(core_);
     }
 
-    for(IPlugin * plugin : plugins_){
-        plugin->initialize2(this);
+    for(PluginResource * pr : plugins_){
+        pr->instance_->initialize2(this);
     }
 }
 

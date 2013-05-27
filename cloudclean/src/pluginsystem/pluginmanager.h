@@ -17,9 +17,29 @@ class ActionManager;
 class MainWindow;
 class Core;
 class QPluginLoader;
+class QFileSystemWatcher;
+class QTimer;
 
 #include "pluginsystem/core.h"
 #include "pluginsystem/iplugin.h"
+
+class PluginResource {
+  public:
+    PluginResource(QString path, Core *core, PluginManager *pm);
+    ~PluginResource();
+
+  private:
+    bool load(QString path);
+
+  public:
+    QFileSystemWatcher * watcher_ = nullptr;
+    QPluginLoader * loader_ = nullptr;
+    IPlugin * instance_ = nullptr;
+
+  private:
+    QTimer * timer = nullptr;
+
+};
 
 class PLUGINSYS_API PluginManager : public QObject{
     Q_OBJECT
@@ -29,7 +49,7 @@ class PLUGINSYS_API PluginManager : public QObject{
 
     IPlugin * findPluginByName(QString name);
     QString getFileName(IPlugin * plugin);
-    IPlugin * loadPlugin(QString loc);
+    IPlugin * loadPlugin(QString path);
     bool unloadPlugin(IPlugin * plugin);
     void loadPlugins();
     void initializePlugins();
@@ -37,8 +57,8 @@ class PLUGINSYS_API PluginManager : public QObject{
     template <typename T>
     T * findPlugin() {
         T * plugin = nullptr;
-        for(IPlugin * aplugin : plugins_){
-            plugin = qobject_cast<T *>(aplugin);
+        for(PluginResource * pr : plugins_){
+            plugin = qobject_cast<T *>(pr->instance_);
             if(plugin != nullptr)
                 return plugin;
         }
@@ -49,8 +69,7 @@ class PLUGINSYS_API PluginManager : public QObject{
     void endEdit();
 
  private:
-    std::vector<IPlugin *> plugins_;
-    std::vector<QPluginLoader *> plugin_loaders_;
+    std::vector<PluginResource *> plugins_;
     Core * core_;
     std::unique_ptr<QDir> plugins_dir_;
 };

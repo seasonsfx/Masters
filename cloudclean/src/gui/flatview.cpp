@@ -127,7 +127,7 @@ void FlatView::mouseMoveEvent(QMouseEvent * event) {
 
     if(event->buttons()){
         delta = delta.cwiseProduct(Eigen::Vector2f(2.0f/width(), -2.0f/height()));
-        qDebug() << "Delta " << delta.x() << delta.y();
+        //qDebug() << "Delta " << delta.x() << delta.y();
         transform_ = Eigen::Translation2f(delta) * transform_;
         update();
     }
@@ -226,6 +226,7 @@ void FlatView::initializeGL() {
 
 
 void FlatView::paintEvent(QPaintEvent *event) {
+
     makeCurrent();
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     //resizeGL(width(), height());

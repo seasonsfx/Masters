@@ -75,6 +75,8 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
     setOrganizationName(APPLICATION_VENDOR_NAME);
     setOrganizationDomain(APPLICATION_VENDOR_URL);
     
+    QString filename = "";
+
     // Parse the commandline
     int idx = 1;
     while ( idx < argc ) {
@@ -153,7 +155,8 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
             printApplicationIdentifier();
             std::exit(0);
         } else {
-            qDebug() << "Unrecognized option: \"" << arg << "\". Ignoring";
+            //qDebug() << "Unrecognized option: \"" << arg << "\". Ignoring";
+            filename = arg;
         }
         idx++;
     }
@@ -167,64 +170,16 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
     pm_->loadPlugins();
     pm_->initializePlugins();
 
-    // Testing reload:
-    QAction * unload_graphcut = new QAction("Unload graohcut", core_->mw_);
-    connect(unload_graphcut, &QAction::triggered, [this] (bool checked) {
-        IPlugin * plugin = pm_->findPluginByName("graph_cut");
-        if(plugin == nullptr)
-            return;
-
-        pm_->unloadPlugin(plugin);
-        qDebug() << "Unload called on graphcut";
-    });
-    core_->mw_->addMenu(unload_graphcut, "Reload");
-
-    QAction * unload = new QAction("Unload stub", core_->mw_);
-    connect(unload, &QAction::triggered, [this] (bool checked) {
-        IPlugin * plugin = pm_->findPluginByName("stub");
-        if(plugin == nullptr)
-            return;
-
-        pm_->unloadPlugin(plugin);
-        qDebug() << "Unload called on stub";
-    });
-    core_->mw_->addMenu(unload, "Reload");
-
-    // Load plugin
-    QAction * load_plugin = new QAction("Load plugin", core_->mw_);
-    connect(load_plugin, &QAction::triggered, [this] (bool checked) {
-        QString fileName = QFileDialog::getOpenFileName(core_->mw_,
-            tr("Open Plugin"), "", tr("Plugins (*.so *.dll *.dynlib)"));
-
-        if(fileName == "")
-            return;
-
-        IPlugin * plugin = pm_->loadPlugin(fileName);
-        plugin->initialize(core_);
-        plugin->initialize2(pm_);
-
-    });
-    core_->mw_->addMenu(load_plugin, "Reload");
-
+    // This is not working, why?
     QAction * disable_plugins = new QAction(this);
     core_->mw_->addAction(disable_plugins);
     connect(disable_plugins, SIGNAL(toggled(bool)), pm_, SIGNAL(endEdit()));
     disable_plugins->setShortcut(QKeySequence(Qt::Key_Escape));
     disable_plugins->setShortcutContext(Qt::ApplicationShortcut);
 
-    // TODO add commandline
-    // load a cloud
-    std::function<void (const char *)> loadcloud = [&] (const char * fname) {
-
-        std::shared_ptr<PointCloud> pc = core_->cl_->loadFile(fname);
-    };
-
-    if(argc == 2)
-        std::thread(loadcloud, argv[1]).detach();
-
-    //std::thread(loadcloud, "/home/rickert/Workspace/uscans/2011.06.11-10.23.54.zfs_cy.ptx").detach();
-    //std::thread(loadcloud, "/home/rickert/Workspace/uscans/Petra_Top_xf.ptx").detach();
-    //std::thread(loadcloud, "/home/rickert/Petra_Top_xf.ptx").detach();
+    // load a cloud from commandline
+    if(filename.length() != 0)
+        std::thread(&CloudList::loadFile, core_->cl_, filename).detach();
 
 }
 
@@ -392,8 +347,9 @@ bool App::notify(QObject * receiver, QEvent * event){
         return QApplication::notify(receiver, event);
     }
     catch(std::exception& e) {
+        qDebug() << "Something terrible happened, you prolly wanna restart the app.";
         qDebug() << "Exception thrown:" << e.what();
-        exit(1);
+        //exit(1);
     }
     return true;
 }

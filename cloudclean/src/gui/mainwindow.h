@@ -30,6 +30,13 @@ class GUI_API MainWindow : public QMainWindow {
 
     void addMenu(QAction * action, QString menu_name);
     void removeMenu(QAction * action, QString menu_name);
+    inline int addTab(QWidget * widget, QString label) {
+        return tabs_->addTab(widget, label);
+    }
+
+    inline void removeTab(int idx) {
+        tabs_->removeTab(idx);
+    }
 
  public slots:
     void loadFile();

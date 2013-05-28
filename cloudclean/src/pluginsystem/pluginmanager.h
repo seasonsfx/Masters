@@ -37,7 +37,7 @@ class PluginResource {
     IPlugin * instance_ = nullptr;
 
   private:
-    QTimer * timer = nullptr;
+    QTimer * timer_ = nullptr;
 
 };
 
@@ -70,8 +70,11 @@ class PLUGINSYS_API PluginManager : public QObject{
 
  private:
     std::vector<PluginResource *> plugins_;
-    Core * core_;
+    Core * core_ = nullptr;
     std::unique_ptr<QDir> plugins_dir_;
+    QFileSystemWatcher * watcher_ = nullptr;
+    bool plugins_loaded_ = false;
+    QTimer * timer_ = nullptr;
 };
 
 #endif // PLUGINMANAGER_H

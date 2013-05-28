@@ -2,6 +2,7 @@
 #include <QResource>
 #include <QKeyEvent>
 #include <QCoreApplication>
+#include <QWindow>
 #include <cmath>
 #include <cstdlib>
 #include "utilities/pointpicker.h"
@@ -110,7 +111,12 @@ void GLWidget::initializeGL() {
 
 
 void GLWidget::paintEvent(QPaintEvent *event) {
+    if(!isValid())
+        return;
+
     makeCurrent();
+
+    //makeCurrent();
     // Make sure the labels are updates
     // Make sure nothing has changed
 

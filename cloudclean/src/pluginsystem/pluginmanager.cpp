@@ -68,17 +68,17 @@ static QString DLLExtension() {
 PluginResource::PluginResource(QString path, Core * core, PluginManager * pm) {
     load(path);
 
-    timer = new QTimer(0);
-    timer->setInterval(1000);
-    timer->setTimerType(Qt::VeryCoarseTimer);
+    timer_ = new QTimer(0);
+    timer_->setInterval(1000);
+    timer_->setTimerType(Qt::VeryCoarseTimer);
 
     watcher_ = new QFileSystemWatcher(0);
     watcher_->addPath(path);
 
     watcher_->connect(watcher_, &QFileSystemWatcher::fileChanged, [this, core, pm] (QString path) {
-        timer->connect(timer, &QTimer::timeout, [this, core, pm, path] () {
-            timer->disconnect();
-            timer->stop();
+        timer_->connect(timer_, &QTimer::timeout, [this, core, pm, path] () {
+            timer_->disconnect();
+            timer_->stop();
 
             if(instance_ != nullptr) {
                 instance_->cleanup();
@@ -101,9 +101,11 @@ PluginResource::PluginResource(QString path, Core * core, PluginManager * pm) {
                 instance_->initialize(core);
                 instance_->initialize2(pm);
             }
-            watcher_->addPath(path);
+            if(QFile::exists(path)){
+                watcher_->addPath(path);
+            }
         });
-        timer->start();
+        timer_->start();
     });
 }
 
@@ -112,8 +114,8 @@ PluginResource::~PluginResource(){
         delete watcher_;
     if(loader_ != nullptr)
         delete loader_;
-    if(timer != nullptr)
-        delete timer;
+    if(timer_ != nullptr)
+        delete timer_;
     // Instance is deleted when unloaded?
 }
 
@@ -172,10 +174,17 @@ PluginManager::PluginManager(Core * core) {
     }
 
     qApp->addLibraryPath(plugins_dir_->absolutePath());
+
+    timer_ = new QTimer(0);
+    timer_->setInterval(1000);
+    timer_->setTimerType(Qt::VeryCoarseTimer);
 }
 
 PluginManager::~PluginManager() {
-
+    if(watcher_ != nullptr)
+        delete watcher_;
+    if(timer_ != nullptr)
+        delete timer_;
 }
 
 IPlugin * PluginManager::findPluginByName(QString name) {
@@ -220,7 +229,7 @@ IPlugin * PluginManager::loadPlugin(QString path){
 }
 
 void PluginManager::loadPlugins() {
-    if(!plugins_dir_)
+    if(!plugins_dir_ || plugins_loaded_)
 		return;
 
     QStringList pluginfilters("*." + DLLExtension());
@@ -230,6 +239,43 @@ void PluginManager::loadPlugins() {
         QString absfilepath = plugins_dir_->absoluteFilePath(fileName);
         loadPlugin(absfilepath);
     }
+    plugins_loaded_ = true;
+
+    // Watch for updates
+    watcher_ = new QFileSystemWatcher();
+    watcher_->addPath(plugins_dir_->path());
+    watcher_->connect(watcher_, &QFileSystemWatcher::directoryChanged, [this] (QString path) {
+        // Delay so compilation completes
+        timer_->connect(timer_, &QTimer::timeout, [this, path] () {
+            timer_->stop();
+            for (QString fileName : plugins_dir_->entryList(QDir::Files)) {
+                QString absfilepath = plugins_dir_->absoluteFilePath(fileName);
+                bool already_loaded = false;
+                // Make sure the plugin is not already loaded
+                for(PluginResource * pr : plugins_){
+                    if(pr->loader_ == nullptr)
+                        continue;
+                    if(pr->loader_->fileName() == absfilepath){
+                        already_loaded = true;
+                        break;
+                    }
+                }
+
+                if(already_loaded)
+                    continue;
+
+                qDebug() << "Detected new plugin at" << absfilepath;
+                IPlugin * instance = loadPlugin(absfilepath);
+                // Todo: need to wait a bit so that the file an be compiled
+                if(instance != nullptr) {
+                    instance->initialize(core_);
+                    instance->initialize2(this);
+                    qDebug() << "Loaded new plugin";
+                }
+            }
+        });
+        timer_->start();
+    });
 }
 
 void PluginManager::initializePlugins() {

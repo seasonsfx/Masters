@@ -93,13 +93,52 @@ void VDepth::myFunc(){
 
     ///////// Magic ///////////
 
-    float sobel_x[9] = {
+    int h = cloud->scan_width_;
+    int w = cloud->scan_height_;
+
+    auto convolve_op = [w, h] (float * source, int x, int y, double * filter, int filter_size) {
+        assert(filter_size%2 != 0);
+
+        int start = -filter_size/2;
+        int end = filter_size/2;
+
+        float sum = 0.0f;
+
+        for(int iy = start; iy <= end; iy++){
+            for(int ix = start; ix <= end; ix++){
+                // map pos
+                int _x = ix + x;
+                int _y = iy + y;
+
+                // wraps around on edges
+                if(_x < 0)
+                    _x = w+_x;
+                else if(_x > w-1)
+                    _x = _x-w;
+
+                if(_y < 0)
+                    _y = h+_y;
+                else if(_y > h-1)
+                    _y = _y-h;
+
+                // map index
+                int i = _x + w * _y;
+                // filter index
+                int f = ix+1 + 3*(iy+1);
+
+                sum += source[i] * filter[f];
+            }
+        }
+        return sum;
+    };
+
+    double sobel_x[9] = {
         1, 0, -1,
         2, 0, -2,
         1, 0, -1,
     };
 
-    float sobel_y[9] = {
+    double sobel_y[9] = {
         1, 2, 1,
         0, 0, 0,
         -1, -2, -1,
@@ -107,48 +146,14 @@ void VDepth::myFunc(){
 
     std::vector<float> grad_mag(size, 0);
 
-    int h = cloud->scan_width_;
-    int w = cloud->scan_height_;
-
-    auto convolve_op = [distmap, w, h] (int x, int y, float * filter) {
-
-        float sum = 0.0f;
-
-        for(int iy = -1; iy <= 1; iy++){
-            for(int ix = -1; ix <= 1; ix++){
-                // map pos
-                int _x = ix + x;
-                int _y = iy + y;
-
-                // wraps around on edges
-                if(_x == -1)
-                    _x = w-1;
-                else if(_x == w)
-                    _x = 0;
-
-                if(_y == -1)
-                    _y = h-1;
-                else if(_y == h)
-                    _y = 0;
-
-                // map index
-                int i = _x + w * _y;
-                // filter index
-                int f = ix+1 + 3*(iy+1);
-
-                sum += distmap[i] * filter[f];
-            }
-        }
-        return sum;
-    };
-
     float grad_max = 0.0f;
     float grad_min = FLT_MAX;
 
+    // Calculate the gradient magnitude
     for(int x = 0; x < w; x++){
         for(int y = 0; y < h; y++){
-            float gx = convolve_op(x, y, sobel_x);
-            float gy = convolve_op(x, y, sobel_y);
+            float gx = convolve_op(&distmap[0], x, y, sobel_x, 3);
+            float gy = convolve_op(&distmap[0], x, y, sobel_y, 3);
             grad_mag[x+y*w] = sqrt(gx*gx + gy*gy);
 
             if(grad_mag[x+y*w] > grad_max)
@@ -158,6 +163,80 @@ void VDepth::myFunc(){
         }
     }
 
+
+    double gaussian[25] = {
+        0.00296901674395065, 0.013306209891014005, 0.02193823127971504, 0.013306209891014005, 0.00296901674395065,
+        0.013306209891014005, 0.05963429543618023, 0.09832033134884507, 0.05963429543618023, 0.013306209891014005,
+        0.02193823127971504, 0.09832033134884507, 0.16210282163712417, 0.09832033134884507, 0.02193823127971504,
+        0.013306209891014005, 0.05963429543618023, 0.09832033134884507, 0.05963429543618023, 0.013306209891014005,
+        0.00296901674395065, 0.013306209891014005, 0.02193823127971504, 0.013306209891014005, 0.00296901674395065,
+    };
+
+    std::vector<float> smooth_grad_mag(size, 0);
+
+
+    // Apply gaussian
+    for(int i = 0; i < 1; i++){
+        grad_max = 0.0f;
+        grad_min = FLT_MAX;
+        for(int x = 0; x < w; x++){
+            for(int y = 0; y < h; y++){
+                float val = convolve_op(&grad_mag[0], x, y, gaussian, 5);
+                smooth_grad_mag[x+y*w] = val;
+
+                if(val > grad_max)
+                    grad_max = val;
+                else if(val < grad_min)
+                    grad_min = val;
+            }
+        }
+    }
+
+    // Threshold && Erode
+/*
+    int strct = {
+        0, 1, 0,
+        1, 0, 1,
+        0, 1, 0,
+    };
+
+    auto morph_op = [w, h] (float * source, float * dest, int x, int y, double * strct, int strct_size) {
+        assert(filter_size%2 != 0);
+
+        int start = -strct_size/2;
+        int end = strct_size/2;
+        int center_x, center_y;
+
+        float sum = 0.0f;
+
+        for(int iy = start; iy <= end; iy++){
+            for(int ix = start; ix <= end; ix++){
+                // map pos
+                int _x = ix + x;
+                int _y = iy + y;
+
+                // wraps around on edges
+                if(_x < 0)
+                    _x = w+_x;
+                else if(_x > w-1)
+                    _x = _x-w;
+
+                if(_y < 0)
+                    _y = h+_y;
+                else if(_y > h-1)
+                    _y = _y-h;
+
+                // map index
+                int i = _x + w * _y;
+                // filter index
+                int f = ix+1 + 3*(iy+1);
+
+                sum += source[i] * strct[f];
+            }
+        }
+        return sum;
+    };
+*/
     ///////// OUTPUT //////////
 
     if(image == nullptr)
@@ -180,10 +259,15 @@ void VDepth::myFunc(){
             }
 
             //int intensity = 255 * (1 - distmap[i]/max_dist);
-            float mag = grad_mag[i];
+            float mag = smooth_grad_mag[i];
             int intensity = 255 * (1 - (mag - grad_min)/(grad_max - grad_min));
 
-            if(intensity < 240) {
+            if(intensity > 255) {
+                qDebug() << "Nope, sorry > 255: " << mag;
+                return;
+            }
+
+            if(intensity < 40) {
                 intensity = 0;
             } else {
                 intensity = 255;

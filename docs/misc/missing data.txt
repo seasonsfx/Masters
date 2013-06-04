@@ -1,0 +1,2 @@
+Problem with depth maps are that missing data creates edges.
+Missing data can be interpolated but we run the risk of interpolating data that should be h

@@ -11,6 +11,7 @@
 #include "gui/mainwindow.h"
 #include "commands/select.h"
 #include "pluginsystem/core.h"
+#include "plugins/visualisedepth/utils.h"
 
 QString VDepth::getName(){
     return "visualisedepth";
@@ -72,97 +73,20 @@ void VDepth::myFunc(){
 
     int size = cloud->scan_width_ * cloud->scan_height_;
 
-    // translate grid idx to cloud idx
-    std::vector<int> lookup(size, -1);
+    // translates grid idx to cloud idx
+    std::shared_ptr<std::vector<int>> lookup = makeLookup(cloud);
 
     // Create distance map
-    std::vector<float> distmap(size, 0);
-
-    float max_dist = 0;
-
-    // Calculate distance from center of cloud
-    for(int i = 0; i < cloud->size(); i++) {
-        int grid_idx = cloud->cloud_to_grid_map_[i];
-        lookup[grid_idx] = i; // construct map while we are at it
-        pcl::PointXYZI & p = cloud->at(i);
-        distmap[grid_idx] = sqrt(pow(p.x, 2) + pow(p.y, 2) + pow(p.z, 2));
-
-        if(distmap[i] > max_dist)
-            max_dist = distmap[i];
-    }
+    std::shared_ptr<std::vector<float>> distmap = makeDistmap(cloud);
 
     ///////// Magic ///////////
 
     int h = cloud->scan_width_;
     int w = cloud->scan_height_;
 
-    auto convolve_op = [w, h] (float * source, int x, int y, double * filter, int filter_size) {
-        assert(filter_size%2 != 0);
 
-        int start = -filter_size/2;
-        int end = filter_size/2;
-
-        float sum = 0.0f;
-
-        for(int iy = start; iy <= end; iy++){
-            for(int ix = start; ix <= end; ix++){
-                // map pos
-                int _x = ix + x;
-                int _y = iy + y;
-
-                // wraps around on edges
-                if(_x < 0)
-                    _x = w+_x;
-                else if(_x > w-1)
-                    _x = _x-w;
-
-                if(_y < 0)
-                    _y = h+_y;
-                else if(_y > h-1)
-                    _y = _y-h;
-
-                // map index
-                int i = _x + w * _y;
-                // filter index
-                int f = ix+1 + 3*(iy+1);
-
-                sum += source[i] * filter[f];
-            }
-        }
-        return sum;
-    };
-
-    double sobel_x[9] = {
-        1, 0, -1,
-        2, 0, -2,
-        1, 0, -1,
-    };
-
-    double sobel_y[9] = {
-        1, 2, 1,
-        0, 0, 0,
-        -1, -2, -1,
-    };
-
-    std::vector<float> grad_mag(size, 0);
-
-    float grad_max = 0.0f;
-    float grad_min = FLT_MAX;
-
-    // Calculate the gradient magnitude
-    for(int x = 0; x < w; x++){
-        for(int y = 0; y < h; y++){
-            float gx = convolve_op(&distmap[0], x, y, sobel_x, 3);
-            float gy = convolve_op(&distmap[0], x, y, sobel_y, 3);
-            grad_mag[x+y*w] = sqrt(gx*gx + gy*gy);
-
-            if(grad_mag[x+y*w] > grad_max)
-                grad_max = grad_mag[x+y*w];
-            else if(grad_mag[x+y*w] < grad_min)
-                grad_min = grad_mag[x+y*w];
-        }
-    }
-
+    std::shared_ptr<std::vector<float> > grad_image = gradientImage(distmap, w, h, size);
+    float * grad_mag = &grad_image->at(0);
 
     double gaussian[25] = {
         0.00296901674395065, 0.013306209891014005, 0.02193823127971504, 0.013306209891014005, 0.00296901674395065,
@@ -172,25 +96,7 @@ void VDepth::myFunc(){
         0.00296901674395065, 0.013306209891014005, 0.02193823127971504, 0.013306209891014005, 0.00296901674395065,
     };
 
-    std::vector<float> smooth_grad_mag(size, 0);
-
-
-    // Apply gaussian
-    for(int i = 0; i < 1; i++){
-        grad_max = 0.0f;
-        grad_min = FLT_MAX;
-        for(int x = 0; x < w; x++){
-            for(int y = 0; y < h; y++){
-                float val = convolve_op(&grad_mag[0], x, y, gaussian, 5);
-                smooth_grad_mag[x+y*w] = val;
-
-                if(val > grad_max)
-                    grad_max = val;
-                else if(val < grad_min)
-                    grad_min = val;
-            }
-        }
-    }
+    std::shared_ptr<std::vector<float> > smooth_grad_image = convolve(grad_image, w, h, gaussian, 5);
 
     // Threshold && Erode
 /*
@@ -200,42 +106,7 @@ void VDepth::myFunc(){
         0, 1, 0,
     };
 
-    auto morph_op = [w, h] (float * source, float * dest, int x, int y, double * strct, int strct_size) {
-        assert(filter_size%2 != 0);
 
-        int start = -strct_size/2;
-        int end = strct_size/2;
-        int center_x, center_y;
-
-        float sum = 0.0f;
-
-        for(int iy = start; iy <= end; iy++){
-            for(int ix = start; ix <= end; ix++){
-                // map pos
-                int _x = ix + x;
-                int _y = iy + y;
-
-                // wraps around on edges
-                if(_x < 0)
-                    _x = w+_x;
-                else if(_x > w-1)
-                    _x = _x-w;
-
-                if(_y < 0)
-                    _y = h+_y;
-                else if(_y > h-1)
-                    _y = _y-h;
-
-                // map index
-                int i = _x + w * _y;
-                // filter index
-                int f = ix+1 + 3*(iy+1);
-
-                sum += source[i] * strct[f];
-            }
-        }
-        return sum;
-    };
 */
     ///////// OUTPUT //////////
 
@@ -247,19 +118,25 @@ void VDepth::myFunc(){
         image->setColor(i, qRgb(i, i, i));
     }
 
-    // Write image
+    float grad_min = FLT_MAX;
+    float grad_max = FLT_MIN;
+    minmax(*grad_image, grad_min, grad_max);
+    qDebug() << "Minmax" << grad_min << grad_max;
+
+    // Draw image
+    auto select = std::make_shared<std::vector<int> >();
     for(int y = 0; y < cloud->scan_height_; y++){
         for(int x = 0; x < cloud->scan_width_; x++){
             int i = (cloud->scan_height_ -1 - y) + x * cloud->scan_height_;
 
-            // Mask
-            if(lookup[i] == -2) {
+            // Mask disabled
+            if(lookup->at(i) == -2) {
                 image->setPixel(x, y, 0);
                 continue;
             }
 
             //int intensity = 255 * (1 - distmap[i]/max_dist);
-            float mag = smooth_grad_mag[i];
+            float mag = (*grad_image)[i];
             int intensity = 255 * (1 - (mag - grad_min)/(grad_max - grad_min));
 
             if(intensity > 255) {
@@ -267,15 +144,24 @@ void VDepth::myFunc(){
                 return;
             }
 
+            // Select
+            if(lookup->at(i) != -1 && intensity > 40) {
+                select->push_back(lookup->at(i));
+            }
+/*
             if(intensity < 40) {
                 intensity = 0;
             } else {
                 intensity = 255;
             }
-
+*/
             image->setPixel(x, y, intensity);
         }
     }
+
+    core_->us_->beginMacro("Experiment");
+    core_->us_->push(new Select(cloud, select));
+    core_->us_->endMacro();
 
     image_container->setPixmap(QPixmap::fromImage(*image));
     image_container->resize(image->size());

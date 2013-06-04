@@ -110,6 +110,8 @@ void VDepth::myFunc(){
 */
     ///////// OUTPUT //////////
 
+    std::shared_ptr<std::vector<float> > out_img = smooth_grad_image;
+
     if(image == nullptr)
         delete image;
     image = new QImage(cloud->scan_width_, cloud->scan_height_, QImage::Format_Indexed8);
@@ -118,10 +120,9 @@ void VDepth::myFunc(){
         image->setColor(i, qRgb(i, i, i));
     }
 
-    float grad_min = FLT_MAX;
-    float grad_max = FLT_MIN;
-    minmax(*grad_image, grad_min, grad_max);
-    qDebug() << "Minmax" << grad_min << grad_max;
+    float min, max;
+    minmax(*out_img, min, max);
+    qDebug() << "Minmax" << min << max;
 
     // Draw image
     auto select = std::make_shared<std::vector<int> >();
@@ -136,8 +137,8 @@ void VDepth::myFunc(){
             }
 
             //int intensity = 255 * (1 - distmap[i]/max_dist);
-            float mag = (*grad_image)[i];
-            int intensity = 255 * (1 - (mag - grad_min)/(grad_max - grad_min));
+            float mag = (*out_img)[i];
+            int intensity = 255 * (1 - (mag - min)/(max - min));
 
             if(intensity > 255) {
                 qDebug() << "Nope, sorry > 255: " << mag;

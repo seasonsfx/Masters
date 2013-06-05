@@ -79,38 +79,35 @@ void VDepth::myFunc(){
     // Create distance map
     std::shared_ptr<std::vector<float>> distmap = makeDistmap(cloud);
 
-    ///////// Magic ///////////
 
     int h = cloud->scan_width_;
     int w = cloud->scan_height_;
 
-
     std::shared_ptr<std::vector<float> > grad_image = gradientImage(distmap, w, h, size);
-    float * grad_mag = &grad_image->at(0);
+    std::shared_ptr<std::vector<float> > stdev_image = stdev(grad_image, w, h, 5);
 
-    double gaussian[25] = {
-        0.00296901674395065, 0.013306209891014005, 0.02193823127971504, 0.013306209891014005, 0.00296901674395065,
-        0.013306209891014005, 0.05963429543618023, 0.09832033134884507, 0.05963429543618023, 0.013306209891014005,
-        0.02193823127971504, 0.09832033134884507, 0.16210282163712417, 0.09832033134884507, 0.02193823127971504,
-        0.013306209891014005, 0.05963429543618023, 0.09832033134884507, 0.05963429543618023, 0.013306209891014005,
-        0.00296901674395065, 0.013306209891014005, 0.02193823127971504, 0.013306209891014005, 0.00296901674395065,
-    };
-
+/*
+    std::shared_ptr<std::vector<float> > grad_image = gradientImage(distmap, w, h, size);
     std::shared_ptr<std::vector<float> > smooth_grad_image = convolve(grad_image, w, h, gaussian, 5);
 
     // Threshold && Erode
-/*
-    int strct = {
+
+    const int strct[] = {
         0, 1, 0,
         1, 0, 1,
         0, 1, 0,
     };
 
-
+    std::shared_ptr<std::vector<float> > dilated_image =  morphology(
+            smooth_grad_image,
+            w, h, strct, 3, Morphology::ERODE,
+            grad_image); // <-- reuse
 */
+
+
     ///////// OUTPUT //////////
 
-    std::shared_ptr<std::vector<float> > out_img = smooth_grad_image;
+    std::shared_ptr<std::vector<float> > out_img = stdev_image;
 
     if(image == nullptr)
         delete image;
@@ -146,7 +143,7 @@ void VDepth::myFunc(){
             }
 
             // Select
-            if(lookup->at(i) != -1 && intensity > 40) {
+            if(lookup->at(i) != -1 && intensity < 230) {
                 select->push_back(lookup->at(i));
             }
 /*

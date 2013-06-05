@@ -71,8 +71,6 @@ void VDepth::myFunc(){
     if(cloud == nullptr)
         return;
 
-    int size = cloud->scan_width_ * cloud->scan_height_;
-
     // translates grid idx to cloud idx
     std::shared_ptr<std::vector<int>> lookup = makeLookup(cloud);
 
@@ -83,8 +81,9 @@ void VDepth::myFunc(){
     int h = cloud->scan_width_;
     int w = cloud->scan_height_;
 
-    std::shared_ptr<std::vector<float> > grad_image = gradientImage(distmap, w, h, size);
-    std::shared_ptr<std::vector<float> > stdev_image = stdev(grad_image, w, h, 5);
+    //std::shared_ptr<std::vector<float> > grad_image = gradientImage(distmap, w, h, size);
+    std::shared_ptr<std::vector<float> > int_image = interpolate(distmap, w, h, 50);
+    std::shared_ptr<std::vector<float> > stdev_image = stdev(int_image, w, h, 5);
 
 /*
     std::shared_ptr<std::vector<float> > grad_image = gradientImage(distmap, w, h, size);
@@ -135,7 +134,9 @@ void VDepth::myFunc(){
 
             //int intensity = 255 * (1 - distmap[i]/max_dist);
             float mag = (*out_img)[i];
-            int intensity = 255 * (1 - (mag - min)/(max - min));
+            //int intensity = 255 * (1 - (mag - min)/(max - min));
+
+            int intensity = 255 * (mag - min)/(max - min);
 
             if(intensity > 255) {
                 qDebug() << "Nope, sorry > 255: " << mag;
@@ -143,7 +144,7 @@ void VDepth::myFunc(){
             }
 
             // Select
-            if(lookup->at(i) != -1 && intensity < 230) {
+            if(lookup->at(i) != -1 && intensity > 40) {
                 select->push_back(lookup->at(i));
             }
 /*

@@ -18,7 +18,7 @@ std::shared_ptr<std::vector<float>> makeDistmap(
     int size = cloud->scan_width_ * cloud->scan_height_;
 
     if(distmap == nullptr || distmap->size() != size)
-        distmap = std::make_shared<std::vector<float>>(size, 0);
+        distmap = std::make_shared<std::vector<float>>(size, 0.0f);
 
     float max_dist = 0.0;
 
@@ -46,10 +46,11 @@ static const double sobel_y[9] = {
     -1, -2, -1,
 };
 
-std::shared_ptr<std::vector<float> > gradientImage(
-        std::shared_ptr<std::vector<float>> image,
-        int w, int h, int size,
+std::shared_ptr<std::vector<float> > gradientImage(std::shared_ptr<std::vector<float>> image,
+        int w, int h,
         std::shared_ptr<std::vector<float>> out_image) {
+
+    int size = w*h;
 
     if(out_image == nullptr || out_image->size() != size) {
         out_image = std::make_shared<std::vector<float>>(size, 0);
@@ -130,6 +131,28 @@ std::shared_ptr<std::vector<float> > stdev(
     for(int x = 0; x < w; x++){
         for(int y = 0; y < h; y++){
             img[x+y*w] = stdev_op(w, h, &image->at(0), x, y, local_size);
+        }
+    }
+
+    return out_image;
+}
+
+std::shared_ptr<std::vector<float> > interpolate(
+        std::shared_ptr<std::vector<float>> image,
+        int w, int h, const int nsize,
+        std::shared_ptr<std::vector<float>> out_image) {
+
+    int size = w*h;
+    if(out_image == nullptr || out_image->size() != size) {
+        out_image = std::make_shared<std::vector<float>>(size, 0);
+    }
+
+    float * img = &out_image->at(0);
+
+    // Calculate the gradient magnitude
+    for(int x = 0; x < w; x++){
+        for(int y = 0; y < h; y++){
+            interp_op(&image->at(0), w, h, &out_image->at(0), x, y, nsize);
         }
     }
 

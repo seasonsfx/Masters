@@ -20,7 +20,7 @@ std::shared_ptr<std::vector<float>> makeDistmap(
 );
 
 std::shared_ptr<std::vector<float> > gradientImage(std::shared_ptr<std::vector<float>> image,
-        int w, int h, int size,
+        int w, int h,
         std::shared_ptr<std::vector<float>> out_image = nullptr);
 
 std::shared_ptr<std::vector<float> > convolve(
@@ -51,6 +51,13 @@ void minmax(std::vector<T> & v, T & min, T & max){
     }
 
 }
+
+std::shared_ptr<std::vector<float> > interpolate(
+        std::shared_ptr<std::vector<float>> image,
+        int w, int h, const int nsize,
+        std::shared_ptr<std::vector<float>> out_image = nullptr);
+
+/// Inline functions:
 
 inline float convolve_op(
         int w, int h, float * source, int x, int y,
@@ -182,6 +189,59 @@ inline float stdev_op(
         }
     }
     return (sum_sq - (sum*sum)/(w*h))/((w*h)-1);
+}
+
+inline void interp_op(float * source, int w, int h, float * dest, int x, int y,
+               int nsize) {
+    assert(nsize%2 != 0);
+
+    int start = -nsize/2;
+    int end = nsize/2;
+
+    // Dont need to interopolate
+    if(source[x+y*w] > 1e-6){
+        dest[x+y*w] = source[x+y*w];
+        return;
+    }
+
+    float sum = 0.0f;
+    int n = 0;
+
+    for(int iy = start; iy <= end; iy++){
+        for(int ix = start; ix <= end; ix++){
+            // map pos
+            int _x = ix + x;
+            int _y = iy + y;
+
+            // wraps around on edges
+            if(_x < 0)
+                _x = w+_x;
+            else if(_x > w-1)
+                _x = _x-w;
+
+            if(_y < 0)
+                _y = h+_y;
+            else if(_y > h-1)
+                _y = _y-h;
+
+            // source index
+            int i = _x + w * _y;
+
+            // Skip null values
+            if(source[i]  < 1e-6)
+                continue;
+
+            sum += source[i];
+            n++;
+        }
+    }
+
+    if(n == 0){
+        dest[x+y*w] = source[x+y*w];
+        return;
+    }
+
+    dest[x+y*w] = sum/n;
 }
 
 static const double gaussian[25] = {

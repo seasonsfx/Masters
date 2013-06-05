@@ -13,7 +13,9 @@ uniform mat4 mv;
 void main(void) {
     vec4 n = normal[0];
     gl_Position = proj * mv * gl_in[0].gl_Position;
-    colour = vec4(line_colour, 1.0f);
+
+    colour = vec4(n.xyz, 1.0f);
+    //colour = vec4(line_colour, 1.0f);
 
     // set normal red if it looks wrong
     /*float len = sqrt(n.x*n.x + n.y*n.y + n.z*n.z);
@@ -26,7 +28,7 @@ void main(void) {
     
     vec4 short_normal = vec4(0.1f, 0.1f, 0.1f, 0.00f) * n;
     gl_Position = proj * mv * (gl_in[0].gl_Position + short_normal);
-    colour = vec4(line_colour, 1.0f);
+    //colour = vec4(line_colour, 1.0f);
     EmitVertex();
     
     EndPrimitive();

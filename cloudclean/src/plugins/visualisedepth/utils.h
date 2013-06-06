@@ -57,6 +57,14 @@ std::shared_ptr<std::vector<float> > interpolate(
         int w, int h, const int nsize,
         std::shared_ptr<std::vector<float>> out_image = nullptr);
 
+std::shared_ptr<std::vector<float> > stdev2(std::shared_ptr<PointCloud> cloud);
+
+std::shared_ptr<std::vector<float>> makeImg(std::shared_ptr<std::vector<int>> map, int img_size,
+        std::shared_ptr<std::vector<float>> input,
+        std::shared_ptr<std::vector<float>> img);
+
+
+
 /// Inline functions:
 
 inline float convolve_op(

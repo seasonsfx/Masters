@@ -91,7 +91,7 @@ FIND_PACKAGE(PCL 1.7 REQUIRED COMPONENTS
     octree
     kdtree # only the graph cut lib uses this
            # if I dont load and link this in the main binary, it prevents unloading
-#    search
+    search
 #    features
 #    filters
 #    segmentation

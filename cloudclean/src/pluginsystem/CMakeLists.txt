@@ -12,6 +12,7 @@ target_link_libraries(
     #${QT_LIBRARIES}
     cloudclean_model
     cloudclean_gui
+    ${PCL_LIBRARIES}
 )
 
 QT5_USE_MODULES(cloudclean_pluginsystem Core Widgets)

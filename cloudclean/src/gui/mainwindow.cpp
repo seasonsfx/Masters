@@ -39,7 +39,7 @@ MainWindow::MainWindow(QUndoStack *us, CloudList * cl, LayerList * ll, QWidget *
     tabs_ = new QTabWidget(this);
 
     QGLFormat base_format;
-    base_format.setVersion(3, 3);
+    base_format.setVersion(4, 3);
     // Compatibility profile breaks gl context sharing on AMD cards
     base_format.setProfile(QGLFormat::CompatibilityProfile);
     // Core profile breaks qpainter on windows

@@ -1,6 +1,8 @@
 #ifndef MINCUT_H
 #define MINCUT_H
 
+#include <pcl/PointIndices.h>
+#include <pcl/pcl_base.h>
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl/search/search.h>

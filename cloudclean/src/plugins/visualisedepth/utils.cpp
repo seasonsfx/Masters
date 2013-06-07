@@ -162,14 +162,14 @@ std::shared_ptr<std::vector<float> > interpolate(
     return out_image;
 }
 
-std::shared_ptr<std::vector<float> > stdev2(std::shared_ptr<PointCloud> cloud) {
+std::shared_ptr<std::vector<float> > stdev_depth(std::shared_ptr<PointCloud> cloud, const double radius) {
     std::shared_ptr<std::vector<float>> stdevs = std::make_shared<std::vector<float>>(cloud->size());
 
     std::vector<int> idxs(0);
     std::vector<float> dists(0);
 
     // 50 cm radius
-    const double radius = 0.05;
+    //const double radius = 0.05;
 
     // center
     Eigen::Map<Eigen::Vector3f> center(cloud->sensor_origin_.data());
@@ -178,7 +178,15 @@ std::shared_ptr<std::vector<float> > stdev2(std::shared_ptr<PointCloud> cloud) {
     for(int i = 0; i < cloud->size(); i++){
         idxs.clear();
         dists.clear();
-        ot->radiusSearch(cloud->points[i], radius, idxs, dists);
+        //ot->radiusSearch(cloud->points[i], radius, idxs, dists);
+
+        idxs.push_back(1);
+        idxs.push_back(2);
+        idxs.push_back(3);
+        idxs.push_back(4);
+        idxs.push_back(5);
+        idxs.push_back(6);
+        idxs.push_back(7);
 
         // calculate stdev of the distances?
         // bad idea because you have a fixed radius
@@ -199,11 +207,12 @@ std::shared_ptr<std::vector<float> > stdev2(std::shared_ptr<PointCloud> cloud) {
 
     }
 
+    return stdevs;
 }
 
 
-std::shared_ptr<std::vector<float>> makeImg(
-        std::shared_ptr<std::vector<int>> map,
+std::shared_ptr<std::vector<float>> cloudToGrid(
+        std::vector<int> & map,
         int img_size,
         std::shared_ptr<std::vector<float>> input,
         std::shared_ptr<std::vector<float>> img) {
@@ -211,9 +220,9 @@ std::shared_ptr<std::vector<float>> makeImg(
     if(img == nullptr || img->size() != img_size)
         img = std::make_shared<std::vector<float>>(img_size, 0.0f);
 
-    for(int i = 0; i < map->size(); i++) {
-        int grid_idx = (*map)[i];
-        img->at(grid_idx) = (*input)[i];
+    for(int i = 0; i < map.size(); i++) {
+        int grid_idx = map[i];
+        (*img)[grid_idx] = (*input)[i];
     }
 
     return img;

@@ -6,6 +6,7 @@
 #include <cassert>
 #include <limits>
 #include <QDebug>
+#include "model/pointcloud.h"
 class PointCloud;
 
 enum class Morphology{ERODE, DILATE};
@@ -57,11 +58,11 @@ std::shared_ptr<std::vector<float> > interpolate(
         int w, int h, const int nsize,
         std::shared_ptr<std::vector<float>> out_image = nullptr);
 
-std::shared_ptr<std::vector<float> > stdev2(std::shared_ptr<PointCloud> cloud);
+std::shared_ptr<std::vector<float> > stdev_depth(std::shared_ptr<PointCloud> cloud, const double radius = 0.05);
 
-std::shared_ptr<std::vector<float>> makeImg(std::shared_ptr<std::vector<int>> map, int img_size,
+std::shared_ptr<std::vector<float>> cloudToGrid(std::vector<int> & map, int img_size,
         std::shared_ptr<std::vector<float>> input,
-        std::shared_ptr<std::vector<float>> img);
+        std::shared_ptr<std::vector<float>> img = nullptr);
 
 
 
@@ -251,6 +252,77 @@ inline void interp_op(float * source, int w, int h, float * dest, int x, int y,
 
     dest[x+y*w] = sum/n;
 }
+
+
+inline void nn_op(std::shared_ptr<PointCloud> cloud, vector<int> & lookup, int idx, const double radius, std::vector<int> idxs, int max_nn) {
+
+    int w = cloud->scan_width_;
+    int h = cloud->scan_height_;
+
+    int grid_idx = cloud->cloud_to_grid_map_[idx];
+    int x = grid_idx / h;
+    int y = grid_idx % h;
+
+    Eigen::Map<Eigen::Vector3f> center(&cloud->points[idx].x);
+
+    const double rad_sq = radius * radius;
+
+    const int max_ring_size = 50;
+    const int max_outside_radius = 10;
+    int outside_radius = 0;
+
+    for(int ring = 1; ring < max_ring_size ; ring++){
+        // Iterator over edge of square
+        for(int iy = -ring; iy <= ring; iy++){
+            for(int ix = -ring; ix <=ring; ix++){
+                // map pos
+                int _x = ix + x;
+                int _y = iy + y;
+
+                // wraps around on edges
+                if(_x < 0)
+                    _x = w+_x;
+                else if(_x > w-1)
+                    _x = _x-w;
+
+                if(_y < 0)
+                    _y = h+_y;
+                else if(_y > h-1)
+                    _y = _y-h;
+
+                // source index
+                int i = _x + w * _y;
+
+                int idx = lookup[i];
+                // Only look at valid indexes
+                if(idx  != -1){
+                    float * data = &(cloud->points[i].x);
+                    Eigen::Map<Eigen::Vector3f> point(data);
+                    float sqdist = (point-center).squaredNorm();
+                    if(sqdist <= rad_sq) {
+                        idxs.push_back(idx);
+                        if(idxs.size() > max_nn)
+                            return;
+                    } else {
+                        outside_radius++;
+                    }
+
+                    if(outside_radius > max_outside_radius)
+                        return;
+                }
+
+                qDebug() << "ix" << ix;
+                qDebug() << "ring" << ring;
+
+                // Skip the inner values
+                if(iy != -ring && iy != ring)
+                    ix = ring-1;
+            }
+        }
+    }
+
+}
+
 
 static const double gaussian[25] = {
     0.00296901674395065, 0.013306209891014005, 0.02193823127971504, 0.013306209891014005, 0.00296901674395065,

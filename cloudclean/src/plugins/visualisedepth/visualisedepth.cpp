@@ -70,22 +70,37 @@ void VDepth::myFunc(){
     std::shared_ptr<PointCloud> cloud = core_->cl_->active_;
     if(cloud == nullptr)
         return;
+    int h = cloud->scan_width_;
+    int w = cloud->scan_height_;
+
 
     // translates grid idx to cloud idx
     std::shared_ptr<std::vector<int>> lookup = makeLookup(cloud);
 
+
+    // Test
+    std::vector<int> nn;
+    nn_op(cloud, *lookup, 333, 0.05, nn, 50);
+    for(int n : nn) {
+        qDebug() << "NN: " << n;
+    }
+
+    std::shared_ptr<std::vector<float> > stdev = stdev_depth(cloud);
+
+    if(stdev == nullptr)
+        qDebug() << "Oh noes!";
+
+    std::shared_ptr<std::vector<float>> img = cloudToGrid(cloud->cloud_to_grid_map_, w*h, stdev);
+
+/*
     // Create distance map
     std::shared_ptr<std::vector<float>> distmap = makeDistmap(cloud);
-
-
-    int h = cloud->scan_width_;
-    int w = cloud->scan_height_;
 
     //std::shared_ptr<std::vector<float> > grad_image = gradientImage(distmap, w, h, size);
     std::shared_ptr<std::vector<float> > int_image = interpolate(distmap, w, h, 50);
     std::shared_ptr<std::vector<float> > stdev_image = stdev(int_image, w, h, 5);
 
-/*
+
     std::shared_ptr<std::vector<float> > grad_image = gradientImage(distmap, w, h, size);
     std::shared_ptr<std::vector<float> > smooth_grad_image = convolve(grad_image, w, h, gaussian, 5);
 
@@ -106,7 +121,9 @@ void VDepth::myFunc(){
 
     ///////// OUTPUT //////////
 
-    std::shared_ptr<std::vector<float> > out_img = stdev_image;
+    std::shared_ptr<std::vector<float> > out_img = img;
+
+    qDebug() << "Size" << img->size();
 
     if(image == nullptr)
         delete image;

@@ -18,6 +18,12 @@ QString VDepth::getName(){
 }
 
 void VDepth::initialize(Core *core){
+    settings_ = nullptr;
+    tab_idx_ = -1;
+
+    QLabel * image_container = nullptr;
+    QImage * image = nullptr;
+
     core_= core;
     cl_ = core_->cl_;
     ll_ = core_->ll_;
@@ -26,7 +32,7 @@ void VDepth::initialize(Core *core){
     mw_ = core_->mw_;
     myaction_ = new QAction(QIcon(":/images/visualisedepth.png"), "Visualisedepth", 0);
 
-    depth_widget_ = new QWidget(depth_widget_);
+    depth_widget_ = new QWidget(0);
     tab_idx_ = core_->mw_->addTab(depth_widget_, "Depth map");
 
     QVBoxLayout * layout = new QVBoxLayout(depth_widget_);

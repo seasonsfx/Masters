@@ -32,12 +32,12 @@ class PluginResource {
     bool load(QString path);
 
   public:
-    QFileSystemWatcher * watcher_ = nullptr;
-    QPluginLoader * loader_ = nullptr;
-    IPlugin * instance_ = nullptr;
+    QFileSystemWatcher * watcher_;
+    QPluginLoader * loader_;
+    IPlugin * instance_;
 
   private:
-    QTimer * timer_ = nullptr;
+    QTimer * timer_;
 
 };
 
@@ -70,11 +70,11 @@ class PLUGINSYS_API PluginManager : public QObject{
 
  private:
     std::vector<PluginResource *> plugins_;
-    Core * core_ = nullptr;
+    Core * core_;
     std::unique_ptr<QDir> plugins_dir_;
-    QFileSystemWatcher * watcher_ = nullptr;
-    bool plugins_loaded_ = false;
-    QTimer * timer_ = nullptr;
+    QFileSystemWatcher * watcher_;
+    bool plugins_loaded_;
+    QTimer * timer_;
 };
 
 #endif // PLUGINMANAGER_H

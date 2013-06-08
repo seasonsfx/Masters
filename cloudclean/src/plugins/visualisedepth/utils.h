@@ -254,7 +254,7 @@ inline void interp_op(float * source, int w, int h, float * dest, int x, int y,
 }
 
 
-inline void nn_op(std::shared_ptr<PointCloud> cloud, vector<int> & lookup, int idx, const double radius, std::vector<int> idxs, int max_nn) {
+inline void nn_op(std::shared_ptr<PointCloud> cloud, std::vector<int> & lookup, int idx, const double radius, std::vector<int> idxs, int max_nn) {
 
     int w = cloud->scan_width_;
     int h = cloud->scan_height_;

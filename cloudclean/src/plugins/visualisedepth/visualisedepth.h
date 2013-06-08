@@ -1,6 +1,7 @@
 #ifndef VDEPTH_CUT_H
 #define VDEPTH_CUT_H
 
+#include "glheaders.h"
 #include "pluginsystem/iplugin.h"
 class QAction;
 class QWidget;
@@ -35,13 +36,13 @@ class VDepth : public IPlugin {
     FlatView * flatview_;
     MainWindow * mw_;
 
-    QAction * myaction_ = nullptr;
-    QWidget * settings_ = nullptr;
-    QWidget * depth_widget_ = nullptr;
-    int tab_idx_ = -1;
+    QAction * myaction_;
+    QWidget * settings_;
+    QWidget * depth_widget_;
+    int tab_idx_;
 
-    QLabel * image_container = nullptr;
-    QImage * image = nullptr;
+    QLabel * image_container;
+    QImage * image;
 
 };
 

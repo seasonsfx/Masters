@@ -66,6 +66,11 @@ static QString DLLExtension() {
 }
 
 PluginResource::PluginResource(QString path, Core * core, PluginManager * pm) {
+    watcher_ = nullptr;
+    loader_ = nullptr;
+    instance_ = nullptr;
+    timer_ = nullptr;
+
     load(path);
 
     timer_ = new QTimer(0);
@@ -154,6 +159,10 @@ PluginManager::PluginManager(Core * core) {
     qApp->addLibraryPath(qApp->applicationDirPath());
     core_ = core;
 
+    watcher_ = nullptr;
+    plugins_loaded_ = false;
+    timer_ = nullptr;
+
     // Look for plugin directory
     plugins_dir_.reset(new QDir(qApp->applicationDirPath()));
     bool succ = false;
@@ -171,6 +180,8 @@ PluginManager::PluginManager(Core * core) {
 		plugins_dir_.reset();
         qDebug("Plugins directory not found!");
 		return;
+    } else {
+        qDebug() << "Plugins dir:" << plugins_dir_->absolutePath();
     }
 
     qApp->addLibraryPath(plugins_dir_->absolutePath());
@@ -196,6 +207,7 @@ IPlugin * PluginManager::findPluginByName(QString name) {
 }
 
 bool PluginManager::unloadPlugin(IPlugin * plugin){
+    qDebug() << "Unloading: " << plugin->getName();
     for(int idx = 0; idx < plugins_.size(); idx++) {
         PluginResource * plugin_resource = plugins_[idx];
         if(plugin_resource->instance_ == plugin) {
@@ -224,6 +236,8 @@ IPlugin * PluginManager::loadPlugin(QString path){
     PluginResource * pr = new PluginResource(path, core_, this);
     if(pr->instance_ != nullptr) {
         plugins_.push_back(pr);
+    } else {
+        qDebug() << "Failed to load: " << path;
     }
     return pr->instance_;
 }
@@ -280,10 +294,12 @@ void PluginManager::loadPlugins() {
 
 void PluginManager::initializePlugins() {
     for(PluginResource * pr : plugins_){
+        qDebug() << "init1: " << pr->instance_->getName();
         pr->instance_->initialize(core_);
     }
 
     for(PluginResource * pr : plugins_){
+        qDebug() << "init2: " << pr->instance_->getName();
         pr->instance_->initialize2(this);
     }
 }

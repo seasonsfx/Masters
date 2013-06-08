@@ -74,8 +74,6 @@ protected:
     GLuint vao_;
 
     Eigen::Vector2d last_mouse_pos_;
-
-    bool update_pending = false;
 };
 
 #endif

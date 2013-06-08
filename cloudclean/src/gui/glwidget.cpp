@@ -22,6 +22,7 @@ GLWidget::GLWidget(QGLFormat &fmt, CloudList *cl,
     setContextMenuPolicy(Qt::CustomContextMenu);
     setAutoFillBackground(false);
     setAutoBufferSwap(false);
+    gl_init_ = false;
 }
 
 GLWidget::~GLWidget() {
@@ -107,6 +108,7 @@ void GLWidget::initializeGL() {
 
     // Generate vao
     glGenVertexArrays(1, &vao_);
+    gl_init_ = true;
 }
 
 
@@ -115,6 +117,8 @@ void GLWidget::paintEvent(QPaintEvent *event) {
         return;
 
     makeCurrent();
+    if(!gl_init_)
+        initializeGL();
 
     //makeCurrent();
     // Make sure the labels are updates

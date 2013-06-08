@@ -19,6 +19,7 @@ FlatView::FlatView(QGLFormat & fmt, CloudList * cl,
     setAutoBufferSwap(false);
 
     setContextMenuPolicy(Qt::CustomContextMenu);
+    gl_init_ = false;
 }
 
 void FlatView::setGLD(GLData * gld){
@@ -115,8 +116,10 @@ void FlatView::setCloud(std::shared_ptr<PointCloud> new_pc) {
 
     connect(pc->ed_.get(), SIGNAL(flagUpdate()), this, SLOT(update()));
     connect(pc->ed_.get(), SIGNAL(labelUpdate()), this, SLOT(update()));
-    resizeGL(width(), height());
-    update();
+    if(gl_init_)
+        resizeGL(width(), height());
+    if(this->isVisible())
+        update();
 }
 
 void FlatView::mouseMoveEvent(QMouseEvent * event) {
@@ -172,6 +175,18 @@ void FlatView::wheelEvent(QWheelEvent * event) {
 }
 
 void FlatView::initializeGL() {
+    #if defined(Q_OS_WIN32)
+        glewExperimental = true;
+        GLenum GlewInitResult = glewInit();
+        if (GlewInitResult != GLEW_OK) {
+            const GLubyte* errorStr = glewGetErrorString(GlewInitResult);
+            size_t size = strlen(reinterpret_cast<const char*>(errorStr));
+            qDebug() << "Glew error "
+                     << QString::fromUtf8(
+                            reinterpret_cast<const char*>(errorStr), size);
+        }
+    #endif
+
     glClearColor(0.0, 0.0, 0.0, 1.0);
     //glEnable(GL_CULL_FACE);
     glEnable(GL_MULTISAMPLE);
@@ -222,12 +237,14 @@ void FlatView::initializeGL() {
     // Generate vao
     //
     glGenVertexArrays(1, &vao_);
+    gl_init_ = true;
 }
 
 
 void FlatView::paintEvent(QPaintEvent *event) {
-
     makeCurrent();
+    if(!gl_init_)
+        initializeGL();
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     //resizeGL(width(), height());
 

@@ -73,6 +73,7 @@ protected:
     GLuint texture_id_;
     GLuint vao_;
 
+    bool gl_init_;
     Eigen::Vector2d last_mouse_pos_;
 };
 

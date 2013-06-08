@@ -77,8 +77,8 @@ class GUI_API FlatView : public QGLWidget {
 
     float rotation_;
     Eigen::Vector2f aspect_;
-
     Eigen::Vector2f last_mouse_pos_;
+    bool gl_init_;
 };
 
 #endif // FLATVIEW_H

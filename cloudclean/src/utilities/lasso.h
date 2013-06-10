@@ -28,7 +28,7 @@ public:
                     std::shared_ptr<std::vector<int> > source_indices,
                     std::shared_ptr<std::vector<int> > removed_indices);
     void getIndices2D(int height, const Eigen::Affine2f & cam,
-                      std::vector<int> &cloud_to_grid_map,
+                      const std::vector<int> &cloud_to_grid_map,
                       std::shared_ptr<std::vector<int> > source_indices,
                       std::shared_ptr<std::vector<int> > removed_indices);
 

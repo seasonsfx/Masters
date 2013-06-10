@@ -171,7 +171,7 @@ void Brush3D::select(QMouseEvent * event){
     empty.reset(new std::vector<int>());
 
     std::vector<float> distsq;
-    cl_->active_->getOctree()->radiusSearch(idx, radius_, *indices, distsq);
+    cl_->active_->octree()->radiusSearch(idx, radius_, *indices, distsq);
 
     bool negative_select = QApplication::keyboardModifiers() == Qt::ControlModifier;
 

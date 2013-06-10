@@ -85,8 +85,8 @@ bool Lasso2D::mouseDblClickEvent(QMouseEvent * event){
     std::shared_ptr<std::vector<int>> selected_indices = std::make_shared<std::vector<int>>();
     std::shared_ptr<std::vector<int>> removed_indices= std::make_shared<std::vector<int>>();
 
-    lasso_->getIndices2D(cloud->scan_height_, flatview_->getCamera(),
-                         cloud->cloud_to_grid_map_, selected_indices,
+    lasso_->getIndices2D(cloud->scan_height(), flatview_->getCamera(),
+                         cloud->cloudToGridMap(), selected_indices,
                          removed_indices);
 
     core_->us_->beginMacro("2d lasso tool");

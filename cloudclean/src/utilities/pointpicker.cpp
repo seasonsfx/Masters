@@ -103,7 +103,7 @@ int pick(int win_x, int win_y, int win_width, int win_height, float max_dist,
     std::vector<int> intercept_indices;
 
     // this may block
-    const Octree::Ptr octree_ptr = pc->getOctree();
+    const Octree::Ptr octree_ptr = pc->octree();
     octree_ptr->getIntersectedVoxelIndices(origin, direction, intercept_indices);
 
     // Find point

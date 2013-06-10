@@ -64,11 +64,11 @@ VDepth::~VDepth(){
 }
 
 int gridToCloudIdx(int x, int y, std::shared_ptr<PointCloud> pc, int * lookup){
-    if(x < 0 || x > pc->scan_width_)
+    if(x < 0 || x > pc->scan_width())
         return -1;
-    else if(y < 0 || y > pc->scan_height_)
+    else if(y < 0 || y > pc->scan_height())
         return -1;
-    return lookup[x + y*pc->scan_width_];
+    return lookup[x + y*pc->scan_width()];
 }
 
 void VDepth::myFunc(){
@@ -76,17 +76,21 @@ void VDepth::myFunc(){
     std::shared_ptr<PointCloud> cloud = core_->cl_->active_;
     if(cloud == nullptr)
         return;
-    int h = cloud->scan_width_;
-    int w = cloud->scan_height_;
+    int h = cloud->scan_width();
+    int w = cloud->scan_height();
 
 
     // translates grid idx to cloud idx
-    std::shared_ptr<std::vector<int>> lookup = makeLookup(cloud);
+    std::shared_ptr<const std::vector<int>> lookup = cloud->gridToCloudMap();
 
 
     // Test
+    int idx = 33;
+    int grid_idx = cloud->cloudToGridMap()[idx];
+    int x = grid_idx / h;
+    int y = grid_idx % h;
     std::vector<int> nn;
-    nn_op(cloud, *lookup, 333, 0.05, nn, 50);
+    grid_nn_op(idx, x, y, w, h, *cloud, *lookup, nn, 50, 50);
     for(int n : nn) {
         qDebug() << "NN: " << n;
     }
@@ -96,7 +100,7 @@ void VDepth::myFunc(){
     if(stdev == nullptr)
         qDebug() << "Oh noes!";
 
-    std::shared_ptr<std::vector<float>> img = cloudToGrid(cloud->cloud_to_grid_map_, w*h, stdev);
+    std::shared_ptr<const std::vector<float>> img = cloudToGrid(cloud->cloudToGridMap(), w*h, stdev);
 
 /*
     // Create distance map
@@ -127,13 +131,13 @@ void VDepth::myFunc(){
 
     ///////// OUTPUT //////////
 
-    std::shared_ptr<std::vector<float> > out_img = img;
+    std::shared_ptr<const std::vector<float> > out_img = img;
 
     qDebug() << "Size" << img->size();
 
     if(image == nullptr)
         delete image;
-    image = new QImage(cloud->scan_width_, cloud->scan_height_, QImage::Format_Indexed8);
+    image = new QImage(cloud->scan_width(), cloud->scan_height(), QImage::Format_Indexed8);
 
     for(int i = 0; i < 256; i++) {
         image->setColor(i, qRgb(i, i, i));
@@ -145,9 +149,9 @@ void VDepth::myFunc(){
 
     // Draw image
     auto select = std::make_shared<std::vector<int> >();
-    for(int y = 0; y < cloud->scan_height_; y++){
-        for(int x = 0; x < cloud->scan_width_; x++){
-            int i = (cloud->scan_height_ -1 - y) + x * cloud->scan_height_;
+    for(int y = 0; y < cloud->scan_height(); y++){
+        for(int x = 0; x < cloud->scan_width(); x++){
+            int i = (cloud->scan_height() -1 - y) + x * cloud->scan_height();
 
             // Mask disabled
             if(lookup->at(i) == -2) {

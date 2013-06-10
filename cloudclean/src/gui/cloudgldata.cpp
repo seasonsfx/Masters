@@ -159,8 +159,8 @@ void CloudGLData::copyGrid(){
     grid_buffer_->bind(); CE();
     int * gridbuff =
             static_cast<int *>(glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY)); CE();
-    for(uint i = 0; i < pc_->cloud_to_grid_map_.size(); i++){
-        gridbuff[i] = pc_->cloud_to_grid_map_[i];
+    for(uint i = 0; i < pc_->cloudToGridMap().size(); i++){
+        gridbuff[i] = pc_->cloudToGridMap()[i];
     }
     glUnmapBuffer(GL_ARRAY_BUFFER);
     grid_buffer_->release(); CE();

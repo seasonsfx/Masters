@@ -272,16 +272,16 @@ NormalEstimator::estimateNormals(std::shared_ptr<PointCloud> cloud) {
 
     // Temporary data structure to save mapping from grid to cloud
     std::vector<int> grid_to_cloud;
-    grid_to_cloud.resize(cloud->scan_width_*cloud->scan_height_, -1);
-    for(uint i = 0; i < cloud->cloud_to_grid_map_.size(); i++){
-        grid_to_cloud[cloud->cloud_to_grid_map_[i]] = i;
+    grid_to_cloud.resize(cloud->scan_width()*cloud->scan_height(), -1);
+    for(uint i = 0; i < cloud->cloudToGridMap().size(); i++){
+        grid_to_cloud[cloud->cloudToGridMap()[i]] = i;
     }
 
     // Keeps track of NAN indices
     std::vector<int> missing_normals;
 
-    int height = cloud->scan_width_;
-    int width = cloud->scan_height_;
+    int height = cloud->scan_width();
+    int width = cloud->scan_height();
     int length = width*height;
 
     // Relative point anticlockwise around (0,0)

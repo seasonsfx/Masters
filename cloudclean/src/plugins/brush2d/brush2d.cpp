@@ -85,7 +85,7 @@ void Brush2D::select(QMouseEvent * event){
         -2.0f* (event->y()/float(flatview_->height()) - 0.5), 1;
     coord = flatview_->getCamera().inverse() * coord;
 
-    coord[1] = cl_->active_->scan_height_-coord[1];
+    coord[1] = cl_->active_->scan_height()-coord[1];
 
     std::shared_ptr<std::vector<int> > selected;
     selected.reset(new std::vector<int>());
@@ -148,8 +148,8 @@ bool Brush2D::mouseReleaseEvent(QMouseEvent * event){
 bool Brush2D::mouseWheelEvent(QWheelEvent * event){
     int delta = event->delta()/120;
 
-    bool valid_upscale = delta > 0 && radius_ < cl_->active_->scan_height_ &&
-            radius_ < cl_->active_->scan_width_;
+    bool valid_upscale = delta > 0 && radius_ < cl_->active_->scan_height() &&
+            radius_ < cl_->active_->scan_width();
 
     bool valid_downscale = delta < 0 && radius_ > 1;
 

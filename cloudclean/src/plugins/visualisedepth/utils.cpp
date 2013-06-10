@@ -6,10 +6,10 @@
 #include <memory>
 
 std::shared_ptr<std::vector<int>> makeLookup(std::shared_ptr<PointCloud> cloud) {
-    int size = cloud->scan_width_ * cloud->scan_height_;
+    int size = cloud->scan_width() * cloud->scan_height();
     auto grid_to_cloud = std::make_shared<std::vector<int>>(size, -1);
     for(int i = 0; i < cloud->size(); i++) {
-        int grid_idx = cloud->cloud_to_grid_map_[i];
+        int grid_idx = cloud->cloudToGridMap()[i];
         grid_to_cloud->at(grid_idx) = i;
     }
     return grid_to_cloud;
@@ -18,7 +18,7 @@ std::shared_ptr<std::vector<int>> makeLookup(std::shared_ptr<PointCloud> cloud) 
 std::shared_ptr<std::vector<float>> makeDistmap(
         std::shared_ptr<PointCloud> cloud,
         std::shared_ptr<std::vector<float>> distmap) {
-    int size = cloud->scan_width_ * cloud->scan_height_;
+    int size = cloud->scan_width() * cloud->scan_height();
 
     if(distmap == nullptr || distmap->size() != size)
         distmap = std::make_shared<std::vector<float>>(size, 0.0f);
@@ -26,7 +26,7 @@ std::shared_ptr<std::vector<float>> makeDistmap(
     float max_dist = 0.0;
 
     for(int i = 0; i < cloud->size(); i++) {
-        int grid_idx = cloud->cloud_to_grid_map_[i];
+        int grid_idx = cloud->cloudToGridMap()[i];
         pcl::PointXYZI & p = cloud->at(i);
         distmap->at(grid_idx) = sqrt(pow(p.x, 2) + pow(p.y, 2) + pow(p.z, 2));
 
@@ -174,7 +174,7 @@ std::shared_ptr<std::vector<float> > stdev_depth(std::shared_ptr<PointCloud> clo
     // center
     Eigen::Map<Eigen::Vector3f> center(cloud->sensor_origin_.data());
 
-    const Octree::Ptr ot = cloud->getOctree();
+    const Octree::Ptr ot = cloud->octree();
     for(int i = 0; i < cloud->size(); i++){
         idxs.clear();
         dists.clear();
@@ -211,8 +211,7 @@ std::shared_ptr<std::vector<float> > stdev_depth(std::shared_ptr<PointCloud> clo
 }
 
 
-std::shared_ptr<std::vector<float>> cloudToGrid(
-        std::vector<int> & map,
+std::shared_ptr<std::vector<float>> cloudToGrid(const std::vector<int> &map,
         int img_size,
         std::shared_ptr<std::vector<float>> input,
         std::shared_ptr<std::vector<float>> img) {

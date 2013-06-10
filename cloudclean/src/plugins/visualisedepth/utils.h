@@ -6,14 +6,10 @@
 #include <cassert>
 #include <limits>
 #include <QDebug>
+#include <pcl/point_types.h>
 #include "model/pointcloud.h"
-class PointCloud;
 
 enum class Morphology{ERODE, DILATE};
-
-std::shared_ptr<std::vector<int>> makeLookup(
-        std::shared_ptr<PointCloud> cloud
-);
 
 std::shared_ptr<std::vector<float>> makeDistmap(
         std::shared_ptr<PointCloud> cloud,
@@ -41,7 +37,7 @@ std::shared_ptr<std::vector<float> > stdev(
         std::shared_ptr<std::vector<float>> out_image = nullptr);
 
 template <typename T>
-void minmax(std::vector<T> & v, T & min, T & max){
+void minmax(const std::vector<T> & v, T & min, T & max){
     min = std::numeric_limits<T>::max();
     max = std::numeric_limits<T>::min();
     for(auto val : v){
@@ -60,7 +56,7 @@ std::shared_ptr<std::vector<float> > interpolate(
 
 std::shared_ptr<std::vector<float> > stdev_depth(std::shared_ptr<PointCloud> cloud, const double radius = 0.05);
 
-std::shared_ptr<std::vector<float>> cloudToGrid(std::vector<int> & map, int img_size,
+std::shared_ptr<std::vector<float>> cloudToGrid(const std::vector<int> & map, int img_size,
         std::shared_ptr<std::vector<float>> input,
         std::shared_ptr<std::vector<float>> img = nullptr);
 
@@ -254,16 +250,18 @@ inline void interp_op(float * source, int w, int h, float * dest, int x, int y,
 }
 
 
-inline void nn_op(std::shared_ptr<PointCloud> cloud, std::vector<int> & lookup, int idx, const double radius, std::vector<int> idxs, int max_nn) {
+inline void grid_nn_op(int idx,
+                       int x,
+                       int y,
+                       int w,
+                       int h,
+                       pcl::PointCloud<pcl::PointXYZI> & cloud,
+                       const std::vector<int> & grid_to_cloud,
+                       std::vector<int> & idxs,
+                       double radius,
+                       int max_nn) {
 
-    int w = cloud->scan_width_;
-    int h = cloud->scan_height_;
-
-    int grid_idx = cloud->cloud_to_grid_map_[idx];
-    int x = grid_idx / h;
-    int y = grid_idx % h;
-
-    Eigen::Map<Eigen::Vector3f> center(&cloud->points[idx].x);
+    Eigen::Map<Eigen::Vector3f> query_point(&cloud.points[idx].x);
 
     const double rad_sq = radius * radius;
 
@@ -293,12 +291,12 @@ inline void nn_op(std::shared_ptr<PointCloud> cloud, std::vector<int> & lookup, 
                 // source index
                 int i = _x + w * _y;
 
-                int idx = lookup[i];
+                int idx = grid_to_cloud[i];
                 // Only look at valid indexes
                 if(idx  != -1){
-                    float * data = &(cloud->points[i].x);
-                    Eigen::Map<Eigen::Vector3f> point(data);
-                    float sqdist = (point-center).squaredNorm();
+                    float * data = &(cloud.points[i].x);
+                    Eigen::Map<Eigen::Vector3f> neighbour(data);
+                    float sqdist = (neighbour-query_point).squaredNorm();
                     if(sqdist <= rad_sq) {
                         idxs.push_back(idx);
                         if(idxs.size() > max_nn)

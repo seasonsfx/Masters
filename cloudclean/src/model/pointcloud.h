@@ -75,25 +75,34 @@ class MODEL_API PointCloud : public pcl::PointCloud<pcl::PointXYZI> {
     void rotate2D(float x, float y);
 
     Eigen::Affine3f modelview();
-    const Octree::Ptr getOctree();
+    const Octree::Ptr octree();
+    std::shared_ptr<const std::vector<int>> gridToCloudMap();
+    const std::vector<int> & cloudToGridMap();
 
     bool isVisible();
     void toggleVisible();
+    const CoordinateFrame coordinateFrame();
+    int scan_width();
+    int scan_height();
 
  private:
-    std::future<Octree::Ptr> fut_octree;
-    Octree::Ptr octree;
+    std::future<Octree::Ptr> fut_octree_;
+    Octree::Ptr octree_;
     bool visible_;
+    std::weak_ptr<std::vector<int>> grid_to_cloud_map_;
+    std::vector<int> cloud_to_grid_map_;
+    std::shared_ptr<std::mutex> pc_mutex;
+
+
 
  public:
     std::shared_ptr<EventDispatcher> ed_;
-    std::shared_ptr<std::mutex> pc_mutex;
-    std::vector<int> cloud_to_grid_map_;
+
     int scan_width_;
     int scan_height_;
+
     std::vector<int16_t> labels_;
     std::vector<PointFlags> flags_;
-
     CoordinateFrame frame_;
 
     // yeah... i think this is in the octree

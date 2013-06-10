@@ -2,63 +2,43 @@
 #include "utilities/pointpicker.h"
 #include "model/pointcloud.h"
 
+#include <QTime>
+#include <QDebug>
+
 namespace {
 
 // The fixture for testing class Foo.
-class FooTest : public ::testing::Test {
+class PerfTest : public ::testing::Test {
  protected:
-  // You can remove any or all of the following functions if its body
-  // is empty.
-  Eigen::Vector4f world_point;
-  Eigen::Vector4f projected_point;
-  Eigen::Affine3f proj;
-  Eigen::Affine3f mv;
-  int win_width;
-  int win_height;
 
-  FooTest() {
-      world_point = Eigen::Vector4f(0.1, 0.3, 0.7, 1);
-    // You can do set-up work for each test here.
-  }
+    QTime t;
+    int ms;
 
-  virtual ~FooTest() {
-    EXPECT_EQ(1, 1);
-    // You can do clean-up work that doesn't throw exceptions here.
-  }
+    PerfTest() {
+        ms = 0;
+    }
 
-  // If the constructor and destructor are not enough for setting up
-  // and cleaning up each test, you can define the following methods:
+    virtual ~PerfTest() {}
 
-  virtual void SetUp() {
-    // Code here will be called immediately after the constructor (right
-    // before each test).
-  }
+    virtual void SetUp() {
+        t.restart();
+        t.start();
+    }
 
-  virtual void TearDown() {
-    // Code here will be called immediately after each test (right
-    // before the destructor).
-  }
-
-  // Objects declared here can be used by all tests in the test case for Foo.
+    virtual void TearDown() {
+        int ms = t.elapsed();
+    }
 };
 
-// Tests that the Foo::Bar() method does Abc.
-TEST_F(FooTest, MethodBarDoesAbc) {
-    EXPECT_EQ(1, 1);
-}
-
-// Tests that Foo does Xyz.
-TEST_F(FooTest, DoesXyz) {
+TEST_F(PerfTest, DoesXyz) {
   EXPECT_EQ(0, 0);
-  // Exercises the Xyz feature of Foo.
+  qDebug() << "Time (ms): " << ms;
 }
 
-TEST_F(FooTest, DoesPtxReadWork) {
-  //EXPECT_EQ(0, 0);
+TEST(PTXTest, Read) {
   PointCloud pc;
   bool succ = pc.load_ptx("/home/rickert/Masters/utilities/ptxmaker/out.ptx");
   EXPECT_EQ(succ, true);
-  // Exercises the Xyz feature of Foo.
 }
 
 }  // namespace

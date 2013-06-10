@@ -47,7 +47,7 @@ const Eigen::Affine2f FlatView::getCamera() {
             transform_ *
             Eigen::AlignedScaling2f(aspect_) *
             Eigen::Rotation2Df(rotation_) *
-            Eigen::Translation2f(-pc->scan_width_*0.5, -pc->scan_height_*0.5)  *
+            Eigen::Translation2f(-pc->scan_width()*0.5, -pc->scan_height()*0.5)  *
             Eigen::Affine2f::Identity();
 }
 
@@ -69,23 +69,23 @@ int binary_search(std::vector<int> A, int key) {
 
 int FlatView::imageToCloudIdx(int x, int y){
     std::shared_ptr<PointCloud> pc = pc_.lock();
-    if(x < 0 || x > pc->scan_width_){
+    if(x < 0 || x > pc->scan_width()){
         return -1;
     }
-    else if(y < 0 || y > pc->scan_height_){
+    else if(y < 0 || y > pc->scan_height()){
         return -1;
     }
 
-    return cloud_idx_lookup_[x + y*pc->scan_width_];
+    return cloud_idx_lookup_[x + y*pc->scan_width()];
 }
 
 // scan lines go from top to bottom & left to right
 
 inline QPoint FlatView::cloudToImageCoord(int idx){
     std::shared_ptr<PointCloud> pc = pc_.lock();
-    int i = pc->cloud_to_grid_map_[idx];
-    int x = i/pc->scan_height_;
-    int y = pc->scan_height_ - 1 - (i%pc->scan_height_);
+    int i = pc->cloudToGridMap()[idx];
+    int x = i/pc->scan_height();
+    int y = pc->scan_height() - 1 - (i%pc->scan_height());
     return QPoint(x, y);
 }
 
@@ -108,10 +108,10 @@ void FlatView::setCloud(std::shared_ptr<PointCloud> new_pc) {
         return;
 
     std::shared_ptr<PointCloud> pc = pc_.lock();
-    cloud_idx_lookup_.resize(pc->scan_width_*pc->scan_height_, -1);
-    for(uint idx = 0 ; idx < pc->cloud_to_grid_map_.size(); idx++){
+    cloud_idx_lookup_.resize(pc->scan_width()*pc->scan_height(), -1);
+    for(uint idx = 0 ; idx < pc->cloudToGridMap().size(); idx++){
         QPoint p = cloudToImageCoord(idx);
-        cloud_idx_lookup_[p.x() + p.y()*pc->scan_width_] = idx;
+        cloud_idx_lookup_[p.x() + p.y()*pc->scan_width()] = idx;
     }
 
     connect(pc->ed_.get(), SIGNAL(flagUpdate()), this, SLOT(update()));
@@ -280,7 +280,7 @@ void FlatView::paintEvent(QPaintEvent *event) {
 
     program_.bind(); CE();
     glUniformMatrix3fv(uni_camera_, 1, GL_FALSE, getCamera().data()); CE();
-    glUniform1i(uni_height_, pc->scan_height_); CE();
+    glUniform1i(uni_height_, pc->scan_height()); CE();
     glUniform1i(uni_sampler_, 0); CE();
     glBindTexture(GL_TEXTURE_BUFFER, texture_id_); CE();
     glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, gld_->color_lookup_buffer_->bufferId()); CE();
@@ -335,16 +335,16 @@ void FlatView::resizeGL(int width, int height) {
     auto pc = pc_.lock();
 
     float war = width/float(height);
-    float sar = pc->scan_width_/float(pc->scan_height_);
+    float sar = pc->scan_width()/float(pc->scan_height());
 
     float cfx = sar/war;
     float cfy = (1/sar)/(1/war);
 
     // screen if wider than scan
     if(war <  sar){
-        aspect_ = Eigen::Vector2f(2.0f/pc->scan_width_, 2.0/(cfx*pc->scan_height_));
+        aspect_ = Eigen::Vector2f(2.0f/pc->scan_width(), 2.0/(cfx*pc->scan_height()));
     } else {
-        aspect_ = Eigen::Vector2f(2.0/(cfy*pc->scan_width_), 2.0f/pc->scan_height_);
+        aspect_ = Eigen::Vector2f(2.0/(cfy*pc->scan_width()), 2.0f/pc->scan_height());
     }
 
     program_.bind(); CE();   

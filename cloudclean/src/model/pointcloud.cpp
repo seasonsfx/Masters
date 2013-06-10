@@ -317,7 +317,7 @@ bool PointCloud::load_ptx(const char* filename, int decimation_factor) {
     pc_mutex->unlock();
 
     // Start loading octree
-    fut_octree = std::async(std::launch::async, [&, this](){
+    fut_octree_ = std::async(std::launch::async, [&, this](){
         double resolution = 0.2;
         qDebug() << "Start octree";
         Octree::Ptr octree = Octree::Ptr(new Octree(resolution));
@@ -354,12 +354,37 @@ Eigen::Affine3f PointCloud::modelview() {
     return  rotation * sensor_orientation_ * tr * Affine3f::Identity();
 }
 
-const Octree::Ptr PointCloud::getOctree() {
-    if(octree.get() != nullptr)
-        return octree;
+const Octree::Ptr PointCloud::octree() {
+    if(octree_.get() != nullptr)
+        return octree_;
 
-    octree = fut_octree.get();
-    return octree;
+    octree_ = fut_octree_.get();
+    return octree_;
+}
+
+std::shared_ptr<const std::vector<int> > PointCloud::gridToCloudMap() {
+    // Weak pointer serves as a cache while in use
+    std::shared_ptr<std::vector<int> > grid_to_cloud(
+                grid_to_cloud_map_.lock());
+    if(grid_to_cloud)
+        return grid_to_cloud;
+
+    // New map when weak_ptr expired
+    grid_to_cloud = std::make_shared<std::vector<int>>(
+                scan_width_*scan_height_, -1);
+
+    for(int i = 0; i < size(); i++) {
+        int grid_idx = cloud_to_grid_map_[i];
+        (*grid_to_cloud)[grid_idx] = i;
+    }
+
+    grid_to_cloud_map_ = grid_to_cloud;
+
+    return grid_to_cloud;
+}
+
+const std::vector<int> & PointCloud::cloudToGridMap() {
+    return cloud_to_grid_map_;
 }
 
 bool PointCloud::isVisible() {
@@ -368,4 +393,16 @@ bool PointCloud::isVisible() {
 
 void PointCloud::toggleVisible() {
     visible_ = !visible_;
+}
+
+const CoordinateFrame PointCloud::coordinateFrame() {
+    return frame_;
+}
+
+int PointCloud::scan_width() {
+    return scan_width_;
+}
+
+int PointCloud::scan_height(){
+    return scan_height_;
 }

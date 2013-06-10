@@ -6,7 +6,6 @@
 #include <cassert>
 #include <limits>
 #include <QDebug>
-#include <pcl/point_types.h>
 #include "model/pointcloud.h"
 
 enum class Morphology{ERODE, DILATE};
@@ -251,31 +250,40 @@ inline void interp_op(float * source, int w, int h, float * dest, int x, int y,
 
 
 inline void grid_nn_op(int idx,
-                       int x,
-                       int y,
-                       int w,
-                       int h,
-                       pcl::PointCloud<pcl::PointXYZI> & cloud,
-                       const std::vector<int> & grid_to_cloud,
+                       PointCloud & cloud,
                        std::vector<int> & idxs,
                        double radius,
                        int max_nn) {
 
-    Eigen::Map<Eigen::Vector3f> query_point(&cloud.points[idx].x);
+
+    int h = cloud.scan_height();
+    int w = cloud.scan_width();
+
+    std::shared_ptr<const std::vector<int>> grid_to_cloud = cloud.gridToCloudMap();
+
+    int grid_idx = cloud.cloudToGridMap()[idx];
+    int x = grid_idx / h;
+    int y = grid_idx % h;
+
+    Eigen::Map<Eigen::Vector3f> query_point(&cloud.points[idx].x, 3);
+
+    qDebug("Query point  %f, %f, %f, aka (%d, %d) or idx. %d, grid_idx: %d",
+           query_point.x(), query_point.y(), query_point.z(), x, y, idx, grid_idx);
 
     const double rad_sq = radius * radius;
-
-    const int max_ring_size = 50;
-    const int max_outside_radius = 10;
+    const int max_ring_size = (w>h?w:h)/2;
     int outside_radius = 0;
 
     for(int ring = 1; ring < max_ring_size ; ring++){
+        qDebug("Ring %d", ring);
         // Iterator over edge of square
         for(int iy = -ring; iy <= ring; iy++){
             for(int ix = -ring; ix <=ring; ix++){
                 // map pos
                 int _x = ix + x;
                 int _y = iy + y;
+
+                //qDebug("Offset (%d, %d)", ix, iy);
 
                 // wraps around on edges
                 if(_x < 0)
@@ -288,33 +296,43 @@ inline void grid_nn_op(int idx,
                 else if(_y > h-1)
                     _y = _y-h;
 
-                // source index
-                int i = _x + w * _y;
 
-                int idx = grid_to_cloud[i];
+                //qDebug("after (%d, %d)", _x, _y);
+
+                // source index
+                int i = _y + h * _x;
+
+                int idx = (*grid_to_cloud)[i];
+                qDebug("Grid idx: %d, cloud idx: %d", i, idx);
                 // Only look at valid indexes
                 if(idx  != -1){
-                    float * data = &(cloud.points[i].x);
-                    Eigen::Map<Eigen::Vector3f> neighbour(data);
+                    float * data = &(cloud.points[idx].x);
+                    Eigen::Map<Eigen::Vector3f> neighbour(data, 3);
                     float sqdist = (neighbour-query_point).squaredNorm();
+                    //qDebug() << neighbour.x() << neighbour.y() << neighbour.z();
+                    //qDebug("%d at dist %.2f", idx, sqrt(sqdist));
+
                     if(sqdist <= rad_sq) {
                         idxs.push_back(idx);
+                        qDebug("inside");
                         if(idxs.size() > max_nn)
                             return;
                     } else {
+                        qDebug("outside");
                         outside_radius++;
                     }
 
-                    if(outside_radius > max_outside_radius)
-                        return;
+                    //if(outside_radius > ring*4-(2*ring-2))
+                    //    return;
                 }
 
-                qDebug() << "ix" << ix;
-                qDebug() << "ring" << ring;
+                //qDebug("(%d, %d): %d", ix, iy, ring);
 
                 // Skip the inner values
-                if(iy != -ring && iy != ring)
+                if(iy != -ring && iy != ring && ix == -ring) {
+                    qDebug() << "Skip x";
                     ix = ring-1;
+                }
             }
         }
     }

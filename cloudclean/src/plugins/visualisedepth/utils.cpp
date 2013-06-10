@@ -178,15 +178,7 @@ std::shared_ptr<std::vector<float> > stdev_depth(std::shared_ptr<PointCloud> clo
     for(int i = 0; i < cloud->size(); i++){
         idxs.clear();
         dists.clear();
-        //ot->radiusSearch(cloud->points[i], radius, idxs, dists);
-
-        idxs.push_back(1);
-        idxs.push_back(2);
-        idxs.push_back(3);
-        idxs.push_back(4);
-        idxs.push_back(5);
-        idxs.push_back(6);
-        idxs.push_back(7);
+        ot->radiusSearch(cloud->points[i], radius, idxs, dists);
 
         // calculate stdev of the distances?
         // bad idea because you have a fixed radius
@@ -196,7 +188,7 @@ std::shared_ptr<std::vector<float> > stdev_depth(std::shared_ptr<PointCloud> clo
         float sum_sq = 0.0f;
 
         for(int idx : idxs) {
-            float * data = &(cloud->points[i].x);
+            float * data = &(cloud->points[idx].x);
             Eigen::Map<Eigen::Vector3f> point(data);
             float dist = (point-center).norm();
             sum += dist;

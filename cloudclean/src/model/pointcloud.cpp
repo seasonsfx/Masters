@@ -304,7 +304,7 @@ bool PointCloud::load_ptx(const char* filename, int decimation_factor) {
             min_bounding_box_.z() = z;
 
         this->points.push_back(point);
-        this->cloud_to_grid_map_.push_back(sampled_idx);
+        this->cloud_to_grid_map_.push_back(sampled_idx-1); // Undo the increment
     }
 
     this->width = this->points.size();

@@ -83,18 +83,6 @@ void VDepth::myFunc(){
     // translates grid idx to cloud idx
     std::shared_ptr<const std::vector<int>> lookup = cloud->gridToCloudMap();
 
-
-    // Test
-    int idx = 33;
-    int grid_idx = cloud->cloudToGridMap()[idx];
-    int x = grid_idx / h;
-    int y = grid_idx % h;
-    std::vector<int> nn;
-    grid_nn_op(idx, x, y, w, h, *cloud, *lookup, nn, 50, 50);
-    for(int n : nn) {
-        qDebug() << "NN: " << n;
-    }
-
     std::shared_ptr<std::vector<float> > stdev = stdev_depth(cloud);
 
     if(stdev == nullptr)

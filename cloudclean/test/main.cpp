@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 #include "utilities/pointpicker.h"
 #include "model/pointcloud.h"
+#include "plugins/visualisedepth/utils.h"
 
 #include <QTime>
 #include <QDebug>
@@ -21,24 +22,38 @@ class PerfTest : public ::testing::Test {
     virtual ~PerfTest() {}
 
     virtual void SetUp() {
-        t.restart();
-        t.start();
+        //t.restart();
+        //t.start();
     }
 
     virtual void TearDown() {
-        int ms = t.elapsed();
+        //int ms = t.elapsed();
     }
 };
 
-TEST_F(PerfTest, DoesXyz) {
-  EXPECT_EQ(0, 0);
-  qDebug() << "Time (ms): " << ms;
+TEST_F(PerfTest, NearestNeighbours) {
+  //EXPECT_EQ(0, 0);
+
+    PointCloud cloud;
+    bool succ = cloud.load_ptx("/home/rickert/Masters/misc/testdata/plane4x5.ptx");
+
+
+    // Test
+    int idx = 4;
+
+    std::vector<int> nn;
+    grid_nn_op(idx, cloud, nn, 1.0, 50);
+    for(int n : nn) {
+        qDebug() << "Idx: " << n << "XYX: " << cloud.points[n].x << cloud.points[n].y << cloud.points[n].z;
+    }
+
+
 }
 
-TEST(PTXTest, Read) {
-  PointCloud pc;
-  bool succ = pc.load_ptx("/home/rickert/Masters/utilities/ptxmaker/out.ptx");
-  EXPECT_EQ(succ, true);
+TEST(PTXTest, DISABLED_Read) {
+    PointCloud pc;
+    bool succ = pc.load_ptx("/home/rickert/Masters/utilities/ptxmaker/out.ptx");
+    EXPECT_EQ(succ, true);
 }
 
 }  // namespace

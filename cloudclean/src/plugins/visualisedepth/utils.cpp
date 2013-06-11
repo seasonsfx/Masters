@@ -85,7 +85,6 @@ std::shared_ptr<std::vector<float> > convolve(
 
     float * img = &out_image->at(0);
 
-    // Calculate the gradient magnitude
     for(int x = 0; x < w; x++){
         for(int y = 0; y < h; y++){
             img[x+y*w] = convolve_op(w, h, &image->at(0), x, y, filter, filter_size);

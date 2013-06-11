@@ -93,9 +93,11 @@ inline float convolve_op(
             // map index
             int i = _x + w * _y;
             // filter index
-            int f = ix+1 + 3*(iy+1);
+            int f = ix+end + filter_size*(iy+end);
 
-            sum += source[i] * filter[f];
+            float val = source[i] * filter[f];
+
+            sum += val;
         }
     }
     return sum;

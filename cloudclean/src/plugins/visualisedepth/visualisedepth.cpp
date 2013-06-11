@@ -83,17 +83,28 @@ void VDepth::myFunc(){
     // translates grid idx to cloud idx
     std::shared_ptr<const std::vector<int>> lookup = cloud->gridToCloudMap();
 
-    std::shared_ptr<std::vector<float> > stdev = stdev_depth(cloud);
-
-    if(stdev == nullptr)
-        qDebug() << "Oh noes!";
-
-    std::shared_ptr<const std::vector<float>> img = cloudToGrid(cloud->cloudToGridMap(), w*h, stdev);
 
 /*
+    std::shared_ptr<std::vector<float> > stdev = stdev_depth(cloud);
+
+    std::shared_ptr<const std::vector<float>> img = cloudToGrid(cloud->cloudToGridMap(), w*h, stdev);
+*/
     // Create distance map
     std::shared_ptr<std::vector<float>> distmap = makeDistmap(cloud);
+    //distmap = interpolate(distmap, w, h, 21);
 
+    std::shared_ptr<std::vector<float> > smooth_grad_image = convolve(distmap, w, h, gaussian, 5);
+    smooth_grad_image = convolve(smooth_grad_image, w, h, gaussian, 5);
+    smooth_grad_image = convolve(smooth_grad_image, w, h, gaussian, 5);
+    smooth_grad_image = convolve(smooth_grad_image, w, h, gaussian, 5);
+
+    std::shared_ptr<std::vector<float>> highfreq = distmap;
+
+    for(int i = 0; i < distmap->size(); i++){
+        (*highfreq)[i] = (*distmap)[i] - (*smooth_grad_image)[i];
+    }
+
+/*
     //std::shared_ptr<std::vector<float> > grad_image = gradientImage(distmap, w, h, size);
     std::shared_ptr<std::vector<float> > int_image = interpolate(distmap, w, h, 50);
     std::shared_ptr<std::vector<float> > stdev_image = stdev(int_image, w, h, 5);
@@ -119,9 +130,9 @@ void VDepth::myFunc(){
 
     ///////// OUTPUT //////////
 
-    std::shared_ptr<const std::vector<float> > out_img = img;
+    std::shared_ptr<const std::vector<float> > out_img = highfreq;
 
-    qDebug() << "Size" << img->size();
+    //qDebug() << "Size" << img->size();
 
     if(image_ != nullptr)
         delete image_;
@@ -161,7 +172,7 @@ void VDepth::myFunc(){
             }
 
             // Select
-            if(lookup->at(i) != -1 && intensity > 5) {
+            if(lookup->at(i) != -1 && intensity > 100) {
                 select->push_back(lookup->at(i));
             }
 /*

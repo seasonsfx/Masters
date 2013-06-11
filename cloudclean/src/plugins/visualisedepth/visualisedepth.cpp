@@ -21,8 +21,8 @@ void VDepth::initialize(Core *core){
     settings_ = nullptr;
     tab_idx_ = -1;
 
-    QLabel * image_container = nullptr;
-    QImage * image = nullptr;
+    image_container_ = nullptr;
+    image_ = nullptr;
 
     core_= core;
     cl_ = core_->cl_;
@@ -39,8 +39,8 @@ void VDepth::initialize(Core *core){
     QScrollArea * scrollarea = new QScrollArea();
     scrollarea->setBackgroundRole(QPalette::Dark);
     layout->addWidget(scrollarea);
-    image_container = new QLabel();
-    scrollarea->setWidget(image_container);
+    image_container_ = new QLabel();
+    scrollarea->setWidget(image_container_);
 
     // Nonsense
     connect(myaction_,&QAction::triggered, [this] (bool on) {
@@ -59,8 +59,8 @@ void VDepth::cleanup(){
 }
 
 VDepth::~VDepth(){
-    if(image != nullptr)
-        delete image;
+    if(image_ != nullptr)
+        delete image_;
 }
 
 int gridToCloudIdx(int x, int y, std::shared_ptr<PointCloud> pc, int * lookup){
@@ -123,12 +123,12 @@ void VDepth::myFunc(){
 
     qDebug() << "Size" << img->size();
 
-    if(image == nullptr)
-        delete image;
-    image = new QImage(cloud->scan_width(), cloud->scan_height(), QImage::Format_Indexed8);
+    if(image_ != nullptr)
+        delete image_;
+    image_ = new QImage(cloud->scan_width(), cloud->scan_height(), QImage::Format_Indexed8);
 
     for(int i = 0; i < 256; i++) {
-        image->setColor(i, qRgb(i, i, i));
+        image_->setColor(i, qRgb(i, i, i));
     }
 
     float min, max;
@@ -143,7 +143,7 @@ void VDepth::myFunc(){
 
             // Mask disabled
             if(lookup->at(i) == -2) {
-                image->setPixel(x, y, 0);
+                image_->setPixel(x, y, 0);
                 continue;
             }
 
@@ -153,13 +153,15 @@ void VDepth::myFunc(){
 
             int intensity = 255 * (mag - min)/(max - min);
 
-            if(intensity > 255) {
-                qDebug() << "Nope, sorry > 255: " << mag;
+            if(intensity > 255 || intensity < 0) {
+                qDebug() << "Nope, sorry > 255 || < 0: " << mag;
+                qDebug() << mag;
+                qDebug() << intensity;
                 return;
             }
 
             // Select
-            if(lookup->at(i) != -1 && intensity > 40) {
+            if(lookup->at(i) != -1 && intensity > 5) {
                 select->push_back(lookup->at(i));
             }
 /*
@@ -169,17 +171,20 @@ void VDepth::myFunc(){
                 intensity = 255;
             }
 */
-            image->setPixel(x, y, intensity);
+            image_->setPixel(x, y, intensity);
         }
     }
+
+    qDebug() << "Done";
 
     core_->us_->beginMacro("Experiment");
     core_->us_->push(new Select(cloud, select));
     core_->us_->endMacro();
-
-    image_container->setPixmap(QPixmap::fromImage(*image));
-    image_container->resize(image->size());
-
+    qDebug() << "Done1";
+    image_container_->setPixmap(QPixmap::fromImage(*image_));
+    qDebug() << "Done1.1";
+    image_container_->resize(image_->size());
+    qDebug() << "Done 2";
 }
 
 Q_PLUGIN_METADATA(IID "za.co.circlingthesun.cloudclean.iplugin")

@@ -178,11 +178,14 @@ std::shared_ptr<std::vector<float> > stdev_depth(std::shared_ptr<PointCloud> clo
     for(int i = 0; i < cloud->size(); i++){
         idxs.clear();
         dists.clear();
-        ot->radiusSearch(cloud->points[i], radius, idxs, dists);
+        //ot->radiusSearch(cloud->points[i], radius, idxs, dists);
+        grid_nn_op(i, *cloud, idxs, 1, 50);
 
         // calculate stdev of the distances?
         // bad idea because you have a fixed radius
         // Calculate distance from center of scan
+
+        Eigen::Map<Eigen::Vector3f> query_point(&(cloud->points[i].x));
 
         float sum = 0.0f;
         float sum_sq = 0.0f;
@@ -191,11 +194,15 @@ std::shared_ptr<std::vector<float> > stdev_depth(std::shared_ptr<PointCloud> clo
             float * data = &(cloud->points[idx].x);
             Eigen::Map<Eigen::Vector3f> point(data);
             float dist = (point-center).norm();
+            //float dist = (point-query_point).norm();
             sum += dist;
             sum_sq += dist*dist;
         }
 
-        (*stdevs)[i] = (sum_sq - (sum*sum)/(idxs.size()))/((idxs.size())-1);
+        if(idxs.size() > 1)
+            (*stdevs)[i] = (sum_sq - (sum*sum)/(idxs.size()))/((idxs.size())-1);
+        else
+            (*stdevs)[i] = 0;
 
     }
 

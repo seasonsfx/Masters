@@ -41,8 +41,8 @@ class VDepth : public IPlugin {
     QWidget * depth_widget_;
     int tab_idx_;
 
-    QLabel * image_container;
-    QImage * image;
+    QLabel * image_container_;
+    QImage * image_;
 
 };
 

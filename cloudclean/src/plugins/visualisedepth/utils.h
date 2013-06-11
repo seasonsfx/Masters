@@ -271,10 +271,10 @@ inline void grid_nn_op(int idx,
     const int max_ring_size = (w>h?w:h)/2;
     int outside_radius = 0;
 
-    qDebug() << "max ring" << max_ring_size;
+    //qDebug() << "max ring" << max_ring_size;
 
     for(int ring = 1; ring <= max_ring_size ; ring++){
-        qDebug("Ring %d", ring);
+        //qDebug("Ring %d", ring);
         // Iterator over edge of square
         for(int iy = -ring; iy <= ring; iy++){
             for(int ix = -ring; ix <=ring; ix++){
@@ -318,7 +318,7 @@ inline void grid_nn_op(int idx,
 
                     // If error is more than the indexes in a ring
                     if(outside_radius > max_err){
-                        qDebug() << "Exeeded" << max_err;
+                        //qDebug() << "Exeeded" << max_err;
                         return;
                     }
                 }

@@ -6,6 +6,8 @@
 #include <vector>
 #include <memory>
 #include <pcl/common/pca.h>
+#include <pcl/search/flann_search.h>
+#include <pcl/kdtree/kdtree_flann.h>
 #include "plugins/visualisedepth/gridsearch.h"
 
 std::shared_ptr<std::vector<int>> makeLookup(std::shared_ptr<PointCloud> cloud) {
@@ -236,11 +238,20 @@ std::shared_ptr<std::vector<Eigen::Vector3f> > getPCA(std::shared_ptr<PointCloud
     std::shared_ptr<std::vector<Eigen::Vector3f> > eigen_vals =
             std::make_shared<std::vector<Eigen::Vector3f>>(cloud->size());
 
-    GridSearch search(*cloud);
+    //GridSearch search(*cloud);
+    //pcl::search::FlannSearch<pcl::PointXYZI> search;
+    pcl::KdTreeFLANN<pcl::PointXYZI> search;
+    search.setInputCloud(pcl::PointCloud<pcl::PointXYZI>::ConstPtr(cloud.get(), boost::serialization::null_deleter()));
+
 
     QTime t;
     t.start();
 
+    int less_than_three_points_count = 0;
+
+    boost::shared_ptr <std::vector<int> > kIdxs;
+    kIdxs = boost::shared_ptr <std::vector<int> >(new std::vector<int>);
+    std::vector<float> kDist;
 
     // For every point
     for(unsigned int i = 0; i < cloud->size(); i++){
@@ -249,16 +260,14 @@ std::shared_ptr<std::vector<Eigen::Vector3f> > getPCA(std::shared_ptr<PointCloud
         }
 
 
-        if(i % 500 == 0) {
+        if(i % 2000 == 0) {
             int ms = t.restart();
+            qDebug() << "so " << less_than_three_points_count << "out of " << i << "points have less than 2 neighbours";
+            qDebug() << "Radius: " << radius << "Max nn: " << max_nn;
             qDebug() << "% done: " << float(i) / cloud->size();
-            qDebug() << "MS per loop" << float(ms)/500.0f;
+            qDebug() << "MS per loop" << float(ms)/2000.0f;
         }
 
-
-        boost::shared_ptr <std::vector<int> > kIdxs;
-        kIdxs = boost::shared_ptr <std::vector<int> >(new std::vector<int>);
-        std::vector<float> kDist;
         search.radiusSearch(i, radius, *kIdxs, kDist, max_nn);
 
         if(kIdxs->size() > max_nn){
@@ -267,6 +276,7 @@ std::shared_ptr<std::vector<Eigen::Vector3f> > getPCA(std::shared_ptr<PointCloud
         }
 
         if(kIdxs->size() < 3) {
+            less_than_three_points_count++;
             (*eigen_vals)[i] = Eigen::Vector3f(0, 0, 1.0f); // Assume isotaled point
             continue;
         }

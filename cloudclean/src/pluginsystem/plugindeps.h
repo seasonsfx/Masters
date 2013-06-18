@@ -1,6 +1,7 @@
 #include <pcl/search/kdtree.h>
 #include <pcl/segmentation/boost.h>
 #include <pcl/search/search.h>
+#include <pcl/common/pca.h>
 #include <cmath>
 
 typedef boost::adjacency_list_traits< boost::vecS, boost::vecS, boost::directedS > Traits;
@@ -39,4 +40,5 @@ void linkerhack(){
     pcl::search::Search <pcl::PointXYZI> * KdTree;
     boost::shared_ptr<mGraph> graph_;
     graph_ = boost::shared_ptr< mGraph > (new mGraph ());
+    pcl::PCA<pcl::PointXYZI> pc(false);
 }

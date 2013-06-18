@@ -199,8 +199,8 @@ class GridSearch : public pcl::search::Search<pcl::PointXYZI>
 
         std::shared_ptr<const std::vector<int>> grid_to_cloud = cloud->gridToCloudMap();
 
-        //int idx = point.data_c[2];
-        int grid_idx = point.data_c[3];
+        //int idx = point.data_c[3];
+        int grid_idx = point.data_c[2];
 
         int x = grid_idx / h;
         int y = grid_idx % h;
@@ -246,6 +246,7 @@ class GridSearch : public pcl::search::Search<pcl::PointXYZI>
                         if(sqdist <= rad_sq) {
                             k_indices.push_back(idx);
                             k_sqr_distances.push_back(sqdist);
+                            qDebug() << "Yay";
                             if(max_nn != 0 && k_indices.size() > max_nn)
                                 return k_indices.size();
 

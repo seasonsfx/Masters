@@ -187,7 +187,7 @@ void VDepth::myFunc(){
     // This is important so its cached and not recalculated
     std::shared_ptr<const std::vector<int>> grid_to_cloud = cloud->gridToCloudMap();
 
-    std::shared_ptr<std::vector<Eigen::Vector3f> > pca = getPCA(cloud, 0.05f, 5);
+    std::shared_ptr<std::vector<Eigen::Vector3f> > pca = getPCA(cloud, 1.0f, 50);
 
     std::shared_ptr<std::vector<Eigen::Vector3f> > grid = std::make_shared<std::vector<Eigen::Vector3f> >(grid_to_cloud->size(), Eigen::Vector3f(0.0f, 0.0f, 0.0f));
     for(int i = 0; i < grid_to_cloud->size(); i++) {

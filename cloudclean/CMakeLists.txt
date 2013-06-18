@@ -86,7 +86,7 @@ FIND_PACKAGE(Qt5OpenGL REQUIRED)
 
 FIND_PACKAGE(OpenGL REQUIRED)
 FIND_PACKAGE(PCL 1.7 REQUIRED COMPONENTS
-#    common
+    common
 #    io
     octree
     kdtree # only the graph cut lib uses this

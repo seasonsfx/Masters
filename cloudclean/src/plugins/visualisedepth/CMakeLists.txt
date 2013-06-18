@@ -12,8 +12,9 @@ target_link_libraries(visualisedepth
     cloudclean_model
     cloudclean_gui
     ${PCL_LIBRARIES}
+    ${FLANN_LIBRARY}
+    ${Boost_LIBRARIES}
 )
-
 
 QT5_USE_MODULES(visualisedepth Core Gui OpenGL)
 

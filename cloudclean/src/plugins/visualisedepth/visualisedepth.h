@@ -1,8 +1,12 @@
 #ifndef VDEPTH_CUT_H
 #define VDEPTH_CUT_H
 
+#include <memory>
+#include <Eigen/Dense>
 #include "glheaders.h"
 #include "pluginsystem/iplugin.h"
+
+class PointCloud;
 class QAction;
 class QWidget;
 class Core;
@@ -24,6 +28,8 @@ class VDepth : public IPlugin {
     ~VDepth();
 
  private:
+    void drawFloats(std::shared_ptr<const std::vector<float> > out_img, std::shared_ptr<PointCloud> cloud);
+    void drawVector3f(std::shared_ptr<const std::vector<Eigen::Vector3f> > out_img, std::shared_ptr<PointCloud> cloud);
 
  private slots:
     void myFunc();

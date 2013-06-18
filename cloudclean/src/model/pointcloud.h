@@ -76,20 +76,20 @@ class MODEL_API PointCloud : public pcl::PointCloud<pcl::PointXYZI> {
 
     Eigen::Affine3f modelview();
     const Octree::Ptr octree();
-    std::shared_ptr<const std::vector<int>> gridToCloudMap();
-    const std::vector<int> & cloudToGridMap();
+    std::shared_ptr<const std::vector<int>> gridToCloudMap() const;
+    const std::vector<int> & cloudToGridMap() const;
 
     bool isVisible();
     void toggleVisible();
     const CoordinateFrame coordinateFrame();
-    int scan_width();
-    int scan_height();
+    int scan_width() const;
+    int scan_height() const;
 
  private:
     std::future<Octree::Ptr> fut_octree_;
     Octree::Ptr octree_;
     bool visible_;
-    std::weak_ptr<std::vector<int>> grid_to_cloud_map_;
+    mutable std::weak_ptr<std::vector<int>> grid_to_cloud_map_;
     std::vector<int> cloud_to_grid_map_;
     std::shared_ptr<std::mutex> pc_mutex;
 

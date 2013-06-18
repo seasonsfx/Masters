@@ -53,12 +53,13 @@ std::shared_ptr<std::vector<float> > interpolate(
         int w, int h, const int nsize,
         std::shared_ptr<std::vector<float>> out_image = nullptr);
 
-std::shared_ptr<std::vector<float> > stdev_depth(std::shared_ptr<PointCloud> cloud, const double radius = 0.05);
+std::shared_ptr<std::vector<float> > stdev_depth(std::shared_ptr<PointCloud> cloud, const double radius);
 
 std::shared_ptr<std::vector<float>> cloudToGrid(const std::vector<int> & map, int img_size,
         std::shared_ptr<std::vector<float>> input,
         std::shared_ptr<std::vector<float>> img = nullptr);
 
+std::shared_ptr<std::vector<Eigen::Vector3f> > getPCA(std::shared_ptr<PointCloud> cloud, double radius, int max_nn = 0);
 
 
 /// Inline functions:
@@ -272,8 +273,6 @@ inline void grid_nn_op(int idx,
     const double rad_sq = radius * radius;
     const int max_ring_size = (w>h?w:h)/2;
     int outside_radius = 0;
-
-    //qDebug() << "max ring" << max_ring_size;
 
     for(int ring = 1; ring <= max_ring_size ; ring++){
         //qDebug("Ring %d", ring);

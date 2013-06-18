@@ -43,7 +43,10 @@
 #include <pcl/for_each_type.h>
 #include <pcl/common/concatenate.h>
 #include <pcl/search/search.h>
+#include "model/pointcloud.h"
+#include <boost/serialization/shared_ptr.hpp>
 
+typedef PointCloud CCPointCloud;
 
 /** \brief Generic search class. All search wrappers must inherit from this.
   *
@@ -67,20 +70,27 @@
   * \author Radu B. Rusu
   * \ingroup search
   */
-template<typename PointT>
-class GridSearch : public pcl::search::Search
+class GridSearch : public pcl::search::Search<pcl::PointXYZI>
 {
   public:
 
     /** Constructor. */
-    //GridSearch (const std::string& name = "", bool sorted = false);
+    GridSearch (const std::string& name = "", bool sorted = false)
+        : Search(name, sorted)
+    {
+    }
+
+    GridSearch (CCPointCloud & cloud, const std::string& name = "", bool sorted = false)
+      : Search(name, sorted)
+    {
+        input_  = pcl::PointCloud<pcl::PointXYZI>::ConstPtr(&cloud, boost::serialization::null_deleter());
+    }
 
     /** Destructor. */
     virtual
     ~GridSearch ()
     {
     }
-
 
     /** \brief Search for the k-nearest neighbors for the given query point.
       * \param[in] point the given query point
@@ -91,8 +101,77 @@ class GridSearch : public pcl::search::Search
       * \return number of neighbors found
       */
     virtual int
-    nearestKSearch (const PointT &point, int k, std::vector<int> &k_indices,
-                    std::vector<float> &k_sqr_distances) const = 0;
+    nearestKSearch (const pcl::PointXYZI &point, int k, std::vector<int> &k_indices,
+                    std::vector<float> &k_sqr_distances) const {
+
+        const CCPointCloud * cloud = dynamic_cast<const CCPointCloud *>(input_.get());
+        assert(cloud != nullptr && "Not of right type Pointcloud");
+
+        k_indices.clear();
+        k_sqr_distances.clear();
+
+        int idx = point.data_c[3];
+
+        int h = cloud->scan_height();
+        int w = cloud->scan_width();
+
+        std::shared_ptr<const std::vector<int>> grid_to_cloud = cloud->gridToCloudMap();
+
+        int grid_idx = cloud->cloudToGridMap()[idx];
+        int x = grid_idx / h;
+        int y = grid_idx % h;
+
+        Eigen::Map<const Eigen::Vector3f> query_point(&cloud->points[idx].x, 3);
+
+        const int max_ring_size = (w>h?w:h)/2;
+
+        for(int ring = 1; ring <= max_ring_size ; ring++){
+            // Iterator over edge of square
+            for(int iy = -ring; iy <= ring; iy++){
+                for(int ix = -ring; ix <=ring; ix++){
+
+                    // map pos
+                    int _x = ix + x;
+                    int _y = iy + y;
+
+                    // wraps around on edges
+                    if(_x < 0)
+                        _x = w+_x;
+                    else if(_x > w-1)
+                        _x = _x-w;
+
+                    if(_y < 0)
+                        _y = h+_y;
+                    else if(_y > h-1)
+                        _y = _y-h;
+
+
+                    // source index
+                    int i = _y + h * _x;
+                    int idx = (*grid_to_cloud)[i];
+
+                    // Only consider valid indices
+                    if(idx  != -1){
+                        const float * data = &(cloud->points[idx].x);
+                        Eigen::Map<const Eigen::Vector3f> neighbour(data, 3);
+                        float sqdist = (neighbour-query_point).squaredNorm();
+
+                        k_indices.push_back(idx);
+                        k_sqr_distances.push_back(sqdist);
+                        if(k_indices.size() == k)
+                            return k_indices.size();
+                    }
+
+                    // Skip the inner values
+                    if(iy != -ring && iy != ring && ix == -ring) {
+                        ix = ring-1;
+                    }
+                }
+            }
+        }
+
+        return k_indices.size();
+    }
 
 
     /** \brief Search for all the nearest neighbors of the query point in a given radius.
@@ -106,19 +185,95 @@ class GridSearch : public pcl::search::Search
       * \return number of neighbors found in radius
       */
     virtual int
-    radiusSearch (const PointT& point, double radius, std::vector<int>& k_indices,
-                  std::vector<float>& k_sqr_distances, unsigned int max_nn = 0) const = 0;
+    radiusSearch (const pcl::PointXYZI& point, double radius, std::vector<int>& k_indices,
+                  std::vector<float>& k_sqr_distances, unsigned int max_nn = 0) const {
+
+        const CCPointCloud * cloud = dynamic_cast<const CCPointCloud *>(input_.get());
+        assert(cloud != nullptr && "Not of right type Pointcloud");
+
+        k_indices.clear();
+        k_sqr_distances.clear();
+
+        int h = cloud->scan_height();
+        int w = cloud->scan_width();
+
+        std::shared_ptr<const std::vector<int>> grid_to_cloud = cloud->gridToCloudMap();
+
+        //int idx = point.data_c[2];
+        int grid_idx = point.data_c[3];
+
+        int x = grid_idx / h;
+        int y = grid_idx % h;
+
+        //Eigen::Map<const Eigen::Vector3f> query_point(&cloud->points[idx].x, 3);
+        Eigen::Vector3f qp(point.x, point.y, point.z);
+
+        const double rad_sq = radius * radius;
+        const int max_ring_size = (w>h?w:h)/2;
+        int points_outside_radius = 0;
+
+        for(int ring = 1; ring <= max_ring_size ; ring++){
+            // Iterator over edge of square
+            for(int iy = -ring; iy <= ring; iy++){
+                for(int ix = -ring; ix <=ring; ix++){
+
+                    // map pos
+                    int _x = ix + x;
+                    int _y = iy + y;
+
+                    // wraps around on edges
+                    if(_x < 0)
+                        _x = w+_x;
+                    else if(_x > w-1)
+                        _x = _x-w;
+
+                    if(_y < 0)
+                        _y = h+_y;
+                    else if(_y > h-1)
+                        _y = _y-h;
 
 
-  protected:
+                    // source index
+                    int i = _y + h * _x;
+                    int idx = (*grid_to_cloud)[i];
 
-/*
-    PointCloudConstPtr input_;
-    IndicesConstPtr indices_;
-    bool sorted_results_;
-    std::string name_;
-*/
+                    // Only consider valid indices
+                    if(idx  != -1){
+                        const float * data = &(cloud->points[idx].x);
+                        Eigen::Map<const Eigen::Vector3f> neighbour(data, 3);
+                        float sqdist = (qp - neighbour).squaredNorm();
+
+                        if(sqdist <= rad_sq) {
+                            k_indices.push_back(idx);
+                            k_sqr_distances.push_back(sqdist);
+                            if(max_nn != 0 && k_indices.size() > max_nn)
+                                return k_indices.size();
+
+                        } else {
+                            points_outside_radius++;
+                        }
+
+                        int side_len = (ring*2+1);
+                        int max_err = side_len*2 + 2*(side_len-2);
+
+                        // If error is more than the indices in a ring
+                        if(points_outside_radius > max_err){
+                            return k_indices.size();
+                        }
+                    }
+
+                    // Skip the inner values
+                    if(iy != -ring && iy != ring && ix == -ring) {
+                        ix = ring-1;
+                    }
+                }
+            }
+        }
+
+        return k_indices.size();
+    }
+
 
 }; // class GridSearch
 
-#endif  //#ifndef GRID_SEARCH_H_
+#endif  // GRID_SEARCH_H_

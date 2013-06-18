@@ -303,6 +303,8 @@ bool PointCloud::load_ptx(const char* filename, int decimation_factor) {
         if(z > max_bounding_box_.z())
             min_bounding_box_.z() = z;
 
+        point.data_c[2] = cloud_to_grid_map_.size();
+        point.data_c[3] = sampled_idx-1; // Store the index in the cloud, new hack
         this->points.push_back(point);
         this->cloud_to_grid_map_.push_back(sampled_idx-1); // Undo the increment
     }
@@ -362,7 +364,7 @@ const Octree::Ptr PointCloud::octree() {
     return octree_;
 }
 
-std::shared_ptr<const std::vector<int> > PointCloud::gridToCloudMap() {
+std::shared_ptr<const std::vector<int> > PointCloud::gridToCloudMap() const {
     // Weak pointer serves as a cache while in use
     std::shared_ptr<std::vector<int> > grid_to_cloud(
                 grid_to_cloud_map_.lock());
@@ -383,7 +385,7 @@ std::shared_ptr<const std::vector<int> > PointCloud::gridToCloudMap() {
     return grid_to_cloud;
 }
 
-const std::vector<int> & PointCloud::cloudToGridMap() {
+const std::vector<int> & PointCloud::cloudToGridMap() const {
     return cloud_to_grid_map_;
 }
 
@@ -399,10 +401,10 @@ const CoordinateFrame PointCloud::coordinateFrame() {
     return frame_;
 }
 
-int PointCloud::scan_width() {
+int PointCloud::scan_width() const {
     return scan_width_;
 }
 
-int PointCloud::scan_height(){
+int PointCloud::scan_height() const{
     return scan_height_;
 }

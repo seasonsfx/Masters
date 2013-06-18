@@ -71,68 +71,10 @@ int gridToCloudIdx(int x, int y, std::shared_ptr<PointCloud> pc, int * lookup){
     return lookup[x + y*pc->scan_width()];
 }
 
-void VDepth::myFunc(){
-    qDebug() << "Myfunc";
-    std::shared_ptr<PointCloud> cloud = core_->cl_->active_;
-    if(cloud == nullptr)
-        return;
-    int h = cloud->scan_width();
-    int w = cloud->scan_height();
-
-
+void VDepth::drawFloats(std::shared_ptr<const std::vector<float> > out_img, std::shared_ptr<PointCloud> cloud){
+    qDebug() << "DRAWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW!";
     // translates grid idx to cloud idx
     std::shared_ptr<const std::vector<int>> lookup = cloud->gridToCloudMap();
-
-
-/*
-    std::shared_ptr<std::vector<float> > stdev = stdev_depth(cloud);
-
-    std::shared_ptr<const std::vector<float>> img = cloudToGrid(cloud->cloudToGridMap(), w*h, stdev);
-*/
-    // Create distance map
-    std::shared_ptr<std::vector<float>> distmap = makeDistmap(cloud);
-    //distmap = interpolate(distmap, w, h, 21);
-
-    std::shared_ptr<std::vector<float> > smooth_grad_image = convolve(distmap, w, h, gaussian, 5);
-    smooth_grad_image = convolve(smooth_grad_image, w, h, gaussian, 5);
-    smooth_grad_image = convolve(smooth_grad_image, w, h, gaussian, 5);
-    smooth_grad_image = convolve(smooth_grad_image, w, h, gaussian, 5);
-
-    std::shared_ptr<std::vector<float>> highfreq = distmap;
-
-    for(int i = 0; i < distmap->size(); i++){
-        (*highfreq)[i] = (*distmap)[i] - (*smooth_grad_image)[i];
-    }
-
-/*
-    //std::shared_ptr<std::vector<float> > grad_image = gradientImage(distmap, w, h, size);
-    std::shared_ptr<std::vector<float> > int_image = interpolate(distmap, w, h, 50);
-    std::shared_ptr<std::vector<float> > stdev_image = stdev(int_image, w, h, 5);
-
-
-    std::shared_ptr<std::vector<float> > grad_image = gradientImage(distmap, w, h, size);
-    std::shared_ptr<std::vector<float> > smooth_grad_image = convolve(grad_image, w, h, gaussian, 5);
-
-    // Threshold && Erode
-
-    const int strct[] = {
-        0, 1, 0,
-        1, 0, 1,
-        0, 1, 0,
-    };
-
-    std::shared_ptr<std::vector<float> > dilated_image =  morphology(
-            smooth_grad_image,
-            w, h, strct, 3, Morphology::ERODE,
-            grad_image); // <-- reuse
-*/
-
-
-    ///////// OUTPUT //////////
-
-    std::shared_ptr<const std::vector<float> > out_img = highfreq;
-
-    //qDebug() << "Size" << img->size();
 
     if(image_ != nullptr)
         delete image_;
@@ -196,6 +138,114 @@ void VDepth::myFunc(){
     qDebug() << "Done1.1";
     image_container_->resize(image_->size());
     qDebug() << "Done 2";
+
+}
+
+void VDepth::drawVector3f(std::shared_ptr<const std::vector<Eigen::Vector3f> > out_img, std::shared_ptr<PointCloud> cloud){
+
+    // translates grid idx to cloud idx
+    std::shared_ptr<const std::vector<int>> lookup = cloud->gridToCloudMap();
+
+    if(image_ != nullptr)
+        delete image_;
+    image_ = new QImage(cloud->scan_width(), cloud->scan_height(), QImage::Format_RGB32);
+
+    // Draw image
+    for(int y = 0; y < cloud->scan_height(); y++){
+        for(int x = 0; x < cloud->scan_width(); x++){
+            int i = (cloud->scan_height() -1 - y) + x * cloud->scan_height();
+
+            // Mask disabled
+            if(lookup->at(i) == -2) {
+                image_->setPixel(x, y, 0);
+                continue;
+            }
+
+            int r = (*out_img)[i][0] * 255;
+            int g = (*out_img)[i][1] * 255;
+            int b = (*out_img)[i][2] * 255;
+
+            QRgb value = qRgb(r, g, b);
+
+            image_->setPixel(x, y, value);
+        }
+    }
+
+
+    image_container_->setPixmap(QPixmap::fromImage(*image_));
+    image_container_->resize(image_->size());
+}
+
+void VDepth::myFunc(){
+    qDebug() << "Myfunc";
+    std::shared_ptr<PointCloud> cloud = core_->cl_->active_;
+    if(cloud == nullptr)
+        return;
+    int h = cloud->scan_width();
+    int w = cloud->scan_height();
+
+    // This is important so its cached and not recalculated
+    std::shared_ptr<const std::vector<int>> grid_to_cloud = cloud->gridToCloudMap();
+
+    std::shared_ptr<std::vector<Eigen::Vector3f> > pca = getPCA(cloud, 0.05f, 5);
+
+    std::shared_ptr<std::vector<Eigen::Vector3f> > grid = std::make_shared<std::vector<Eigen::Vector3f> >(grid_to_cloud->size(), Eigen::Vector3f(0.0f, 0.0f, 0.0f));
+    for(int i = 0; i < grid_to_cloud->size(); i++) {
+        int idx = (*grid_to_cloud)[i];
+        if(idx != -1)
+            (*grid)[i] = (*pca)[idx];
+    }
+
+    //std::shared_ptr<std::vector<float> > stdev = stdev_depth(cloud, 1.0f);
+    //std::shared_ptr<const std::vector<float>> img = cloudToGrid(cloud->cloudToGridMap(), w*h, stdev);
+
+
+    /*
+    // Create distance map
+    std::shared_ptr<std::vector<float>> distmap = makeDistmap(cloud);
+    //distmap = interpolate(distmap, w, h, 21);
+
+    std::shared_ptr<std::vector<float> > smooth_grad_image = convolve(distmap, w, h, gaussian, 5);
+    smooth_grad_image = convolve(smooth_grad_image, w, h, gaussian, 5);
+    smooth_grad_image = convolve(smooth_grad_image, w, h, gaussian, 5);
+    smooth_grad_image = convolve(smooth_grad_image, w, h, gaussian, 5);
+
+    std::shared_ptr<std::vector<float>> highfreq = distmap;
+
+    for(int i = 0; i < distmap->size(); i++){
+        (*highfreq)[i] = (*distmap)[i] - (*smooth_grad_image)[i];
+    }
+
+/*
+    //std::shared_ptr<std::vector<float> > grad_image = gradientImage(distmap, w, h, size);
+    std::shared_ptr<std::vector<float> > int_image = interpolate(distmap, w, h, 50);
+    std::shared_ptr<std::vector<float> > stdev_image = stdev(int_image, w, h, 5);
+
+
+    std::shared_ptr<std::vector<float> > grad_image = gradientImage(distmap, w, h, size);
+    std::shared_ptr<std::vector<float> > smooth_grad_image = convolve(grad_image, w, h, gaussian, 5);
+
+    // Threshold && Erode
+
+    const int strct[] = {
+        0, 1, 0,
+        1, 0, 1,
+        0, 1, 0,
+    };
+
+    std::shared_ptr<std::vector<float> > dilated_image =  morphology(
+            smooth_grad_image,
+            w, h, strct, 3, Morphology::ERODE,
+            grad_image); // <-- reuse
+*/
+
+
+    ///////// OUTPUT //////////
+
+    //drawFloats(img, cloud);
+
+    drawVector3f(grid, cloud);
+
 }
 
 Q_PLUGIN_METADATA(IID "za.co.circlingthesun.cloudclean.iplugin")

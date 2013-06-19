@@ -53,7 +53,8 @@ std::shared_ptr<std::vector<float> > interpolate(
         int w, int h, const int nsize,
         std::shared_ptr<std::vector<float>> out_image = nullptr);
 
-std::shared_ptr<std::vector<float> > stdev_depth(std::shared_ptr<PointCloud> cloud, const double radius);
+std::shared_ptr<std::vector<float> > stdev_dist(std::shared_ptr<PointCloud> cloud,
+                                 const double radius, int max_nn = 0, bool use_depth = false);
 
 std::shared_ptr<std::vector<float>> cloudToGrid(const std::vector<int> & map, int img_size,
         std::shared_ptr<std::vector<float>> input,
@@ -61,6 +62,9 @@ std::shared_ptr<std::vector<float>> cloudToGrid(const std::vector<int> & map, in
 
 std::shared_ptr<std::vector<Eigen::Vector3f> > getPCA(std::shared_ptr<PointCloud> cloud, double radius, int max_nn = 0);
 
+std::shared_ptr<std::vector<float> > normal_stdev(std::shared_ptr<PointCloud> cloud,
+                  pcl::PointCloud<pcl::Normal>::Ptr normals,
+                  double radius, int max_nn);
 
 /// Inline functions:
 
@@ -343,5 +347,10 @@ static const double gaussian[25] = {
     0.013306209891014005, 0.05963429543618023, 0.09832033134884507, 0.05963429543618023, 0.013306209891014005,
     0.00296901674395065, 0.013306209891014005, 0.02193823127971504, 0.013306209891014005, 0.00296901674395065,
 };
+
+inline float clamp(float x, float a, float b)
+{
+    return x < a ? a : (x > b ? b : x);
+}
 
 #endif  // VISIUALISE_DEPTH_UTIL

@@ -16,6 +16,7 @@ class FlatView;
 class GLWidget;
 class MainWindow;
 class QLabel;
+class NormalEstimator;
 
 class VDepth : public IPlugin {
     Q_INTERFACES(IPlugin)
@@ -24,6 +25,7 @@ class VDepth : public IPlugin {
  public:
     QString getName();
     void initialize(Core * core);
+    void initialize2(PluginManager * pm);
     void cleanup();
     ~VDepth();
 
@@ -32,6 +34,11 @@ class VDepth : public IPlugin {
     void drawVector3f(std::shared_ptr<const std::vector<Eigen::Vector3f> > out_img, std::shared_ptr<PointCloud> cloud);
 
  private slots:
+    void normalnoise();
+    void dist_stdev();
+    void sutract_lowfreq_noise();
+    void pca();
+    void sobel_erode();
     void myFunc();
 
  private:
@@ -49,6 +56,8 @@ class VDepth : public IPlugin {
 
     QLabel * image_container_;
     QImage * image_;
+
+    NormalEstimator * ne_;
 
 };
 

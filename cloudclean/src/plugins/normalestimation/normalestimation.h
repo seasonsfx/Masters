@@ -11,6 +11,7 @@
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
 #include "plugins/normalestimation/export.h"
+#include "pluginsystem/pluginmanager.h"
 
 #include "glheaders.h"
 #ifdef __APPLE__

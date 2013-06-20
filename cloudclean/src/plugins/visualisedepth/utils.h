@@ -353,4 +353,17 @@ inline float clamp(float x, float a, float b)
     return x < a ? a : (x > b ? b : x);
 }
 
+inline float angle(Eigen::Vector3f &a, Eigen::Vector3f &b){
+    float cosine = a.dot(b) / (a.norm()*b.norm());
+    cosine = clamp(cosine, 0.0f, 1.0f);
+    float angle = acos(cosine);
+    return angle;
+    //return angle/M_PI;
+}
+
+inline float cosine(Eigen::Vector3f &a, Eigen::Vector3f &b){
+    float cosine = a.dot(b) / (a.norm()*b.norm());
+    return clamp(cosine, 0.0f, 1.0f);
+}
+
 #endif  // VISIUALISE_DEPTH_UTIL

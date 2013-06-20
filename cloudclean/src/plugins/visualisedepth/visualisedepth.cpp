@@ -47,7 +47,7 @@ void VDepth::initialize(Core *core){
     connect(myaction_,&QAction::triggered, [this] (bool on) {
         qDebug() << "Click!";
     });
-    connect(myaction_, SIGNAL(triggered()), this, SLOT(normalnoise()));
+    connect(myaction_, SIGNAL(triggered()), this, SLOT(pca()));
     mw_->toolbar_->addAction(myaction_);
 
 }
@@ -259,8 +259,27 @@ void VDepth::pca(){
     // This is important so its cached and not recalculated
     std::shared_ptr<const std::vector<int>> grid_to_cloud = cloud->gridToCloudMap();
 
-    std::shared_ptr<std::vector<Eigen::Vector3f> > pca = getPCA(cloud, 1.0f, 50);
+    std::shared_ptr<std::vector<Eigen::Vector3f> > pca = getPCA(cloud, 0.05f, 20);
 
+    std::shared_ptr<std::vector<float>> plane_likelyhood =
+               std::make_shared<std::vector<float>>(pca->size(), 0.0f);
+
+    Eigen::Vector3f ideal_plane(1.0f, 0.0f, 0.0f);
+    ideal_plane.normalize();
+
+    for(int i = 0; i < pca->size(); i++) {
+        Eigen::Vector3f & val = (*pca)[i];
+
+        // Not enough neighbours
+        if(val[1] < val[2]) {
+            (*plane_likelyhood)[i] = 0;
+            continue;
+        }
+
+        float similarity = cosine(val, ideal_plane);
+        (*plane_likelyhood)[i] = similarity;
+    }
+/*
     std::shared_ptr<std::vector<Eigen::Vector3f> > grid = std::make_shared<std::vector<Eigen::Vector3f> >(grid_to_cloud->size(), Eigen::Vector3f(0.0f, 0.0f, 0.0f));
     for(int i = 0; i < grid_to_cloud->size(); i++) {
         int idx = (*grid_to_cloud)[i];
@@ -269,6 +288,11 @@ void VDepth::pca(){
     }
 
     drawVector3f(grid, cloud);
+*/
+
+    std::shared_ptr<const std::vector<float>> img = cloudToGrid(cloud->cloudToGridMap(), w*h, plane_likelyhood);
+
+    drawFloats(img, cloud);
 }
 
 void VDepth::sobel_erode(){

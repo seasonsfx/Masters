@@ -1,0 +1,98 @@
+talk:
+
+Last time:
+	Normal noise
+	PCA
+	Fast point features
+
+	Tried region growing approach
+
+	This was like swinging at a pinata in the dark
+
+Architecture was colapsing under the weight of its complexity
+
+	Premature opitimsation
+	Data structures were designed to work on both the cpu and gpu
+	Not ideal for cpu or gpu
+	Works well with pcl
+
+Refactor
+	Sparse representation
+	Index grid to reconstruct when saving or when necessarry
+
+	Layers represented with sets of point labels
+
+	This results in approximately constant space per layer
+
+	Makes set operations easy and cheap
+		Good for using more than one tool to identify an object
+		Good for comparing methods
+
+	Still allows points to be part of more than one layer
+
+	Nice alpha blending
+
+Problem with workflow
+	Used to be:
+		1. Code
+		2. Compile (2-5 minutes)
+		4. Start program
+		5. Load point cloud (+-1min)
+		6. Set up state (+-1min)
+		7. Test
+		8. Bug. goto 1
+
+
+	Now:
+		1. Code
+		2. Compile plugin (1 minute)
+		3. Test
+		4. If bug, goto 1
+
+So key to undertanding whats going on is visualisation.
+	There is simply too much data to eyeball numerically
+
+	2D vis 3d visualisation
+
+	I visualised the graph cut but this was not of much use.
+
+
+	Visualising
+
+		PCA
+			Explanation
+				For a neigbourhood of points, calculate the primary axis along which the points vary
+				Covariance matrix and eigen value decomposition
+				You get 3 eigen vectors that represent the 3 primary axis
+				Also get 3 eigen values that represent to what degree point vary along a given axis
+
+				Its a good idea to sort the eigen values
+
+				The absolute eigen values do not really matter?
+				Its the values relative to the others
+
+			Cost
+				Search
+					KDtree vs Grid search
+
+			Parameters
+				Neighbours
+				Normalisation of eigen values
+
+		Normals
+			Stdev
+			Colours
+
+		Sobel filter
+			
+
+Is gridsearch faster?
+
+
+Radius:  0.05  Max_nn:  50  Time:  74.267 Sec 
+Points with less than 50 neighbours: 55791
+Eigen values, Max: 777930616, Min: 0
+
+Radius:  0.05  Max_nn:  20  Time:  40.195 Sec 
+Points with less than 20 neighbours: 55791
+Max: 777930616, Min: 0

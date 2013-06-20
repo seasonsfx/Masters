@@ -15,7 +15,7 @@ std::shared_ptr<std::vector<int>> makeLookup(std::shared_ptr<PointCloud> cloud) 
     auto grid_to_cloud = std::make_shared<std::vector<int>>(size, -1);
     for(uint i = 0; i < cloud->size(); i++) {
         int grid_idx = cloud->cloudToGridMap()[i];
-        grid_to_cloud->at(grid_idx) = i;
+        (*grid_to_cloud)[grid_idx] = i;
     }
     return grid_to_cloud;
 }
@@ -32,11 +32,11 @@ std::shared_ptr<std::vector<float>> makeDistmap(
 
     for(uint i = 0; i < cloud->size(); i++) {
         int grid_idx = cloud->cloudToGridMap()[i];
-        pcl::PointXYZI & p = cloud->at(i);
-        distmap->at(grid_idx) = sqrt(pow(p.x, 2) + pow(p.y, 2) + pow(p.z, 2));
+        pcl::PointXYZI & p = (*cloud)[i];
+        (*distmap)[grid_idx] = sqrt(pow(p.x, 2) + pow(p.y, 2) + pow(p.z, 2));
 
-        if(distmap->at(i) > max_dist)
-            max_dist = distmap->at(i);
+        if((*distmap)[i] > max_dist)
+            max_dist = (*distmap)[i];
     }
 
     return distmap;
@@ -69,8 +69,8 @@ std::shared_ptr<std::vector<float> > gradientImage(std::shared_ptr<std::vector<f
     // Calculate the gradient magnitude
     for(int x = 0; x < w; x++){
         for(int y = 0; y < h; y++){
-            float gx = convolve_op(w, h, &image->at(0), x, y, sobel_x, 3);
-            float gy = convolve_op(w, h, &image->at(0), x, y, sobel_y, 3);
+            float gx = convolve_op(w, h, &(*image)[0], x, y, sobel_x, 3);
+            float gy = convolve_op(w, h, &(*image)[0], x, y, sobel_y, 3);
             grad_mag[x+y*w] = sqrt(gx*gx + gy*gy);
         }
     }
@@ -92,7 +92,7 @@ std::shared_ptr<std::vector<float> > convolve(
 
     for(int x = 0; x < w; x++){
         for(int y = 0; y < h; y++){
-            img[x+y*w] = convolve_op(w, h, &image->at(0), x, y, filter, filter_size);
+            img[x+y*w] = convolve_op(w, h, &(*image)[0], x, y, filter, filter_size);
         }
     }
 
@@ -115,7 +115,7 @@ std::shared_ptr<std::vector<float> > morphology(std::shared_ptr<std::vector<floa
     // Calculate the gradient magnitude
     for(int x = 0; x < w; x++){
         for(int y = 0; y < h; y++){
-            morph_op(&image->at(0), w, h, &out_image->at(0), x, y, strct, strct_size, type);
+            morph_op(&(*image)[0], w, h, &(*out_image)[0], x, y, strct, strct_size, type);
         }
     }
 
@@ -137,7 +137,7 @@ std::shared_ptr<std::vector<float> > stdev(
 
     for(int x = 0; x < w; x++){
         for(int y = 0; y < h; y++){
-            img[x+y*w] = stdev_op(w, h, &image->at(0), x, y, local_size);
+            img[x+y*w] = stdev_op(w, h, &(*image)[0], x, y, local_size);
         }
     }
 
@@ -159,7 +159,7 @@ std::shared_ptr<std::vector<float> > interpolate(
     // Calculate the gradient magnitude
     for(int x = 0; x < w; x++){
         for(int y = 0; y < h; y++){
-            interp_op(&image->at(0), w, h, &out_image->at(0), x, y, nsize);
+            interp_op(&(*image)[0], w, h, &(*out_image)[0], x, y, nsize);
         }
     }
 
@@ -190,7 +190,7 @@ std::shared_ptr<std::vector<float> > stdev_dist(std::shared_ptr<PointCloud> clou
 
         //ot->radiusSearch(cloud->points[i], radius, idxs, dists);
         //grid_nn_op(i, *cloud, idxs, 1, 50);
-        gs.radiusSearch(cloud->at(i), radius, idxs, dists, max_nn);
+        gs.radiusSearch((*cloud)[i], radius, idxs, dists, max_nn);
 
         // calculate stdev of the distances?
         // bad idea because you have a fixed radius
@@ -254,6 +254,9 @@ std::shared_ptr<std::vector<Eigen::Vector3f> > getPCA(std::shared_ptr<PointCloud
     search.setInputCloud(pcl::PointCloud<pcl::PointXYZI>::ConstPtr(cloud.get(), boost::serialization::null_deleter()));
 
 
+    QTime total;
+    total.start();
+
     QTime t;
     t.start();
 
@@ -263,19 +266,18 @@ std::shared_ptr<std::vector<Eigen::Vector3f> > getPCA(std::shared_ptr<PointCloud
     kIdxs = boost::shared_ptr <std::vector<int> >(new std::vector<int>);
     std::vector<float> kDist;
 
+    float min = FLT_MAX;
+    float max = FLT_MIN;
+
     // For every point
     for(unsigned int i = 0; i < cloud->size(); i++){
-        if(i < 10) {
-            qDebug() << "Loop: " << i;
-        }
 
-
-        if(i % 2000 == 0) {
+        if(i % 200000 == 0) {
             int ms = t.restart();
             qDebug() << "so " << less_than_three_points_count << "out of " << i << "points have less than 2 neighbours";
             qDebug() << "Radius: " << radius << "Max nn: " << max_nn;
             qDebug() << "% done: " << float(i) / cloud->size();
-            qDebug() << "MS per loop" << float(ms)/2000.0f;
+            qDebug() << "MS per loop" << float(ms)/200000.0f;
         }
 
         search.radiusSearch(i, radius, *kIdxs, kDist, max_nn);
@@ -287,7 +289,7 @@ std::shared_ptr<std::vector<Eigen::Vector3f> > getPCA(std::shared_ptr<PointCloud
 
         if(kIdxs->size() < 3) {
             less_than_three_points_count++;
-            (*eigen_vals)[i] = Eigen::Vector3f(0, 0, 1.0f); // Assume isotaled point
+            (*eigen_vals)[i] = Eigen::Vector3f(0, 0, 1.0f); // Assume isolated point
             continue;
         }
 
@@ -295,24 +297,30 @@ std::shared_ptr<std::vector<Eigen::Vector3f> > getPCA(std::shared_ptr<PointCloud
         pcl::PointCloud<pcl::PointXYZI>::ConstPtr const_cloud(cloud.get(), boost::serialization::null_deleter());
         pcEstimator.setInputCloud (const_cloud);
         pcEstimator.setIndices(kIdxs);
-        eigen_vals->at(i) = pcEstimator.getEigenValues();
+        (*eigen_vals)[i] = pcEstimator.getEigenValues();
 
-        // Sort and normalise
-        float * eigenvalues = eigen_vals->at(i).data();
-
+/*
         for(int j = 0; j < 3; j++ ){
-            int max = j;
-            for(int k = j; k < 3; k++ ){
-                if(eigenvalues[k] > eigenvalues[max])
-                    max = k;
-            }
-            float tmp = eigenvalues[j];
-            eigenvalues[j] = eigenvalues[max];
-            eigenvalues[max] = tmp;
+            float val = (*eigen_vals)[i][j];
+            if(val > max)
+                max = val;
+            else if(val < min)
+                min = val;
         }
+*/
+        (*eigen_vals)[i].normalize(); // SHOULD THIS BE NORMALISED?
 
-        eigen_vals->at(i).normalize(); // SHOULD THIS BE NORMALISED?
     }
+
+    /*
+    for(unsigned int i = 0; i < cloud->size(); i++){
+        (*eigen_vals)[i] = ((*eigen_vals)[i] - Eigen::Vector3f(min, min, min) ) / (max - min);
+    }
+    */
+
+    qDebug() << "Radius: " << radius << " Max_nn: " << max_nn << " Time: " << total.elapsed()/1000.0f << "Sec";
+    qDebug("Points with less than %d neighbours: %d", max_nn, less_than_three_points_count);
+    qDebug("Max: %d, Min: %d", max, min);
 
     return eigen_vals;
 }
@@ -370,7 +378,7 @@ std::shared_ptr<std::vector<float> > normal_stdev(std::shared_ptr<PointCloud> cl
 
         for(int idx : *kIdxs) {
 
-            Eigen::Map<Eigen::Vector3f> neighbour(normals->at(idx).data_n);
+            Eigen::Map<Eigen::Vector3f> neighbour((*normals)[idx].data_n);
 
             float cosine = neighbour.dot(current) /
                     neighbour.norm()*current.norm();

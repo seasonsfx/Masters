@@ -1,0 +1,11 @@
+Problem with depth maps are that missing data creates edges.
+Missing data can be interpolated but we run the risk of not finding valid edges.
+
+Algorithm for interpolating missing data.
+
+For each missing datapoint, find 8 neighbours.
+	Calculate mean.
+
+No wait... Lets find a noise estimate in the area instead.
+
+For each valid point, calculate the stddev. 

@@ -47,7 +47,7 @@ void VDepth::initialize(Core *core){
     connect(myaction_,&QAction::triggered, [this] (bool on) {
         qDebug() << "Click!";
     });
-    connect(myaction_, SIGNAL(triggered()), this, SLOT(pca()));
+    connect(myaction_, SIGNAL(triggered()), this, SLOT(sutract_lowfreq_noise()));
     mw_->toolbar_->addAction(myaction_);
 
 }
@@ -215,7 +215,7 @@ void VDepth::dist_stdev(){
     // This is important so its cached and not recalculated
     std::shared_ptr<const std::vector<int>> grid_to_cloud = cloud->gridToCloudMap();
 
-    std::shared_ptr<std::vector<float> > stdev = stdev_dist(cloud, 1.0f, 50, false);
+    std::shared_ptr<std::vector<float> > stdev = stdev_dist(cloud, 0.05f, 20, false);
 
     std::shared_ptr<const std::vector<float>> img = cloudToGrid(cloud->cloudToGridMap(), w*h, stdev);
 

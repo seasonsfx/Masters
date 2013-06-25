@@ -7,6 +7,7 @@
 #include <QMouseEvent>
 #include <QTime>
 
+#include <set>
 #include <boost/serialization/shared_ptr.hpp>
 
 #include "model/layerlist.h"
@@ -160,10 +161,17 @@ void Flood::flood(int source_idx){
     double radius = 0.05;
     int max_nn = 4;
 
+    std::set<int> visited;
+
     std::shared_ptr<std::vector<int> > selected = std::make_shared<std::vector<int> >();
 
     while (!index_queue.empty()){
         current_idx = index_queue.front(); index_queue.pop();
+
+        auto ret = visited.insert(current_idx);
+
+        if(ret.second == false)
+            continue;
 
         selected->push_back(current_idx);
 

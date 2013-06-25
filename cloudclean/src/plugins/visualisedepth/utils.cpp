@@ -243,6 +243,67 @@ std::shared_ptr<std::vector<float>> cloudToGrid(const std::vector<int> &map,
     return img;
 }
 
+std::shared_ptr<std::vector<Eigen::Vector3f> > getHist(std::shared_ptr<PointCloud> cloud, double radius, int max_nn) {
+
+    std::shared_ptr<std::vector<Eigen::Vector3f> > eigen_vals =
+            std::make_shared<std::vector<Eigen::Vector3f>>(cloud->size());
+
+    pcl::KdTreeFLANN<pcl::PointXYZI> search;
+    search.setInputCloud(pcl::PointCloud<pcl::PointXYZI>::ConstPtr(cloud.get(), boost::serialization::null_deleter()));
+
+
+    QTime total;
+    total.start();
+
+    int less_than_three_points_count = 0;
+
+    boost::shared_ptr <std::vector<int> > kIdxs;
+    kIdxs = boost::shared_ptr <std::vector<int> >(new std::vector<int>);
+    std::vector<float> kDist;
+
+    float min = FLT_MAX;
+    float max = FLT_MIN;
+
+    // For every point
+    for(unsigned int i = 0; i < cloud->size(); i++){
+
+        search.radiusSearch(i, radius, *kIdxs, kDist, max_nn);
+
+        if(kIdxs->size() > max_nn){
+            qDebug() << "Whoops! Too many";
+            continue;
+        }
+
+        if(kIdxs->size() < 3) {
+            less_than_three_points_count++;
+            (*eigen_vals)[i] = Eigen::Vector3f(0, 0, 1.0f); // Assume isolated point
+            continue;
+        }
+
+        pcl::PCA<pcl::PointXYZI> pcEstimator(true);
+        pcl::PointCloud<pcl::PointXYZI>::ConstPtr const_cloud(cloud.get(), boost::serialization::null_deleter());
+        pcEstimator.setInputCloud (const_cloud);
+        pcEstimator.setIndices(kIdxs);
+        (*eigen_vals)[i] = pcEstimator.getEigenValues();
+
+
+        (*eigen_vals)[i].normalize(); // SHOULD THIS BE NORMALISED?
+
+    }
+
+    /*
+    for(unsigned int i = 0; i < cloud->size(); i++){
+        (*eigen_vals)[i] = ((*eigen_vals)[i] - Eigen::Vector3f(min, min, min) ) / (max - min);
+    }
+    */
+
+    qDebug() << "Radius: " << radius << " Max_nn: " << max_nn << " Time: " << total.elapsed()/1000.0f << "Sec";
+    qDebug("Points with less than %d neighbours: %d", max_nn, less_than_three_points_count);
+    qDebug("Max: %d, Min: %d", max, min);
+
+    return eigen_vals;
+}
+
 std::shared_ptr<std::vector<Eigen::Vector3f> > getPCA(std::shared_ptr<PointCloud> cloud, double radius, int max_nn) {
 
     std::shared_ptr<std::vector<Eigen::Vector3f> > eigen_vals =

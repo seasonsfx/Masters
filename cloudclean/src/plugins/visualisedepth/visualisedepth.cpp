@@ -47,7 +47,7 @@ void VDepth::initialize(Core *core){
     connect(myaction_,&QAction::triggered, [this] (bool on) {
         qDebug() << "Click!";
     });
-    connect(myaction_, SIGNAL(triggered()), this, SLOT(sutract_lowfreq_noise()));
+    connect(myaction_, SIGNAL(triggered()), this, SLOT(intensity_play()));
     mw_->toolbar_->addAction(myaction_);
 
 }
@@ -323,6 +323,41 @@ void VDepth::sobel_erode(){
 
     drawFloats(dilated_image, cloud);
 }
+
+void VDepth::intensity_play() {
+    std::shared_ptr<PointCloud> cloud = core_->cl_->active_;
+    if(cloud == nullptr)
+        return;
+    int h = cloud->scan_width();
+    int w = cloud->scan_height();
+
+    std::shared_ptr<std::vector<float>> intensity = std::make_shared<std::vector<float>>(cloud->size());
+
+    // Create intensity cloud
+    for(int i = 0; i < intensity->size(); i++){
+        (*intensity)[i] = (*cloud)[i].intensity;
+    }
+
+    std::shared_ptr<std::vector<float>> img = cloudToGrid(cloud->cloudToGridMap(), w*h, intensity);
+
+
+    std::shared_ptr<std::vector<float> > smooth_grad_image = convolve(img, w, h, gaussian, 5);
+    smooth_grad_image = convolve(smooth_grad_image, w, h, gaussian, 5);
+    smooth_grad_image = convolve(smooth_grad_image, w, h, gaussian, 5);
+    smooth_grad_image = convolve(smooth_grad_image, w, h, gaussian, 5);
+/*
+    std::shared_ptr<std::vector<float>> highfreq = img;
+
+    for(int i = 0; i < highfreq->size(); i++){
+        (*highfreq)[i] = (*highfreq)[i] - (*smooth_grad_image)[i];
+    }
+
+    drawFloats(highfreq, cloud);
+*/
+    drawFloats(smooth_grad_image, cloud);
+
+}
+
 
 void VDepth::myFunc(){
     qDebug() << "Myfunc";

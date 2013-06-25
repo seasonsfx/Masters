@@ -60,6 +60,7 @@ std::shared_ptr<std::vector<float>> cloudToGrid(const std::vector<int> & map, in
         std::shared_ptr<std::vector<float>> input,
         std::shared_ptr<std::vector<float>> img = nullptr);
 
+std::shared_ptr<std::vector<Eigen::Vector3f> > getHist(std::shared_ptr<PointCloud> cloud, double radius, int max_nn = 0);
 std::shared_ptr<std::vector<Eigen::Vector3f> > getPCA(std::shared_ptr<PointCloud> cloud, double radius, int max_nn = 0);
 
 std::shared_ptr<std::vector<float> > normal_stdev(std::shared_ptr<PointCloud> cloud,

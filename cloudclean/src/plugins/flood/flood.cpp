@@ -140,56 +140,74 @@ std::shared_ptr<std::vector<int> > Flood::getLayerIndices() {
 }
 
 void Flood::flood(int source_idx){
+
+    float max_dist = 1.0f;
+    int max_nn = 8;
+    float radius = 0.10f;
+
     QTime t;
     t.start();
 
     // get normals
     pcl::PointCloud<pcl::Normal>::Ptr normals = ne_->getNormals(cl_->active_);
 
-    Eigen::Map<Eigen::Vector3f> source_normal(&((*normals)[source_idx].data_c[0]));
+    pcl::Normal & n = (*normals)[source_idx];
+    Eigen::Map<Eigen::Vector3f> source_normal(&n.normal_x);
 
-    std::queue<int> index_queue;
-    index_queue.push(source_idx);
+    qDebug() << "Source normal: " << source_normal.x() << source_normal.y() << source_normal.z();
+
+    std::queue<int> flood_queue;
+    flood_queue.push(source_idx);
     int current_idx;
 
-    std::shared_ptr<std::vector<int> > indices = getLayerIndices();
+    //std::shared_ptr<std::vector<int> > indices = getLayerIndices();
 
-    //Octree::Ptr octree = cl_->active_->octree();
+    //Octree search = *(cl_->active_->octree());
     pcl::KdTreeFLANN<pcl::PointXYZI> search;
     search.setInputCloud(pcl::PointCloud<pcl::PointXYZI>::ConstPtr(cl_->active_.get(), boost::serialization::null_deleter()));
-
-    double radius = 0.05;
-    int max_nn = 4;
 
     std::set<int> visited;
 
     std::shared_ptr<std::vector<int> > selected = std::make_shared<std::vector<int> >();
 
-    while (!index_queue.empty()){
-        current_idx = index_queue.front(); index_queue.pop();
+    int count = 0;
+    int dist_count = 0;
 
-        auto ret = visited.insert(current_idx);
+    while (!flood_queue.empty()){
+        current_idx = flood_queue.front(); flood_queue.pop();
 
-        if(ret.second == false)
+        bool seen = !visited.insert(current_idx).second;
+
+        if(seen)
             continue;
+
+        count++;
 
         selected->push_back(current_idx);
 
         std::vector<int> idxs;
         std::vector<float> dists;
-        search.radiusSearch(source_idx, radius, idxs, dists, max_nn);
+        search.radiusSearch(current_idx, radius, idxs, dists, max_nn);
 
         for (int idx : idxs) {
-            Eigen::Map<Eigen::Vector3f> normal(&((*normals)[idx].data_c[0]));
+            pcl::Normal & n = (*normals)[idx];
+            Eigen::Map<Eigen::Vector3f> normal(&n.normal_x);
 
             float dist = (normal-source_normal).norm();
 
-            //qDebug("Noise %f. Min: %f, Max; %f", noise, minNoise, maxNoise);
+            if(count < 10){
+                qDebug() << "normal: " << normal.x() << normal.y() << normal.z();
+                qDebug() << "Dist" << dist;
+            }
 
-            if(dist > 0.5)
+            if(dist > max_dist) {
+                if(dist_count++ < 10){
+                    qDebug() << "too big:" << dist;
+                }
                 continue;
+            }
 
-            index_queue.push(idx);
+            flood_queue.push(idx);
         }
     }
 

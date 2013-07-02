@@ -70,6 +70,7 @@ class Snake : public IPlugin {
 
     QWidget * settings_;
     Lasso * lasso_;
+    float min_segment_len_;
 };
 
 #endif  // SNAKE_H

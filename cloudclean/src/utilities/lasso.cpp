@@ -5,6 +5,7 @@
 #include <QPolygonF>
 #include <QPainter>
 #include <QDebug>
+#include <QPen>
 
 #include <time.h>
 #include <cstdlib>
@@ -12,6 +13,12 @@
 Lasso::Lasso()
 {
 
+}
+
+Eigen::Vector2f Lasso::getScreenPoint(Eigen::Vector2f & p, QPaintDevice *device) {
+    float x = (p.x()+1)*(device->width()/2.0f);
+    float y = (-p.y()+1)*(device->height()/2.0f);
+    return Eigen::Vector2f(x, y);
 }
 
 int inline side(float a){
@@ -86,22 +93,24 @@ bool pointInsidePolygon(std::vector<Eigen::Vector2f> polygon,
 }
 
 
-void Lasso::addPoint(Eigen::Vector2f point) {
-    points.push_back(point);
+
+
+void Lasso::addNormPoint(Eigen::Vector2f point) {
+    points_.push_back(point);
 }
 
 void Lasso::movePoint(int x, int y, QPaintDevice *device) {
     float fx = 2.0*float(x)/device->width()-1.0f;
     float fy = -2.0*float(y)/device->height()+1.0f;
-    if(points.size() != 0)
-        points.pop_back();
-    addPoint(Eigen::Vector2f(fx, fy));
+    if(points_.size() != 0)
+        points_.pop_back();
+    addNormPoint(Eigen::Vector2f(fx, fy));
 }
 
 void Lasso::addPoint(int x, int y, QPaintDevice *device) {
     float fx = 2.0*float(x)/device->width()-1.0f;
     float fy = -2.0*float(y)/device->height()+1.0f;
-    addPoint(Eigen::Vector2f(fx, fy));
+    addNormPoint(Eigen::Vector2f(fx, fy));
 }
 
 inline QPointF screenPoint(Eigen::Vector2f & p, int width, int height){
@@ -120,7 +129,7 @@ void Lasso::drawLasso(Eigen::Vector2f mouseLoc, QPaintDevice * device){
     QPolygonF polygon;
 
     // Conversion is a bit of a hack
-    for(auto p: points){
+    for(auto p: points_){
         polygon << screenPoint(p, device->width(),
                                device->height());
     }
@@ -133,16 +142,29 @@ void Lasso::drawLasso(Eigen::Vector2f mouseLoc, QPaintDevice * device){
     painter.endNativePainting();
     painter.setPen(Qt::green);
     painter.drawPolygon(polygon); CE();
+
+    //const_cast<QPen>(painter.pen()).setWidth(3);
+    QPen pen(Qt::red);
+    pen.setCapStyle(Qt::RoundCap);
+    pen.setWidth(6);
+
+    painter.setPen(pen);
+    painter.drawPoints(polygon);
+
     painter.beginNativePainting();
 
 }
 
 void Lasso::clear(){
-    points.clear();
+    points_.clear();
 }
 
 std::vector<Eigen::Vector2f> Lasso::getPolygon(){
-    return points;
+    return points_;
+}
+
+std::vector<Eigen::Vector2f> Lasso::getPoints() {
+    return points_;
 }
 
 void Lasso::getIndices(Eigen::Matrix4f & ndc_mat,
@@ -168,7 +190,7 @@ void Lasso::getIndices(Eigen::Matrix4f & ndc_mat,
         p_2 /= p_4.z();
 
         /// do lasso test
-        return  pointInsidePolygon(points, p_2);
+        return  pointInsidePolygon(points_, p_2);
     };
 
     if(source_indices->size() == 0) {
@@ -198,7 +220,7 @@ void Lasso::getIndices2D(int height, const Eigen::Affine2f & cam,
 
         Eigen::Vector2f point = cam * Eigen::Vector2f(i/height, i%height);
 
-        return  pointInsidePolygon(points, point);
+        return  pointInsidePolygon(points_, point);
     };
 
     if(source_indices->size() == 0) {

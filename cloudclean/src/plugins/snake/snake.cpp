@@ -41,6 +41,7 @@ void Snake::initialize(Core *core){
     enable_->setChecked(false);
 
     is_enabled_ = false;
+    min_segment_len_ = 50;
 
     connect(enable_, SIGNAL(triggered()), this, SLOT(enable()));
     connect(this, SIGNAL(enabling()), core_, SIGNAL(endEdit()));
@@ -100,6 +101,46 @@ bool Snake::mouseDblClickEvent(QMouseEvent * event){
     // Find appropriate weights
     //
 
+
+   std::vector<Eigen::Vector2f> points = lasso_->getPoints();
+
+   Lasso * new_lasso = new Lasso();
+
+   for(int idx1 = 0; idx1 < points.size(); idx1++) {
+       new_lasso->addNormPoint(points[idx1]);
+
+       int idx2 = (idx1 + 1) % points.size();
+
+       Eigen::Vector2f p1 = Lasso::getScreenPoint(points[idx1], flatview_);
+       Eigen::Vector2f p2 = Lasso::getScreenPoint(points[idx2], flatview_);
+
+       float dist = (p2-p1).norm();
+
+       if(dist <= min_segment_len_)
+           continue;
+
+       Eigen ::Vector2f dir = (p2-p1).normalized();
+
+       float dist_along_segment = 0;
+
+       while (dist_along_segment+min_segment_len_ < dist) {
+            dist_along_segment += min_segment_len_;
+            Eigen::Vector2f new_point = dist_along_segment * dir + p1;
+            new_lasso->addPoint(new_point.x(), new_point.y(), flatview_);
+       }
+
+
+   }
+
+   delete lasso_;
+   lasso_ = new_lasso;
+
+   points = lasso_->getPoints();
+
+   // points are now control points
+
+   // for each point around the control groups, calculate the cost function,
+   // move to the lowest?
 
 
 /*

@@ -15,13 +15,17 @@ class UTIL_API Lasso
 public:
     Lasso();
 
+    static Eigen::Vector2f getScreenPoint(Eigen::Vector2f &p, QPaintDevice *device);
+
     // add a new point in normalised screen coordinates
     void addPoint(int x, int y, QPaintDevice *device);
     void movePoint(int x, int y, QPaintDevice *device);
-    void addPoint(Eigen::Vector2f point);
+    void addNormPoint(Eigen::Vector2f point);
     void drawLasso(int x, int y, QPaintDevice *device);
     void drawLasso(Eigen::Vector2f mouseLoc, QPaintDevice *device);
     void clear();
+    std::vector<Eigen::Vector2f> getPoints();
+
     std::vector<Eigen::Vector2f> getPolygon();
     void getIndices(Eigen::Matrix4f & ndc_mat,
                     pcl::PointCloud<pcl::PointXYZI> *cloud,
@@ -32,9 +36,10 @@ public:
                       std::shared_ptr<std::vector<int> > source_indices,
                       std::shared_ptr<std::vector<int> > removed_indices);
 
+
 private:
     // Points normalised
-    std::vector<Eigen::Vector2f>    points;
+    std::vector<Eigen::Vector2f>    points_;
 };
 
 #endif // LASSO_H

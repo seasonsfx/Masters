@@ -15,9 +15,9 @@ Lasso::Lasso()
 
 }
 
-Eigen::Vector2f Lasso::getScreenPoint(Eigen::Vector2f & p, QPaintDevice *device) {
-    float x = (p.x()+1)*(device->width()/2.0f);
-    float y = (-p.y()+1)*(device->height()/2.0f);
+Eigen::Vector2f Lasso::getScreenPoint(Eigen::Vector2f & p, int w, int h) {
+    float x = (p.x()+1)*(w/2.0f);
+    float y = (-p.y()+1)*(h/2.0f);
     return Eigen::Vector2f(x, y);
 }
 

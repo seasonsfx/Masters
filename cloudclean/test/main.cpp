@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 #include "utilities/pointpicker.h"
 #include "model/pointcloud.h"
-#include "plugins/visualisedepth/utils.h"
+#include "utilities/cv.h"
 
 #include <QTime>
 #include <QDebug>

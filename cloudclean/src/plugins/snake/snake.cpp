@@ -23,6 +23,7 @@
 #include "utilities/pointpicker.h"
 #include "commands/select.h"
 #include "pluginsystem/core.h"
+#include "utilities/cv.h"
 
 QString Snake::getName(){
     return "3D Brush Tool";
@@ -106,14 +107,15 @@ bool Snake::mouseDblClickEvent(QMouseEvent * event){
 
    Lasso * new_lasso = new Lasso();
 
-   for(int idx1 = 0; idx1 < points.size(); idx1++) {
+   for(uint idx1 = 0; idx1 < points.size(); idx1++) {
        new_lasso->addNormPoint(points[idx1]);
 
        int idx2 = (idx1 + 1) % points.size();
 
-       Eigen::Vector2f p1 = Lasso::getScreenPoint(points[idx1], flatview_);
-       Eigen::Vector2f p2 = Lasso::getScreenPoint(points[idx2], flatview_);
-
+       Eigen::Vector2f p1 = Lasso::getScreenPoint(points[idx1],
+                                     flatview_->width(), flatview_->height());
+       Eigen::Vector2f p2 = Lasso::getScreenPoint(points[idx2],
+                                     flatview_->width(), flatview_->height());
        float dist = (p2-p1).norm();
 
        if(dist <= min_segment_len_)
@@ -136,6 +138,16 @@ bool Snake::mouseDblClickEvent(QMouseEvent * event){
    lasso_ = new_lasso;
 
    points = lasso_->getPoints();
+
+   int h = cloud->scan_width();
+   int w = cloud->scan_height();
+
+   // Create distance map
+   std::shared_ptr<std::vector<float>> distmap = makeDistmap(cloud);
+   std::shared_ptr<std::vector<float> > grad_image = gradientImage(distmap, w, h);
+   std::shared_ptr<std::vector<float> > smooth_grad_image = convolve(grad_image, w, h, gaussian, 5);
+
+
 
    // points are now control points
 

@@ -11,7 +11,7 @@
 #include "gui/mainwindow.h"
 #include "commands/select.h"
 #include "pluginsystem/core.h"
-#include "plugins/visualisedepth/utils.h"
+#include "utilities/cv.h"
 #include "plugins/normalestimation/normalestimation.h"
 
 QString VDepth::getName(){

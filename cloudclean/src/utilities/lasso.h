@@ -15,7 +15,7 @@ class UTIL_API Lasso
 public:
     Lasso();
 
-    static Eigen::Vector2f getScreenPoint(Eigen::Vector2f &p, QPaintDevice *device);
+    static Eigen::Vector2f getScreenPoint(Eigen::Vector2f &p, int w, int h);
 
     // add a new point in normalised screen coordinates
     void addPoint(int x, int y, QPaintDevice *device);

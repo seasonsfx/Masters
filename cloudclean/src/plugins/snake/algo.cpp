@@ -45,8 +45,7 @@ bool snake_iteration(std::shared_ptr<const std::vector<float> > img,
                int win_h,
                float alpha,
                float beta,
-               float gamma)
-{
+               float gamma) {
     int n = points.size();
     int neighbors = win_h * win_w;
 
@@ -69,8 +68,7 @@ bool snake_iteration(std::shared_ptr<const std::vector<float> > img,
     std::vector<float> Eimg(neighbors);
     std::vector<float> E(neighbors);
 
-    while( !converged )
-    {
+    while( !converged ) {
         float ave_d = 0;
         int moved = 0;
 
@@ -233,6 +231,9 @@ bool snake_iteration(std::shared_ptr<const std::vector<float> > img,
             }
         }
         converged = (moved == 0);
+        break;
     }
 
+
+    return converged;
 }

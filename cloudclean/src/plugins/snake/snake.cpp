@@ -15,6 +15,7 @@
 #include <QStackedWidget>
 #include <QSlider>
 #include <QDockWidget>
+#include <QApplication>
 #include "model/layerlist.h"
 #include "model/cloudlist.h"
 #include "gui/glwidget.h"
@@ -24,6 +25,7 @@
 #include "commands/select.h"
 #include "pluginsystem/core.h"
 #include "utilities/cv.h"
+#include "plugins/snake/algo.h"
 
 QString Snake::getName(){
     return "3D Brush Tool";
@@ -147,6 +149,21 @@ bool Snake::mouseDblClickEvent(QMouseEvent * event){
    std::shared_ptr<std::vector<float> > grad_image = gradientImage(distmap, w, h);
    std::shared_ptr<std::vector<float> > smooth_grad_image = convolve(grad_image, w, h, gaussian, 5);
 
+
+   bool converged = false;
+   while(!converged) {
+       converged = snake_iteration(smooth_grad_image,
+                      w,
+                      h,
+                      points,
+                      11,
+                      11,
+                      1,
+                      1,
+                      1);
+       flatview_->update(0, 0 , flatview_->width(), flatview_->height());
+       QApplication::processEvents();
+   }
 
 
    // points are now control points

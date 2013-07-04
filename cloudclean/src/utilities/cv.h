@@ -8,35 +8,37 @@
 #include <QDebug>
 #include "model/pointcloud.h"
 
+#include "utilities/export.h"
+
 enum class Morphology{ERODE, DILATE};
 
-std::shared_ptr<std::vector<float>> makeDistmap(
+UTIL_API std::shared_ptr<std::vector<float>> makeDistmap(
         std::shared_ptr<PointCloud> cloud,
         std::shared_ptr<std::vector<float>> distmap = nullptr
 );
 
-std::shared_ptr<std::vector<float> > gradientImage(std::shared_ptr<std::vector<float>> image,
+UTIL_API std::shared_ptr<std::vector<float> > gradientImage(std::shared_ptr<std::vector<float>> image,
         int w, int h,
         std::shared_ptr<std::vector<float>> out_image = nullptr);
 
-std::shared_ptr<std::vector<float> > convolve(
+UTIL_API std::shared_ptr<std::vector<float> > convolve(
         std::shared_ptr<std::vector<float>> image,
         int w, int h, const double * filter, const int filter_size,
         std::shared_ptr<std::vector<float>> out_image = nullptr);
 
-std::shared_ptr<std::vector<float> > morphology(
+UTIL_API std::shared_ptr<std::vector<float> > morphology(
         std::shared_ptr<std::vector<float>> image,
         int w, int h, const int * strct, int strct_size,
         Morphology type,
         std::shared_ptr<std::vector<float>> out_image = nullptr);
 
-std::shared_ptr<std::vector<float> > stdev(
+UTIL_API std::shared_ptr<std::vector<float> > stdev(
         std::shared_ptr<std::vector<float>> image,
         int w, int h, const int local_size,
         std::shared_ptr<std::vector<float>> out_image = nullptr);
 
 template <typename T>
-void minmax(const std::vector<T> & v, T & min, T & max){
+UTIL_API void minmax(const std::vector<T> & v, T & min, T & max){
     min = std::numeric_limits<T>::max();
     max = std::numeric_limits<T>::min();
     for(auto val : v){
@@ -48,22 +50,22 @@ void minmax(const std::vector<T> & v, T & min, T & max){
 
 }
 
-std::shared_ptr<std::vector<float> > interpolate(
+UTIL_API std::shared_ptr<std::vector<float> > interpolate(
         std::shared_ptr<std::vector<float>> image,
         int w, int h, const int nsize,
         std::shared_ptr<std::vector<float>> out_image = nullptr);
 
-std::shared_ptr<std::vector<float> > stdev_dist(std::shared_ptr<PointCloud> cloud,
+UTIL_API std::shared_ptr<std::vector<float> > stdev_dist(std::shared_ptr<PointCloud> cloud,
                                  const double radius, int max_nn = 0, bool use_depth = false);
 
-std::shared_ptr<std::vector<float>> cloudToGrid(const std::vector<int> & map, int img_size,
+UTIL_API std::shared_ptr<std::vector<float>> cloudToGrid(const std::vector<int> & map, int img_size,
         std::shared_ptr<std::vector<float>> input,
         std::shared_ptr<std::vector<float>> img = nullptr);
 
-std::shared_ptr<std::vector<Eigen::Vector3f> > getHist(std::shared_ptr<PointCloud> cloud, double radius, int max_nn = 0);
-std::shared_ptr<std::vector<Eigen::Vector3f> > getPCA(std::shared_ptr<PointCloud> cloud, double radius, int max_nn = 0);
+UTIL_API std::shared_ptr<std::vector<Eigen::Vector3f> > getHist(std::shared_ptr<PointCloud> cloud, double radius, int max_nn = 0);
+UTIL_API std::shared_ptr<std::vector<Eigen::Vector3f> > getPCA(std::shared_ptr<PointCloud> cloud, double radius, int max_nn = 0);
 
-std::shared_ptr<std::vector<float> > normal_stdev(std::shared_ptr<PointCloud> cloud,
+UTIL_API std::shared_ptr<std::vector<float> > normal_stdev(std::shared_ptr<PointCloud> cloud,
                   pcl::PointCloud<pcl::Normal>::Ptr normals,
                   double radius, int max_nn);
 

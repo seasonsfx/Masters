@@ -67,6 +67,7 @@ class Snake : public IPlugin {
     Eigen::Vector2d mouse_down_pos_;
 
     bool is_enabled_;
+    bool done_;
 
     QWidget * settings_;
     Lasso * lasso_;

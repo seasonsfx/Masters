@@ -15,10 +15,10 @@ Lasso::Lasso()
 
 }
 
-Eigen::Vector2f Lasso::getScreenPoint(Eigen::Vector2f & p, int w, int h) {
+Eigen::Vector2i Lasso::getScreenPoint(Eigen::Vector2f & p, int w, int h) {
     float x = (p.x()+1)*(w/2.0f);
     float y = (-p.y()+1)*(h/2.0f);
-    return Eigen::Vector2f(x, y);
+    return Eigen::Vector2i(x, y);
 }
 
 int inline side(float a){
@@ -99,7 +99,7 @@ void Lasso::addNormPoint(Eigen::Vector2f point) {
     points_.push_back(point);
 }
 
-void Lasso::movePoint(int x, int y, QPaintDevice *device) {
+void Lasso::moveLastScreenPoint(int x, int y, QPaintDevice *device) {
     float fx = 2.0*float(x)/device->width()-1.0f;
     float fy = -2.0*float(y)/device->height()+1.0f;
     if(points_.size() != 0)
@@ -107,9 +107,9 @@ void Lasso::movePoint(int x, int y, QPaintDevice *device) {
     addNormPoint(Eigen::Vector2f(fx, fy));
 }
 
-void Lasso::addPoint(int x, int y, QPaintDevice *device) {
-    float fx = 2.0*float(x)/device->width()-1.0f;
-    float fy = -2.0*float(y)/device->height()+1.0f;
+void Lasso::addScreenPoint(int x, int y, int w, int h) {
+    float fx = 2.0*float(x)/w-1.0f;
+    float fy = -2.0*float(y)/h+1.0f;
     addNormPoint(Eigen::Vector2f(fx, fy));
 }
 

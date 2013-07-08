@@ -69,7 +69,7 @@ void Lasso2D::paint(){
 
 
 bool Lasso2D::mouseClickEvent(QMouseEvent * event){
-    lasso_->addPoint(event->x(), event->y(), core_->mw_->flatview_);
+    lasso_->addScreenPoint(event->x(), event->y(), core_->mw_->flatview_->width(), core_->mw_->flatview_->height());
     return true;
 }
 
@@ -104,7 +104,7 @@ bool Lasso2D::mouseMoveEvent(QMouseEvent * event) {
         disable();
         return false;
     }
-    lasso_->movePoint(event->x(), event->y(), core_->mw_->flatview_);
+    lasso_->moveLastScreenPoint(event->x(), event->y(), core_->mw_->flatview_);
     flatview_->update();
 
     if(event->buttons() != Qt::LeftButton)

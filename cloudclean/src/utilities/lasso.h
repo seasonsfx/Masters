@@ -15,11 +15,11 @@ class UTIL_API Lasso
 public:
     Lasso();
 
-    static Eigen::Vector2f getScreenPoint(Eigen::Vector2f &p, int w, int h);
+    static Eigen::Vector2i getScreenPoint(Eigen::Vector2f &p, int w, int h);
 
     // add a new point in normalised screen coordinates
-    void addPoint(int x, int y, QPaintDevice *device);
-    void movePoint(int x, int y, QPaintDevice *device);
+    void addScreenPoint(int x, int y, int w, int h);
+    void moveLastScreenPoint(int x, int y, QPaintDevice *device);
     void addNormPoint(Eigen::Vector2f point);
     void drawLasso(int x, int y, QPaintDevice *device);
     void drawLasso(Eigen::Vector2f mouseLoc, QPaintDevice *device);

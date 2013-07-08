@@ -40,7 +40,7 @@ T _min(T a, T b) {
 bool snake_iteration(std::shared_ptr<const std::vector<float> > img,
                int w,
                int h,
-               std::vector<Eigen::Vector2f> points,
+               std::vector<Eigen::Vector2i> & points,
                int win_w,
                int win_h,
                float alpha,
@@ -104,10 +104,10 @@ bool snake_iteration(std::shared_ptr<const std::vector<float> > img,
             float tmp;
 
             /* compute bounds */
-            int left = _min( int(points[i].x()), win_w >> 1 );
-            int right = _min( w - 1 - int(points[i].x()), win_w >> 1 );
-            int upper = _min( int(points[i].y()), win_h >> 1 );
-            int bottom = _min( h - 1 - int(points[i].y()), win_h >> 1 );
+            int left = _min( points[i].x(), win_w >> 1 );
+            int right = _min( w - 1 - points[i].x(), win_w >> 1 );
+            int upper = _min( points[i].y(), win_h >> 1 );
+            int bottom = _min( h - 1 - points[i].y(), win_h >> 1 );
 
             maxEcont = 0;
             minEcont = FLT_MAX;
@@ -130,7 +130,8 @@ bool snake_iteration(std::shared_ptr<const std::vector<float> > img,
 
                     float energy = (float) fabs(ave_d - sqrt( (float) (diffx * diffx + diffy * diffy) ));
 
-                    Econt[(j + centery) * win_w + k + centerx] = energy;
+                    int idx = (j + centery) * win_w + k + centerx;
+                    Econt[idx] = energy;
 
                     maxEcont = _max( maxEcont, energy );
                     minEcont = _min( minEcont, energy );
@@ -186,7 +187,10 @@ bool snake_iteration(std::shared_ptr<const std::vector<float> > img,
             {
                 for(int k = -left; k <= right; k++ )
                 {
-                    float energy = (*img)[(points[i].y() + j) * w + points[i].x() + k];
+                    int y = points[i].y();
+                    int x = points[i].x();
+                    int idx = (y + j) * w + x + k;
+                    float energy = (*img)[idx];
 
                     Eimg[(j + centery) * win_w + k + centerx] = energy;
 
@@ -225,8 +229,9 @@ bool snake_iteration(std::shared_ptr<const std::vector<float> > img,
 
             if( offsetx || offsety )
             {
-                points[i].x() += offsetx;
-                points[i].y() += offsety;
+                //qDebug() << "(" << points[i].x() << points[i].y() << ") + (" << offsetx << offsety << ")" ;
+                points[i] = points[i] + Eigen::Vector2i(offsetx, offsety);
+                //qDebug() << " = (" << points[i].x() << points[i].y() << ")";
                 moved++;
             }
         }

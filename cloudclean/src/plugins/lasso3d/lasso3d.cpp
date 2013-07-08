@@ -69,7 +69,7 @@ void Lasso3D::paint(const Eigen::Affine3f& proj, const Eigen::Affine3f& mv){
 
 
 bool Lasso3D::mouseClickEvent(QMouseEvent * event){
-    lasso_->addPoint(event->x(), event->y(), core_->mw_->glwidget_);
+    lasso_->addScreenPoint(event->x(), event->y(), core_->mw_->glwidget_->width(), core_->mw_->glwidget_->height());
     return true;
 }
 
@@ -105,7 +105,7 @@ bool Lasso3D::mouseMoveEvent(QMouseEvent * event) {
         disable();
         return false;
     }
-    lasso_->movePoint(event->x(), event->y(), core_->mw_->glwidget_);
+    lasso_->moveLastScreenPoint(event->x(), event->y(), core_->mw_->glwidget_);
     glwidget_->update();
 
     if(event->buttons() != Qt::LeftButton)

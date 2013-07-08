@@ -8,7 +8,7 @@
 bool snake_iteration(std::shared_ptr<const std::vector<float> > img,
                int w,
                int h,
-               std::vector<Eigen::Vector2f> points,
+               std::vector<Eigen::Vector2i> & points,
                int win_w,
                int win_h,
                float alpha,

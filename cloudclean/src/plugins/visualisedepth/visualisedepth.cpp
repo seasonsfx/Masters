@@ -47,7 +47,7 @@ void VDepth::initialize(Core *core){
     connect(myaction_,&QAction::triggered, [this] (bool on) {
         qDebug() << "Click!";
     });
-    connect(myaction_, SIGNAL(triggered()), this, SLOT(intensity_play()));
+    connect(myaction_, SIGNAL(triggered()), this, SLOT(sobel_blur()));
     mw_->toolbar_->addAction(myaction_);
 
 }
@@ -322,6 +322,23 @@ void VDepth::sobel_erode(){
             grad_image); // <-- reuse
 
     drawFloats(dilated_image, cloud);
+}
+
+void VDepth::sobel_blur(){
+    std::shared_ptr<PointCloud> cloud = core_->cl_->active_;
+    if(cloud == nullptr)
+        return;
+    int h = cloud->scan_width();
+    int w = cloud->scan_height();
+
+    // Create distance map
+    std::shared_ptr<std::vector<float>> distmap = makeDistmap(cloud);
+
+    std::shared_ptr<std::vector<float> > smooth_grad_image = gradientImage(distmap, w, h);
+    for(int i = 0; i < 4; i++)
+        smooth_grad_image = convolve(smooth_grad_image, w, h, gaussian, 5);
+
+    drawFloats(smooth_grad_image, cloud);
 }
 
 void VDepth::intensity_play() {

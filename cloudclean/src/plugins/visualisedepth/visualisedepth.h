@@ -39,6 +39,7 @@ class VDepth : public IPlugin {
     void sutract_lowfreq_noise();
     void pca();
     void sobel_erode();
+    void sobel_blur();
     void intensity_play();
     void myFunc();
 

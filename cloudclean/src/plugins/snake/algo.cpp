@@ -37,7 +37,7 @@ T _min(T a, T b) {
     return (a<b?a:b);
 }
 
-bool snake_iteration(std::shared_ptr<const std::vector<float> > img,
+bool snake_iteration(std::shared_ptr<std::vector<float> > img,
                int w,
                int h,
                std::vector<Eigen::Vector2i> & points,
@@ -198,6 +198,12 @@ bool snake_iteration(std::shared_ptr<const std::vector<float> > img,
                     minEimg = _min( minEimg, energy );
                 }
             }
+
+            // Test purposes
+            int y = points[i].y();
+            int x = points[i].x();
+            int idx = (y + 0) * w + x + 0;
+            (*img)[idx] = 400;
 
             tmp = (maxEimg - minEimg);
             tmp = (tmp == 0) ? 0 : (1 / tmp);

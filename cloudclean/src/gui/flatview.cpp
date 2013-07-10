@@ -51,6 +51,34 @@ const Eigen::Affine2f FlatView::getCamera() {
             Eigen::Affine2f::Identity();
 }
 
+const Eigen::Affine2f FlatView::getNDCCamera() {
+    if(pc_.expired())
+        return Eigen::Affine2f::Identity();
+    auto pc = pc_.lock();
+
+    Eigen::Vector2f aspect;
+
+    float war = width()/float(height());
+    float sar = pc->scan_width()/float(pc->scan_height());
+
+    float cfx = sar/war;
+    float cfy = (1/sar)/(1/war);
+
+    // screen if wider than scan
+    if(war <  sar){
+        aspect = Eigen::Vector2f(1.0, -1.0/cfx);
+    } else {
+        aspect = Eigen::Vector2f(1.0/cfy, -1.0);
+    }
+
+
+    return
+            transform_ *
+            Eigen::AlignedScaling2f(aspect) *
+            Eigen::Rotation2Df(rotation_) *
+            Eigen::Affine2f::Identity();
+}
+
 int binary_search(std::vector<int> A, int key) {
     int imin = 0;
     int imax = A.size();

@@ -5,7 +5,7 @@
 #include <memory>
 #include <Eigen/Dense>
 
-bool snake_iteration(std::shared_ptr<const std::vector<float> > img,
+bool snake_iteration(std::shared_ptr<std::vector<float> > img,
                int w,
                int h,
                std::vector<Eigen::Vector2i> & points,

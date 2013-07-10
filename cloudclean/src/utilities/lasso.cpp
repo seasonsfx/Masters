@@ -21,6 +21,12 @@ Eigen::Vector2i Lasso::getScreenPoint(Eigen::Vector2f & p, int w, int h) {
     return Eigen::Vector2i(x, y);
 }
 
+Eigen::Vector2f Lasso::NDCPoint(Eigen::Vector2i & p, int w, int h) {
+    float fx = 2.0*float(p.x())/w-1.0f;
+    float fy = -2.0*float(p.y())/h+1.0f;
+    return Eigen::Vector2f(fx, fy);
+}
+
 int inline side(float a){
     if(a < -1e-6)
         return -1;

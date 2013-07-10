@@ -22,6 +22,7 @@ class GLWidget;
 class MainWindow;
 class QSpinbox;
 class QLabel;
+class PointCloud;
 
 class Snake : public IPlugin {
     Q_INTERFACES(IPlugin)
@@ -47,6 +48,7 @@ class Snake : public IPlugin {
     void paint();
 
  private:
+    void drawFloats(std::shared_ptr<const std::vector<float> > out_img, std::shared_ptr<PointCloud> cloud);
     void select(QMouseEvent * event);
     bool mouseClickEvent(QMouseEvent * event);
     bool mouseDblClickEvent(QMouseEvent * event);
@@ -72,6 +74,14 @@ class Snake : public IPlugin {
     QWidget * settings_;
     Lasso * lasso_;
     float min_segment_len_;
+
+    std::shared_ptr<std::vector<float> > img_;
+
+    QWidget * widget_;
+    int tab_idx_;
+
+    QLabel * image_container_;
+    QImage * image_;
 };
 
 #endif  // SNAKE_H

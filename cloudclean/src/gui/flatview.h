@@ -22,6 +22,7 @@ class GUI_API FlatView : public QGLWidget {
              QGLWidget * sharing = 0);
     void setGLD(GLData *gld);
     const Eigen::Affine2f getCamera();
+    const Eigen::Affine2f getNDCCamera();
 
     int imageToCloudIdx(int x, int y);
     QPoint cloudToImageCoord(int idx);

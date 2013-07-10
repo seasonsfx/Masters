@@ -16,6 +16,7 @@ public:
     Lasso();
 
     static Eigen::Vector2i getScreenPoint(Eigen::Vector2f &p, int w, int h);
+    static Eigen::Vector2f NDCPoint(Eigen::Vector2i & p, int w, int h);
 
     // add a new point in normalised screen coordinates
     void addScreenPoint(int x, int y, int w, int h);

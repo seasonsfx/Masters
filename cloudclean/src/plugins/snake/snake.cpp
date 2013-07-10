@@ -16,6 +16,7 @@
 #include <QSlider>
 #include <QDockWidget>
 #include <QApplication>
+#include <QScrollArea>
 #include "model/layerlist.h"
 #include "model/cloudlist.h"
 #include "gui/glwidget.h"
@@ -59,9 +60,24 @@ void Snake::initialize(Core *core){
     mw_->tooloptions_->addWidget(settings_);
 
     lasso_ = new Lasso();
+
+    image_ = nullptr;
+    widget_ = new QWidget(0);
+    tab_idx_ = core_->mw_->addTab(widget_, "Snake viz");
+
+    QVBoxLayout * layout2 = new QVBoxLayout(widget_);
+    QScrollArea * scrollarea = new QScrollArea();
+    scrollarea->setBackgroundRole(QPalette::Dark);
+    layout2->addWidget(scrollarea);
+    image_container_ = new QLabel();
+    scrollarea->setWidget(image_container_);
 }
 
 void Snake::cleanup(){
+    mw_->removeTab(tab_idx_);
+    delete widget_;
+    mw_->removeMenu(enable_, "Edit");
+    mw_->toolbar_->removeAction(enable_);
     disconnect(this, SIGNAL(enabling()), core_, SIGNAL(endEdit()));
     disconnect(enable_, SIGNAL(triggered()), this, SLOT(enable()));
     delete lasso_;
@@ -71,10 +87,62 @@ void Snake::paint(){
     lasso_->drawLasso(last_mouse_pos_.x(), last_mouse_pos_.y(), flatview_);
 }
 
+void Snake::drawFloats(std::shared_ptr<const std::vector<float> > out_img, std::shared_ptr<PointCloud> cloud){
+    // translates grid idx to cloud idx
+    std::shared_ptr<const std::vector<int>> lookup = cloud->gridToCloudMap();
+
+    if(image_ != nullptr)
+        delete image_;
+    image_ = new QImage(cloud->scan_width(), cloud->scan_height(), QImage::Format_Indexed8);
+
+    for(int i = 0; i < 256; i++) {
+        image_->setColor(i, qRgb(i, i, i));
+    }
+
+    float min, max;
+    minmax(*out_img, min, max);
+    qDebug() << "Minmax" << min << max;
+
+    // Draw image
+    auto select = std::make_shared<std::vector<int> >();
+    for(int y = 0; y < cloud->scan_height(); y++){
+        for(int x = 0; x < cloud->scan_width(); x++){
+            int i = (cloud->scan_height() -1 - y) + x * cloud->scan_height();
+
+            // Mask disabled
+            if(lookup->at(i) == -2) {
+                image_->setPixel(x, y, 0);
+                continue;
+            }
+
+            //int intensity = 255 * (1 - distmap[i]/max_dist);
+            float mag = (*out_img)[i];
+            //int intensity = 255 * (1 - (mag - min)/(max - min));
+
+            int intensity = 255 * (mag - min)/(max - min);
+
+            if(intensity > 255 || intensity < 0) {
+                qDebug() << "Nope, sorry > 255 || < 0: " << mag;
+                qDebug() << "Mag: " << mag;
+                qDebug() << "Intensity" << intensity;
+                return;
+            }
+
+            // Select
+            if(lookup->at(i) != -1 && intensity > 100) {
+                select->push_back(lookup->at(i));
+            }
+
+            image_->setPixel(x, y, intensity);
+        }
+    }
+    image_container_->setPixmap(QPixmap::fromImage(*image_));
+    image_container_->resize(image_->size());
+
+}
 
 bool Snake::mouseClickEvent(QMouseEvent * event){
-    if(!done_)
-        lasso_->addScreenPoint(event->x(), event->y(), core_->mw_->flatview_->width(), core_->mw_->flatview_->height());
+    lasso_->addScreenPoint(event->x(), event->y(), core_->mw_->flatview_->width(), core_->mw_->flatview_->height());
     return true;
 }
 
@@ -107,40 +175,53 @@ bool Snake::mouseDblClickEvent(QMouseEvent * event){
 
 
     std::vector<Eigen::Vector2f> points = lasso_->getPoints();
+    std::vector<Eigen::Vector2i> img_points;
 
     Lasso * new_lasso = new Lasso();
 
+    Eigen::Affine2f t = flatview_->getNDCCamera();
+
+    // Convert lasso to image space
     for(uint idx1 = 0; idx1 < points.size(); idx1++) {
-       new_lasso->addNormPoint(points[idx1]);
+        int idx2 = (idx1 + 1) % points.size();
 
-       int idx2 = (idx1 + 1) % points.size();
+        qDebug() << "Point added at (ndc space): " << points[idx1].x() << points[idx1].y();
 
-       Eigen::Vector2i p1 = Lasso::getScreenPoint(points[idx1],
-                                     flatview_->width(), flatview_->height());
-       Eigen::Vector2i p2 = Lasso::getScreenPoint(points[idx2],
-                                     flatview_->width(), flatview_->height());
-       float dist = (p2-p1).cast<float>().norm();
+        // Back to ndc scale with rotation and translation applied
+        Eigen::Vector2f p1f = t.inverse() * points[idx1];
+        Eigen::Vector2f p2f = t.inverse() * points[idx2];
 
-       if(dist <= min_segment_len_)
-           continue;
+        qDebug() << "Point added at (ndc space): " << p1f.x() << p1f.y();
 
-       Eigen::Vector2f dir = (p2-p1).cast<float>().normalized();
+        // Scale to image size
+        Eigen::Vector2i p1 = Lasso::getScreenPoint(p1f,
+                                   cl_->active_->scan_width(),
+                                   cl_->active_->scan_height());
+        Eigen::Vector2i p2 = Lasso::getScreenPoint(p2f,
+                                   cl_->active_->scan_width(),
+                                   cl_->active_->scan_height());
 
-       float dist_along_segment = 0;
 
-       while (dist_along_segment+min_segment_len_ < dist) {
+        img_points.push_back(p1);
+        qDebug("Point added at (image space, %d %d): %d, %d", cl_->active_->scan_width(), cl_->active_->scan_height(),
+               p1.x(), p1.y());
+
+        float dist = (p2-p1).cast<float>().norm();
+
+        if(dist <= min_segment_len_)
+        continue;
+
+        Eigen::Vector2f dir = (p2-p1).cast<float>().normalized();
+
+        float dist_along_segment = 0;
+
+        while (dist_along_segment+min_segment_len_ < dist) {
             dist_along_segment += min_segment_len_;
             Eigen::Vector2f new_point = dist_along_segment * dir + p1.cast<float>();
-            new_lasso->addScreenPoint(new_point.x(), new_point.y(), flatview_->width(), flatview_->height());
-       }
-
-
+            img_points.push_back(new_point.cast<int>());
+        }
     }
 
-    delete lasso_;
-    lasso_ = new_lasso;
-
-    points = lasso_->getPoints();
 
     int h = cloud->scan_width();
     int w = cloud->scan_height();
@@ -148,45 +229,42 @@ bool Snake::mouseDblClickEvent(QMouseEvent * event){
     // Create distance map
     std::shared_ptr<std::vector<float> > distmap = makeDistmap(cloud);
     std::shared_ptr<std::vector<float> > grad_image = gradientImage(distmap, w, h);
-    std::shared_ptr<std::vector<float> > smooth_grad_image = convolve(grad_image, w, h, gaussian, 5);
+    //std::shared_ptr<std::vector<float> > smooth_grad_image = convolve(grad_image, w, h, gaussian, 5);
 
-    // problem!
-    // Points are in ndc space
+    std::shared_ptr<std::vector<float> > blur_image = convolve(grad_image, w, h, gaussian, 5);
+    for(int i = 0; i < 3; i++)
+        blur_image = convolve(blur_image, w, h, gaussian, 5);
 
-    std::vector<Eigen::Vector2i> spoints;
-
-    qDebug() << "New size" << points.size();
-
-    for(Eigen::Vector2f & p : points) {
-        Eigen::Vector2i sp = Lasso::getScreenPoint(p, w, h);
-        qDebug() << "Point:" << sp.x() << sp.y();
-        spoints.push_back(sp);
-    }
-
-    for(Eigen::Vector2i & p : spoints) {
+    for(Eigen::Vector2i & p : img_points) {
         qDebug() << "Out: " << p.x() << p.y();
     }
 
+
+    img_ = blur_image;
+
     int it = 0;
     bool converged = false;
+
     while(!converged && it++ < 100) {
 
-        converged = snake_iteration(smooth_grad_image,
-                      w,
+        // Note, inverted width and height
+        converged = snake_iteration(blur_image,
                       h,
-                      spoints,
-                      11,
-                      11,
-                      1,
-                      1,
+                      w,
+                      img_points,
+                      21,
+                      21,
+                      0,
+                      0,
                       1);
 
 
         new_lasso = new Lasso();
 
-        for(Eigen::Vector2i & p : spoints) {
-            //qDebug() << p.x() << p.y();
-            new_lasso->addScreenPoint(p.x(), p.y(), w, h);
+        for(Eigen::Vector2i p : img_points) {
+
+            Eigen::Vector2f ndc_point = t * Lasso::NDCPoint(p, cl_->active_->scan_width(), cl_->active_->scan_height());
+            new_lasso->addNormPoint(ndc_point);
         }
 
         delete lasso_;
@@ -197,6 +275,15 @@ bool Snake::mouseDblClickEvent(QMouseEvent * event){
         flatview_->update(0, 0 , flatview_->width(), flatview_->height());
         QApplication::processEvents();
     }
+
+
+    for(Eigen::Vector2i p : img_points) {
+        int x = p.x();
+        int y = p.y();
+        (*img_)[cloud->scan_height() * x + y] = 255;
+    }
+
+    drawFloats(img_, cloud);
 
 
    // points are now control points
@@ -216,7 +303,6 @@ bool Snake::mouseDblClickEvent(QMouseEvent * event){
 
     disable();
 */
-    done_ = true;
     return true;
 }
 
@@ -228,8 +314,7 @@ bool Snake::mouseMoveEvent(QMouseEvent * event) {
         return false;
     }
 
-    if(!done_)
-        lasso_->moveLastScreenPoint(event->x(), event->y(), core_->mw_->flatview_);
+    lasso_->moveLastScreenPoint(event->x(), event->y(), core_->mw_->flatview_);
     flatview_->update();
 
     if(event->buttons() != Qt::LeftButton)
@@ -255,7 +340,7 @@ bool Snake::mousePressEvent(QMouseEvent * event) {
 bool Snake::mouseReleaseEvent(QMouseEvent * event){
     last_mouse_pos_ << event->x(), event->y();
     float dist = (last_mouse_pos_ - mouse_down_pos_).norm();
-    if(dist < 2){
+    if(dist < 5){
         return mouseClickEvent(event);
     }
 
@@ -267,7 +352,6 @@ void Snake::enable() {
         disable();
         return;
     }
-    done_ = false;
     QTabWidget * tabs = qobject_cast<QTabWidget *>(flatview_->parent()->parent());
     tabs->setCurrentWidget(flatview_);
     enable_->setChecked(true);

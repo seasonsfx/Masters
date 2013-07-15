@@ -66,9 +66,9 @@ const Eigen::Affine2f FlatView::getNDCCamera() {
 
     // screen if wider than scan
     if(war <  sar){
-        aspect = Eigen::Vector2f(1.0, -1.0/cfx);
+        aspect = Eigen::Vector2f(1.0, 1.0/cfx);
     } else {
-        aspect = Eigen::Vector2f(1.0/cfy, -1.0);
+        aspect = Eigen::Vector2f(1.0/cfy, 1.0);
     }
 
 

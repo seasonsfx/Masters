@@ -189,7 +189,8 @@ bool snake_iteration(std::shared_ptr<std::vector<float> > img,
                 {
                     int y = points[i].y();
                     int x = points[i].x();
-                    int idx = (y + j) * w + x + k;
+                    //int idx = (y + j) * w + x + k;
+                    int idx = (x + k) * h + h-1 - (y + j);
                     float energy = (*img)[idx];
 
                     Eimg[(j + centery) * win_w + k + centerx] = energy;
@@ -200,10 +201,13 @@ bool snake_iteration(std::shared_ptr<std::vector<float> > img,
             }
 
             // Test purposes
-            int y = points[i].y();
+            /*int y = points[i].y();
             int x = points[i].x();
-            int idx = (y + 0) * w + x + 0;
+            int k = 0;
+            int j = 0;
+            int idx = (x + k) * h + h-1 - (y + j);
             (*img)[idx] = 400;
+            */
 
             tmp = (maxEimg - minEimg);
             tmp = (tmp == 0) ? 0 : (1 / tmp);

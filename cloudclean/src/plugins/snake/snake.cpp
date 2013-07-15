@@ -223,24 +223,20 @@ bool Snake::mouseDblClickEvent(QMouseEvent * event){
     }
 
 
-    int h = cloud->scan_width();
-    int w = cloud->scan_height();
+    int w = cloud->scan_width();
+    int h = cloud->scan_height();
 
     // Create distance map
-    std::shared_ptr<std::vector<float> > distmap = makeDistmap(cloud);
-    std::shared_ptr<std::vector<float> > grad_image = gradientImage(distmap, w, h);
-    //std::shared_ptr<std::vector<float> > smooth_grad_image = convolve(grad_image, w, h, gaussian, 5);
-
-    std::shared_ptr<std::vector<float> > blur_image = convolve(grad_image, w, h, gaussian, 5);
+    img_ = makeDistmap(cloud);
+    img_ = gradientImage(img_, h, w);
+    img_ = convolve(img_, h, w, gaussian, 5);
     for(int i = 0; i < 3; i++)
-        blur_image = convolve(blur_image, w, h, gaussian, 5);
+        img_ = convolve(img_, h, w, gaussian, 5);
 
     for(Eigen::Vector2i & p : img_points) {
         qDebug() << "Out: " << p.x() << p.y();
     }
 
-
-    img_ = blur_image;
 
     int it = 0;
     bool converged = false;
@@ -248,14 +244,14 @@ bool Snake::mouseDblClickEvent(QMouseEvent * event){
     while(!converged && it++ < 100) {
 
         // Note, inverted width and height
-        converged = snake_iteration(blur_image,
-                      h,
+        converged = snake_iteration(img_,
                       w,
+                      h,
                       img_points,
                       21,
                       21,
-                      0,
-                      0,
+                      1,
+                      1,
                       1);
 
 
@@ -280,7 +276,7 @@ bool Snake::mouseDblClickEvent(QMouseEvent * event){
     for(Eigen::Vector2i p : img_points) {
         int x = p.x();
         int y = p.y();
-        (*img_)[cloud->scan_height() * x + y] = 255;
+        //(*img_)[cloud->scan_height() * x + y] = 255;
     }
 
     drawFloats(img_, cloud);

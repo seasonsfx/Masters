@@ -251,8 +251,9 @@ bool Snake::mouseDblClickEvent(QMouseEvent * event){
                       21,
                       21,
                       1,
+                      0.5,
                       1,
-                      1);
+                      0.1);
 
 
         new_lasso = new Lasso();

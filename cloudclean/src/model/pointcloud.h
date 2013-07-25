@@ -89,7 +89,7 @@ class MODEL_API PointCloud : public pcl::PointCloud<pcl::PointXYZI> {
     std::future<Octree::Ptr> fut_octree_;
     Octree::Ptr octree_;
     bool visible_;
-    mutable std::weak_ptr<std::vector<int>> grid_to_cloud_map_;
+    mutable std::shared_ptr<std::vector<int>> grid_to_cloud_map_;
     std::vector<int> cloud_to_grid_map_;
     std::shared_ptr<std::mutex> pc_mutex;
 

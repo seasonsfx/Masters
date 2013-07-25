@@ -34,6 +34,7 @@ class VDepth : public IPlugin {
     void drawVector3f(std::shared_ptr<const std::vector<Eigen::Vector3f> > out_img, std::shared_ptr<PointCloud> cloud);
 
  private slots:
+    void fpfh_vis();
     void normalnoise();
     void dist_stdev();
     void sutract_lowfreq_noise();

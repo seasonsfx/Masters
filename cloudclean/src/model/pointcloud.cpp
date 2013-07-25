@@ -365,24 +365,19 @@ const Octree::Ptr PointCloud::octree() {
 }
 
 std::shared_ptr<const std::vector<int> > PointCloud::gridToCloudMap() const {
-    // Weak pointer serves as a cache while in use
-    std::shared_ptr<std::vector<int> > grid_to_cloud(
-                grid_to_cloud_map_.lock());
-    if(grid_to_cloud)
-        return grid_to_cloud;
+    if(grid_to_cloud_map_ != nullptr)
+        return grid_to_cloud_map_;
 
-    // New map when weak_ptr expired
-    grid_to_cloud = std::make_shared<std::vector<int>>(
+    // New map
+    grid_to_cloud_map_ = std::make_shared<std::vector<int>>(
                 scan_width_*scan_height_, -1);
 
     for(int i = 0; i < size(); i++) {
         int grid_idx = cloud_to_grid_map_[i];
-        (*grid_to_cloud)[grid_idx] = i;
+        (*grid_to_cloud_map_)[grid_idx] = i;
     }
 
-    grid_to_cloud_map_ = grid_to_cloud;
-
-    return grid_to_cloud;
+    return grid_to_cloud_map_;
 }
 
 const std::vector<int> & PointCloud::cloudToGridMap() const {

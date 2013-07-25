@@ -86,14 +86,14 @@ FIND_PACKAGE(Qt5OpenGL REQUIRED)
 
 FIND_PACKAGE(OpenGL REQUIRED)
 FIND_PACKAGE(PCL 1.7 REQUIRED COMPONENTS
-    common
+     common
 #    io
-    octree
-    kdtree # only the graph cut lib uses this
+     octree
+     kdtree # only the graph cut lib uses this
            # if I dont load and link this in the main binary, it prevents unloading
-    search
-#    features
-#    filters
+     search
+     features
+     filters
 #    segmentation
 )
 

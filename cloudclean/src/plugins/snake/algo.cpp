@@ -45,7 +45,8 @@ bool snake_iteration(std::shared_ptr<std::vector<float> > img,
                int win_h,
                float alpha,
                float beta,
-               float gamma) {
+               float gamma,
+               float delta) {
     int n = points.size();
     int neighbors = win_h * win_w;
 
@@ -66,6 +67,7 @@ bool snake_iteration(std::shared_ptr<std::vector<float> > img,
     std::vector<float> Econt(neighbors);
     std::vector<float> Ecurv(neighbors);
     std::vector<float> Eimg(neighbors);
+    std::vector<float> Esize(neighbors);
     std::vector<float> E(neighbors);
 
     while( !converged ) {
@@ -94,9 +96,11 @@ bool snake_iteration(std::shared_ptr<std::vector<float> > img,
             float maxEcont = 0;
             float maxEcurv = 0;
             float maxEimg = 0;
+            float maxEsize = 0;
             float minEcont = FLT_MAX;
             float minEcurv = FLT_MAX;
             float minEimg = FLT_MAX;
+            float minEsize = FLT_MAX;
             float Emin = FLT_MAX;
 
             int offsetx = 0;
@@ -191,7 +195,7 @@ bool snake_iteration(std::shared_ptr<std::vector<float> > img,
                     int x = points[i].x();
                     //int idx = (y + j) * w + x + k;
                     int idx = (x + k) * h + h-1 - (y + j);
-                    float energy = (*img)[idx];
+                    float energy = -(*img)[idx];
 
                     Eimg[(j + centery) * win_w + k + centerx] = energy;
 
@@ -217,10 +221,54 @@ bool snake_iteration(std::shared_ptr<std::vector<float> > img,
                 Eimg[k] = (minEimg - Eimg[k]) * tmp;
             }
 
+            /*  Calculate Esize */
+            maxEsize = 0;
+            minEsize = FLT_MAX;
+            for(int j = -upper; j <= bottom; j++ )
+            {
+                for(int k = -left; k <= right; k++ )
+                {
+                    Eigen::Vector2i prev;
+                    Eigen::Vector2i next;
+                    Eigen::Vector2i & curr = points[i];
+
+                    if(i == 0 )
+                    {
+                        prev = points[n - 1];
+                        next = points[i + 1];
+                    }
+                    else if( i == n - 1 )
+                    {
+                        prev = points[i - 1];
+                        next = points[0];
+                    }
+                    else
+                    {
+                        prev = points[i - 1];
+                        next = points[i + 1];
+                    }
+
+                    float dist1 = pow(curr.x() + k - prev.x(), 2) + pow(curr.y() + j - prev.y(), 2);
+                    float dist2 = pow(curr.x() + k - next.x(), 2) + pow(curr.y() + j - next.y(), 2);
+
+                    float energy = (dist1 + dist2) * 0.5f;
+
+                    Esize[(j + centery) * win_w + k + centerx] = energy;
+                    maxEsize = _max( maxEsize, energy );
+                    minEsize = _min( minEsize, energy );
+                }
+            }
+            tmp = maxEsize - minEsize;
+            tmp = (tmp == 0) ? 0 : (1 / tmp);
+            for(int k = 0; k < neighbors; k++ )
+            {
+                Esize[k] = (Esize[k] - minEsize) * tmp;
+            }
+
             /* Find Minimize point in the neighbors */
             for(int k = 0; k < neighbors; k++ )
             {
-                E[k] = alpha * Econt[k] + beta * Ecurv[k] + gamma * Eimg[k];
+                E[k] = alpha * Econt[k] + beta * Ecurv[k] + gamma * Eimg[k] + delta * Esize[k];
             }
             Emin = FLT_MAX;
             for(int j = -upper; j <= bottom; j++ )

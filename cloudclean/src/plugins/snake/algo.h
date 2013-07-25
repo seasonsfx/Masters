@@ -13,6 +13,7 @@ bool snake_iteration(std::shared_ptr<std::vector<float> > img,
                int win_h,
                float alpha,
                float beta,
-               float gamma);
+               float gamma,
+               float delta);
 
 #endif  // ALGO_H

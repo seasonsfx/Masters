@@ -13,6 +13,10 @@
 #include "pluginsystem/core.h"
 #include "utilities/cv.h"
 #include "plugins/normalestimation/normalestimation.h"
+#include <pcl/point_types.h>
+#include <pcl/features/fpfh.h>
+#include <boost/serialization/shared_ptr.hpp>
+#include <pcl/filters/voxel_grid.h>
 
 QString VDepth::getName(){
     return "visualisedepth";
@@ -47,7 +51,7 @@ void VDepth::initialize(Core *core){
     connect(myaction_,&QAction::triggered, [this] (bool on) {
         qDebug() << "Click!";
     });
-    connect(myaction_, SIGNAL(triggered()), this, SLOT(sobel_blur()));
+    connect(myaction_, SIGNAL(triggered()), this, SLOT(fpfh_vis()));
     mw_->toolbar_->addAction(myaction_);
 
 }
@@ -185,6 +189,152 @@ void VDepth::drawVector3f(std::shared_ptr<const std::vector<Eigen::Vector3f> > o
     image_container_->resize(image_->size());
 }
 
+void VDepth::fpfh_vis(){
+    std::shared_ptr<PointCloud> _cloud = core_->cl_->active_;
+    if(_cloud == nullptr)
+        return;
+
+    pcl::PointCloud<pcl::Normal>::Ptr normals = ne_->getNormals(_cloud);
+
+    // HACK
+    // Make sure normals are not NaN or inf
+    for (pcl::Normal & n : *normals) {
+      if (!pcl::isFinite<pcl::Normal>(n)){
+          n.normal_x = 0;
+          n.normal_y = 0;
+          n.normal_z = 1;
+      }
+    }
+
+    // Zipper up normals and xyzi
+    pcl::PointCloud<pcl::PointXYZINormal>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZINormal>());
+    cloud->resize(_cloud->size());
+    for(int i = 0; i < _cloud->size(); i ++){
+        pcl::PointXYZI & p = (*_cloud)[i];
+        pcl::Normal & n = (*normals)[i];
+
+        pcl::PointXYZINormal & pn = (*cloud)[i];
+        pn.x = p.x;
+        pn.y = p.y;
+        pn.z = p.z;
+        pn.intensity = p.intensity;
+        pn.normal_x = n.normal_x;
+        pn.normal_y = n.normal_y;
+        pn.normal_z = n.normal_z;
+    }
+
+    pcl::PointCloud<pcl::PointXYZINormal>::Ptr filt_cloud(new pcl::PointCloud<pcl::PointXYZINormal>());
+
+    // Hypothesis: FPFH dont work well on dense sections
+    // Hence: subsample open point per 1cm^3
+
+    QTime t;
+
+    t.start(); qDebug() << "Timer started (Subsample)";
+    pcl::VoxelGrid<pcl::PointXYZINormal> sor;
+    sor.setInputCloud(cloud);
+    sor.setLeafSize(0.05f, 0.05f, 0.05f);
+    sor.setDownsampleAllData (true);
+    sor.filter(*filt_cloud);
+    qDebug() << "Filt size: " << filt_cloud->size() << ", orig size: " << _cloud->size();
+    qDebug() << "Subsample cloud in " << t.elapsed() << " ms";
+
+    // FPFH
+    t.start(); qDebug() << "Timer started (FPFH)";
+    pcl::FPFHEstimation<pcl::PointXYZINormal, pcl::PointXYZINormal, pcl::FPFHSignature33> fpfh;
+    fpfh.setInputCloud(filt_cloud);
+    fpfh.setInputNormals(filt_cloud);
+    pcl::search::KdTree<pcl::PointXYZINormal>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZINormal>);
+    fpfh.setSearchMethod(tree);
+    fpfh.setRadiusSearch(0.10);
+    pcl::PointCloud<pcl::FPFHSignature33>::Ptr fpfhs (new pcl::PointCloud<pcl::FPFHSignature33> ());
+    fpfh.compute(*fpfhs);
+    qDebug() << "FPFH in " << t.elapsed() << " ms";
+
+    // Map feature to original cloud
+    pcl::PointCloud<pcl::FPFHSignature33>::Ptr fpfhs2 (new pcl::PointCloud<pcl::FPFHSignature33> ());
+    pcl::FPFHSignature33 blankfpfh;
+    for(int i = 0; i < 33; i++){
+        blankfpfh.histogram[i] = 0.0f;
+    }
+    fpfhs2->points.resize(cloud->size(), blankfpfh);
+
+    qDebug() << "resized";
+
+    int count = 0;
+
+    for(int i = 0; i < cloud->size(); i++) {
+
+        pcl::PointXYZINormal & p = (*cloud)[i];
+        Eigen::Vector3i pos = sor.getGridCoordinates(p.x, p.y, p.z);
+        int idx = sor.getCentroidIndexAt(pos);
+
+        if (count++ < 10) {
+            qDebug() << "Idx: " << idx << " Pos:" << pos.x() << pos.y() << pos.z();
+        }
+
+
+        if(idx != -1 && idx < fpfhs->size())
+            (*fpfhs2)[i] = (*fpfhs)[idx];
+    }
+
+    qDebug() << "here!!!!!!!!!!!";
+
+    std::shared_ptr<const std::vector<int>> grid_to_cloud = _cloud->gridToCloudMap();
+
+    int w = _cloud->scan_width();
+    int h = _cloud->scan_height();
+
+    // in the grid, subtract (x, y+1) from every (x, y)
+    std::shared_ptr<std::vector<float>> diffs = std::make_shared<std::vector<float>>(w*h, 0.0f);
+
+    bool print = true;
+
+    for(int x = 0; x < w; x ++) {
+        for(int y = 0; y < h-1; y ++) {
+            int idx1 = (*grid_to_cloud)[x*h + y];
+            int idx2 = (*grid_to_cloud)[x*h + y+1];
+            if(idx1 == -1 || idx2 == -1){
+                (*diffs)[idx1] = 0;
+                continue;
+            }
+
+            pcl::FPFHSignature33 & sig1 = (*fpfhs2)[idx1];
+            pcl::FPFHSignature33 & sig2 = (*fpfhs2)[idx2];
+
+            // calclate Kullback-Leibler distance
+
+            //NB! assumed histograms are normalised
+
+            float kl = 0;
+
+            for(int i = 0; i < 33; i++){
+                float p = sig1.histogram[i];
+                float q = sig2.histogram[i];
+                kl += p*log(p/q);
+            }
+
+            if(kl != kl && sig1.histogram[0] == sig1.histogram[0] && print){
+                qDebug() << "NAN caluclated form non nan";
+                print = false;
+            }
+
+            if(kl != kl || kl == FLT_MAX || kl == FLT_MIN){
+                (*diffs)[idx1] = 0;
+                continue;
+            }
+
+
+            (*diffs)[idx1] = kl;
+
+        }
+    }
+
+    std::shared_ptr<const std::vector<float>> img = cloudToGrid(_cloud->cloudToGridMap(), w*h, diffs);
+
+    drawFloats(img, _cloud);
+}
+
 void VDepth::normalnoise(){
     std::shared_ptr<PointCloud> cloud = core_->cl_->active_;
     if(cloud == nullptr)
@@ -193,9 +343,6 @@ void VDepth::normalnoise(){
     int w = cloud->scan_height();
 
     pcl::PointCloud<pcl::Normal>::Ptr normals = ne_->getNormals(cloud);
-
-    // This is important so its cached and not recalculated
-    std::shared_ptr<const std::vector<int>> grid_to_cloud = cloud->gridToCloudMap();
 
     std::shared_ptr<std::vector<float>> stdev = normal_stdev(cloud, normals, 1, 100);
 
@@ -211,9 +358,6 @@ void VDepth::dist_stdev(){
         return;
     int h = cloud->scan_width();
     int w = cloud->scan_height();
-
-    // This is important so its cached and not recalculated
-    std::shared_ptr<const std::vector<int>> grid_to_cloud = cloud->gridToCloudMap();
 
     std::shared_ptr<std::vector<float> > stdev = stdev_dist(cloud, 0.05f, 20, false);
 
@@ -255,9 +399,6 @@ void VDepth::pca(){
         return;
     int h = cloud->scan_width();
     int w = cloud->scan_height();
-
-    // This is important so its cached and not recalculated
-    std::shared_ptr<const std::vector<int>> grid_to_cloud = cloud->gridToCloudMap();
 
     std::shared_ptr<std::vector<Eigen::Vector3f> > pca = getPCA(cloud, 0.05f, 20);
 
@@ -384,7 +525,6 @@ void VDepth::myFunc(){
     int h = cloud->scan_width();
     int w = cloud->scan_height();
 
-    // This is important so its cached and not recalculated
     std::shared_ptr<const std::vector<int>> grid_to_cloud = cloud->gridToCloudMap();
 
     std::shared_ptr<std::vector<Eigen::Vector3f> > pca = getPCA(cloud, 1.0f, 50);

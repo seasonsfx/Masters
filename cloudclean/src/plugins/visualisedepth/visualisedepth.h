@@ -5,6 +5,7 @@
 #include <Eigen/Dense>
 #include "glheaders.h"
 #include "pluginsystem/iplugin.h"
+#include <pcl/point_types.h>
 
 class PointCloud;
 class QAction;
@@ -32,6 +33,9 @@ class VDepth : public IPlugin {
  private:
     void drawFloats(std::shared_ptr<const std::vector<float> > out_img, std::shared_ptr<PointCloud> cloud);
     void drawVector3f(std::shared_ptr<const std::vector<Eigen::Vector3f> > out_img, std::shared_ptr<PointCloud> cloud);
+
+    pcl::PointCloud<pcl::PointXYZINormal>::Ptr octreeDownsample(std::shared_ptr<PointCloud> input, float resolution, std::vector<int>& sub_idxs);
+    pcl::PointCloud<pcl::PointXYZINormal>::Ptr gridDownsample(std::shared_ptr<PointCloud> input, float resolution, std::vector<int>& sub_idxs);
 
  private slots:
     void fpfh_vis();
@@ -61,6 +65,7 @@ class VDepth : public IPlugin {
     QImage * image_;
 
     NormalEstimator * ne_;
+    float time = 0;
 
 };
 

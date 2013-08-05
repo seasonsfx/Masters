@@ -176,6 +176,54 @@ void Camera::rotate2D(float x, float y) {
     rotation_.normalize();
 }
 
+void Camera::rotate3D(float _yaw, float _pitch, float _roll) {
+
+    AngleAxis<float> rotX(_yaw, Vector3f::UnitY()); // look left right
+    AngleAxis<float> rotY(_pitch, Vector3f::UnitX()); // look up down
+
+    rotation_ = (rotX * rotY) * rotation_;
+
+    auto clamp = [] (double num, double low, double high) {
+        if (num > high)
+            return high;
+        if (num < low)
+            return low;
+        return num;
+    };
+
+    Eigen::Matrix3f r = rotation_.toRotationMatrix();
+    double roll = -atan2(r(0,2), r(1, 2));
+    double pitch = acos(r(2,2));
+    //double yaw = atan2(r(2, 0), r(2, 1));
+
+
+    Vector3f dir = rotation_ * Vector3f::UnitZ();
+    double dotp = dir.dot(Vector3f::UnitZ());
+
+    double sign = dir.dot(Vector3f::UnitY()) > 0 ? 1.0 : -1.0;
+    double angle = sign * acos(dotp);
+
+/*
+    qDebug() << "Y angle" << angle;
+    qDebug() << "Y angle (DEG)" << (angle/M_PI) * 180;
+    qDebug() << "Roll" << roll;
+    qDebug() << "Pitch" << pitch;
+    qDebug() << "Yaw" << yaw;
+*/
+    double correction_factor = 1.0 - fabs(pitch-M_PI/2)/(M_PI/2);
+    correction_factor = -0.5 + 1.5 * correction_factor;
+    correction_factor = clamp(correction_factor, 0, 1);
+
+    if(angle < 0)
+        correction_factor = 0;
+
+    //qDebug() << "Correction factor:" << correction_factor;
+
+    AngleAxis<float> roll_correction(correction_factor*-roll, Vector3f::UnitZ());
+    rotation_ = roll_correction * rotation_;
+    rotation_.normalize();
+}
+
 void Camera::adjustFov(int val) {
     // Mouse seems to move in increments of 120
     val = -val/60.0f;

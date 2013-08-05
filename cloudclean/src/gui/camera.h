@@ -78,6 +78,7 @@ class GUI_API Camera {
     }
 
     void rotate2D(float x, float y);
+    void rotate3D(float _yaw, float _pitch, float _roll);
     void adjustFov(int val);
 
  private:

@@ -35,6 +35,7 @@ target_link_libraries(
     ${OPENGL_LIBRARIES}
     cloudclean_model
     cloudclean_commands
+    Leap
 )
 
 QT5_USE_MODULES(cloudclean_gui Widgets Gui OpenGL)

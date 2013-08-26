@@ -1,5 +1,5 @@
-#ifndef VISIUALISE_DEPTH_UTIL
-#define VISIUALISE_DEPTH_UTIL
+#ifndef UTILITIES_CV_H
+#define UTILITIES_CV_H
 
 #include <memory>
 #include <vector>
@@ -369,4 +369,4 @@ inline float cosine(Eigen::Vector3f &a, Eigen::Vector3f &b){
     return clamp(cosine, 0.0f, 1.0f);
 }
 
-#endif  // VISIUALISE_DEPTH_UTIL
+#endif  // UTILITIES_CV_H

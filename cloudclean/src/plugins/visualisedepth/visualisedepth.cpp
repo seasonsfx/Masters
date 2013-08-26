@@ -1,9 +1,20 @@
 #include "plugins/visualisedepth/visualisedepth.h"
+#include <iostream>
 #include <QDebug>
 #include <QAction>
 #include <QToolBar>
 #include <QtWidgets>
 #include <QScrollArea>
+
+#include <pcl/point_types.h>
+#include <pcl/features/fpfh.h>
+#include <boost/serialization/shared_ptr.hpp>
+#include <pcl/filters/voxel_grid.h>
+#include <pcl/io/pcd_io.h>
+#include <pcl/features/principal_curvatures.h>
+#include <pcl/octree/octree.h>
+#include <pcl/octree/octree_iterator.h>
+
 #include "model/layerlist.h"
 #include "model/cloudlist.h"
 #include "gui/glwidget.h"
@@ -13,15 +24,7 @@
 #include "pluginsystem/core.h"
 #include "utilities/cv.h"
 #include "plugins/normalestimation/normalestimation.h"
-#include <pcl/point_types.h>
-#include <pcl/features/fpfh.h>
-#include <boost/serialization/shared_ptr.hpp>
-#include <pcl/filters/voxel_grid.h>
-#include <pcl/io/pcd_io.h>
-#include <pcl/features/principal_curvatures.h>
-#include <pcl/octree/octree.h>
-#include <pcl/octree/octree_iterator.h>
-#include <iostream>
+#include "plugins/visualisedepth/utils.h"
 
 QString VDepth::getName(){
     return "visualisedepth";
@@ -56,7 +59,7 @@ void VDepth::initialize(Core *core){
     connect(myaction_,&QAction::triggered, [this] (bool on) {
         qDebug() << "Click!";
     });
-    connect(myaction_, SIGNAL(triggered()), this, SLOT(fpfh_vis()));
+    connect(myaction_, SIGNAL(triggered()), this, SLOT(hist_vis()));
     mw_->toolbar_->addAction(myaction_);
 
 }
@@ -196,19 +199,27 @@ void VDepth::drawVector3f(std::shared_ptr<const std::vector<Eigen::Vector3f> > o
 
 // Kullback-Leibler distance
 
-inline float KLDist(float * feature1, float * feature2, int size) {
-    float kl = 0;
+inline double KLDist(float * feature1, float * feature2, int size) {
+    double kl = 0;
 
     for(int i = 0; i < size; i++){
         float p = feature1[i];
         float q = feature2[i];
-        kl += p*log(p/q);
+        double tmp = p*log(p/q);
+
+        if(tmp != tmp || tmp >= FLT_MAX || tmp <= FLT_MIN)
+            continue;
+        kl += tmp;
     }
 
-    if(kl != kl || kl >= FLT_MAX || kl <= FLT_MIN) {
-        return 0;
+    /*
+    for(int i = 0; i < size; i++){
+        std::cout << feature1[i] << "/" << feature2[i] << " ";
     }
 
+    std::cout << std::endl << "feature:" << kl << std::endl;
+    fflush(stdout);
+    */
     return kl;
 }
 
@@ -244,7 +255,7 @@ pcl::PointCloud<pcl::PointXYZINormal>::Ptr VDepth::gridDownsample(std::shared_pt
     // Zipper up normals and xyzi
     pcl::PointCloud<pcl::PointXYZINormal>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZINormal>());
     cloud->resize(input->size());
-    for(int i = 0; i < input->size(); i ++){
+    for(uint i = 0; i < input->size(); i ++){
         pcl::PointXYZI & p = (*input)[i];
         pcl::Normal & n = (*normals)[i];
 
@@ -272,7 +283,7 @@ pcl::PointCloud<pcl::PointXYZINormal>::Ptr VDepth::gridDownsample(std::shared_pt
     sor.filter(*output);
 
 
-    for(int i = 0; i < input->size(); i++) {
+    for(uint i = 0; i < input->size(); i++) {
         pcl::PointXYZINormal &p = (*cloud)[i];
         int idx = sor.getCentroidIndex(p);
         sub_idxs[i] = idx;
@@ -305,7 +316,7 @@ pcl::PointCloud<pcl::PointXYZINormal>::Ptr VDepth::octreeDownsample(std::shared_
     // Zipper up normals and xyzi
     pcl::PointCloud<pcl::PointXYZINormal>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZINormal>());
     cloud->resize(input->size());
-    for(int i = 0; i < input->size(); i ++){
+    for(uint i = 0; i < input->size(); i ++){
         pcl::PointXYZI & p = (*input)[i];
         pcl::Normal & n = (*normals)[i];
 
@@ -380,6 +391,108 @@ pcl::PointCloud<pcl::PointXYZINormal>::Ptr VDepth::octreeDownsample(std::shared_
 
 }
 
+void VDepth::hist_vis(){
+    std::shared_ptr<PointCloud> _cloud = core_->cl_->active_;
+    if(_cloud == nullptr)
+        return;
+
+    pcl::PointCloud<pcl::PointXYZINormal>::Ptr filt_cloud;
+    std::vector<int> sub_idxs;
+    filt_cloud = octreeDownsample(_cloud, 0.01, sub_idxs);
+
+
+    int bins = 33;
+    float radius = 0.1;
+    int max_nn = 0;
+
+    std::shared_ptr<std::vector<std::vector<float> > > hists = calcDistHist(*filt_cloud, bins, radius, max_nn);
+
+    std::shared_ptr<std::vector<std::vector<float> > > hists2 = std::make_shared<std::vector<std::vector<float> > >(_cloud->size());
+
+    // map back to cloud
+    for(int i = 0; i < _cloud->size(); i++) {
+        int idx = sub_idxs[i];
+        (*hists2)[i] = (*hists)[idx];
+    }
+
+    qDebug() << "Crash 1?";
+    hists.reset();
+    qDebug() << "Nope 1";
+
+    std::shared_ptr<const std::vector<int>> grid_to_cloud = _cloud->gridToCloudMap();
+
+    int w = _cloud->scan_width();
+    int h = _cloud->scan_height();
+
+    // in the grid, subtract (x, y+1) from every (x, y)
+    std::shared_ptr<std::vector<float>> diffs = std::make_shared<std::vector<float>>(w*h, 0.0f);
+
+    //auto distfunc = EuclidianDist;
+    auto distfunc = KLDist;
+
+    /*
+    // Lambda
+    auto maxval = [] (float * array, int size) {
+        float max = FLT_MIN;
+        for(int i = 0; i < size; i++) {
+            if(array[i] > max)
+                max = array[i];
+        }
+        return max;
+    };
+    */
+
+    const int feature_size = bins;
+
+    for(int x = 1; x < w-1; x ++) {
+        //qDebug() << "yes";
+        for(int y = 1; y < h-1; y ++) {
+            int center = (*grid_to_cloud)[x*h + y];
+            int up = (*grid_to_cloud)[x*h + y-1];
+            int down = (*grid_to_cloud)[x*h + y+1];
+            int left = (*grid_to_cloud)[(x-1)*h + y];
+            int right = (*grid_to_cloud)[(x+1)*h + y];
+
+
+            (*diffs)[center] = 0;
+
+            if(center == -1){
+                continue;
+            }
+
+            // NB! assumed histograms are normalised
+
+            if(up != -1 && down != -1){
+                float * feature1 = &((*hists2)[up][0]);
+                float * feature2 = &((*hists2)[down][0]);
+                //float max1 = maxval(feature1, feature_size);
+                //float max2 = maxval(feature2, feature_size);
+                //(*diffs)[center] += fabs(max1 - max2);
+                (*diffs)[center] += distfunc(feature1, feature2, feature_size);
+            }
+
+            if(left != -1 && right != -1){
+                float * feature1 = &((*hists2)[left][0]);
+                float * feature2 = &((*hists2)[right][0]);
+                //float max1 = maxval(feature1, feature_size);
+                //float max2 = maxval(feature2, feature_size);
+                //(*diffs)[center] += fabs(max1 - max2);
+                (*diffs)[center] += distfunc(feature1, feature2, feature_size);
+            }
+
+        }
+    }
+
+    std::shared_ptr<const std::vector<float>> img = cloudToGrid(_cloud->cloudToGridMap(), w*h, diffs);
+
+    qDebug() << "about to draw";
+    drawFloats(img, _cloud);
+    qDebug() << "Crash 2?";
+    hists2.reset();
+    qDebug() << "Nope 2";
+
+}
+
 void VDepth::fpfh_vis(){
     std::shared_ptr<PointCloud> _cloud = core_->cl_->active_;
     if(_cloud == nullptr)
@@ -387,39 +500,114 @@ void VDepth::fpfh_vis(){
 
     pcl::PointCloud<pcl::PointXYZINormal>::Ptr filt_cloud;
     std::vector<int> sub_idxs;
+    filt_cloud = octreeDownsample(_cloud, 0.1, sub_idxs);
 
-    int n = 10;
-    float start = 0.1;
-    float step = 0.01;
-    float end = 0.05;
 
-    qDebug() << "Grid";
-    for(float i = start ; i >= end; i-=step){
-        float sum = 0, sumsq = 0;
-        for(int j = 0; j < n; j++){
-            sub_idxs.clear();
-            filt_cloud = gridDownsample(_cloud, i, sub_idxs);
-            sum +=time;
-            sumsq +=time*time;
-        }
-        float stdev = sqrt((sumsq - (sum*sum)/n)/(n-1));
-        float mean = sum/n;
-        qDebug("%f, %f, %f", i, mean , stdev);
+    // FPFH
+    QTime t; t.start(); qDebug() << "Timer started (FPFH)";
+    pcl::FPFHEstimation<pcl::PointXYZINormal, pcl::PointXYZINormal, pcl::FPFHSignature33> fpfh;
+    fpfh.setInputCloud(filt_cloud);
+    fpfh.setInputNormals(filt_cloud);
+    pcl::search::KdTree<pcl::PointXYZINormal>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZINormal>);
+    fpfh.setSearchMethod(tree);
+    fpfh.setRadiusSearch(0.20);
+    pcl::PointCloud<pcl::FPFHSignature33>::Ptr fpfhs (new pcl::PointCloud<pcl::FPFHSignature33> ());
+    fpfh.compute(*fpfhs);
+    qDebug() << "FPFH in " << t.elapsed() << " ms";
+
+    // Map feature to original cloud
+    pcl::PointCloud<pcl::FPFHSignature33>::Ptr fpfhs2 (new pcl::PointCloud<pcl::FPFHSignature33> ());
+    pcl::FPFHSignature33 blankfpfh;
+    for(int i = 0; i < 33; i++){
+        blankfpfh.histogram[i] = 0.0f;
+    }
+    fpfhs2->points.resize(_cloud->size(), blankfpfh);
+
+    qDebug() << "resized";
+
+    for(int i = 0; i < _cloud->size(); i++) {
+        int idx = sub_idxs[i];
+
+        if(idx != -1 && idx < fpfhs->size())
+            (*fpfhs2)[i] = (*fpfhs)[idx];
     }
 
-    qDebug() << "Octree";
-    for(float i = start ; i >= end; i-=step){
-        float sum = 0, sumsq = 0;
-        for(int j = 0; j < n; j++){
-            sub_idxs.clear();
-            filt_cloud = octreeDownsample(_cloud, i, sub_idxs);
-            sum +=time;
-            sumsq +=time*time;
+    std::shared_ptr<const std::vector<int>> grid_to_cloud = _cloud->gridToCloudMap();
+
+    int w = _cloud->scan_width();
+    int h = _cloud->scan_height();
+
+    // in the grid, subtract (x, y+1) from every (x, y)
+    std::shared_ptr<std::vector<float>> diffs = std::make_shared<std::vector<float>>(_cloud->size(), 0.0f);
+
+
+    auto distfunc = EuclidianDist;
+/*
+    auto maxval = [] (float * array, int size) {
+        float max = FLT_MIN;
+        for(int i = 0; i < size; i++) {
+            if(array[i] > max)
+                max = array[i];
         }
-        float stdev = sqrt((sumsq - (sum*sum)/n)/(n-1));
-        float mean = sum/n;
-        qDebug("%f, %f, %f", i, mean , stdev);
+        return max;
+    };
+*/
+    const int feature_size = 33;
+
+    for(int x = 1; x < w-1; x ++) {
+        for(int y = 1; y < h-1; y ++) {
+            int center = (*grid_to_cloud)[x*h + y];
+            int up = (*grid_to_cloud)[x*h + y-1];
+            int down = (*grid_to_cloud)[x*h + y+1];
+            int left = (*grid_to_cloud)[(x-1)*h + y];
+            int right = (*grid_to_cloud)[(x+1)*h + y];
+
+
+            (*diffs)[center] = 0;
+
+            if(center == -1){
+                continue;
+            }
+
+            // NB! assumed histograms are normalised
+
+            if(up != -1 && down != -1){
+                float * feature1 = (*fpfhs2)[up].histogram;
+                float * feature2 = (*fpfhs2)[down].histogram;
+                //float max1 = maxval(feature1, feature_size);
+                //float max2 = maxval(feature2, feature_size);
+                //(*diffs)[center] += fabs(max1 - max2);
+                (*diffs)[center] += distfunc(feature1, feature2, feature_size);
+            }
+
+            if(left != -1 && right != -1){
+                float * feature1 = (*fpfhs2)[up].histogram;
+                float * feature2 = (*fpfhs2)[down].histogram;
+                //float max1 = maxval(feature1, feature_size);
+                //float max2 = maxval(feature2, feature_size);
+                //(*diffs)[center] += fabs(max1 - max2);
+                (*diffs)[center] += distfunc(feature1, feature2, feature_size);
+            }
+
+        }
     }
+
+    std::shared_ptr<const std::vector<float>> img = cloudToGrid(_cloud->cloudToGridMap(), w*h, diffs);
+
+    qDebug() << "about to draw";
+    drawFloats(img, _cloud);
+
+}
+
+void VDepth::curve_vis(){
+    std::shared_ptr<PointCloud> _cloud = core_->cl_->active_;
+    if(_cloud == nullptr)
+        return;
+
+    pcl::PointCloud<pcl::PointXYZINormal>::Ptr filt_cloud;
+    std::vector<int> sub_idxs;
+    filt_cloud = octreeDownsample(_cloud, 0.1, sub_idxs);
+
 
     //pcl::io::savePCDFileASCII ("test_pcd.pcd", *filt_cloud);
 
@@ -432,7 +620,7 @@ void VDepth::fpfh_vis(){
 
     pcl::search::KdTree<pcl::PointXYZINormal>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZINormal>);
     principal_curvatures_estimation.setSearchMethod (tree);
-    principal_curvatures_estimation.setRadiusSearch (0.05);
+    principal_curvatures_estimation.setRadiusSearch (0.5);
 
     // Actually compute the principal curvatures
     pcl::PointCloud<pcl::PrincipalCurvatures>::Ptr principal_curvatures (new pcl::PointCloud<pcl::PrincipalCurvatures> ());
@@ -474,52 +662,6 @@ void VDepth::fpfh_vis(){
         (*principal_curvatures2)[i] = (*principal_curvatures)[idx];
     }
 
-
-
-/*
-    // FPFH
-    t.start(); qDebug() << "Timer started (FPFH)";
-    pcl::FPFHEstimation<pcl::PointXYZINormal, pcl::PointXYZINormal, pcl::FPFHSignature33> fpfh;
-    fpfh.setInputCloud(filt_cloud);
-    fpfh.setInputNormals(filt_cloud);
-    pcl::search::KdTree<pcl::PointXYZINormal>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZINormal>);
-    fpfh.setSearchMethod(tree);
-    fpfh.setRadiusSearch(0.20);
-    pcl::PointCloud<pcl::FPFHSignature33>::Ptr fpfhs (new pcl::PointCloud<pcl::FPFHSignature33> ());
-    fpfh.compute(*fpfhs);
-    qDebug() << "FPFH in " << t.elapsed() << " ms";
-
-    // Map feature to original cloud
-    pcl::PointCloud<pcl::FPFHSignature33>::Ptr fpfhs2 (new pcl::PointCloud<pcl::FPFHSignature33> ());
-    pcl::FPFHSignature33 blankfpfh;
-    for(int i = 0; i < 33; i++){
-        blankfpfh.histogram[i] = 0.0f;
-    }
-    fpfhs2->points.resize(cloud->size(), blankfpfh);
-
-    qDebug() << "resized";
-
-    int count = 0;
-
-    for(int i = 0; i < cloud->size(); i++) {
-
-        pcl::PointXYZINormal & p = (*cloud)[i];
-        //Eigen::Vector3i pos = sor.getGridCoordinates(p.x, p.y, p.z);
-        //int idx = sor.getCentroidIndexAt(pos);
-
-        int idx = sor.getCentroidIndex(p);
-
-        if (count++ < 10) {
-            //qDebug() << "Idx: " << idx << " Pos:" << pos.x() << pos.y() << pos.z();
-            qDebug() << "Idx: " << idx;
-        }
-
-
-        if(idx != -1 && idx < fpfhs->size())
-            (*fpfhs2)[i] = (*fpfhs)[idx];
-    }
-*/
-
     std::shared_ptr<const std::vector<int>> grid_to_cloud = _cloud->gridToCloudMap();
 
     int w = _cloud->scan_width();
@@ -530,6 +672,15 @@ void VDepth::fpfh_vis(){
 
 
     auto distfunc = EuclidianDist;
+
+    auto maxval = [] (float * array, int size) {
+        float max = FLT_MIN;
+        for(int i = 0; i < size; i++) {
+            if(array[i] > max)
+                max = array[i];
+        }
+        return max;
+    };
 
     const int feature_size = 3;
 
@@ -553,13 +704,19 @@ void VDepth::fpfh_vis(){
             if(up != -1 && down != -1){
                 float * feature1 = (*principal_curvatures2)[up].principal_curvature;
                 float * feature2 = (*principal_curvatures2)[down].principal_curvature;
-                (*diffs)[center] += distfunc(feature1, feature2, feature_size);
+                float max1 = maxval(feature1, feature_size);
+                float max2 = maxval(feature2, feature_size);
+                (*diffs)[center] += fabs(max1 - max2);
+                //(*diffs)[center] += distfunc(feature1, feature2, feature_size);
             }
 
             if(left != -1 && right != -1){
                 float * feature1 = (*principal_curvatures2)[left].principal_curvature;
                 float * feature2 = (*principal_curvatures2)[right].principal_curvature;
-                (*diffs)[center] += distfunc(feature1, feature2, feature_size);
+                float max1 = maxval(feature1, feature_size);
+                float max2 = maxval(feature2, feature_size);
+                (*diffs)[center] += fabs(max1 - max2);
+                //(*diffs)[center] += distfunc(feature1, feature2, feature_size);
             }
 
         }
@@ -713,7 +870,8 @@ void VDepth::sobel_blur(){
     std::shared_ptr<std::vector<float>> distmap = makeDistmap(cloud);
 
     std::shared_ptr<std::vector<float> > smooth_grad_image = gradientImage(distmap, w, h);
-    for(int i = 0; i < 4; i++)
+    int blurs = 0;
+    for(int i = 0; i < blurs; i++)
         smooth_grad_image = convolve(smooth_grad_image, w, h, gaussian, 5);
 
     drawFloats(smooth_grad_image, cloud);
@@ -793,7 +951,6 @@ void VDepth::myFunc(){
         (*highfreq)[i] = (*distmap)[i] - (*smooth_grad_image)[i];
     }
 
-/*
     //std::shared_ptr<std::vector<float> > grad_image = gradientImage(distmap, w, h, size);
     std::shared_ptr<std::vector<float> > int_image = interpolate(distmap, w, h, 50);
     std::shared_ptr<std::vector<float> > stdev_image = stdev(int_image, w, h, 5);

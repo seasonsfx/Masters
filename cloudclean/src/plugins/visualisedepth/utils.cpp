@@ -10,6 +10,7 @@
 #include <pcl/search/flann_search.h>
 #include <pcl/kdtree/kdtree_flann.h>
 #include "plugins/visualisedepth/gridsearch.h"
+#include "utilities/cv.h"
 
 std::shared_ptr<std::vector<float> > test_feature(std::shared_ptr<PointCloud> cloud,
                             const double radius, int max_nn, bool use_depth) {
@@ -70,3 +71,4 @@ std::shared_ptr<std::vector<float> > test_feature(std::shared_ptr<PointCloud> cl
 
     return stdevs;
 }
+

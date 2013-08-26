@@ -53,7 +53,7 @@ void LeapListener::onFrame(const Leap::Controller& controller) {
     if(frame.fingers().count() > 200 && frame.hands().count() == 1){
         Leap::Vector trans = hand.translation(controller.frame(1));
 
-        int dir = trans.y > 0 ? 1 : -1;
+        //int dir = trans.y > 0 ? 1 : -1;
         trans = 0.1 * trans;
         //glwidget_->camera_.translate(0, 0, dir*0.1);
 

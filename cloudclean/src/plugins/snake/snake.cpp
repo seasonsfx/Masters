@@ -229,13 +229,13 @@ bool Snake::mouseDblClickEvent(QMouseEvent * event){
     // Create distance map
     img_ = makeDistmap(cloud);
     img_ = gradientImage(img_, h, w);
-    img_ = convolve(img_, h, w, gaussian, 5);
-    for(int i = 0; i < 3; i++)
-        img_ = convolve(img_, h, w, gaussian, 5);
+    //img_ = convolve(img_, h, w, gaussian, 5);
+    //for(int i = 0; i < 3; i++)
+    //    img_ = convolve(img_, h, w, gaussian, 5);
 
-    for(Eigen::Vector2i & p : img_points) {
-        qDebug() << "Out: " << p.x() << p.y();
-    }
+    //for(Eigen::Vector2i & p : img_points) {
+    //    qDebug() << "Out: " << p.x() << p.y();
+    //}
 
 
     int it = 0;
@@ -253,7 +253,7 @@ bool Snake::mouseDblClickEvent(QMouseEvent * event){
                       1,
                       0.5,
                       1,
-                      0.1);
+                      0.0);
 
 
         new_lasso = new Lasso();

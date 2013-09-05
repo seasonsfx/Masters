@@ -108,5 +108,89 @@ std::shared_ptr<std::vector<std::vector<float> > > calcDistHist(pcl::PointCloud<
     return histograms;
 }
 
+template <typename PointT>
+std::shared_ptr<std::vector<std::vector<float> > > calcIntensityHist(pcl::PointCloud<PointT> & cloud, int bins, double radius, int max_nn) {
+
+    //std::shared_ptr<std::vector<float>> distmap = makeDistmap(cloud);
+    //const std::vector<int> & cloud_to_grid = cloud->cloudToGridMap();
+
+    std::vector<float> blank(bins, 0.0f);
+
+    std::shared_ptr<std::vector<std::vector<float>> > histograms =
+            std::make_shared<std::vector<std::vector<float> > >(cloud.size(), blank);
+
+    pcl::KdTreeFLANN<PointT> search;
+    search.setInputCloud(typename pcl::PointCloud<PointT>::ConstPtr(&cloud, boost::serialization::null_deleter()));
+
+    QTime total;
+    total.start();
+
+    int less_than_three_points_count = 0;
+
+    std::vector<int> kIdxs;
+    std::vector<float> kSqDist;
+
+    float min = FLT_MAX;
+    float max = FLT_MIN;
+
+    qDebug() << "Here";
+
+    // For every point
+    for(unsigned int i = 0; i < cloud.size(); i++){
+        kIdxs.clear();
+        kSqDist.clear();
+
+        search.radiusSearch(i, radius, kIdxs, kSqDist, max_nn);
+
+        if(kIdxs.size() > max_nn && max_nn != 0){
+            qDebug() << "Whoops! Too many";
+            continue;
+        }
+
+        if(kIdxs.size() < 3) {
+            less_than_three_points_count++;
+            //(*histograms)[i] = Eigen::Vector3f(0, 0, 1.0f); // Assume isolated point
+            continue;
+        }
+
+        /*
+        // Calculate histogram dist
+        float min = FLT_MAX;
+        float max = FLT_MIN;
+        float mean = 0;
+        for(float & d : kDist) {
+            if(d > max)
+                max = d;
+            if(d < min)
+                min = d;
+            mean+=d;
+        }
+        mean /= kDist.size();
+        */
+
+        float norm_increment = 1.0/kSqDist.size();
+
+        for(int & idx : kIdxs) {
+            float & intensity = cloud[idx].intensity;
+            int bin_idx = intensity * (bins-1);
+            (*histograms)[i][bin_idx] += norm_increment;
+        }
+
+        /*
+        for(int j = 0; j < bins; j++){
+            std::cout << (*histograms)[i][j] << " ";
+        }
+        std::cout << std::endl;
+        fflush(stdout);
+        */
+    }
+
+    qDebug() << "Radius: " << radius << " Max_nn: " << max_nn << " Time: " << total.elapsed()/1000.0f << "Sec";
+    qDebug("Points with less than %d neighbours: %d", max_nn, less_than_three_points_count);
+    qDebug("Max: %f, Min: %f", max, min);
+
+    return histograms;
+}
+
 
 #endif  // VISIUALISE_DEPTH_UTIL

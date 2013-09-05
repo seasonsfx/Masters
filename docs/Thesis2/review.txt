@@ -1,0 +1,113 @@
+Distoinguish between range scan / depth map and pointcloud
+
+Drill down into details for methods that I select
+
+Background:
+	Main features
+	Who has used them
+
+	Stuff i dont use:
+		Show that I've read about it an the implications
+
+
+Say what an edge is:
+	Mention different methods
+	Choose one that is a primary one that I focus on.
+
+Segmentation:
+	image based
+	feature based
+
+High level discussinon of features:
+	What we need to segment something
+
+
+Details in later chapters
+
+
+Design:
+	More details on the methods
+
+
+End of teh chapter:
+	Come up with a bunch of methods that should be considered
+
+
+System chapter
+
+
+Comparison of segmentation methods:
+	Use fair poor and average
+	Suitability
+	Cost
+	Paralisable
+	User control
+		Environment is complex
+		Set user constraint
+	Parameters determination
+	Extent to which user needs to provide information/ level of interaction required.
+	Argue in favour guided segmentation
+
+Features & Methods	
+
+Deal with scanner perculiarities:
+
+
+
+Refer to existing systems in when decribing why you cant use stuff of the shelf
+	Also during system design
+
+
+What is background
+What work has being done
+Use range image instead of pointcloud
+General point cloud schemes
+
+Characteristics of depth maps of lidar vs other
+
+How to deal with irregularities in range scans
+
+Need to point out canopy segmentation
+Dismis methods
+
+Literature review discuss all the methods
+
+At the end you have a taxonomy
+
+
+Textbook level overview
+then go into lietarture
+delay complicated detail discussion for specific chapter
+
+
+Inroduction
+	How its ganne be layed out
+	Noise and atrifacts
+	Types of images and how they differ
+		Hergitage scenes vs normal scenes
+		More natural scenes vs Artificail city scenes
+
+	Segmentation
+		Compact and reasonably comprehensive
+		Broad stoke segmentation
+		Machine learning
+		Classes of segmentation methotds
+		Which things are relevant
+		Describe features
+
+
+	Survey of existing work
+	Algoritms to segment images... 2d 3d and rage scans
+		Range scans, point clouds, natural scenes, artificial schenes
+		Properties
+		Samples are sparse
+		Appaorach does this
+			Tempted to do that
+			However problems
+
+End with taxonomy:
+	This is what we have determined
+
+Add a images to describe data
+
+15 to 16 pages of background

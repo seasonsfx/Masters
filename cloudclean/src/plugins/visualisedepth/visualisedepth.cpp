@@ -401,11 +401,13 @@ void VDepth::hist_vis(){
     filt_cloud = octreeDownsample(_cloud, 0.01, sub_idxs);
 
 
-    int bins = 33;
-    float radius = 0.1;
+    int bins = 20;
+    float radius = 0.05;
     int max_nn = 0;
 
-    std::shared_ptr<std::vector<std::vector<float> > > hists = calcDistHist(*filt_cloud, bins, radius, max_nn);
+
+    std::shared_ptr<std::vector<std::vector<float> > > hists = calcIntensityHist(*filt_cloud, bins, radius, max_nn);
+    //std::shared_ptr<std::vector<std::vector<float> > > hists = calcDistHist(*filt_cloud, bins, radius, max_nn);
 
     std::shared_ptr<std::vector<std::vector<float> > > hists2 = std::make_shared<std::vector<std::vector<float> > >(_cloud->size());
 

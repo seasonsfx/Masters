@@ -21,10 +21,13 @@ class QUndoStack;
 class QMenuBar;
 class QStackedWidget;
 class QToolBox;
+
+#ifdef LEAP_SUPPORT
 class LeapListener;
 namespace Leap {
     class Controller;
 }
+#endif
 
 class GUI_API MainWindow : public QMainWindow {
     Q_OBJECT
@@ -86,8 +89,10 @@ class GUI_API MainWindow : public QMainWindow {
     QMenuBar * mb_;
     QHash<QString, QMenu *> menus_;
 
+#ifdef LEAP_SUPPORT
     LeapListener * listener;
     Leap::Controller * controller;
+#endif
 
 };
 

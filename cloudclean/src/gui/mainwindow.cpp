@@ -190,11 +190,11 @@ MainWindow::MainWindow(QUndoStack *us, CloudList * cl, LayerList * ll, QWidget *
 
     restoreState(settings.value("mainwindow/windowState").toByteArray());
 
-    qDebug() << "LEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP";
+#ifdef LEAP_SUPPORT
     listener = new LeapListener(glwidget_);
     controller = new Leap::Controller();
     controller->addListener(*listener);
-    qDebug() << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
+#endif
 
 }
 

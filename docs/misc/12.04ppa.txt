@@ -1,0 +1,12 @@
+Current GCC
+	ppa:ubuntu-toolchain-r/test
+Current Clang
+	ppa:h-rayflood/llvm
+Qt5
+	ppa:ubuntu-sdk-team/ppa
+PCL 1.7
+	ppa:v-launchpad-jochen-sprickerhof-de/pcl
+CMake 2.8.11
+	ppa:kalakris/cmake
+Boost 1.5.0
+	ppa:28msec/boost

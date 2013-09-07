@@ -13,6 +13,14 @@ include_directories(
 FILE (GLOB app_SRCS *.cpp *.cxx *.cc *.C *.c *.h *.hpp)
 FILE (GLOB app_FORMS *.ui)
 
+if(NOT LEAP_SUPPORT)
+    foreach(file ${app_SRCS})
+        if(file MATCHES ".*leaplistener.cpp|.*leaplistener.h")
+            list(REMOVE_ITEM app_SRCS ${file})
+        endif()
+    endforeach()
+endif()
+
 QT5_WRAP_UI(app_FORMS_HEADERS ${app_FORMS})
 QT5_ADD_RESOURCES(app_RESOURCES_RCC resources/resources.qrc)
 
@@ -35,8 +43,11 @@ target_link_libraries(
     ${OPENGL_LIBRARIES}
     cloudclean_model
     cloudclean_commands
-    Leap
 )
+
+if($(LEAP_SUPPORT))
+    TARGET_LINK_LIBRARIES(Leap)
+endif()
 
 QT5_USE_MODULES(cloudclean_gui Widgets Gui OpenGL)
 

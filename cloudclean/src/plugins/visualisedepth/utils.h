@@ -4,6 +4,7 @@
 #include <memory>
 #include <vector>
 #include <cassert>
+#include <cfloat>
 #include <QTime>
 #include <QDebug>
 #include <pcl/kdtree/kdtree_flann.h>

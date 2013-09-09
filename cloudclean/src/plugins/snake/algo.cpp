@@ -1,4 +1,5 @@
 #include "plugins/snake/algo.h"
+#include <float.h>
 #include <vector>
 #include <memory>
 #include <utilities/cv.h>

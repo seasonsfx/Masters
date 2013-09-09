@@ -6,6 +6,7 @@
 #include "glheaders.h"
 #include "pluginsystem/iplugin.h"
 #include <pcl/point_types.h>
+#include <pcl/point_cloud.h>
 
 class PointCloud;
 class QAction;

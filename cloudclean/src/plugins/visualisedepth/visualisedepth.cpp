@@ -14,6 +14,7 @@
 #include <pcl/features/principal_curvatures.h>
 #include <pcl/octree/octree.h>
 #include <pcl/octree/octree_iterator.h>
+#include <pcl/octree/octree_container.h>
 
 #include "model/layerlist.h"
 #include "model/cloudlist.h"
@@ -344,12 +345,13 @@ pcl::PointCloud<pcl::PointXYZINormal>::Ptr VDepth::octreeDownsample(std::shared_
     pcl::octree::OctreePointCloud<pcl::PointXYZINormal>::LeafNodeIterator it1;
     pcl::octree::OctreePointCloud<pcl::PointXYZINormal>::LeafNodeIterator it1_end = octree1.leaf_end();
 
-    std::vector<int> indices;
+    //std::vector<int> indices;
     unsigned int leafNodeCounter = 0;
 
     for (it1 = octree1.leaf_begin(); it1 != it1_end; ++it1) {
-        indices.clear();
-        it1.getData (indices);
+        //indices.clear();
+        //it1.getData(indices);
+        std::vector<int> & indices = it1.getLeafContainer().getPointIndicesVector();
 
         pcl::PointXYZINormal p;
 

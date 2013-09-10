@@ -36,6 +36,7 @@ cloudclean/docs/*.pdf
 *.pro.user
 qrc_*.cpp
 ui_*.h
+debuglog.txt
 # Docs
 /docs/*/*.pdf
 *.snm

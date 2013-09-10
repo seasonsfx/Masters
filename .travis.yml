@@ -4,9 +4,8 @@ compiler:
   - clang
 before_install:
   - sudo add-apt-repository ppa:v-launchpad-jochen-sprickerhof-de/pcl -y
-  - sudo add-apt-repository ppa:apokluda/boost1.53 -y
   - sudo apt-get update -d
-  - sudo apt-get install cmake mesa-common-dev libpcl-1.7-all-dev libflann-dev libeigen3-dev libboost-filesystem1.53-dev libboost-iostreams1.53-dev libboost-thread1.53-dev
+  - sudo apt-get install cmake mesa-common-dev libpcl-1.7-all-dev libflann-dev libeigen3-dev
 script:
   - cd cloudclean
   - mkdir build && cd build

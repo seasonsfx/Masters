@@ -1,6 +1,7 @@
 #include "utilities/cv.h"
 #include "model/pointcloud.h"
-#include "Eigen/Dense"
+#include <cfloat>
+#include <Eigen/Dense>
 #include <QDebug>
 #include <QTime>
 #include <vector>
@@ -299,7 +300,7 @@ std::shared_ptr<std::vector<Eigen::Vector3f> > getHist(std::shared_ptr<PointClou
 
     qDebug() << "Radius: " << radius << " Max_nn: " << max_nn << " Time: " << total.elapsed()/1000.0f << "Sec";
     qDebug("Points with less than %d neighbours: %d", max_nn, less_than_three_points_count);
-    qDebug("Max: %d, Min: %d", max, min);
+    qDebug("Max: %f, Min: %f", max, min);
 
     return eigen_vals;
 }
@@ -381,7 +382,7 @@ std::shared_ptr<std::vector<Eigen::Vector3f> > getPCA(std::shared_ptr<PointCloud
 
     qDebug() << "Radius: " << radius << " Max_nn: " << max_nn << " Time: " << total.elapsed()/1000.0f << "Sec";
     qDebug("Points with less than %d neighbours: %d", max_nn, less_than_three_points_count);
-    qDebug("Max: %d, Min: %d", max, min);
+    qDebug("Max: %f, Min: %f", max, min);
 
     return eigen_vals;
 }

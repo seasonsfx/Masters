@@ -39,6 +39,7 @@ class VDepth : public IPlugin {
     pcl::PointCloud<pcl::PointXYZINormal>::Ptr gridDownsample(std::shared_ptr<PointCloud> input, float resolution, std::vector<int>& sub_idxs);
 
  private slots:
+    void don_vis();
     void hist_vis();
     void fpfh_vis();
     void curve_vis();

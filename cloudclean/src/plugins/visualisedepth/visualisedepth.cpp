@@ -60,7 +60,7 @@ void VDepth::initialize(Core *core){
     connect(myaction_,&QAction::triggered, [this] (bool on) {
         qDebug() << "Click!";
     });
-    connect(myaction_, SIGNAL(triggered()), this, SLOT(hist_vis()));
+    connect(myaction_, SIGNAL(triggered()), this, SLOT(don_vis()));
     mw_->toolbar_->addAction(myaction_);
 
 }
@@ -391,6 +391,71 @@ pcl::PointCloud<pcl::PointXYZINormal>::Ptr VDepth::octreeDownsample(std::shared_
     //qDebug() << "Ok";
     return output;
 
+}
+
+pcl::PointCloud<pcl::Normal>::Ptr don(std::shared_ptr<PointCloud> cloud,
+            pcl::PointCloud<pcl::Normal>::Ptr normals, float radius1 = 0.2,
+            float radius2 = 0.5){
+
+    pcl::PointCloud<pcl::Normal>::Ptr donormals;
+    donormals.reset(new pcl::PointCloud<pcl::Normal>());
+    donormals->resize(cloud->size());
+
+    pcl::search::Search<pcl::PointXYZI>::Ptr tree;
+    tree.reset (new pcl::search::KdTree<pcl::PointXYZI> (false));
+
+    pcl::PointCloud<pcl::PointXYZI>::ConstPtr cptr(cloud.get(), boost::serialization::null_deleter());
+    tree->setInputCloud(cptr);
+
+    std::vector<int> idxs;
+    std::vector<float> sq_dists;
+
+    auto avg_normal = [] (std::vector<int> idxs, pcl::PointCloud<pcl::Normal>::Ptr normals) {
+        pcl::Normal sum;
+        for(pcl::Normal normal : *normals) {
+            sum.getNormalVector3fMap() += normal.getNormalVector3fMap();
+        }
+        sum.getNormalVector3fMap() /= idxs.size();
+        return sum;
+    };
+
+    for(int idx = 0; idx < cloud->size(); idx++){
+        std::vector<float> rads{radius1, radius2};
+        std::vector<pcl::Normal> avgs;
+        for(float rad : rads){
+            idxs.clear();
+            sq_dists.clear();
+            tree->radiusSearch(idx, rad, idxs, sq_dists);
+            idxs.push_back(idx);
+            avgs.push_back(avg_normal(idxs, normals));
+        }
+
+        (*donormals)[idx].getNormalVector3fMap() = avgs[0].getNormalVector3fMap() - avgs[1].getNormalVector3fMap();;
+    }
+
+
+}
+
+void VDepth::don_vis(){
+    std::shared_ptr<PointCloud> _cloud = core_->cl_->active_;
+    if(_cloud == nullptr)
+        return;
+
+    int w = _cloud->scan_width();
+    int h = _cloud->scan_height();
+
+    pcl::PointCloud<pcl::Normal>::Ptr normals = ne_->getNormals(_cloud);
+    pcl::PointCloud<pcl::Normal>::Ptr donormals = don(_cloud, normals);
+
+    const std::vector<int> & cloudtogrid = _cloud->cloudToGridMap();
+
+    std::shared_ptr<std::vector<Eigen::Vector3f> > grid = std::make_shared<std::vector<Eigen::Vector3f> >(w*h, Eigen::Vector3f(0.0f, 0.0f, 0.0f));
+    for(int i = 0; i < normals->size(); i++){
+        int grid_idx = cloudtogrid[i];
+        (*grid)[grid_idx] = (*donormals)[i].getNormalVector3fMap();
+    }
+
+    drawVector3f(grid, _cloud);
 }
 
 void VDepth::hist_vis(){

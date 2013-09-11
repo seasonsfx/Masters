@@ -7,7 +7,9 @@ before_install:
   - sudo apt-add-repository ppa:ubuntu-sdk-team/ppa -y
   - sudo add-apt-repository ppa:apokluda/boost1.53 -y
   - sudo apt-get update -d
-  - sudo apt-get install cmake libboost1.53-all-dev nvidia-opencl-dev qtdeclarative5-dev mesa-common-dev libpcl-1.7-all-dev libflann-dev libeigen3-dev
+  - sudo apt-get install cmake libboost1.53-all-dev nvidia-opencl-dev qtdeclarative5-dev mesa-common-dev libflann-dev libeigen3-dev
+  - wget http://public.jacklab.co.za/PCL-1.7.0-Linux.deb
+  - sudo dpkg -i PCL-1.7.0-Linux.deb
 script:
   - cd cloudclean
   - mkdir build && cd build

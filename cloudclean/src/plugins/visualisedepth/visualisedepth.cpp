@@ -93,6 +93,35 @@ int gridToCloudIdx(int x, int y, std::shared_ptr<PointCloud> pc, int * lookup){
     return lookup[x + y*pc->scan_width()];
 }
 
+pcl::PointCloud<pcl::PointXYZINormal>::Ptr zipNormals(
+        pcl::PointCloud<pcl::PointXYZI> & cloud,
+        pcl::PointCloud<pcl::Normal> & normals){
+
+    pcl::PointCloud<pcl::PointXYZINormal>::Ptr zipped (new pcl::PointCloud<pcl::PointXYZINormal>());
+    zipped->resize(cloud.size());
+
+    for(uint i = 0; i < cloud.size(); i ++){
+        pcl::PointXYZI & p = cloud[i];
+        pcl::Normal & n = normals[i];
+
+        pcl::PointXYZINormal & pn = (*zipped)[i];
+        pn.getNormalVector4fMap() = n.getNormalVector4fMap();
+        pn.getVector4fMap() = p.getVector4fMap();
+        pn.intensity = p.intensity;
+    }
+
+    return zipped;
+}
+
+template <typename T>
+void map(T & small, T& big, int big_size, std::vector<int> map){
+    big.resize(big_size);
+    for(uint i = 0; i < small.size(); i++) {
+        int big_idx = map[i];
+        big[big_idx] = small[i];
+    }
+}
+
 void VDepth::drawFloats(std::shared_ptr<const std::vector<float> > out_img, std::shared_ptr<PointCloud> cloud){
     qDebug() << "DRAW!";
     // translates grid idx to cloud idx
@@ -254,21 +283,7 @@ pcl::PointCloud<pcl::PointXYZINormal>::Ptr VDepth::gridDownsample(std::shared_pt
 
 
     // Zipper up normals and xyzi
-    pcl::PointCloud<pcl::PointXYZINormal>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZINormal>());
-    cloud->resize(input->size());
-    for(uint i = 0; i < input->size(); i ++){
-        pcl::PointXYZI & p = (*input)[i];
-        pcl::Normal & n = (*normals)[i];
-
-        pcl::PointXYZINormal & pn = (*cloud)[i];
-        pn.x = p.x;
-        pn.y = p.y;
-        pn.z = p.z;
-        pn.intensity = p.intensity;
-        pn.normal_x = n.normal_x;
-        pn.normal_y = n.normal_y;
-        pn.normal_z = n.normal_z;
-    }
+    pcl::PointCloud<pcl::PointXYZINormal>::Ptr cloud = zipNormals(*input, *normals);
 
     QTime t; t.start(); //qDebug() << "Timer started (Subsample)";
     /////////////////////////
@@ -302,37 +317,24 @@ pcl::PointCloud<pcl::PointXYZINormal>::Ptr VDepth::gridDownsample(std::shared_pt
 
 }
 
-pcl::PointCloud<pcl::PointXYZINormal>::Ptr VDepth::octreeDownsample(std::shared_ptr<PointCloud> input, float resolution, std::vector<int>& sub_idxs) {
+pcl::PointCloud<pcl::PointXYZINormal>::Ptr VDepth::octreeDownsample(
+        std::shared_ptr<PointCloud> input,
+        float resolution,
+        std::vector<int>& sub_idxs){
+
     pcl::PointCloud<pcl::Normal>::Ptr normals = ne_->getNormals(input);
 
     // HACK: Make sure normals are not NaN or inf
     for (pcl::Normal & n : *normals) {
       if (!pcl::isFinite<pcl::Normal>(n)){
-          n.normal_x = 0;
-          n.normal_y = 0;
-          n.normal_z = 1;
+          n.getNormalVector3fMap() << 0, 0, 1;
       }
     }
 
     // Zipper up normals and xyzi
-    pcl::PointCloud<pcl::PointXYZINormal>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZINormal>());
-    cloud->resize(input->size());
-    for(uint i = 0; i < input->size(); i ++){
-        pcl::PointXYZI & p = (*input)[i];
-        pcl::Normal & n = (*normals)[i];
+    pcl::PointCloud<pcl::PointXYZINormal>::Ptr cloud = zipNormals(*input, *normals);
 
-        pcl::PointXYZINormal & pn = (*cloud)[i];
-        pn.x = p.x;
-        pn.y = p.y;
-        pn.z = p.z;
-        pn.intensity = p.intensity;
-        pn.normal_x = n.normal_x;
-        pn.normal_y = n.normal_y;
-        pn.normal_z = n.normal_z;
-    }
-
-
-    QTime t; t.start(); //qDebug() << "Timer started (Subsample)";
+    QTime t; t.start();
     /////////////////////////
 
     pcl::PointCloud<pcl::PointXYZINormal>::Ptr output(new pcl::PointCloud<pcl::PointXYZINormal>());
@@ -349,77 +351,62 @@ pcl::PointCloud<pcl::PointXYZINormal>::Ptr VDepth::octreeDownsample(std::shared_
     unsigned int leafNodeCounter = 0;
 
     for (it1 = octree1.leaf_begin(); it1 != it1_end; ++it1) {
-        //indices.clear();
-        //it1.getData(indices);
         std::vector<int> & indices = it1.getLeafContainer().getPointIndicesVector();
 
         pcl::PointXYZINormal p;
 
         for(int idx : indices){
             pcl::PointXYZINormal & p1 = (*cloud)[idx];
-            p.x+=p1.x;
-            p.y+=p1.y;
-            p.z+=p1.z;
+            p.getVector4fMap() += p1.getVector4fMap();
+            p.getNormalVector4fMap()+=p1.getNormalVector4fMap();
             p.intensity+=p1.intensity;
-            p.normal_x+=p1.normal_x;
-            p.normal_y+=p1.normal_y;
-            p.normal_z+=p1.normal_z;
             sub_idxs[idx] = output->size();
         }
 
         float size_inv = 1.0/indices.size();
 
-        p.x*=size_inv;
-        p.y*=size_inv;
-        p.z*=size_inv;
+        p.getVector4fMap()*=size_inv;
+        p.getNormalVector4fMap()*=size_inv;
         p.intensity*=size_inv;
-        p.normal_x*=size_inv;
-        p.normal_y*=size_inv;
-        p.normal_z*=size_inv;
-
         output->push_back(p);
-
 
         leafNodeCounter++;
     }
 
     /////////////////////////
-    //qDebug() << "Output size: " << output->size() << ", orig size: " << input->size();
     time = t.elapsed();
-    //qDebug() << "Subsample cloud in " << time << " ms";
-    //qDebug() << "Enter to comntinue"; std::string enter; std::cin >> enter;
-    //qDebug() << "Ok";
     return output;
 
 }
 
-pcl::PointCloud<pcl::Normal>::Ptr don(std::shared_ptr<PointCloud> cloud,
-            pcl::PointCloud<pcl::Normal>::Ptr normals, float radius1 = 0.2,
+template<typename PointT, typename NormalT>
+pcl::PointCloud<pcl::Normal>::Ptr don(pcl::PointCloud<PointT> & cloud,
+            pcl::PointCloud<NormalT> & normals, float radius1 = 0.2,
             float radius2 = 0.5){
 
     pcl::PointCloud<pcl::Normal>::Ptr donormals;
     donormals.reset(new pcl::PointCloud<pcl::Normal>());
-    donormals->resize(cloud->size());
+    donormals->resize(cloud.size());
 
-    pcl::search::Search<pcl::PointXYZI>::Ptr tree;
-    tree.reset (new pcl::search::KdTree<pcl::PointXYZI> (false));
+    typename pcl::search::Search<PointT>::Ptr tree;
+    tree.reset (new pcl::search::KdTree<PointT> (false));
 
-    pcl::PointCloud<pcl::PointXYZI>::ConstPtr cptr(cloud.get(), boost::serialization::null_deleter());
+    typename pcl::PointCloud<PointT>::ConstPtr cptr(&cloud, boost::serialization::null_deleter());
     tree->setInputCloud(cptr);
 
     std::vector<int> idxs;
     std::vector<float> sq_dists;
 
-    auto avg_normal = [] (std::vector<int> idxs, pcl::PointCloud<pcl::Normal>::Ptr normals) {
+    auto avg_normal = [] (std::vector<int> idxs, pcl::PointCloud<NormalT> & normals) {
         pcl::Normal sum;
-        for(pcl::Normal normal : *normals) {
+        for(NormalT normal : normals) {
             sum.getNormalVector3fMap() += normal.getNormalVector3fMap();
         }
         sum.getNormalVector3fMap() /= idxs.size();
         return sum;
     };
 
-    for(int idx = 0; idx < cloud->size(); idx++){
+    for(uint idx = 0; idx < cloud.size(); idx++){
         std::vector<float> rads{radius1, radius2};
         std::vector<pcl::Normal> avgs;
         for(float rad : rads){
@@ -445,14 +432,24 @@ void VDepth::don_vis(){
     int h = _cloud->scan_height();
 
     pcl::PointCloud<pcl::Normal>::Ptr normals = ne_->getNormals(_cloud);
-    pcl::PointCloud<pcl::Normal>::Ptr donormals = don(_cloud, normals);
+
+    // Downsample
+    pcl::PointCloud<pcl::PointXYZINormal>::Ptr smaller_cloud;
+    std::vector<int> sub_idxs;
+    smaller_cloud = octreeDownsample(_cloud, 0.01, sub_idxs);
+
+    pcl::PointCloud<pcl::Normal>::Ptr donormals = don(*smaller_cloud, *smaller_cloud);
+
+    pcl::PointCloud<pcl::Normal> big_donormals;
+
+    map(*donormals, big_donormals, normals->size(), sub_idxs);
 
     const std::vector<int> & cloudtogrid = _cloud->cloudToGridMap();
 
     std::shared_ptr<std::vector<Eigen::Vector3f> > grid = std::make_shared<std::vector<Eigen::Vector3f> >(w*h, Eigen::Vector3f(0.0f, 0.0f, 0.0f));
-    for(int i = 0; i < normals->size(); i++){
+    for(uint i = 0; i < normals->size(); i++){
         int grid_idx = cloudtogrid[i];
-        (*grid)[grid_idx] = (*donormals)[i].getNormalVector3fMap();
+        (*grid)[grid_idx] = big_donormals[i].getNormalVector3fMap();
     }
 
     drawVector3f(grid, _cloud);
@@ -479,7 +476,7 @@ void VDepth::hist_vis(){
     std::shared_ptr<std::vector<std::vector<float> > > hists2 = std::make_shared<std::vector<std::vector<float> > >(_cloud->size());
 
     // map back to cloud
-    for(int i = 0; i < _cloud->size(); i++) {
+    for(uint i = 0; i < _cloud->size(); i++) {
         int idx = sub_idxs[i];
         (*hists2)[i] = (*hists)[idx];
     }
@@ -594,7 +591,7 @@ void VDepth::fpfh_vis(){
 
     qDebug() << "resized";
 
-    for(int i = 0; i < _cloud->size(); i++) {
+    for(uint i = 0; i < _cloud->size(); i++) {
         int idx = sub_idxs[i];
 
         if(idx != -1 && idx < fpfhs->size())
@@ -726,7 +723,7 @@ void VDepth::curve_vis(){
     principal_curvatures2->points.resize(_cloud->size(), blank);
 
 
-    for(int i = 0; i < _cloud->size(); i++) {
+    for(uint i = 0; i < _cloud->size(); i++) {
         int idx = sub_idxs[i];
         (*principal_curvatures2)[i] = (*principal_curvatures)[idx];
     }
@@ -848,7 +845,7 @@ void VDepth::sutract_lowfreq_noise(){
 
     std::shared_ptr<std::vector<float>> highfreq = distmap;
 
-    for(int i = 0; i < distmap->size(); i++){
+    for(uint i = 0; i < distmap->size(); i++){
         (*highfreq)[i] = (*distmap)[i] - (*smooth_grad_image)[i];
     }
 
@@ -871,7 +868,7 @@ void VDepth::pca(){
     Eigen::Vector3f ideal_plane(1.0f, 0.0f, 0.0f);
     ideal_plane.normalize();
 
-    for(int i = 0; i < pca->size(); i++) {
+    for(uint i = 0; i < pca->size(); i++) {
         Eigen::Vector3f & val = (*pca)[i];
 
         // Not enough neighbours
@@ -956,7 +953,7 @@ void VDepth::intensity_play() {
     std::shared_ptr<std::vector<float>> intensity = std::make_shared<std::vector<float>>(cloud->size());
 
     // Create intensity cloud
-    for(int i = 0; i < intensity->size(); i++){
+    for(uint i = 0; i < intensity->size(); i++){
         (*intensity)[i] = (*cloud)[i].intensity;
     }
 
@@ -994,7 +991,7 @@ void VDepth::myFunc(){
     std::shared_ptr<std::vector<Eigen::Vector3f> > pca = getPCA(cloud, 1.0f, 50);
 
     std::shared_ptr<std::vector<Eigen::Vector3f> > grid = std::make_shared<std::vector<Eigen::Vector3f> >(grid_to_cloud->size(), Eigen::Vector3f(0.0f, 0.0f, 0.0f));
-    for(int i = 0; i < grid_to_cloud->size(); i++) {
+    for(uint i = 0; i < grid_to_cloud->size(); i++) {
         int idx = (*grid_to_cloud)[i];
         if(idx != -1)
             (*grid)[i] = (*pca)[idx];

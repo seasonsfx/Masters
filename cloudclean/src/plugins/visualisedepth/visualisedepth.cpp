@@ -114,11 +114,11 @@ pcl::PointCloud<pcl::PointXYZINormal>::Ptr zipNormals(
 }
 
 template <typename T>
-void map(T & small, T& big, int big_size, std::vector<int> map){
+void map(T & small, T& big, int big_size, std::vector<int> & map){
     big.resize(big_size);
-    for(uint i = 0; i < small.size(); i++) {
-        int big_idx = map[i];
-        big[big_idx] = small[i];
+    for(uint i = 0; i < big_size; i++) {
+        int small_idx = map[i];
+        big[i].getNormalVector4fMap() = small[small_idx].getNormalVector4fMap();
     }
 }
 
@@ -399,12 +399,15 @@ pcl::PointCloud<pcl::Normal>::Ptr don(pcl::PointCloud<PointT> & cloud,
 
     auto avg_normal = [] (std::vector<int> idxs, pcl::PointCloud<NormalT> & normals) {
         pcl::Normal sum;
-        for(NormalT normal : normals) {
-            sum.getNormalVector3fMap() += normal.getNormalVector3fMap();
+        for(int idx : idxs) {
+            sum.getNormalVector3fMap() += normals[idx].getNormalVector3fMap();
         }
         sum.getNormalVector3fMap() /= idxs.size();
         return sum;
     };
+
+    QTime t;
+    t.start();
 
     for(uint idx = 0; idx < cloud.size(); idx++){
         std::vector<float> rads{radius1, radius2};
@@ -417,10 +420,10 @@ pcl::PointCloud<pcl::Normal>::Ptr don(pcl::PointCloud<PointT> & cloud,
             avgs.push_back(avg_normal(idxs, normals));
         }
 
-        (*donormals)[idx].getNormalVector3fMap() = avgs[0].getNormalVector3fMap() - avgs[1].getNormalVector3fMap();;
+        (*donormals)[idx].getNormalVector3fMap() = (avgs[0].getNormalVector3fMap() - avgs[1].getNormalVector3fMap())/2.0;
     }
 
-
+    return donormals;
 }
 
 void VDepth::don_vis(){
@@ -433,12 +436,15 @@ void VDepth::don_vis(){
 
     pcl::PointCloud<pcl::Normal>::Ptr normals = ne_->getNormals(_cloud);
 
+    float res1 = 0.5;
+    float res2 = 1;
+
     // Downsample
     pcl::PointCloud<pcl::PointXYZINormal>::Ptr smaller_cloud;
     std::vector<int> sub_idxs;
-    smaller_cloud = octreeDownsample(_cloud, 0.01, sub_idxs);
+    smaller_cloud = octreeDownsample(_cloud, res1, sub_idxs);
 
-    pcl::PointCloud<pcl::Normal>::Ptr donormals = don(*smaller_cloud, *smaller_cloud);
+    pcl::PointCloud<pcl::Normal>::Ptr donormals = don(*smaller_cloud, *smaller_cloud, res1, res2);
 
     pcl::PointCloud<pcl::Normal> big_donormals;
 

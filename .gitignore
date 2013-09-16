@@ -2,6 +2,7 @@
 *.autosave
 *.dll.manifest
 *.exp
+*_latexmk
 cloudclean/bin
 cloudclean/lib
 cloudclean/plugins

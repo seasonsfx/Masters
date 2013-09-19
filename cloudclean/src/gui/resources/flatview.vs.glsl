@@ -1,9 +1,8 @@
 #version 330
-layout(location = 0) in vec4 vertex;
-layout(location = 1) in float intensity;
-layout(location = 2) in int color_index;
-layout(location = 3) in int flags;
-layout(location = 4) in int position;
+layout(location = 0) in float intensity;
+layout(location = 1) in int color_index;
+layout(location = 2) in int flags;
+layout(location = 3) in int position;
 
 uniform samplerBuffer sampler;
 uniform vec4 select_color;
@@ -23,7 +22,7 @@ void main( void ) {
     }
 
     vec3 pos;
-    pos.y = float(position%height);
+    pos.y = mod(position, height);
     pos.x = float(position/float(height));
     pos.z = 1;
 

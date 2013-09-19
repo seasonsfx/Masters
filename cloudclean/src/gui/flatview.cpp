@@ -317,28 +317,28 @@ void FlatView::paintEvent(QPaintEvent *event) {
 
     // Point intensity buffer
     IF_FAIL("buffer bind") = cd->point_buffer_->bind(); CE();
-    glEnableVertexAttribArray(1); CE();
+    glEnableVertexAttribArray(0); CE();
     int offset = sizeof(float)*3;
-    glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(float)*4,
+    glVertexAttribPointer(0, 1, GL_FLOAT, GL_FALSE, sizeof(float)*4,
                           reinterpret_cast<const void *>(offset)); CE();
     cd->point_buffer_->release(); CE();
 
     // Label buffer
     IF_FAIL("buffer bind") = cd->label_buffer_->bind(); CE();
-    glEnableVertexAttribArray(2); CE(); CE();
-    glVertexAttribIPointer(2, 1, GL_SHORT, 0, 0); CE();
+    glEnableVertexAttribArray(1); CE(); CE();
+    glVertexAttribIPointer(1, 1, GL_SHORT, 0, 0); CE();
     cd->label_buffer_->release(); CE();
 
     // Flag buffer
     IF_FAIL("buffer bind") = cd->flag_buffer_->bind(); CE();
-    glEnableVertexAttribArray(3); CE();
-    glVertexAttribIPointer(3, 1, GL_BYTE, 0, 0); CE();
+    glEnableVertexAttribArray(2); CE();
+    glVertexAttribIPointer(2, 1, GL_BYTE, 0, 0); CE();
     cd->flag_buffer_->release(); CE();
 
     // Grid buffer
     IF_FAIL("buffer bind") = cd->grid_buffer_->bind(); CE();
-    glEnableVertexAttribArray(4); CE();
-    glVertexAttribIPointer(4, 1, GL_INT, 0, 0); CE();
+    glEnableVertexAttribArray(3); CE();
+    glVertexAttribIPointer(3, 1, GL_INT, 0, 0); CE();
     cd->grid_buffer_->release(); CE();
 
     cd->draw(vao_); CE();

@@ -274,28 +274,10 @@ void FlatView::paintEvent(QPaintEvent *event) {
     if(!gl_init_)
         initializeGL();
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-    //resizeGL(width(), height());
 
-    /*QPainter p(this);
-    QRadialGradient gradient;
-    gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
-    gradient.setCenter(0.45, 0.50);
-    gradient.setFocalPoint(0.40, 0.45);
-    gradient.setColorAt(0.0, QColor(105, 146, 182));
-    gradient.setColorAt(0.4, QColor(81, 113, 150));
-    gradient.setColorAt(0.8, QColor(16, 56, 121));
-
-    p.setRenderHint(QPainter::Antialiasing);
-    p.setPen(Qt::NoPen);
-    p.setPen(Qt::NoPen);
-    p.setBrush(gradient);
-    p.drawRect(0, 0, size().width(), size().height());
-
+    QPainter p(this);
     p.beginNativePainting();
-    */
 
-    //glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-    //glClear(GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
 
     if(pc_.expired()){
@@ -348,10 +330,11 @@ void FlatView::paintEvent(QPaintEvent *event) {
 
     program_.release();
 
-    //p.endNativePainting();
+    p.endNativePainting();
+    p.end();
 
     emit pluginPaint();
-    //glFinish();
+    glFinish();
     swapBuffers();
 }
 

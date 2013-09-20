@@ -3,6 +3,8 @@
 *.dll.manifest
 *.exp
 *_latexmk
+*.pyc
+*.egg-info
 cloudclean/bin
 cloudclean/lib
 cloudclean/plugins

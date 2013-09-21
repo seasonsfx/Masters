@@ -72,8 +72,8 @@ void NewLayer::redo(){
     }
     applied_once_ = true;
 
-    pc_->ed_->emitlabelUpdate();
-    pc_->ed_->emitflagUpdate();
+    pc_->labelsUpdated();
+    pc_->flagsUpdated();
 
     // TODO(Rickert) : Update color lookup buffer
 }

@@ -12,38 +12,7 @@
 #include <Eigen/Dense>
 #include "model/export.h"
 
-
-class PointCloud;
-
 typedef pcl::octree::OctreePointCloudSearch<pcl::PointXYZI> Octree;
-
-class MODEL_API EventDispatcher : public QObject {
-    Q_OBJECT
- public:
-    EventDispatcher(PointCloud * pc);
-
- private:
-    void updateProgress(int value);
-    void emitTransformed(std::shared_ptr<std::vector<int> > idxs = nullptr);
-
- public:
-    void emitlabelUpdate(std::shared_ptr<std::vector<int> > idxs = nullptr);
-    void emitflagUpdate(std::shared_ptr<std::vector<int> > idxs = nullptr);
-
- signals:
-    void transformed();
-    void progress(int percentage);
-    void flagUpdate(std::shared_ptr<std::vector<int> > idxs = nullptr);
-    void labelUpdate(std::shared_ptr<std::vector<int> > idxs = nullptr);
-
- public slots:
-   void resetOrientation();
-
- private:
-   PointCloud * pc_;
-
- friend class PointCloud;
-};
 
 enum class MODEL_API PointFlags : int8_t {
     selected = 0x001,
@@ -60,7 +29,8 @@ enum class MODEL_API CoordinateFrame: bool {
     Laser
 };
 
-class MODEL_API PointCloud : public pcl::PointCloud<pcl::PointXYZI> {
+class MODEL_API PointCloud : public QObject, public pcl::PointCloud<pcl::PointXYZI> {
+    Q_OBJECT
  public:
     explicit PointCloud();
     ~PointCloud();
@@ -85,6 +55,18 @@ class MODEL_API PointCloud : public pcl::PointCloud<pcl::PointXYZI> {
     int scan_width() const;
     int scan_height() const;
 
+    void flagsUpdated(std::shared_ptr<std::vector<int> > idxs = nullptr);
+    void labelsUpdated(std::shared_ptr<std::vector<int> > idxs = nullptr);
+
+ signals:
+   void transformed();
+   void progress(int percentage);
+   void flagUpdate(std::shared_ptr<std::vector<int> > idxs = nullptr);
+   void labelUpdate(std::shared_ptr<std::vector<int> > idxs = nullptr);
+
+ public slots:
+  void resetOrientation();
+
  private:
     std::future<Octree::Ptr> fut_octree_;
     Octree::Ptr octree_;
@@ -93,11 +75,7 @@ class MODEL_API PointCloud : public pcl::PointCloud<pcl::PointXYZI> {
     std::vector<int> cloud_to_grid_map_;
     std::shared_ptr<std::mutex> pc_mutex;
 
-
-
  public:
-    std::shared_ptr<EventDispatcher> ed_;
-
     int scan_width_;
     int scan_height_;
 

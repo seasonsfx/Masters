@@ -123,9 +123,9 @@ void FlatView::setCloud(std::shared_ptr<PointCloud> new_pc) {
 
     if(!pc_.expired()){
         std::shared_ptr<PointCloud> old_pc = pc_.lock();
-        disconnect(old_pc->ed_.get(), SIGNAL(flagUpdate()), this,
+        disconnect(old_pc.get(), SIGNAL(flagUpdate()), this,
                    SLOT(update()));
-        disconnect(old_pc->ed_.get(), SIGNAL(labelUpdate()), this,
+        disconnect(old_pc.get(), SIGNAL(labelUpdate()), this,
                    SLOT(update()));
     }
 
@@ -142,8 +142,8 @@ void FlatView::setCloud(std::shared_ptr<PointCloud> new_pc) {
         cloud_idx_lookup_[p.x() + p.y()*pc->scan_width()] = idx;
     }
 
-    connect(pc->ed_.get(), SIGNAL(flagUpdate()), this, SLOT(update()));
-    connect(pc->ed_.get(), SIGNAL(labelUpdate()), this, SLOT(update()));
+    connect(pc.get(), SIGNAL(flagUpdate()), this, SLOT(update()));
+    connect(pc.get(), SIGNAL(labelUpdate()), this, SLOT(update()));
     if(gl_init_)
         resizeGL(width(), height());
     if(this->isVisible())

@@ -58,9 +58,9 @@ void CloudListView::contextMenu(const QPoint &pos) {
 
     if(cell.isValid()){
         int row = cell.row();
-        EventDispatcher * ed = cl_->clouds_[row]->ed_.get();
+        PointCloud * pc = cl_->clouds_[row].get();
 
-        menu.addAction("Reset orientation", ed,
+        menu.addAction("Reset orientation", pc,
                         SLOT(resetOrientation()));
 
         QAction del("Delete", 0);

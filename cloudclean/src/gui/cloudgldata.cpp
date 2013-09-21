@@ -53,17 +53,17 @@ CloudGLData::CloudGLData(std::shared_ptr<PointCloud> pc) {
     QMetaObject::invokeMethod(this, "syncLabels");
 
 
-    connect(pc_->ed_.get(), SIGNAL(flagUpdate(std::shared_ptr<std::vector<int> >)),
+    connect(pc_.get(), SIGNAL(flagUpdate(std::shared_ptr<std::vector<int> >)),
             this, SLOT(syncFlags(std::shared_ptr<std::vector<int> >)));
-    connect(pc_->ed_.get(), SIGNAL(labelUpdate(std::shared_ptr<std::vector<int> >)),
+    connect(pc_.get(), SIGNAL(labelUpdate(std::shared_ptr<std::vector<int> >)),
             this, SLOT(syncLabels(std::shared_ptr<std::vector<int> >)));
 }
 
 CloudGLData::~CloudGLData() {
     qDebug() << "CloudGLData deleted";
-    disconnect(pc_->ed_.get(), SIGNAL(flagUpdate(std::shared_ptr<std::vector<int> >)),
+    disconnect(pc_.get(), SIGNAL(flagUpdate(std::shared_ptr<std::vector<int> >)),
                this, SLOT(syncFlags(std::shared_ptr<std::vector<int> >)));
-    disconnect(pc_->ed_.get(), SIGNAL(labelUpdate(std::shared_ptr<std::vector<int> >)),
+    disconnect(pc_.get(), SIGNAL(labelUpdate(std::shared_ptr<std::vector<int> >)),
                this, SLOT(syncLabels(std::shared_ptr<std::vector<int> >)));
 }
 

@@ -28,32 +28,9 @@ inline bool isNaN(float val){
     return (val != val);
 }
 
-EventDispatcher::EventDispatcher(PointCloud * pc) {
-    pc_ = pc;
-}
-
-void EventDispatcher::updateProgress(int value){
-    emit progress(value);
-}
-
-void EventDispatcher::emitlabelUpdate(std::shared_ptr<std::vector<int> > idxs) {
-    emit labelUpdate();
-}
-
-void EventDispatcher::emitflagUpdate(std::shared_ptr<std::vector<int> > idxs) {
-    emit flagUpdate(idxs);
-}
-
-void EventDispatcher::resetOrientation() {
-    qDebug() << "reset";
-    pc_->sensor_orientation_ = pc_->sensor_orientation_.setIdentity();
-    emit transformed();
-}
-
 PointCloud::PointCloud()
     : pcl::PointCloud<pcl::PointXYZI>() {
     pc_mutex.reset(new std::mutex());
-    ed_.reset(new EventDispatcher(this));
     frame_ = CoordinateFrame::Laser;
 
     min_bounding_box_ = Eigen::Vector3f(INFINITY, INFINITY, INFINITY);
@@ -76,7 +53,7 @@ inline bool PointCloud::point_matches_label(int idx, std::vector<uint16_t> & lab
 
 bool PointCloud::save_ptx(const char* filename, std::vector<uint16_t> labels){
     //pc_mutex->lock();
-    ed_->updateProgress(0);
+    emit progress(0);
     setlocale(LC_NUMERIC,"C");
 
     FILE * pfile;
@@ -117,7 +94,7 @@ bool PointCloud::save_ptx(const char* filename, std::vector<uint16_t> labels){
 
     for(uint grid_idx = 0; grid_idx < point_count; grid_idx++) {
         if(grid_idx % update_interval == 0)
-            ed_->updateProgress(100*grid_idx/static_cast<float>(point_count));
+            emit progress(100*grid_idx/static_cast<float>(point_count));
 
         if(next_grid_idx != grid_idx) {
             fprintf(pfile, "%f %f %f %f\n", 0.0f, 0.0f, 0.0f, 0.0f);
@@ -138,7 +115,8 @@ bool PointCloud::save_ptx(const char* filename, std::vector<uint16_t> labels){
     }
 
     fclose(pfile);
-    ed_->updateProgress(100);
+
+    emit progress(100);
     //pc_mutex->unlock();
     return true;
 
@@ -146,7 +124,7 @@ bool PointCloud::save_ptx(const char* filename, std::vector<uint16_t> labels){
 
 bool PointCloud::load_ptx(const char* filename, int decimation_factor) {
     pc_mutex->lock();
-    ed_->updateProgress(0);
+    emit progress(0);
     assert(decimation_factor%2 == 0 || decimation_factor == 1);
 
     // Avoid using a comma delimiter
@@ -233,7 +211,7 @@ bool PointCloud::load_ptx(const char* filename, int decimation_factor) {
         if(file_sample_idx % update_interval == 0) {
             double prog = 100.0*file_sample_idx/static_cast<double>(line_count);
             //qDebug("%f%% done.", prog);
-            ed_->updateProgress(prog);
+            emit progress(prog);
         }
 
         row = file_sample_idx / file_width;
@@ -315,7 +293,7 @@ bool PointCloud::load_ptx(const char* filename, int decimation_factor) {
     labels_.resize(this->points.size(), 0);
     flags_.resize(this->points.size(), PointFlags(0));
 
-    ed_->updateProgress(100);
+    emit progress(100);
     pc_mutex->unlock();
 
     // Start loading octree
@@ -403,3 +381,18 @@ int PointCloud::scan_width() const {
 int PointCloud::scan_height() const{
     return scan_height_;
 }
+
+void PointCloud::resetOrientation() {
+    qDebug() << "reset";
+    sensor_orientation_ = sensor_orientation_.setIdentity();
+    emit transformed();
+}
+
+void PointCloud::flagsUpdated(std::shared_ptr<std::vector<int> > idxs) {
+    emit flagUpdate(idxs);
+}
+
+void PointCloud::labelsUpdated(std::shared_ptr<std::vector<int> > idxs) {
+    emit labelUpdate(idxs);
+}
+

@@ -89,9 +89,9 @@ std::shared_ptr<PointCloud> CloudList::addCloud(std::shared_ptr<PointCloud> pc) 
     endInsertRows();
     mtx_->unlock();
 
-    connect(pc->ed_.get(), SIGNAL(flagUpdate()), this, SIGNAL(updated()));
-    connect(pc->ed_.get(), SIGNAL(labelUpdate()), this, SIGNAL(updated()));
-    connect(pc->ed_.get(), SIGNAL(transformed()), this, SIGNAL(updated()));
+    connect(pc.get(), SIGNAL(flagUpdate()), this, SIGNAL(updated()));
+    connect(pc.get(), SIGNAL(labelUpdate()), this, SIGNAL(updated()));
+    connect(pc.get(), SIGNAL(transformed()), this, SIGNAL(updated()));
 
     emit cloudUpdate(pc);
     return pc;
@@ -110,9 +110,9 @@ void CloudList::removeCloud(int idx){
     pc->deleting_ = true;
     emit deletingCloud(pc);
 
-    disconnect(pc->ed_.get(), SIGNAL(flagUpdate()), this, SIGNAL(updated()));
-    disconnect(pc->ed_.get(), SIGNAL(labelUpdate()), this, SIGNAL(updated()));
-    disconnect(pc->ed_.get(), SIGNAL(transformed()), this, SIGNAL(updated()));
+    disconnect(pc.get(), SIGNAL(flagUpdate()), this, SIGNAL(updated()));
+    disconnect(pc.get(), SIGNAL(labelUpdate()), this, SIGNAL(updated()));
+    disconnect(pc.get(), SIGNAL(transformed()), this, SIGNAL(updated()));
 
 
     beginRemoveRows(QModelIndex(), idx, idx);
@@ -138,12 +138,12 @@ void CloudList::selectionChanged(const QItemSelection &sel,
 std::shared_ptr<PointCloud> CloudList::loadFile(QString filename){
     std::shared_ptr<PointCloud> pc;
     pc.reset(new PointCloud());
-    pc->ed_->moveToThread(QApplication::instance()->thread());
+    pc->moveToThread(QApplication::instance()->thread());
 
-    connect(pc->ed_.get(), SIGNAL(progress(int)), this, SIGNAL(progressUpdate(int)));
+    connect(pc.get(), SIGNAL(progress(int)), this, SIGNAL(progressUpdate(int)));
     pc->load_ptx(filename.toLocal8Bit().constData());
     emit progressUpdate(0);
-    disconnect(pc->ed_.get(), SIGNAL(progress(int)), this, SIGNAL(progressUpdate(int)));
+    disconnect(pc.get(), SIGNAL(progress(int)), this, SIGNAL(progressUpdate(int)));
 
     emit startNonDetJob();
     addCloud(pc);
@@ -153,9 +153,9 @@ std::shared_ptr<PointCloud> CloudList::loadFile(QString filename){
 }
 
 bool CloudList::saveFile(QString filename, std::vector<uint16_t> labels) {
-    connect(active_->ed_.get(), SIGNAL(progress(int)), this, SIGNAL(progressUpdate(int)));
+    connect(active_.get(), SIGNAL(progress(int)), this, SIGNAL(progressUpdate(int)));
     active_->save_ptx(filename.toLocal8Bit().constData(), labels);
-    connect(active_->ed_.get(), SIGNAL(progress(int)), this, SIGNAL(progressUpdate(int)));
+    connect(active_.get(), SIGNAL(progress(int)), this, SIGNAL(progressUpdate(int)));
     emit progressUpdate(0);
     return true;
 }

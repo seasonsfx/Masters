@@ -315,8 +315,6 @@ public:
     /** \brief Signalizes if the graph is valid. */
     bool graph_is_valid_;
 
-    bool horisonal_radius_;
-
     /** \brief Stores the points that are known to be in the foreground. */
     std::vector<pcl::PointXYZI, Eigen::aligned_allocator<pcl::PointXYZI> > foreground_points_;
 
@@ -349,6 +347,8 @@ public:
 
     /** \brief Stores the maximum flow value that was calculated during the segmentation. */
     double max_flow_;
+
+    bool horisonal_radius_;
 
     public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW

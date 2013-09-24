@@ -119,6 +119,7 @@ bool Select::mergeWith(const QUndoCommand *other){
 
     selected_ = mergeUnique(selected_, o->selected_);
     deselected_ = mergeUnique(deselected_, o->deselected_);
+    return true;
 }
 
 int Select::id() const {

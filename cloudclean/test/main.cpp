@@ -37,6 +37,7 @@ TEST_F(PerfTest, NearestNeighbours) {
     PointCloud cloud;
     bool succ = cloud.load_ptx("/home/rickert/Masters/misc/testdata/plane4x5.ptx");
 
+    EXPECT_EQ(succ, true);
 
     // Test
     int idx = 4;

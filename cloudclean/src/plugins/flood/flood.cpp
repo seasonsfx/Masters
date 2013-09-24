@@ -103,7 +103,7 @@ std::shared_ptr<std::vector<int> > Flood::getLayerIndices() {
     std::shared_ptr<PointCloud> active = cl_->active_;
 
     if(ll_->selection_.size() == 0){
-        for(int i = 0; i < active->size(); i++) {
+        for(uint i = 0; i < active->size(); i++) {
             indices->push_back(i);
         }
         return indices;
@@ -130,7 +130,7 @@ std::shared_ptr<std::vector<int> > Flood::getLayerIndices() {
         return false;
     };
 
-    for(int i = 0; i < active->size(); i++) {
+    for(uint i = 0; i < active->size(); i++) {
         if(in(active->labels_[i], selected_labels)){
             indices->push_back(i);
         }
@@ -231,6 +231,7 @@ bool Flood::mouseReleaseEvent(QMouseEvent * event){
         return true;
 
     flood(idx);
+    return true;
 }
 
 bool Flood::eventFilter(QObject *object, QEvent *event){

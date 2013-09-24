@@ -63,7 +63,7 @@ void NormalEstimator::initialize(Core *core){
         result = clGetDeviceIDs(clPlatformIDs[i], CL_DEVICE_TYPE_GPU, 100, devices, &devices_n);
 
         qDebug("CL Devices on platform %s", chBuffer);
-        for (int i = 0; i < devices_n; i++) {
+        for (uint i = 0; i < devices_n; i++) {
             char buffer[10240];
             char devicename[10240];
             cl_uint buf_uint;

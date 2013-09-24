@@ -208,7 +208,7 @@ void LayerListView::contextMenu(const QPoint &pos) {
             us_->beginMacro("Select layer");
             for(std::shared_ptr<PointCloud> pc : cl_->clouds_){
                 std::shared_ptr<std::vector<int>> points = std::make_shared<std::vector<int>>();
-                for(int idx = 0; idx < pc->size(); ++idx) {
+                for(uint idx = 0; idx < pc->size(); ++idx) {
                     for(uint16_t slabel : selected_labels) {
                         if(slabel == pc->labels_[idx]){
                             points->push_back(idx);

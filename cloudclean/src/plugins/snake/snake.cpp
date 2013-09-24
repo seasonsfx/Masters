@@ -273,12 +273,13 @@ bool Snake::mouseDblClickEvent(QMouseEvent * event){
         QApplication::processEvents();
     }
 
-
+/*
     for(Eigen::Vector2i p : img_points) {
         int x = p.x();
         int y = p.y();
         //(*img_)[cloud->scan_height() * x + y] = 255;
     }
+*/
 
     drawFloats(img_, cloud);
 

@@ -58,12 +58,12 @@ UTIL_API std::shared_ptr<std::vector<float> > interpolate(
 UTIL_API std::shared_ptr<std::vector<float> > stdev_dist(std::shared_ptr<PointCloud> cloud,
                                  const double radius, int max_nn = 0, bool use_depth = false);
 
-UTIL_API std::shared_ptr<std::vector<float>> cloudToGrid(const std::vector<int> & map, int img_size,
+UTIL_API std::shared_ptr<std::vector<float>> cloudToGrid(const std::vector<int> & map, uint img_size,
         std::shared_ptr<std::vector<float>> input,
         std::shared_ptr<std::vector<float>> img = nullptr);
 
-UTIL_API std::shared_ptr<std::vector<Eigen::Vector3f> > getHist(std::shared_ptr<PointCloud> cloud, double radius, int max_nn = 0);
-UTIL_API std::shared_ptr<std::vector<Eigen::Vector3f> > getPCA(std::shared_ptr<PointCloud> cloud, double radius, int max_nn = 0);
+UTIL_API std::shared_ptr<std::vector<Eigen::Vector3f> > getHist(std::shared_ptr<PointCloud> cloud, double radius, uint max_nn = 0);
+UTIL_API std::shared_ptr<std::vector<Eigen::Vector3f> > getPCA(std::shared_ptr<PointCloud> cloud, double radius, uint max_nn = 0);
 
 UTIL_API std::shared_ptr<std::vector<float> > normal_stdev(std::shared_ptr<PointCloud> cloud,
                   pcl::PointCloud<pcl::Normal>::Ptr normals,
@@ -263,7 +263,7 @@ inline void grid_nn_op(int idx,
                        PointCloud & cloud,
                        std::vector<int> & idxs,
                        double radius,
-                       int max_nn) {
+                       uint max_nn) {
 
 
     int h = cloud.scan_height();

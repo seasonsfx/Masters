@@ -208,7 +208,7 @@ IPlugin * PluginManager::findPluginByName(QString name) {
 
 bool PluginManager::unloadPlugin(IPlugin * plugin){
     qDebug() << "Unloading: " << plugin->getName();
-    for(int idx = 0; idx < plugins_.size(); idx++) {
+    for(uint idx = 0; idx < plugins_.size(); idx++) {
         PluginResource * plugin_resource = plugins_[idx];
         if(plugin_resource->instance_ == plugin) {
             plugin_resource->instance_->cleanup();

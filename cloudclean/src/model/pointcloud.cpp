@@ -350,7 +350,7 @@ std::shared_ptr<const std::vector<int> > PointCloud::gridToCloudMap() const {
     grid_to_cloud_map_ = std::make_shared<std::vector<int>>(
                 scan_width_*scan_height_, -1);
 
-    for(int i = 0; i < size(); i++) {
+    for(uint i = 0; i < size(); i++) {
         int grid_idx = cloud_to_grid_map_[i];
         (*grid_to_cloud_map_)[grid_idx] = i;
     }

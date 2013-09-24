@@ -105,7 +105,7 @@ void CloudListView::deselectAllPoints(){
         std::shared_ptr<std::vector<int> > empty;
         empty.reset(new std::vector<int>());
 
-        for(int idx = 0; idx < cloud->flags_.size(); idx++){
+        for(uint idx = 0; idx < cloud->flags_.size(); idx++){
             PointFlags & flag =  cloud->flags_[idx];
             if(uint8_t(PointFlags::selected) & uint8_t(flag))
                 indices->push_back(idx);
@@ -125,7 +125,7 @@ void CloudListView::selectAllPoints(){
         std::shared_ptr<std::vector<int> > empty;
         empty.reset(new std::vector<int>());
 
-        for(int idx = 0; idx < cloud->flags_.size(); idx++){
+        for(uint idx = 0; idx < cloud->flags_.size(); idx++){
             PointFlags & flag =  cloud->flags_[idx];
             if(!(uint8_t(PointFlags::selected) & uint8_t(flag)))
                 indices->push_back(idx);

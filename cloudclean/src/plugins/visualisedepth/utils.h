@@ -110,7 +110,7 @@ std::shared_ptr<std::vector<std::vector<float> > > calcDistHist(pcl::PointCloud<
 }
 
 template <typename PointT>
-std::shared_ptr<std::vector<std::vector<float> > > calcIntensityHist(pcl::PointCloud<PointT> & cloud, int bins, double radius, int max_nn) {
+std::shared_ptr<std::vector<std::vector<float> > > calcIntensityHist(pcl::PointCloud<PointT> & cloud, int bins, double radius, uint max_nn) {
 
     //std::shared_ptr<std::vector<float>> distmap = makeDistmap(cloud);
     //const std::vector<int> & cloud_to_grid = cloud->cloudToGridMap();

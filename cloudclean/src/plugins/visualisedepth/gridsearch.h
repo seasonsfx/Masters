@@ -158,7 +158,7 @@ class GridSearch : public pcl::search::Search<pcl::PointXYZI>
 
                         k_indices.push_back(idx);
                         k_sqr_distances.push_back(sqdist);
-                        if(k_indices.size() == k)
+                        if(k_indices.size() == uint(k))
                             return k_indices.size();
                     }
 

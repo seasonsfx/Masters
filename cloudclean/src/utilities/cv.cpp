@@ -111,7 +111,7 @@ std::shared_ptr<std::vector<float> > morphology(std::shared_ptr<std::vector<floa
         out_image = std::make_shared<std::vector<float>>(size, 0);
     }
 
-    float * img = &out_image->at(0);
+    //float * img = &out_image->at(0);
 
     // Calculate the gradient magnitude
     for(int x = 0; x < w; x++){
@@ -129,7 +129,7 @@ std::shared_ptr<std::vector<float> > stdev(
         int w, int h, const int local_size,
         std::shared_ptr<std::vector<float>> out_image) {
 
-    int size = w*h;
+    uint size = w*h;
     if(out_image == nullptr || out_image->size() != size) {
         out_image = std::make_shared<std::vector<float>>(size, 0);
     }
@@ -150,12 +150,12 @@ std::shared_ptr<std::vector<float> > interpolate(
         int w, int h, const int nsize,
         std::shared_ptr<std::vector<float>> out_image) {
 
-    int size = w*h;
+    uint size = w*h;
     if(out_image == nullptr || out_image->size() != size) {
         out_image = std::make_shared<std::vector<float>>(size, 0);
     }
 
-    float * img = &out_image->at(0);
+    //float * img = &out_image->at(0);
 
     // Calculate the gradient magnitude
     for(int x = 0; x < w; x++){
@@ -229,7 +229,7 @@ std::shared_ptr<std::vector<float> > stdev_dist(std::shared_ptr<PointCloud> clou
 
 
 std::shared_ptr<std::vector<float>> cloudToGrid(const std::vector<int> &map,
-        int img_size,
+        uint img_size,
         std::shared_ptr<std::vector<float>> input,
         std::shared_ptr<std::vector<float>> img) {
 
@@ -244,7 +244,7 @@ std::shared_ptr<std::vector<float>> cloudToGrid(const std::vector<int> &map,
     return img;
 }
 
-std::shared_ptr<std::vector<Eigen::Vector3f> > getHist(std::shared_ptr<PointCloud> cloud, double radius, int max_nn) {
+std::shared_ptr<std::vector<Eigen::Vector3f> > getHist(std::shared_ptr<PointCloud> cloud, double radius, uint max_nn) {
 
     std::shared_ptr<std::vector<Eigen::Vector3f> > eigen_vals =
             std::make_shared<std::vector<Eigen::Vector3f>>(cloud->size());
@@ -305,7 +305,7 @@ std::shared_ptr<std::vector<Eigen::Vector3f> > getHist(std::shared_ptr<PointClou
     return eigen_vals;
 }
 
-std::shared_ptr<std::vector<Eigen::Vector3f> > getPCA(std::shared_ptr<PointCloud> cloud, double radius, int max_nn) {
+std::shared_ptr<std::vector<Eigen::Vector3f> > getPCA(std::shared_ptr<PointCloud> cloud, double radius, uint max_nn) {
 
     std::shared_ptr<std::vector<Eigen::Vector3f> > eigen_vals =
             std::make_shared<std::vector<Eigen::Vector3f>>(cloud->size());

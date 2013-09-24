@@ -114,7 +114,7 @@ pcl::PointCloud<pcl::PointXYZINormal>::Ptr zipNormals(
 }
 
 template <typename T>
-void map(T & small, T& big, int big_size, std::vector<int> & map){
+void map(T & small, T& big, uint big_size, std::vector<int> & map){
     big.resize(big_size);
     for(uint i = 0; i < big_size; i++) {
         int small_idx = map[i];
@@ -598,9 +598,9 @@ void VDepth::fpfh_vis(){
     qDebug() << "resized";
 
     for(uint i = 0; i < _cloud->size(); i++) {
-        int idx = sub_idxs[i];
+        uint idx = sub_idxs[i];
 
-        if(idx != -1 && idx < fpfhs->size())
+        if(idx != -1u && idx < fpfhs->size())
             (*fpfhs2)[i] = (*fpfhs)[idx];
     }
 
@@ -743,7 +743,7 @@ void VDepth::curve_vis(){
     std::shared_ptr<std::vector<float>> diffs = std::make_shared<std::vector<float>>(w*h, 0.0f);
 
 
-    auto distfunc = EuclidianDist;
+    //auto distfunc = EuclidianDist;
 
     auto maxval = [] (float * array, int size) {
         float max = FLT_MIN;
@@ -989,8 +989,8 @@ void VDepth::myFunc(){
     std::shared_ptr<PointCloud> cloud = core_->cl_->active_;
     if(cloud == nullptr)
         return;
-    int h = cloud->scan_width();
-    int w = cloud->scan_height();
+    //int h = cloud->scan_width();
+    //int w = cloud->scan_height();
 
     std::shared_ptr<const std::vector<int>> grid_to_cloud = cloud->gridToCloudMap();
 

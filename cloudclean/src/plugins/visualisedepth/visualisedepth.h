@@ -36,6 +36,10 @@ class VDepth : public IPlugin {
     void drawVector3f(std::shared_ptr<const std::vector<Eigen::Vector3f> > out_img, std::shared_ptr<PointCloud> cloud);
 
     pcl::PointCloud<pcl::PointXYZINormal>::Ptr octreeDownsample(std::shared_ptr<PointCloud> input, float resolution, std::vector<int>& sub_idxs);
+    pcl::PointCloud<pcl::PointXYZI>::Ptr octreeDownsample(pcl::PointCloud<pcl::PointXYZI> *input,
+            float resolution,
+            std::vector<int>& sub_idxs);
+
     pcl::PointCloud<pcl::PointXYZINormal>::Ptr gridDownsample(std::shared_ptr<PointCloud> input, float resolution, std::vector<int>& sub_idxs);
 
  private slots:
@@ -46,6 +50,7 @@ class VDepth : public IPlugin {
     void normalnoise();
     void dist_stdev();
     void sutract_lowfreq_noise();
+    void eigen_ratio();
     void pca();
     void sobel_erode();
     void sobel_blur();

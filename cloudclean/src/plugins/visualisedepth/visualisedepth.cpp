@@ -60,7 +60,7 @@ void VDepth::initialize(Core *core){
     connect(myaction_,&QAction::triggered, [this] (bool on) {
         qDebug() << "Click!";
     });
-    connect(myaction_, SIGNAL(triggered()), this, SLOT(don_vis()));
+    connect(myaction_, SIGNAL(triggered()), this, SLOT(eigen_ratio()));
     mw_->toolbar_->addAction(myaction_);
 
 }
@@ -378,6 +378,55 @@ pcl::PointCloud<pcl::PointXYZINormal>::Ptr VDepth::octreeDownsample(
     return output;
 
 }
+
+pcl::PointCloud<pcl::PointXYZI>::Ptr VDepth::octreeDownsample(
+        pcl::PointCloud<pcl::PointXYZI> * input,
+        float resolution,
+        std::vector<int>& sub_idxs){
+
+    QTime t; t.start();
+    /////////////////////////
+
+    pcl::PointCloud<pcl::PointXYZI>::Ptr output(new pcl::PointCloud<pcl::PointXYZI>());
+    sub_idxs.resize(input->size(), 0);
+
+    pcl::octree::OctreePointCloud<pcl::PointXYZI> octree1(resolution);
+    pcl::PointCloud<pcl::PointXYZI>::ConstPtr cptr(input, boost::serialization::null_deleter());
+    octree1.setInputCloud (cptr);
+    octree1.addPointsFromInputCloud();
+
+    pcl::octree::OctreePointCloud<pcl::PointXYZI>::LeafNodeIterator it1;
+    pcl::octree::OctreePointCloud<pcl::PointXYZI>::LeafNodeIterator it1_end = octree1.leaf_end();
+
+    //std::vector<int> indices;
+    unsigned int leafNodeCounter = 0;
+
+    for (it1 = octree1.leaf_begin(); it1 != it1_end; ++it1) {
+        std::vector<int> & indices = it1.getLeafContainer().getPointIndicesVector();
+
+        pcl::PointXYZI p;
+
+        for(int idx : indices){
+            pcl::PointXYZI & p1 = (*input)[idx];
+            p.getVector4fMap() += p1.getVector4fMap();
+            p.intensity+=p1.intensity;
+            sub_idxs[idx] = output->size();
+        }
+
+        float size_inv = 1.0/indices.size();
+
+        p.getVector4fMap()*=size_inv;
+        p.intensity*=size_inv;
+        output->push_back(p);
+
+        leafNodeCounter++;
+    }
+
+    /////////////////////////
+    time = t.elapsed();
+    return output;
+}
+
 
 template<typename PointT, typename NormalT>
 pcl::PointCloud<pcl::Normal>::Ptr don(pcl::PointCloud<PointT> & cloud,
@@ -858,6 +907,62 @@ void VDepth::sutract_lowfreq_noise(){
     drawFloats(highfreq, cloud);
 }
 
+void VDepth::eigen_ratio(){
+    std::shared_ptr<PointCloud> cloud = core_->cl_->active_;
+    if(cloud == nullptr)
+        return;
+    int h = cloud->scan_width();
+    int w = cloud->scan_height();
+
+
+
+    // Downsample
+    pcl::PointCloud<pcl::PointXYZI>::Ptr smaller_cloud;
+    std::vector<int> sub_idxs;
+    smaller_cloud = octreeDownsample(cloud.get(), 0.01, sub_idxs);
+
+
+    std::shared_ptr<std::vector<Eigen::Vector3f> > pca = getPCA(smaller_cloud.get(), 0.05f, 0);
+
+    std::shared_ptr<std::vector<float>> likely_veg =
+               std::make_shared<std::vector<float>>(pca->size(), 0.0f);
+
+    for(uint i = 0; i < pca->size(); i++) {
+        Eigen::Vector3f val = (*pca)[i];
+
+        // Not enough neighbours
+        if(val[1] < val[2]) {
+            (*likely_veg)[i] = 0;
+            continue;
+        }
+
+        val /= val[0];
+
+        float fudge_factor = 4.0f;
+        if(val[1] < 0.05 * fudge_factor || val[2] < 0.01 * fudge_factor) {
+            (*likely_veg)[i] = 0;
+        } else {
+            (*likely_veg)[i] = 1;
+        }
+
+    }
+
+
+    std::shared_ptr<std::vector<float>> likely_veg2 =
+               std::make_shared<std::vector<float>>(cloud->size(), 0.0f);
+
+
+    for(uint i = 0; i < cloud->size(); i++) {
+        uint subidx = sub_idxs[i];
+        (*likely_veg2)[i] = (*likely_veg)[subidx];
+    }
+
+
+    std::shared_ptr<const std::vector<float>> img = cloudToGrid(cloud->cloudToGridMap(), w*h, likely_veg2);
+
+    drawFloats(img, cloud);
+}
+
 void VDepth::pca(){
     qDebug() << "Myfunc";
     std::shared_ptr<PointCloud> cloud = core_->cl_->active_;
@@ -866,7 +971,7 @@ void VDepth::pca(){
     int h = cloud->scan_width();
     int w = cloud->scan_height();
 
-    std::shared_ptr<std::vector<Eigen::Vector3f> > pca = getPCA(cloud, 0.05f, 20);
+    std::shared_ptr<std::vector<Eigen::Vector3f> > pca = getPCA(cloud.get(), 0.05f, 20);
 
     std::shared_ptr<std::vector<float>> plane_likelyhood =
                std::make_shared<std::vector<float>>(pca->size(), 0.0f);
@@ -994,7 +1099,7 @@ void VDepth::myFunc(){
 
     std::shared_ptr<const std::vector<int>> grid_to_cloud = cloud->gridToCloudMap();
 
-    std::shared_ptr<std::vector<Eigen::Vector3f> > pca = getPCA(cloud, 1.0f, 50);
+    std::shared_ptr<std::vector<Eigen::Vector3f> > pca = getPCA(cloud.get(), 1.0f, 50);
 
     std::shared_ptr<std::vector<Eigen::Vector3f> > grid = std::make_shared<std::vector<Eigen::Vector3f> >(grid_to_cloud->size(), Eigen::Vector3f(0.0f, 0.0f, 0.0f));
     for(uint i = 0; i < grid_to_cloud->size(); i++) {

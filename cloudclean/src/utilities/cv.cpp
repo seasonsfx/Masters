@@ -305,7 +305,7 @@ std::shared_ptr<std::vector<Eigen::Vector3f> > getHist(std::shared_ptr<PointClou
     return eigen_vals;
 }
 
-std::shared_ptr<std::vector<Eigen::Vector3f> > getPCA(std::shared_ptr<PointCloud> cloud, double radius, uint max_nn) {
+std::shared_ptr<std::vector<Eigen::Vector3f> > getPCA(pcl::PointCloud<pcl::PointXYZI> * cloud, double radius, uint max_nn) {
 
     std::shared_ptr<std::vector<Eigen::Vector3f> > eigen_vals =
             std::make_shared<std::vector<Eigen::Vector3f>>(cloud->size());
@@ -313,7 +313,8 @@ std::shared_ptr<std::vector<Eigen::Vector3f> > getPCA(std::shared_ptr<PointCloud
     //GridSearch search(*cloud);
     //pcl::search::FlannSearch<pcl::PointXYZI> search;
     pcl::KdTreeFLANN<pcl::PointXYZI> search;
-    search.setInputCloud(pcl::PointCloud<pcl::PointXYZI>::ConstPtr(cloud.get(), boost::serialization::null_deleter()));
+    pcl::PointCloud<pcl::PointXYZI>::ConstPtr cptr(cloud, boost::serialization::null_deleter());
+    search.setInputCloud(cptr);
 
 
     QTime total;
@@ -344,7 +345,7 @@ std::shared_ptr<std::vector<Eigen::Vector3f> > getPCA(std::shared_ptr<PointCloud
 
         search.radiusSearch(i, radius, *kIdxs, kDist, max_nn);
 
-        if(kIdxs->size() > max_nn){
+        if(kIdxs->size() > max_nn && max_nn > 0){
             qDebug() << "Whoops! Too many";
             continue;
         }
@@ -356,8 +357,7 @@ std::shared_ptr<std::vector<Eigen::Vector3f> > getPCA(std::shared_ptr<PointCloud
         }
 
         pcl::PCA<pcl::PointXYZI> pcEstimator(true);
-        pcl::PointCloud<pcl::PointXYZI>::ConstPtr const_cloud(cloud.get(), boost::serialization::null_deleter());
-        pcEstimator.setInputCloud (const_cloud);
+        pcEstimator.setInputCloud (cptr);
         pcEstimator.setIndices(kIdxs);
         (*eigen_vals)[i] = pcEstimator.getEigenValues();
 

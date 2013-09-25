@@ -63,7 +63,7 @@ UTIL_API std::shared_ptr<std::vector<float>> cloudToGrid(const std::vector<int> 
         std::shared_ptr<std::vector<float>> img = nullptr);
 
 UTIL_API std::shared_ptr<std::vector<Eigen::Vector3f> > getHist(std::shared_ptr<PointCloud> cloud, double radius, uint max_nn = 0);
-UTIL_API std::shared_ptr<std::vector<Eigen::Vector3f> > getPCA(std::shared_ptr<PointCloud> cloud, double radius, uint max_nn = 0);
+UTIL_API std::shared_ptr<std::vector<Eigen::Vector3f> > getPCA(pcl::PointCloud<pcl::PointXYZI> *, double radius, uint max_nn = 0);
 
 UTIL_API std::shared_ptr<std::vector<float> > normal_stdev(std::shared_ptr<PointCloud> cloud,
                   pcl::PointCloud<pcl::Normal>::Ptr normals,

@@ -7,6 +7,12 @@
 #include "pluginsystem/iplugin.h"
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
+#include <pcl/io/io.h>
+
+#include <pcl/octree/octree.h>
+#include <pcl/octree/octree_iterator.h>
+#include <pcl/octree/octree_container.h>
+#include <boost/serialization/shared_ptr.hpp>
 
 class PointCloud;
 class QAction;
@@ -35,10 +41,61 @@ class VDepth : public IPlugin {
     void drawFloats(std::shared_ptr<const std::vector<float> > out_img, std::shared_ptr<PointCloud> cloud);
     void drawVector3f(std::shared_ptr<const std::vector<Eigen::Vector3f> > out_img, std::shared_ptr<PointCloud> cloud);
 
-    pcl::PointCloud<pcl::PointXYZINormal>::Ptr octreeDownsample(std::shared_ptr<PointCloud> input, float resolution, std::vector<int>& sub_idxs);
-    pcl::PointCloud<pcl::PointXYZI>::Ptr octreeDownsample(pcl::PointCloud<pcl::PointXYZI> *input,
+    pcl::PointCloud<pcl::PointXYZINormal>::Ptr octreeDownsample(
+            std::shared_ptr<PointCloud> input,
+            float resolution, std::vector<int> & sub_idxs);
+
+
+    // Templated version
+    template <typename PointT>
+    typename pcl::PointCloud<PointT>::Ptr octreeDownsample(
+            pcl::PointCloud<PointT> * input,
             float resolution,
-            std::vector<int>& sub_idxs);
+            std::vector<int> & sub_idxs) {
+
+        size_t data_items = sizeof(PointT)/sizeof(float);
+
+        typename pcl::PointCloud<PointT>::Ptr output(new pcl::PointCloud<PointT>());
+        sub_idxs.resize(input->size(), 0);
+
+        typename pcl::PointCloud<PointT>::Ptr ptr(input, boost::serialization::null_deleter());
+
+        typename pcl::octree::OctreePointCloud<PointT> octree1(resolution);
+        octree1.setInputCloud (ptr);
+        octree1.addPointsFromInputCloud();
+
+        typename pcl::octree::OctreePointCloud<PointT>::LeafNodeIterator it1;
+        typename pcl::octree::OctreePointCloud<PointT>::LeafNodeIterator it1_end = octree1.leaf_end();
+
+        unsigned int leafNodeCounter = 0;
+
+
+        for (it1 = octree1.leaf_begin(); it1 != it1_end; ++it1) {
+            std::vector<int> & indices = it1.getLeafContainer().getPointIndicesVector();
+
+            PointT p;
+            Eigen::Map<Eigen::VectorXf> pmap = Eigen::VectorXf::Map(&p.data[0], data_items);
+
+            for(int idx : indices){
+
+                auto & array = *input;
+                Eigen::Map<Eigen::VectorXf> pmap1 = Eigen::VectorXf::Map(&(array[idx].data[0]), data_items);
+                pmap += pmap1;
+                sub_idxs[idx] = output->size();
+
+            }
+
+            float size_inv = 1.0/indices.size();
+
+            pmap*=size_inv;
+            output->push_back(p);
+
+            leafNodeCounter++;
+        }
+
+        return output;
+
+    }
 
     pcl::PointCloud<pcl::PointXYZINormal>::Ptr gridDownsample(std::shared_ptr<PointCloud> input, float resolution, std::vector<int>& sub_idxs);
 

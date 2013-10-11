@@ -33,7 +33,6 @@ class ${camel_name} : public IPlugin {
     MainWindow * mw_;
 
     QAction * myaction;
-    QWidget * settings_;
 };
 
 #endif  // ${upper_name}_H

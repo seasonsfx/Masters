@@ -11,7 +11,10 @@
 #include <pcl/filters/voxel_grid.h>
 #include <pcl/io/pcd_io.h>
 #include <pcl/features/principal_curvatures.h>
-
+#include <pcl/octree/octree.h>
+#include <pcl/octree/octree_iterator.h>
+#include <pcl/octree/octree_container.h>
+#include <boost/serialization/shared_ptr.hpp>
 
 #include "model/layerlist.h"
 #include "model/cloudlist.h"
@@ -21,6 +24,7 @@
 #include "commands/select.h"
 #include "pluginsystem/core.h"
 #include "utilities/cv.h"
+#include "utilities/filters.h"
 #include "plugins/normalestimation/normalestimation.h"
 #include "plugins/visualisedepth/utils.h"
 
@@ -110,14 +114,6 @@ pcl::PointCloud<pcl::PointXYZINormal>::Ptr zipNormals(
     return zipped;
 }
 
-template <typename T>
-void map(T & small, T& big, uint big_size, std::vector<int> & map){
-    big.resize(big_size);
-    for(uint i = 0; i < big_size; i++) {
-        int small_idx = map[i];
-        big[i].getNormalVector4fMap() = small[small_idx].getNormalVector4fMap();
-    }
-}
 
 void VDepth::drawFloats(std::shared_ptr<const std::vector<float> > out_img, std::shared_ptr<PointCloud> cloud){
     qDebug() << "DRAW!";
@@ -314,7 +310,7 @@ pcl::PointCloud<pcl::PointXYZINormal>::Ptr VDepth::gridDownsample(std::shared_pt
 
 }
 
-pcl::PointCloud<pcl::PointXYZINormal>::Ptr VDepth::octreeDownsample(
+pcl::PointCloud<pcl::PointXYZINormal>::Ptr VDepth::downsample(
         std::shared_ptr<PointCloud> input,
         float resolution,
         std::vector<int>& sub_idxs){
@@ -331,14 +327,8 @@ pcl::PointCloud<pcl::PointXYZINormal>::Ptr VDepth::octreeDownsample(
     // Zipper up normals and xyzi
     pcl::PointCloud<pcl::PointXYZINormal>::Ptr cloud = zipNormals(*input, *normals);
 
-    QTime t; t.start();
-    /////////////////////////
-
-
     pcl::PointCloud<pcl::PointXYZINormal>::Ptr output = octreeDownsample(cloud.get(), resolution, sub_idxs);
 
-    /////////////////////////
-    time = t.elapsed();
     return output;
 
 }
@@ -407,13 +397,13 @@ void VDepth::don_vis(){
     // Downsample
     pcl::PointCloud<pcl::PointXYZINormal>::Ptr smaller_cloud;
     std::vector<int> sub_idxs;
-    smaller_cloud = octreeDownsample(_cloud, res1, sub_idxs);
+    smaller_cloud = downsample(_cloud, res1, sub_idxs);
 
     pcl::PointCloud<pcl::Normal>::Ptr donormals = don(*smaller_cloud, *smaller_cloud, res1, res2);
 
     pcl::PointCloud<pcl::Normal> big_donormals;
 
-    map(*donormals, big_donormals, normals->size(), sub_idxs);
+    map((*donormals).points, big_donormals.points, sub_idxs);
 
     const std::vector<int> & cloudtogrid = _cloud->cloudToGridMap();
 
@@ -433,7 +423,7 @@ void VDepth::hist_vis(){
 
     pcl::PointCloud<pcl::PointXYZINormal>::Ptr filt_cloud;
     std::vector<int> sub_idxs;
-    filt_cloud = octreeDownsample(_cloud, 0.01, sub_idxs);
+    filt_cloud = downsample(_cloud, 0.01, sub_idxs);
 
 
     int bins = 20;
@@ -537,7 +527,7 @@ void VDepth::fpfh_vis(){
 
     pcl::PointCloud<pcl::PointXYZINormal>::Ptr filt_cloud;
     std::vector<int> sub_idxs;
-    filt_cloud = octreeDownsample(_cloud, 0.1, sub_idxs);
+    filt_cloud = downsample(_cloud, 0.1, sub_idxs);
 
 
     // FPFH
@@ -643,7 +633,7 @@ void VDepth::curve_vis(){
 
     pcl::PointCloud<pcl::PointXYZINormal>::Ptr filt_cloud;
     std::vector<int> sub_idxs;
-    filt_cloud = octreeDownsample(_cloud, 0.1, sub_idxs);
+    filt_cloud = downsample(_cloud, 0.1, sub_idxs);
 
 
     //pcl::io::savePCDFileASCII ("test_pcd.pcd", *filt_cloud);

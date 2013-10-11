@@ -10,6 +10,7 @@ class LayerList;
 class FlatView;
 class GLWidget;
 class MainWindow;
+class Picker;
 
 class Markov : public IPlugin {
     Q_INTERFACES(IPlugin)
@@ -19,10 +20,19 @@ class Markov : public IPlugin {
     QString getName();
     void initialize(Core * core);
     void cleanup();
+
     ~Markov();
 
- private slots:
-    void myFunc();
+ private:
+    void graphcut(int idx);
+
+ signals:
+    void enabling();
+
+ public slots:
+    void enable();
+    void disable();
+
 
  private:
     Core * core_;
@@ -32,8 +42,12 @@ class Markov : public IPlugin {
     FlatView * flatview_;
     MainWindow * mw_;
 
-    QAction * myaction;
-    QWidget * settings_;
+    Picker * picker_;
+
+    QAction * enable_;
+    bool enabled_;
+
+    int fg_idx_;
 };
 
 #endif  // MARKOV_H

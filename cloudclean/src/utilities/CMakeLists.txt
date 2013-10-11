@@ -15,6 +15,6 @@ target_link_libraries(
     cloudclean_model
 )
 
-QT5_USE_MODULES(cloudclean_util Core Gui)
+QT5_USE_MODULES(cloudclean_util Core Gui OpenGL)
 
 INSTALL(TARGETS cloudclean_util DESTINATION ${LIB_INSTALL} COMPONENT CloudClean)

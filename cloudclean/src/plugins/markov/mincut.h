@@ -125,24 +125,24 @@ public:
     setNumberOfNeighbours (unsigned int neighbour_number);
 
     /** \brief Returns the points that must belong to foreground. */
-    std::vector<pcl::PointXYZI, Eigen::aligned_allocator<pcl::PointXYZI> >
+    std::vector<int>
     getForegroundPoints () const;
 
     /** \brief Allows to specify points which are known to be the points of the object.
     * \param[in] foreground_points point cloud that contains foreground points. At least one point must be specified.
     */
     void
-    setForegroundPoints ( pcl::PointCloud<pcl::PointXYZI>::Ptr foreground_points);
+    setForegroundPoints (std::vector<int> &foreground_points);
 
     /** \brief Returns the points that must belong to background. */
-    std::vector<pcl::PointXYZI, Eigen::aligned_allocator<pcl::PointXYZI> >
+    std::vector<int>
     getBackgroundPoints () const;
 
     /** \brief Allows to specify points which are known to be the points of the background.
     * \param[in] background_points point cloud that contains background points.
     */
     void
-    setBackgroundPoints ( pcl::PointCloud<pcl::PointXYZI>::Ptr background_points);
+    setBackgroundPoints (std::vector<int> &background_points);
 
     /** \brief This method launches the segmentation algorithm and returns the clusters that were
     * obtained during the segmentation. The indices of points that belong to the object will be stored
@@ -212,11 +212,6 @@ public:
     */
     void
     assembleLabels (ResidualCapacityMap& residual_capacity);
-
-
-    /*void
-    setHorisontalRadius(bool val);
-    */
 
 /////////////////////////////////
 
@@ -316,10 +311,10 @@ public:
     bool graph_is_valid_;
 
     /** \brief Stores the points that are known to be in the foreground. */
-    std::vector<pcl::PointXYZI, Eigen::aligned_allocator<pcl::PointXYZI> > foreground_points_;
+    std::vector<int> foreground_points_;
 
     /** \brief Stores the points that are known to be in the background. */
-    std::vector<pcl::PointXYZI, Eigen::aligned_allocator<pcl::PointXYZI> > background_points_;
+    std::vector<int> background_points_;
 
     /** \brief After the segmentation it will contain the segments. */
     std::vector <pcl::PointIndices> clusters_;
@@ -347,8 +342,6 @@ public:
 
     /** \brief Stores the maximum flow value that was calculated during the segmentation. */
     double max_flow_;
-
-    bool horisonal_radius_;
 
     public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW

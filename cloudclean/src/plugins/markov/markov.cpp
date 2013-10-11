@@ -89,11 +89,12 @@ void Markov::disable() {
 void Markov::graphcut(int idx){
     qDebug() << "Myfunc";
 
-    if(fg_idx_ = -1) {
+    if(fg_idx_ == -1) {
         fg_idx_ = idx;
         QMessageBox::information(nullptr, tr("Select background"),
                         tr("Select background"),
                         QMessageBox::Ok, QMessageBox::Ok);
+        return;
     }
 
     std::shared_ptr<PointCloud> cloud = core_->cl_->active_;
@@ -109,12 +110,11 @@ void Markov::graphcut(int idx){
     MinCut mc;
     mc.setInputCloud(smaller_cloud);
 
-    pcl::PointCloud<pcl::PointXYZI>::Ptr foreground_points(new pcl::PointCloud<pcl::PointXYZI> ());
-    foreground_points->points.push_back(cl_->active_->points[fg_idx_]);
+    std::vector<int> foreground_points;
+    foreground_points.push_back(big_to_small_map[fg_idx_]);
 
-
-    pcl::PointCloud<pcl::PointXYZI>::Ptr background_points(new pcl::PointCloud<pcl::PointXYZI> ());
-    background_points->points.push_back(cl_->active_->points[idx]);
+    std::vector<int> background_points;
+    background_points.push_back(big_to_small_map[idx]);
 
     double radius = 3.0;
     double sigma = 0.25;
@@ -140,7 +140,7 @@ void Markov::graphcut(int idx){
         small_idxs_selected[idx] = true;
     }
 
-    for(int i = 0; i < big_to_small_map.size(); i++) {
+    for(uint i = 0; i < big_to_small_map.size(); i++) {
         int idx = big_to_small_map[i];
         if(small_idxs_selected[idx]) {
             select->push_back(i);

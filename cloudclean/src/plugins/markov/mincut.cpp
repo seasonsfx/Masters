@@ -30,8 +30,7 @@ MinCut::MinCut () :
   edge_marker_ (0),
   source_ (),/////////////////////////////////
   sink_ (),///////////////////////////////////
-  max_flow_ (0.0),
-  horisonal_radius_(false)
+  max_flow_ (0.0)
 {
 }
 
@@ -268,39 +267,37 @@ MinCut::setNumberOfNeighbours (unsigned int neighbour_number)
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
- std::vector<pcl::PointXYZI, Eigen::aligned_allocator<pcl::PointXYZI> >
-MinCut::getForegroundPoints () const
+ std::vector<int> MinCut::getForegroundPoints() const
 {
   return (foreground_points_);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
  void
-MinCut::setForegroundPoints ( pcl::PointCloud<pcl::PointXYZI>::Ptr foreground_points)
+MinCut::setForegroundPoints (std::vector<int> & foreground_points)
 {
   foreground_points_.clear ();
-  foreground_points_.reserve (foreground_points->points.size ());
-  for (size_t i_point = 0; i_point < foreground_points->points.size (); i_point++)
-    foreground_points_.push_back (foreground_points->points[i_point]);
+  foreground_points_.reserve (foreground_points.size ());
+  for (size_t i_point = 0; i_point < foreground_points.size (); i_point++)
+    foreground_points_.push_back (foreground_points[i_point]);
 
   unary_potentials_are_valid_ = false;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
- std::vector<pcl::PointXYZI, Eigen::aligned_allocator<pcl::PointXYZI> >
-MinCut::getBackgroundPoints () const
+ std::vector<int> MinCut::getBackgroundPoints() const
 {
   return (background_points_);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
  void
-MinCut::setBackgroundPoints ( pcl::PointCloud<pcl::PointXYZI>::Ptr background_points)
+MinCut::setBackgroundPoints (std::vector<int> & background_points)
 {
   background_points_.clear ();
-  background_points_.reserve (background_points->points.size ());
-  for (size_t i_point = 0; i_point < background_points->points.size (); i_point++)
-    background_points_.push_back (background_points->points[i_point]);
+  background_points_.reserve (background_points.size ());
+  for (size_t i_point = 0; i_point < background_points.size (); i_point++)
+    background_points_.push_back (background_points[i_point]);
 
   unary_potentials_are_valid_ = false;
 }
@@ -483,63 +480,34 @@ MinCut::calculateUnaryPotential (int point, double& source_weight, double& sink_
 {
   // Given an abritrary point in the cloud.
 
-  double min_dist_to_foreground = std::numeric_limits<double>::max ();
-  double closest_foreground_point[2];
-  closest_foreground_point[0] = closest_foreground_point[1] = 0; // initial closest point is the first point?
+  // Pin fg and bg points to the source and sink
 
-  double initial_point[] = {0.0, 0.0};
-  initial_point[0] = input_->points[point].x;
-  initial_point[1] = input_->points[point].y;
-
-  // Finding the closest foreground point to it
-  for (size_t i_point = 0; i_point < foreground_points_.size (); i_point++)
-  {
-    double dist = 0.0;
-    dist += (foreground_points_[i_point].x - initial_point[0]) * (foreground_points_[i_point].x - initial_point[0]);
-    dist += (foreground_points_[i_point].y - initial_point[1]) * (foreground_points_[i_point].y - initial_point[1]);
-
-    if (min_dist_to_foreground > dist)
-    {
-      min_dist_to_foreground = dist;
-      closest_foreground_point[0] = foreground_points_[i_point].x;
-      closest_foreground_point[1] = foreground_points_[i_point].y;
-    }
+  // Is this point a foreground point
+  for (int fgp : foreground_points_) {
+      if(fgp == point){
+          sink_weight = 0;
+          source_weight = std::numeric_limits<double>::max ();
+          return;
+      }
   }
 
+  // Is this point a background point
+  for (int bgp : background_points_) {
+      if(bgp == point){
+          sink_weight = std::numeric_limits<double>::max ();
+          source_weight = 0;
+          return;
+      }
+  }
+
+  // If the point is not pinnned
 
   // Apply background penalty
-  sink_weight = pow (min_dist_to_foreground / radius_, 0.5);
+  sink_weight = 0.5;
 
   // Apply forground penalty
-  source_weight = source_weight_;
+  source_weight = 0.5;
   return;
-/*
-  if (background_points_.size () == 0)
-    return;
-
-  for (int i_point = 0; i_point < background_points_.size (); i_point++)
-  {
-    double dist = 0.0;
-    dist += (background_points_[i_point].x - initial_point[0]) * (background_points_[i_point].x - initial_point[0]);
-    dist += (background_points_[i_point].y - initial_point[1]) * (background_points_[i_point].y - initial_point[1]);
-    if (min_dist_to_background > dist)
-    {
-      min_dist_to_background = dist;
-      closest_background_point[0] = background_points_[i_point].x;
-      closest_background_point[1] = background_points_[i_point].y;
-    }
-  }
-
-  if (min_dist_to_background <= epsilon_)
-  {
-    source_weight = 0.0;
-    sink_weight = 1.0;
-    return;
-  }
-
-  source_weight = 1.0 / (1.0 + pow (min_dist_to_background / min_dist_to_foreground, 0.5));
-  sink_weight = 1 - source_weight;
-*/
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -573,6 +541,7 @@ MinCut::addEdge (int source, int target, double weight)
  double
 MinCut::calculateBinaryPotential (int source, int target) const
 {
+  /*
   double weight = 0.0;
   double distance = 0.0;
   distance += (input_->points[source].x - input_->points[target].x) * (input_->points[source].x - input_->points[target].x);
@@ -582,6 +551,8 @@ MinCut::calculateBinaryPotential (int source, int target) const
   weight = exp (-distance);
 
   return (weight);
+  */
+  return 1.0;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -782,7 +753,3 @@ MinCut::initCompute ()
    }
    return (true);
  }
-
- /*MinCut::setHorisontalRadius(bool val){
-     horisonal_radius_ = val;
- }*/

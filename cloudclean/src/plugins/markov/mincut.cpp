@@ -485,8 +485,9 @@ MinCut::calculateUnaryPotential (int point, double& source_weight, double& sink_
   // Is this point a foreground point
   for (int fgp : foreground_points_) {
       if(fgp == point){
-          sink_weight = 0;
-          source_weight = std::numeric_limits<double>::max ();
+          sink_weight = 0.4;
+          //source_weight = std::numeric_limits<double>::max ();
+          source_weight = 0.6;
           return;
       }
   }
@@ -494,8 +495,9 @@ MinCut::calculateUnaryPotential (int point, double& source_weight, double& sink_
   // Is this point a background point
   for (int bgp : background_points_) {
       if(bgp == point){
-          sink_weight = std::numeric_limits<double>::max ();
-          source_weight = 0;
+          //sink_weight = std::numeric_limits<double>::max ();
+          sink_weight = 0.6;
+          source_weight = 0.4;
           return;
       }
   }
@@ -507,6 +509,7 @@ MinCut::calculateUnaryPotential (int point, double& source_weight, double& sink_
 
   // Apply forground penalty
   source_weight = 0.5;
+
   return;
 }
 
@@ -541,18 +544,18 @@ MinCut::addEdge (int source, int target, double weight)
  double
 MinCut::calculateBinaryPotential (int source, int target) const
 {
-  /*
+
   double weight = 0.0;
   double distance = 0.0;
-  distance += (input_->points[source].x - input_->points[target].x) * (input_->points[source].x - input_->points[target].x);
-  distance += (input_->points[source].y - input_->points[target].y) * (input_->points[source].y - input_->points[target].y);
-  distance += (input_->points[source].z - input_->points[target].z) * (input_->points[source].z - input_->points[target].z);
+  const pcl::PointXYZI & s = input_->points[source];
+  const pcl::PointXYZI & t = input_->points[target];
+  distance = (s.getVector3fMap() - t.getVector3fMap()).squaredNorm();
   distance *= inverse_sigma_;
-  weight = exp (-distance);
+  weight = exp(-distance);
 
   return (weight);
-  */
-  return 1.0;
+
+  //return 0.1;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

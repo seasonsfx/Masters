@@ -854,6 +854,35 @@ void VDepth::eigen_ratio(){
 
     }
 
+    // 2nd check
+    pca = getPCA(smaller_cloud.get(), 0.1f, 0);
+
+    for(uint i = 0; i < pca->size(); i++) {
+        if((*likely_veg)[i] == 0)
+            continue;
+
+        Eigen::Vector3f eig = (*pca)[i];
+
+        // Not enough neighbours
+        if(eig[1] < eig[2]) {
+            (*likely_veg)[i] = 0;
+            continue;
+        }
+
+        float eig_sum = eig.sum();
+
+        eig /= eig_sum;
+
+        float fudge_factor = 5.0f;
+        if(eig[1] < 0.05 * fudge_factor || eig[2] < 0.01 * fudge_factor) {
+            (*likely_veg)[i] = 0;
+        } else {
+            (*likely_veg)[i] = 1;
+        }
+
+    }
+
+
 
     std::shared_ptr<std::vector<float>> likely_veg2 =
                std::make_shared<std::vector<float>>(cloud->size(), 0.0f);

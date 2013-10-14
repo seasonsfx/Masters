@@ -35,9 +35,10 @@ void Markov::initialize(Core *core){
 
     connect(enable_,&QAction::triggered, [this] (bool on) {
         qDebug() << "Click!";
+        graphcut();
     });
 
-    connect(enable_, SIGNAL(triggered()), this, SLOT(enable()));
+    //connect(enable_, SIGNAL(triggered()), this, SLOT(graphcut()));
 
     mw_->toolbar_->addAction(enable_);
     std::function<void(int)> func = std::bind(&Markov::graphcut, this, std::placeholders::_1);
@@ -141,19 +142,14 @@ void Markov::graphcut(int idx){
     std::vector<int> big_to_small_map;
     smaller_cloud = octreeDownsample(cloud.get(), 0.1, big_to_small_map);
 
-    std::vector<int> foreground_points;
-
-    std::set<int> seen_idxs;
+    std::set<int> foreground_points;
 
     // Map veg to foreground points in 2nd downsampled cloud
     for(uint i = 0; i < cloud->size(); i++) {
         uint pca_idx = pca_idxs[i];
         if(likely_veg[pca_idx] == true){
             uint small_idx = big_to_small_map[i];
-            bool not_duplicate = seen_idxs.insert(small_idx).second;
-
-            if(not_duplicate)
-                foreground_points.push_back(small_idx);
+            foreground_points.insert(small_idx);
         }
     }
 

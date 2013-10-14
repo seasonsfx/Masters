@@ -20,8 +20,8 @@ MinCut::MinCut () :
   search_ (),
   number_of_neighbours_ (14),
   graph_is_valid_ (false),
-  foreground_points_ (0),
-  background_points_ (0),
+  //foreground_points_ (0),
+  //background_points_ (0),
   clusters_ (0),
   graph_ (),
   capacity_ (),
@@ -267,37 +267,35 @@ MinCut::setNumberOfNeighbours (unsigned int neighbour_number)
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
- std::vector<int> MinCut::getForegroundPoints() const
+ std::set<int> MinCut::getForegroundPoints() const
 {
   return (foreground_points_);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
  void
-MinCut::setForegroundPoints (std::vector<int> & foreground_points)
+MinCut::setForegroundPoints (std::set<int> &foreground_points)
 {
   foreground_points_.clear ();
-  foreground_points_.reserve (foreground_points.size ());
-  for (size_t i_point = 0; i_point < foreground_points.size (); i_point++)
-    foreground_points_.push_back (foreground_points[i_point]);
+  for (int i : foreground_points)
+    foreground_points_.insert(i);
 
   unary_potentials_are_valid_ = false;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
- std::vector<int> MinCut::getBackgroundPoints() const
+ std::set<int> MinCut::getBackgroundPoints() const
 {
   return (background_points_);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
  void
-MinCut::setBackgroundPoints (std::vector<int> & background_points)
+MinCut::setBackgroundPoints (std::set<int> &background_points)
 {
   background_points_.clear ();
-  background_points_.reserve (background_points.size ());
-  for (size_t i_point = 0; i_point < background_points.size (); i_point++)
-    background_points_.push_back (background_points[i_point]);
+  for (int i: background_points)
+    background_points_.insert(i);
 
   unary_potentials_are_valid_ = false;
 }
@@ -481,11 +479,11 @@ MinCut::calculateUnaryPotential (int point, double& source_weight, double& sink_
   // Given an abritrary point in the cloud.
 
   // Pin fg and bg points to the source and sink
-
+/*
   // Is this point a foreground point
   for (int fgp : foreground_points_) {
       if(fgp == point){
-          sink_weight = 0.4;
+          sink_weight = 0.5;
           //source_weight = std::numeric_limits<double>::max ();
           source_weight = 0.6;
           return;
@@ -496,19 +494,19 @@ MinCut::calculateUnaryPotential (int point, double& source_weight, double& sink_
   for (int bgp : background_points_) {
       if(bgp == point){
           //sink_weight = std::numeric_limits<double>::max ();
-          sink_weight = 0.6;
-          source_weight = 0.4;
+          sink_weight = 0.5;
+          source_weight = 0.5;
           return;
       }
   }
-
+*/
   // If the point is not pinnned
 
   // Apply background penalty
-  sink_weight = 0.5;
+  sink_weight = number_of_neighbours_;
 
   // Apply forground penalty
-  source_weight = 0.5;
+  source_weight = number_of_neighbours_;
 
   return;
 }
@@ -545,17 +543,29 @@ MinCut::addEdge (int source, int target, double weight)
 MinCut::calculateBinaryPotential (int source, int target) const
 {
 
-  double weight = 0.0;
-  double distance = 0.0;
-  const pcl::PointXYZI & s = input_->points[source];
-  const pcl::PointXYZI & t = input_->points[target];
-  distance = (s.getVector3fMap() - t.getVector3fMap()).squaredNorm();
-  distance *= inverse_sigma_;
-  weight = exp(-distance);
+    bool same_label = foreground_points_.find(source) == foreground_points_.find(target);
 
-  return (weight);
+    if(same_label)
+        return 1;
 
-  //return 0.1;
+    double weight = 0.0;
+    double distance = 0.0;
+    const pcl::PointXYZI & s = input_->points[source];
+    const pcl::PointXYZI & t = input_->points[target];
+    distance = (s.getVector3fMap() - t.getVector3fMap()).squaredNorm();
+    distance *= inverse_sigma_;
+
+    /*if(distance < 1e-05){
+        qDebug() << "Nope nop nop nope!";
+    }*/
+
+    weight = exp(-distance);
+
+    weight *= 0.2;
+
+    return (weight);
+
+    //return 0.1;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

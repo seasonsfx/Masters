@@ -125,24 +125,23 @@ public:
     setNumberOfNeighbours (unsigned int neighbour_number);
 
     /** \brief Returns the points that must belong to foreground. */
-    std::vector<int>
+    std::set<int>
     getForegroundPoints () const;
 
     /** \brief Allows to specify points which are known to be the points of the object.
     * \param[in] foreground_points point cloud that contains foreground points. At least one point must be specified.
     */
     void
-    setForegroundPoints (std::vector<int> &foreground_points);
+    setForegroundPoints (std::set<int> &foreground_points);
 
     /** \brief Returns the points that must belong to background. */
-    std::vector<int>
-    getBackgroundPoints () const;
+    std::set<int> getBackgroundPoints() const;
 
     /** \brief Allows to specify points which are known to be the points of the background.
     * \param[in] background_points point cloud that contains background points.
     */
     void
-    setBackgroundPoints (std::vector<int> &background_points);
+    setBackgroundPoints (std::set<int> &background_points);
 
     /** \brief This method launches the segmentation algorithm and returns the clusters that were
     * obtained during the segmentation. The indices of points that belong to the object will be stored
@@ -311,10 +310,10 @@ public:
     bool graph_is_valid_;
 
     /** \brief Stores the points that are known to be in the foreground. */
-    std::vector<int> foreground_points_;
+    std::set<int> foreground_points_;
 
     /** \brief Stores the points that are known to be in the background. */
-    std::vector<int> background_points_;
+    std::set<int> background_points_;
 
     /** \brief After the segmentation it will contain the segments. */
     std::vector <pcl::PointIndices> clusters_;

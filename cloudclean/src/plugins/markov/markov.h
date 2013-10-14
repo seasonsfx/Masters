@@ -24,7 +24,7 @@ class Markov : public IPlugin {
     ~Markov();
 
  private:
-    void graphcut(int idx);
+    void graphcut(int idx = 0);
 
  signals:
     void enabling();

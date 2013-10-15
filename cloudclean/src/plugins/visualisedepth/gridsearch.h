@@ -115,7 +115,7 @@ class GridSearch : public pcl::search::Search<pcl::PointXYZI>
         int h = cloud->scan_height();
         int w = cloud->scan_width();
 
-        std::shared_ptr<const std::vector<int>> grid_to_cloud = cloud->gridToCloudMap();
+        boost::shared_ptr<const std::vector<int>> grid_to_cloud = cloud->gridToCloudMap();
 
         int grid_idx = cloud->cloudToGridMap()[idx];
         int x = grid_idx / h;
@@ -197,7 +197,7 @@ class GridSearch : public pcl::search::Search<pcl::PointXYZI>
         int h = cloud->scan_height();
         int w = cloud->scan_width();
 
-        std::shared_ptr<const std::vector<int>> grid_to_cloud = cloud->gridToCloudMap();
+        boost::shared_ptr<const std::vector<int>> grid_to_cloud = cloud->gridToCloudMap();
 
         //int idx = point.data_c[3];
         int grid_idx = point.data_c[2];

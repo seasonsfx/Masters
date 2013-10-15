@@ -38,7 +38,7 @@ T _min(T a, T b) {
     return (a<b?a:b);
 }
 
-bool snake_iteration(std::shared_ptr<std::vector<float> > img,
+bool snake_iteration(boost::shared_ptr<std::vector<float> > img,
                int w,
                int h,
                std::vector<Eigen::Vector2i> & points,

@@ -1,7 +1,7 @@
 #include "cloudgldata.h"
 #include <QDebug>
 
-CloudGLData::CloudGLData(std::shared_ptr<PointCloud> pc) {
+CloudGLData::CloudGLData(boost::shared_ptr<PointCloud> pc) {
     // Assumption: cloud size does not change
     pc_ = pc;
 
@@ -53,18 +53,18 @@ CloudGLData::CloudGLData(std::shared_ptr<PointCloud> pc) {
     QMetaObject::invokeMethod(this, "syncLabels");
 
 
-    connect(pc_.get(), SIGNAL(flagUpdate(std::shared_ptr<std::vector<int> >)),
-            this, SLOT(syncFlags(std::shared_ptr<std::vector<int> >)));
-    connect(pc_.get(), SIGNAL(labelUpdate(std::shared_ptr<std::vector<int> >)),
-            this, SLOT(syncLabels(std::shared_ptr<std::vector<int> >)));
+    connect(pc_.get(), SIGNAL(flagUpdate(boost::shared_ptr<std::vector<int> >)),
+            this, SLOT(syncFlags(boost::shared_ptr<std::vector<int> >)));
+    connect(pc_.get(), SIGNAL(labelUpdate(boost::shared_ptr<std::vector<int> >)),
+            this, SLOT(syncLabels(boost::shared_ptr<std::vector<int> >)));
 }
 
 CloudGLData::~CloudGLData() {
     qDebug() << "CloudGLData deleted";
-    disconnect(pc_.get(), SIGNAL(flagUpdate(std::shared_ptr<std::vector<int> >)),
-               this, SLOT(syncFlags(std::shared_ptr<std::vector<int> >)));
-    disconnect(pc_.get(), SIGNAL(labelUpdate(std::shared_ptr<std::vector<int> >)),
-               this, SLOT(syncLabels(std::shared_ptr<std::vector<int> >)));
+    disconnect(pc_.get(), SIGNAL(flagUpdate(boost::shared_ptr<std::vector<int> >)),
+               this, SLOT(syncFlags(boost::shared_ptr<std::vector<int> >)));
+    disconnect(pc_.get(), SIGNAL(labelUpdate(boost::shared_ptr<std::vector<int> >)),
+               this, SLOT(syncLabels(boost::shared_ptr<std::vector<int> >)));
 }
 
 void CloudGLData::setVAO(GLuint vao){
@@ -170,7 +170,7 @@ void CloudGLData::syncCloud() {
     dirty_points_ = true;
 }
 
-void CloudGLData::syncLabels(std::shared_ptr<std::vector<int> > idxs) {
+void CloudGLData::syncLabels(boost::shared_ptr<std::vector<int> > idxs) {
     if(dirty_labels_ && dirty_label_list_.get() != nullptr && dirty_label_list_->size() !=0){
         dirty_label_list_->insert(dirty_label_list_->end(), idxs->begin(), idxs->end());
     }
@@ -180,7 +180,7 @@ void CloudGLData::syncLabels(std::shared_ptr<std::vector<int> > idxs) {
     dirty_labels_ = true;
 }
 
-void CloudGLData::syncFlags(std::shared_ptr<std::vector<int> > idxs) {
+void CloudGLData::syncFlags(boost::shared_ptr<std::vector<int> > idxs) {
     if(dirty_flags_ && dirty_flag_list_.get() != nullptr && dirty_flag_list_->size() !=0){
         dirty_flag_list_->insert(dirty_flag_list_->end(), idxs->begin(), idxs->end());
     }

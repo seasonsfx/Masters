@@ -21,7 +21,7 @@ class LayerListView : public QDockWidget
     ~LayerListView();
 
  public slots:
-    void selectLayer(std::shared_ptr<Layer> layer);
+    void selectLayer(boost::shared_ptr<Layer> layer);
     void selectionToLayer();
 
  private slots:

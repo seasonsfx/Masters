@@ -10,6 +10,7 @@
 #include <boost/iostreams/device/mapped_file.hpp>
 #include <boost/iostreams/stream.hpp>
 #include <boost/iostreams/stream_buffer.hpp>
+#include <boost/make_shared.hpp>
 #include <pcl/io/io.h>
 #include <Eigen/Dense>
 #include <Eigen/Core>
@@ -342,12 +343,12 @@ const Octree::Ptr PointCloud::octree() {
     return octree_;
 }
 
-std::shared_ptr<const std::vector<int> > PointCloud::gridToCloudMap() const {
+boost::shared_ptr<const std::vector<int> > PointCloud::gridToCloudMap() const {
     if(grid_to_cloud_map_ != nullptr)
         return grid_to_cloud_map_;
 
     // New map
-    grid_to_cloud_map_ = std::make_shared<std::vector<int>>(
+    grid_to_cloud_map_ = boost::make_shared<std::vector<int>>(
                 scan_width_*scan_height_, -1);
 
     for(uint i = 0; i < size(); i++) {
@@ -388,11 +389,11 @@ void PointCloud::resetOrientation() {
     emit transformed();
 }
 
-void PointCloud::flagsUpdated(std::shared_ptr<std::vector<int> > idxs) {
+void PointCloud::flagsUpdated(boost::shared_ptr<std::vector<int> > idxs) {
     emit flagUpdate(idxs);
 }
 
-void PointCloud::labelsUpdated(std::shared_ptr<std::vector<int> > idxs) {
+void PointCloud::labelsUpdated(boost::shared_ptr<std::vector<int> > idxs) {
     emit labelUpdate(idxs);
 }
 

@@ -158,9 +158,9 @@ void GLWidget::paintEvent(QPaintEvent *event) {
     glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, gld_->color_lookup_buffer_->bufferId()); CE();
 
     // Draw all clouds
-    for(std::pair<std::shared_ptr<PointCloud>, std::shared_ptr<CloudGLData> > pair: gld_->cloudgldata_) {
-        std::shared_ptr<PointCloud> pc = pair.first;
-        std::shared_ptr<CloudGLData> cd = pair.second;
+    for(std::pair<boost::shared_ptr<PointCloud>, boost::shared_ptr<CloudGLData> > pair: gld_->cloudgldata_) {
+        boost::shared_ptr<PointCloud> pc = pair.first;
+        boost::shared_ptr<CloudGLData> cd = pair.second;
 
         if(!pc->isVisible())
             continue;
@@ -226,7 +226,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent * event) {
         camera_.rotate2D(rot.x(), rot.y());
     }
     else if(event->buttons() /* ==  Qt::RightButton */ ||   event->modifiers() == Qt::ControlModifier){
-        std::shared_ptr<PointCloud> pc = cl_->active_;
+        boost::shared_ptr<PointCloud> pc = cl_->active_;
         pc->rotate2D(rot.x(), -rot.y());
         //qDebug() << "Why?";
     }

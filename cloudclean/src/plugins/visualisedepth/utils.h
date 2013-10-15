@@ -9,21 +9,22 @@
 #include <QDebug>
 #include <pcl/kdtree/kdtree_flann.h>
 #include <boost/serialization/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
 #include "model/pointcloud.h"
 
-std::shared_ptr<std::vector<float> > test_feature(std::shared_ptr<PointCloud> cloud,
+boost::shared_ptr<std::vector<float> > test_feature(boost::shared_ptr<PointCloud> cloud,
                                  const double radius, int max_nn = 0, bool use_depth = false);
 
 template <typename PointT>
-std::shared_ptr<std::vector<std::vector<float> > > calcDistHist(pcl::PointCloud<PointT> & cloud, int bins, double radius, int max_nn) {
+boost::shared_ptr<std::vector<std::vector<float> > > calcDistHist(pcl::PointCloud<PointT> & cloud, int bins, double radius, int max_nn) {
 
-    //std::shared_ptr<std::vector<float>> distmap = makeDistmap(cloud);
+    //boost::shared_ptr<std::vector<float>> distmap = makeDistmap(cloud);
     //const std::vector<int> & cloud_to_grid = cloud->cloudToGridMap();
 
     std::vector<float> blank(bins, 0.0f);
 
-    std::shared_ptr<std::vector<std::vector<float>> > histograms =
-            std::make_shared<std::vector<std::vector<float> > >(cloud.size(), blank);
+    boost::shared_ptr<std::vector<std::vector<float>> > histograms =
+            boost::make_shared<std::vector<std::vector<float> > >(cloud.size(), blank);
 
     pcl::KdTreeFLANN<PointT> search;
     search.setInputCloud(typename pcl::PointCloud<PointT>::ConstPtr(&cloud, boost::serialization::null_deleter()));
@@ -110,15 +111,15 @@ std::shared_ptr<std::vector<std::vector<float> > > calcDistHist(pcl::PointCloud<
 }
 
 template <typename PointT>
-std::shared_ptr<std::vector<std::vector<float> > > calcIntensityHist(pcl::PointCloud<PointT> & cloud, int bins, double radius, uint max_nn) {
+boost::shared_ptr<std::vector<std::vector<float> > > calcIntensityHist(pcl::PointCloud<PointT> & cloud, int bins, double radius, uint max_nn) {
 
-    //std::shared_ptr<std::vector<float>> distmap = makeDistmap(cloud);
+    //boost::shared_ptr<std::vector<float>> distmap = makeDistmap(cloud);
     //const std::vector<int> & cloud_to_grid = cloud->cloudToGridMap();
 
     std::vector<float> blank(bins, 0.0f);
 
-    std::shared_ptr<std::vector<std::vector<float>> > histograms =
-            std::make_shared<std::vector<std::vector<float> > >(cloud.size(), blank);
+    boost::shared_ptr<std::vector<std::vector<float>> > histograms =
+            boost::make_shared<std::vector<std::vector<float> > >(cloud.size(), blank);
 
     pcl::KdTreeFLANN<PointT> search;
     search.setInputCloud(typename pcl::PointCloud<PointT>::ConstPtr(&cloud, boost::serialization::null_deleter()));

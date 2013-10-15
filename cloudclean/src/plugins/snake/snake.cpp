@@ -17,6 +17,7 @@
 #include <QDockWidget>
 #include <QApplication>
 #include <QScrollArea>
+#include <boost/make_shared.hpp>
 #include "model/layerlist.h"
 #include "model/cloudlist.h"
 #include "gui/glwidget.h"
@@ -87,9 +88,9 @@ void Snake::paint(){
     lasso_->drawLasso(last_mouse_pos_.x(), last_mouse_pos_.y(), flatview_);
 }
 
-void Snake::drawFloats(std::shared_ptr<const std::vector<float> > out_img, std::shared_ptr<PointCloud> cloud){
+void Snake::drawFloats(boost::shared_ptr<const std::vector<float> > out_img, boost::shared_ptr<PointCloud> cloud){
     // translates grid idx to cloud idx
-    std::shared_ptr<const std::vector<int>> lookup = cloud->gridToCloudMap();
+    boost::shared_ptr<const std::vector<int>> lookup = cloud->gridToCloudMap();
 
     if(image_ != nullptr)
         delete image_;
@@ -104,7 +105,7 @@ void Snake::drawFloats(std::shared_ptr<const std::vector<float> > out_img, std::
     qDebug() << "Minmax" << min << max;
 
     // Draw image
-    auto select = std::make_shared<std::vector<int> >();
+    auto select = boost::make_shared<std::vector<int> >();
     for(int y = 0; y < cloud->scan_height(); y++){
         for(int x = 0; x < cloud->scan_width(); x++){
             int i = (cloud->scan_height() -1 - y) + x * cloud->scan_height();
@@ -154,9 +155,9 @@ bool Snake::mouseDblClickEvent(QMouseEvent * event){
 
     auto cloud = cl_->active_;
 
-    std::shared_ptr<std::vector<int> > empty = std::make_shared<std::vector<int>>();
-    std::shared_ptr<std::vector<int>> selected_indices = std::make_shared<std::vector<int>>();
-    std::shared_ptr<std::vector<int>> removed_indices= std::make_shared<std::vector<int>>();
+    boost::shared_ptr<std::vector<int> > empty = boost::make_shared<std::vector<int>>();
+    boost::shared_ptr<std::vector<int>> selected_indices = boost::make_shared<std::vector<int>>();
+    boost::shared_ptr<std::vector<int>> removed_indices= boost::make_shared<std::vector<int>>();
 
 
     // This is where the contour is modified

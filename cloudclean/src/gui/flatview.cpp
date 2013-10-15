@@ -96,7 +96,7 @@ int binary_search(std::vector<int> A, int key) {
 }
 
 int FlatView::imageToCloudIdx(int x, int y){
-    std::shared_ptr<PointCloud> pc = pc_.lock();
+    boost::shared_ptr<PointCloud> pc = pc_.lock();
     if(x < 0 || x > pc->scan_width()){
         return -1;
     }
@@ -110,19 +110,19 @@ int FlatView::imageToCloudIdx(int x, int y){
 // scan lines go from top to bottom & left to right
 
 inline QPoint FlatView::cloudToImageCoord(int idx){
-    std::shared_ptr<PointCloud> pc = pc_.lock();
+    boost::shared_ptr<PointCloud> pc = pc_.lock();
     int i = pc->cloudToGridMap()[idx];
     int x = i/pc->scan_height();
     int y = pc->scan_height() - 1 - (i%pc->scan_height());
     return QPoint(x, y);
 }
 
-void FlatView::setCloud(std::shared_ptr<PointCloud> new_pc) {
+void FlatView::setCloud(boost::shared_ptr<PointCloud> new_pc) {
     if(new_pc == pc_.lock())
         return;
 
     if(!pc_.expired()){
-        std::shared_ptr<PointCloud> old_pc = pc_.lock();
+        boost::shared_ptr<PointCloud> old_pc = pc_.lock();
         disconnect(old_pc.get(), SIGNAL(flagUpdate()), this,
                    SLOT(update()));
         disconnect(old_pc.get(), SIGNAL(labelUpdate()), this,
@@ -135,7 +135,7 @@ void FlatView::setCloud(std::shared_ptr<PointCloud> new_pc) {
     if(pc_.expired())
         return;
 
-    std::shared_ptr<PointCloud> pc = pc_.lock();
+    boost::shared_ptr<PointCloud> pc = pc_.lock();
     cloud_idx_lookup_.resize(pc->scan_width()*pc->scan_height(), -1);
     for(uint idx = 0 ; idx < pc->cloudToGridMap().size(); idx++){
         QPoint p = cloudToImageCoord(idx);
@@ -285,8 +285,8 @@ void FlatView::paintEvent(QPaintEvent *event) {
         return;
     }
 
-    std::shared_ptr<PointCloud> pc = pc_.lock();
-    std::shared_ptr<CloudGLData> cd = gld_->cloudgldata_[pc];
+    boost::shared_ptr<PointCloud> pc = pc_.lock();
+    boost::shared_ptr<CloudGLData> cd = gld_->cloudgldata_[pc];
 
     program_.bind(); CE();
     glUniformMatrix3fv(uni_camera_, 1, GL_FALSE, getCamera().data()); CE();

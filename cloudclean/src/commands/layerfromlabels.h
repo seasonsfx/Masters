@@ -7,6 +7,8 @@
 #include <QUndoCommand>
 #include <QColor>
 #include <QString>
+#include <boost/shared_ptr.hpp>
+#include <boost/weak_ptr.hpp>
 #include "commands/export.h"
 
 class LayerList;
@@ -16,7 +18,7 @@ class Layer;
 class COMMAND_API LayerFromLabels : public QUndoCommand
 {
  public:
-    LayerFromLabels(std::shared_ptr<std::vector<uint16_t> > labels,
+    LayerFromLabels(boost::shared_ptr<std::vector<uint16_t> > labels,
                     LayerList * ll, bool subtractive = true);
     QString actionText();
     virtual void undo();
@@ -26,9 +28,9 @@ class COMMAND_API LayerFromLabels : public QUndoCommand
 
  private:
     bool subtractive_;
-    std::shared_ptr<std::vector<uint16_t> > labels_;
+    boost::shared_ptr<std::vector<uint16_t> > labels_;
     LayerList * ll_;
-    std::weak_ptr<Layer> new_layer_;
+    boost::weak_ptr<Layer> new_layer_;
     std::map<uint, std::vector<uint16_t> > removed_from_;
 };
 

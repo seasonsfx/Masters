@@ -9,6 +9,7 @@
 
 #include <set>
 #include <boost/serialization/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
 
 #include "model/layerlist.h"
 #include "model/cloudlist.h"
@@ -98,10 +99,10 @@ void Flood::disable() {
     glwidget_->removeEventFilter(this);
 }
 
-std::shared_ptr<std::vector<int> > Flood::getLayerIndices() {
-    std::shared_ptr<std::vector<int>> indices = std::make_shared<std::vector<int>>();
+boost::shared_ptr<std::vector<int> > Flood::getLayerIndices() {
+    boost::shared_ptr<std::vector<int>> indices = boost::make_shared<std::vector<int>>();
 
-    std::shared_ptr<PointCloud> active = cl_->active_;
+    boost::shared_ptr<PointCloud> active = cl_->active_;
 
     if(ll_->selection_.size() == 0){
         for(uint i = 0; i < active->size(); i++) {
@@ -113,8 +114,8 @@ std::shared_ptr<std::vector<int> > Flood::getLayerIndices() {
     // get labels in selected layers
     std::set<uint16_t> selected_labels;
 
-    for(std::weak_ptr<Layer> wl: ll_->selection_) {
-        std::shared_ptr<Layer> l = wl.lock();
+    for(boost::weak_ptr<Layer> wl: ll_->selection_) {
+        boost::shared_ptr<Layer> l = wl.lock();
         if(l == nullptr)
             continue;
 
@@ -164,7 +165,7 @@ void Flood::flood(int source_idx){
     flood_queue.push(source_idx);
     int current_idx;
 
-    //std::shared_ptr<std::vector<int> > indices = getLayerIndices();
+    //boost::shared_ptr<std::vector<int> > indices = getLayerIndices();
 
     //Octree search = *(cl_->active_->octree());
     pcl::KdTreeFLANN<pcl::PointXYZI> search;
@@ -172,7 +173,7 @@ void Flood::flood(int source_idx){
 
     std::set<int> visited;
 
-    std::shared_ptr<std::vector<int> > selected = std::make_shared<std::vector<int> >();
+    boost::shared_ptr<std::vector<int> > selected = boost::make_shared<std::vector<int> >();
 
     int count = 0;
     int dist_count = 0;

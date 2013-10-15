@@ -145,8 +145,8 @@ MainWindow::MainWindow(QUndoStack *us, CloudList * cl, LayerList * ll, QWidget *
     window_menu_->addAction(options_dock_->toggleViewAction());
 
     // SIGNALS
-    qRegisterMetaType<std::shared_ptr<PointCloud> >("std::shared_ptr<PointCloud>");
-    qRegisterMetaType<std::shared_ptr<Layer> >("std::shared_ptr<Layer>");
+    qRegisterMetaType<boost::shared_ptr<PointCloud> >("boost::shared_ptr<PointCloud>");
+    qRegisterMetaType<boost::shared_ptr<Layer> >("boost::shared_ptr<Layer>");
 
     connect(gld_, &GLData::update, glwidget_, (void (GLWidget:: *)(void)) &GLWidget::update);
     connect(gld_, &GLData::update, flatview_, (void (FlatView:: *)(void)) &FlatView::update);
@@ -240,8 +240,8 @@ void MainWindow::saveFile(){
         return;
 
     std::set<uint16_t> slabels;
-    for(std::weak_ptr<Layer> wl : ll_->selection_) {
-        std::shared_ptr<Layer> l = wl.lock();
+    for(boost::weak_ptr<Layer> wl : ll_->selection_) {
+        boost::shared_ptr<Layer> l = wl.lock();
         for(uint16_t label : l->getLabelSet()){
             slabels.insert(label);
         }

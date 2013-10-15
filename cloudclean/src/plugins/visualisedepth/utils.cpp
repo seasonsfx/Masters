@@ -12,11 +12,11 @@
 #include "plugins/visualisedepth/gridsearch.h"
 #include "utilities/cv.h"
 
-std::shared_ptr<std::vector<float> > test_feature(std::shared_ptr<PointCloud> cloud,
+boost::shared_ptr<std::vector<float> > test_feature(boost::shared_ptr<PointCloud> cloud,
                             const double radius, int max_nn, bool use_depth) {
 
-    std::shared_ptr<std::vector<float>> stdevs
-                        = std::make_shared<std::vector<float>>(cloud->size());
+    boost::shared_ptr<std::vector<float>> stdevs
+                        = boost::make_shared<std::vector<float>>(cloud->size());
 
     std::vector<int> idxs(0);
     std::vector<float> dists(0);

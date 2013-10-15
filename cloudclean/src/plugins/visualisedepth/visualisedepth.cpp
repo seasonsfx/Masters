@@ -86,7 +86,7 @@ VDepth::~VDepth(){
         delete image_;
 }
 
-int gridToCloudIdx(int x, int y, std::shared_ptr<PointCloud> pc, int * lookup){
+int gridToCloudIdx(int x, int y, boost::shared_ptr<PointCloud> pc, int * lookup){
     if(x < 0 || x > pc->scan_width())
         return -1;
     else if(y < 0 || y > pc->scan_height())
@@ -115,10 +115,10 @@ pcl::PointCloud<pcl::PointXYZINormal>::Ptr zipNormals(
 }
 
 
-void VDepth::drawFloats(std::shared_ptr<const std::vector<float> > out_img, std::shared_ptr<PointCloud> cloud){
+void VDepth::drawFloats(boost::shared_ptr<const std::vector<float> > out_img, boost::shared_ptr<PointCloud> cloud){
     qDebug() << "DRAW!";
     // translates grid idx to cloud idx
-    std::shared_ptr<const std::vector<int>> lookup = cloud->gridToCloudMap();
+    boost::shared_ptr<const std::vector<int>> lookup = cloud->gridToCloudMap();
 
     if(image_ != nullptr)
         delete image_;
@@ -133,7 +133,7 @@ void VDepth::drawFloats(std::shared_ptr<const std::vector<float> > out_img, std:
     qDebug() << "Minmax" << min << max;
 
     // Draw image
-    auto select = std::make_shared<std::vector<int> >();
+    auto select = boost::make_shared<std::vector<int> >();
     for(int y = 0; y < cloud->scan_height(); y++){
         for(int x = 0; x < cloud->scan_width(); x++){
             int i = (cloud->scan_height() -1 - y) + x * cloud->scan_height();
@@ -185,10 +185,10 @@ void VDepth::drawFloats(std::shared_ptr<const std::vector<float> > out_img, std:
 
 }
 
-void VDepth::drawVector3f(std::shared_ptr<const std::vector<Eigen::Vector3f> > out_img, std::shared_ptr<PointCloud> cloud){
+void VDepth::drawVector3f(boost::shared_ptr<const std::vector<Eigen::Vector3f> > out_img, boost::shared_ptr<PointCloud> cloud){
 
     // translates grid idx to cloud idx
-    std::shared_ptr<const std::vector<int>> lookup = cloud->gridToCloudMap();
+    boost::shared_ptr<const std::vector<int>> lookup = cloud->gridToCloudMap();
 
     if(image_ != nullptr)
         delete image_;
@@ -262,7 +262,7 @@ inline float EuclidianDist(float * feature1, float * feature2, int size) {
     return dist;
 }
 
-pcl::PointCloud<pcl::PointXYZINormal>::Ptr VDepth::gridDownsample(std::shared_ptr<PointCloud> input, float resolution, std::vector<int>& sub_idxs) {
+pcl::PointCloud<pcl::PointXYZINormal>::Ptr VDepth::gridDownsample(boost::shared_ptr<PointCloud> input, float resolution, std::vector<int>& sub_idxs) {
     pcl::PointCloud<pcl::Normal>::Ptr normals = ne_->getNormals(input);
 
     // HACK: Make sure normals are not NaN or inf
@@ -311,7 +311,7 @@ pcl::PointCloud<pcl::PointXYZINormal>::Ptr VDepth::gridDownsample(std::shared_pt
 }
 
 pcl::PointCloud<pcl::PointXYZINormal>::Ptr VDepth::downsample(
-        std::shared_ptr<PointCloud> input,
+        boost::shared_ptr<PointCloud> input,
         float resolution,
         std::vector<int>& sub_idxs){
 
@@ -382,7 +382,7 @@ pcl::PointCloud<pcl::Normal>::Ptr don(pcl::PointCloud<PointT> & cloud,
 }
 
 void VDepth::don_vis(){
-    std::shared_ptr<PointCloud> _cloud = core_->cl_->active_;
+    boost::shared_ptr<PointCloud> _cloud = core_->cl_->active_;
     if(_cloud == nullptr)
         return;
 
@@ -407,7 +407,7 @@ void VDepth::don_vis(){
 
     const std::vector<int> & cloudtogrid = _cloud->cloudToGridMap();
 
-    std::shared_ptr<std::vector<Eigen::Vector3f> > grid = std::make_shared<std::vector<Eigen::Vector3f> >(w*h, Eigen::Vector3f(0.0f, 0.0f, 0.0f));
+    boost::shared_ptr<std::vector<Eigen::Vector3f> > grid = boost::make_shared<std::vector<Eigen::Vector3f> >(w*h, Eigen::Vector3f(0.0f, 0.0f, 0.0f));
     for(uint i = 0; i < normals->size(); i++){
         int grid_idx = cloudtogrid[i];
         (*grid)[grid_idx] = big_donormals[i].getNormalVector3fMap();
@@ -417,7 +417,7 @@ void VDepth::don_vis(){
 }
 
 void VDepth::hist_vis(){
-    std::shared_ptr<PointCloud> _cloud = core_->cl_->active_;
+    boost::shared_ptr<PointCloud> _cloud = core_->cl_->active_;
     if(_cloud == nullptr)
         return;
 
@@ -431,10 +431,10 @@ void VDepth::hist_vis(){
     int max_nn = 0;
 
 
-    std::shared_ptr<std::vector<std::vector<float> > > hists = calcIntensityHist(*filt_cloud, bins, radius, max_nn);
-    //std::shared_ptr<std::vector<std::vector<float> > > hists = calcDistHist(*filt_cloud, bins, radius, max_nn);
+    boost::shared_ptr<std::vector<std::vector<float> > > hists = calcIntensityHist(*filt_cloud, bins, radius, max_nn);
+    //boost::shared_ptr<std::vector<std::vector<float> > > hists = calcDistHist(*filt_cloud, bins, radius, max_nn);
 
-    std::shared_ptr<std::vector<std::vector<float> > > hists2 = std::make_shared<std::vector<std::vector<float> > >(_cloud->size());
+    boost::shared_ptr<std::vector<std::vector<float> > > hists2 = boost::make_shared<std::vector<std::vector<float> > >(_cloud->size());
 
     // map back to cloud
     for(uint i = 0; i < _cloud->size(); i++) {
@@ -446,13 +446,13 @@ void VDepth::hist_vis(){
     hists.reset();
     qDebug() << "Nope 1";
 
-    std::shared_ptr<const std::vector<int>> grid_to_cloud = _cloud->gridToCloudMap();
+    boost::shared_ptr<const std::vector<int>> grid_to_cloud = _cloud->gridToCloudMap();
 
     int w = _cloud->scan_width();
     int h = _cloud->scan_height();
 
     // in the grid, subtract (x, y+1) from every (x, y)
-    std::shared_ptr<std::vector<float>> diffs = std::make_shared<std::vector<float>>(w*h, 0.0f);
+    boost::shared_ptr<std::vector<float>> diffs = boost::make_shared<std::vector<float>>(w*h, 0.0f);
 
     //auto distfunc = EuclidianDist;
     auto distfunc = KLDist;
@@ -510,7 +510,7 @@ void VDepth::hist_vis(){
         }
     }
 
-    std::shared_ptr<const std::vector<float>> img = cloudToGrid(_cloud->cloudToGridMap(), w*h, diffs);
+    boost::shared_ptr<const std::vector<float>> img = cloudToGrid(_cloud->cloudToGridMap(), w*h, diffs);
 
     qDebug() << "about to draw";
     drawFloats(img, _cloud);
@@ -521,7 +521,7 @@ void VDepth::hist_vis(){
 }
 
 void VDepth::fpfh_vis(){
-    std::shared_ptr<PointCloud> _cloud = core_->cl_->active_;
+    boost::shared_ptr<PointCloud> _cloud = core_->cl_->active_;
     if(_cloud == nullptr)
         return;
 
@@ -559,13 +559,13 @@ void VDepth::fpfh_vis(){
             (*fpfhs2)[i] = (*fpfhs)[idx];
     }
 
-    std::shared_ptr<const std::vector<int>> grid_to_cloud = _cloud->gridToCloudMap();
+    boost::shared_ptr<const std::vector<int>> grid_to_cloud = _cloud->gridToCloudMap();
 
     int w = _cloud->scan_width();
     int h = _cloud->scan_height();
 
     // in the grid, subtract (x, y+1) from every (x, y)
-    std::shared_ptr<std::vector<float>> diffs = std::make_shared<std::vector<float>>(_cloud->size(), 0.0f);
+    boost::shared_ptr<std::vector<float>> diffs = boost::make_shared<std::vector<float>>(_cloud->size(), 0.0f);
 
 
     auto distfunc = EuclidianDist;
@@ -619,7 +619,7 @@ void VDepth::fpfh_vis(){
         }
     }
 
-    std::shared_ptr<const std::vector<float>> img = cloudToGrid(_cloud->cloudToGridMap(), w*h, diffs);
+    boost::shared_ptr<const std::vector<float>> img = cloudToGrid(_cloud->cloudToGridMap(), w*h, diffs);
 
     qDebug() << "about to draw";
     drawFloats(img, _cloud);
@@ -627,7 +627,7 @@ void VDepth::fpfh_vis(){
 }
 
 void VDepth::curve_vis(){
-    std::shared_ptr<PointCloud> _cloud = core_->cl_->active_;
+    boost::shared_ptr<PointCloud> _cloud = core_->cl_->active_;
     if(_cloud == nullptr)
         return;
 
@@ -689,13 +689,13 @@ void VDepth::curve_vis(){
         (*principal_curvatures2)[i] = (*principal_curvatures)[idx];
     }
 
-    std::shared_ptr<const std::vector<int>> grid_to_cloud = _cloud->gridToCloudMap();
+    boost::shared_ptr<const std::vector<int>> grid_to_cloud = _cloud->gridToCloudMap();
 
     int w = _cloud->scan_width();
     int h = _cloud->scan_height();
 
     // in the grid, subtract (x, y+1) from every (x, y)
-    std::shared_ptr<std::vector<float>> diffs = std::make_shared<std::vector<float>>(w*h, 0.0f);
+    boost::shared_ptr<std::vector<float>> diffs = boost::make_shared<std::vector<float>>(w*h, 0.0f);
 
 
     //auto distfunc = EuclidianDist;
@@ -749,7 +749,7 @@ void VDepth::curve_vis(){
         }
     }
 
-    std::shared_ptr<const std::vector<float>> img = cloudToGrid(_cloud->cloudToGridMap(), w*h, diffs);
+    boost::shared_ptr<const std::vector<float>> img = cloudToGrid(_cloud->cloudToGridMap(), w*h, diffs);
 
     qDebug() << "about to draw";
     drawFloats(img, _cloud);
@@ -757,7 +757,7 @@ void VDepth::curve_vis(){
 }
 
 void VDepth::normalnoise(){
-    std::shared_ptr<PointCloud> cloud = core_->cl_->active_;
+    boost::shared_ptr<PointCloud> cloud = core_->cl_->active_;
     if(cloud == nullptr)
         return;
     int h = cloud->scan_width();
@@ -765,46 +765,46 @@ void VDepth::normalnoise(){
 
     pcl::PointCloud<pcl::Normal>::Ptr normals = ne_->getNormals(cloud);
 
-    std::shared_ptr<std::vector<float>> stdev = normal_stdev(cloud, normals, 1, 100);
+    boost::shared_ptr<std::vector<float>> stdev = normal_stdev(cloud, normals, 1, 100);
 
-    std::shared_ptr<const std::vector<float>> img = cloudToGrid(cloud->cloudToGridMap(), w*h, stdev);
+    boost::shared_ptr<const std::vector<float>> img = cloudToGrid(cloud->cloudToGridMap(), w*h, stdev);
 
     drawFloats(img, cloud);
 }
 
 
 void VDepth::dist_stdev(){
-    std::shared_ptr<PointCloud> cloud = core_->cl_->active_;
+    boost::shared_ptr<PointCloud> cloud = core_->cl_->active_;
     if(cloud == nullptr)
         return;
     int h = cloud->scan_width();
     int w = cloud->scan_height();
 
-    std::shared_ptr<std::vector<float> > stdev = stdev_dist(cloud, 0.05f, 20, false);
+    boost::shared_ptr<std::vector<float> > stdev = stdev_dist(cloud, 0.05f, 20, false);
 
-    std::shared_ptr<const std::vector<float>> img = cloudToGrid(cloud->cloudToGridMap(), w*h, stdev);
+    boost::shared_ptr<const std::vector<float>> img = cloudToGrid(cloud->cloudToGridMap(), w*h, stdev);
 
     drawFloats(img, cloud);
 }
 
 void VDepth::sutract_lowfreq_noise(){
-    std::shared_ptr<PointCloud> cloud = core_->cl_->active_;
+    boost::shared_ptr<PointCloud> cloud = core_->cl_->active_;
     if(cloud == nullptr)
         return;
     int h = cloud->scan_width();
     int w = cloud->scan_height();
 
     // Create distance map
-    std::shared_ptr<std::vector<float>> distmap = makeDistmap(cloud);
+    boost::shared_ptr<std::vector<float>> distmap = makeDistmap(cloud);
 
     //distmap = interpolate(distmap, w, h, 21);
 
-    std::shared_ptr<std::vector<float> > smooth_grad_image = convolve(distmap, w, h, gaussian, 5);
+    boost::shared_ptr<std::vector<float> > smooth_grad_image = convolve(distmap, w, h, gaussian, 5);
     smooth_grad_image = convolve(smooth_grad_image, w, h, gaussian, 5);
     smooth_grad_image = convolve(smooth_grad_image, w, h, gaussian, 5);
     smooth_grad_image = convolve(smooth_grad_image, w, h, gaussian, 5);
 
-    std::shared_ptr<std::vector<float>> highfreq = distmap;
+    boost::shared_ptr<std::vector<float>> highfreq = distmap;
 
     for(uint i = 0; i < distmap->size(); i++){
         (*highfreq)[i] = (*distmap)[i] - (*smooth_grad_image)[i];
@@ -814,7 +814,7 @@ void VDepth::sutract_lowfreq_noise(){
 }
 
 void VDepth::eigen_ratio(){
-    std::shared_ptr<PointCloud> cloud = core_->cl_->active_;
+    boost::shared_ptr<PointCloud> cloud = core_->cl_->active_;
     if(cloud == nullptr)
         return;
     int h = cloud->scan_width();
@@ -827,10 +827,10 @@ void VDepth::eigen_ratio(){
     pcl::PointCloud<pcl::PointXYZI>::Ptr smaller_cloud = octreeDownsample(cloud.get(), 0.02, sub_idxs);
 
 
-    std::shared_ptr<std::vector<Eigen::Vector3f> > pca = getPCA(smaller_cloud.get(), 0.2f, 0);
+    boost::shared_ptr<std::vector<Eigen::Vector3f> > pca = getPCA(smaller_cloud.get(), 0.2f, 0);
 
-    std::shared_ptr<std::vector<float>> likely_veg =
-               std::make_shared<std::vector<float>>(pca->size(), 0.0f);
+    boost::shared_ptr<std::vector<float>> likely_veg =
+               boost::make_shared<std::vector<float>>(pca->size(), 0.0f);
 
     for(uint i = 0; i < pca->size(); i++) {
         Eigen::Vector3f eig = (*pca)[i];
@@ -884,8 +884,8 @@ void VDepth::eigen_ratio(){
 
 
 
-    std::shared_ptr<std::vector<float>> likely_veg2 =
-               std::make_shared<std::vector<float>>(cloud->size(), 0.0f);
+    boost::shared_ptr<std::vector<float>> likely_veg2 =
+               boost::make_shared<std::vector<float>>(cloud->size(), 0.0f);
 
 
     for(uint i = 0; i < cloud->size(); i++) {
@@ -894,23 +894,23 @@ void VDepth::eigen_ratio(){
     }
 
 
-    std::shared_ptr<const std::vector<float>> img = cloudToGrid(cloud->cloudToGridMap(), w*h, likely_veg2);
+    boost::shared_ptr<const std::vector<float>> img = cloudToGrid(cloud->cloudToGridMap(), w*h, likely_veg2);
 
     drawFloats(img, cloud);
 }
 
 void VDepth::pca(){
     qDebug() << "Myfunc";
-    std::shared_ptr<PointCloud> cloud = core_->cl_->active_;
+    boost::shared_ptr<PointCloud> cloud = core_->cl_->active_;
     if(cloud == nullptr)
         return;
     int h = cloud->scan_width();
     int w = cloud->scan_height();
 
-    std::shared_ptr<std::vector<Eigen::Vector3f> > pca = getPCA(cloud.get(), 0.05f, 20);
+    boost::shared_ptr<std::vector<Eigen::Vector3f> > pca = getPCA(cloud.get(), 0.05f, 20);
 
-    std::shared_ptr<std::vector<float>> plane_likelyhood =
-               std::make_shared<std::vector<float>>(pca->size(), 0.0f);
+    boost::shared_ptr<std::vector<float>> plane_likelyhood =
+               boost::make_shared<std::vector<float>>(pca->size(), 0.0f);
 
     Eigen::Vector3f ideal_plane(1.0f, 0.0f, 0.0f);
     ideal_plane.normalize();
@@ -928,7 +928,7 @@ void VDepth::pca(){
         (*plane_likelyhood)[i] = similarity;
     }
 /*
-    std::shared_ptr<std::vector<Eigen::Vector3f> > grid = std::make_shared<std::vector<Eigen::Vector3f> >(grid_to_cloud->size(), Eigen::Vector3f(0.0f, 0.0f, 0.0f));
+    boost::shared_ptr<std::vector<Eigen::Vector3f> > grid = boost::make_shared<std::vector<Eigen::Vector3f> >(grid_to_cloud->size(), Eigen::Vector3f(0.0f, 0.0f, 0.0f));
     for(int i = 0; i < grid_to_cloud->size(); i++) {
         int idx = (*grid_to_cloud)[i];
         if(idx != -1)
@@ -938,23 +938,23 @@ void VDepth::pca(){
     drawVector3f(grid, cloud);
 */
 
-    std::shared_ptr<const std::vector<float>> img = cloudToGrid(cloud->cloudToGridMap(), w*h, plane_likelyhood);
+    boost::shared_ptr<const std::vector<float>> img = cloudToGrid(cloud->cloudToGridMap(), w*h, plane_likelyhood);
 
     drawFloats(img, cloud);
 }
 
 void VDepth::sobel_erode(){
-    std::shared_ptr<PointCloud> cloud = core_->cl_->active_;
+    boost::shared_ptr<PointCloud> cloud = core_->cl_->active_;
     if(cloud == nullptr)
         return;
     int h = cloud->scan_width();
     int w = cloud->scan_height();
 
     // Create distance map
-    std::shared_ptr<std::vector<float>> distmap = makeDistmap(cloud);
+    boost::shared_ptr<std::vector<float>> distmap = makeDistmap(cloud);
 
-    std::shared_ptr<std::vector<float> > grad_image = gradientImage(distmap, w, h);
-    std::shared_ptr<std::vector<float> > smooth_grad_image = convolve(grad_image, w, h, gaussian, 5);
+    boost::shared_ptr<std::vector<float> > grad_image = gradientImage(distmap, w, h);
+    boost::shared_ptr<std::vector<float> > smooth_grad_image = convolve(grad_image, w, h, gaussian, 5);
 
     // Threshold && Erode
 
@@ -964,7 +964,7 @@ void VDepth::sobel_erode(){
         0, 1, 0,
     };
 
-    std::shared_ptr<std::vector<float> > dilated_image =  morphology(
+    boost::shared_ptr<std::vector<float> > dilated_image =  morphology(
             smooth_grad_image,
             w, h, strct, 3, Morphology::ERODE,
             grad_image); // <-- reuse
@@ -973,16 +973,16 @@ void VDepth::sobel_erode(){
 }
 
 void VDepth::sobel_blur(){
-    std::shared_ptr<PointCloud> cloud = core_->cl_->active_;
+    boost::shared_ptr<PointCloud> cloud = core_->cl_->active_;
     if(cloud == nullptr)
         return;
     int h = cloud->scan_width();
     int w = cloud->scan_height();
 
     // Create distance map
-    std::shared_ptr<std::vector<float>> distmap = makeDistmap(cloud);
+    boost::shared_ptr<std::vector<float>> distmap = makeDistmap(cloud);
 
-    std::shared_ptr<std::vector<float> > smooth_grad_image = gradientImage(distmap, w, h);
+    boost::shared_ptr<std::vector<float> > smooth_grad_image = gradientImage(distmap, w, h);
     int blurs = 0;
     for(int i = 0; i < blurs; i++)
         smooth_grad_image = convolve(smooth_grad_image, w, h, gaussian, 5);
@@ -991,28 +991,28 @@ void VDepth::sobel_blur(){
 }
 
 void VDepth::intensity_play() {
-    std::shared_ptr<PointCloud> cloud = core_->cl_->active_;
+    boost::shared_ptr<PointCloud> cloud = core_->cl_->active_;
     if(cloud == nullptr)
         return;
     int h = cloud->scan_width();
     int w = cloud->scan_height();
 
-    std::shared_ptr<std::vector<float>> intensity = std::make_shared<std::vector<float>>(cloud->size());
+    boost::shared_ptr<std::vector<float>> intensity = boost::make_shared<std::vector<float>>(cloud->size());
 
     // Create intensity cloud
     for(uint i = 0; i < intensity->size(); i++){
         (*intensity)[i] = (*cloud)[i].intensity;
     }
 
-    std::shared_ptr<std::vector<float>> img = cloudToGrid(cloud->cloudToGridMap(), w*h, intensity);
+    boost::shared_ptr<std::vector<float>> img = cloudToGrid(cloud->cloudToGridMap(), w*h, intensity);
 
 
-    std::shared_ptr<std::vector<float> > smooth_grad_image = convolve(img, w, h, gaussian, 5);
+    boost::shared_ptr<std::vector<float> > smooth_grad_image = convolve(img, w, h, gaussian, 5);
     smooth_grad_image = convolve(smooth_grad_image, w, h, gaussian, 5);
     smooth_grad_image = convolve(smooth_grad_image, w, h, gaussian, 5);
     smooth_grad_image = convolve(smooth_grad_image, w, h, gaussian, 5);
 /*
-    std::shared_ptr<std::vector<float>> highfreq = img;
+    boost::shared_ptr<std::vector<float>> highfreq = img;
 
     for(int i = 0; i < highfreq->size(); i++){
         (*highfreq)[i] = (*highfreq)[i] - (*smooth_grad_image)[i];
@@ -1027,50 +1027,50 @@ void VDepth::intensity_play() {
 
 void VDepth::myFunc(){
     qDebug() << "Myfunc";
-    std::shared_ptr<PointCloud> cloud = core_->cl_->active_;
+    boost::shared_ptr<PointCloud> cloud = core_->cl_->active_;
     if(cloud == nullptr)
         return;
     //int h = cloud->scan_width();
     //int w = cloud->scan_height();
 
-    std::shared_ptr<const std::vector<int>> grid_to_cloud = cloud->gridToCloudMap();
+    boost::shared_ptr<const std::vector<int>> grid_to_cloud = cloud->gridToCloudMap();
 
-    std::shared_ptr<std::vector<Eigen::Vector3f> > pca = getPCA(cloud.get(), 1.0f, 50);
+    boost::shared_ptr<std::vector<Eigen::Vector3f> > pca = getPCA(cloud.get(), 1.0f, 50);
 
-    std::shared_ptr<std::vector<Eigen::Vector3f> > grid = std::make_shared<std::vector<Eigen::Vector3f> >(grid_to_cloud->size(), Eigen::Vector3f(0.0f, 0.0f, 0.0f));
+    boost::shared_ptr<std::vector<Eigen::Vector3f> > grid = boost::make_shared<std::vector<Eigen::Vector3f> >(grid_to_cloud->size(), Eigen::Vector3f(0.0f, 0.0f, 0.0f));
     for(uint i = 0; i < grid_to_cloud->size(); i++) {
         int idx = (*grid_to_cloud)[i];
         if(idx != -1)
             (*grid)[i] = (*pca)[idx];
     }
 
-    //std::shared_ptr<std::vector<float> > stdev = stdev_depth(cloud, 1.0f);
-    //std::shared_ptr<const std::vector<float>> img = cloudToGrid(cloud->cloudToGridMap(), w*h, stdev);
+    //boost::shared_ptr<std::vector<float> > stdev = stdev_depth(cloud, 1.0f);
+    //boost::shared_ptr<const std::vector<float>> img = cloudToGrid(cloud->cloudToGridMap(), w*h, stdev);
 
 
     /*
     // Create distance map
-    std::shared_ptr<std::vector<float>> distmap = makeDistmap(cloud);
+    boost::shared_ptr<std::vector<float>> distmap = makeDistmap(cloud);
     //distmap = interpolate(distmap, w, h, 21);
 
-    std::shared_ptr<std::vector<float> > smooth_grad_image = convolve(distmap, w, h, gaussian, 5);
+    boost::shared_ptr<std::vector<float> > smooth_grad_image = convolve(distmap, w, h, gaussian, 5);
     smooth_grad_image = convolve(smooth_grad_image, w, h, gaussian, 5);
     smooth_grad_image = convolve(smooth_grad_image, w, h, gaussian, 5);
     smooth_grad_image = convolve(smooth_grad_image, w, h, gaussian, 5);
 
-    std::shared_ptr<std::vector<float>> highfreq = distmap;
+    boost::shared_ptr<std::vector<float>> highfreq = distmap;
 
     for(int i = 0; i < distmap->size(); i++){
         (*highfreq)[i] = (*distmap)[i] - (*smooth_grad_image)[i];
     }
 
-    //std::shared_ptr<std::vector<float> > grad_image = gradientImage(distmap, w, h, size);
-    std::shared_ptr<std::vector<float> > int_image = interpolate(distmap, w, h, 50);
-    std::shared_ptr<std::vector<float> > stdev_image = stdev(int_image, w, h, 5);
+    //boost::shared_ptr<std::vector<float> > grad_image = gradientImage(distmap, w, h, size);
+    boost::shared_ptr<std::vector<float> > int_image = interpolate(distmap, w, h, 50);
+    boost::shared_ptr<std::vector<float> > stdev_image = stdev(int_image, w, h, 5);
 
 
-    std::shared_ptr<std::vector<float> > grad_image = gradientImage(distmap, w, h, size);
-    std::shared_ptr<std::vector<float> > smooth_grad_image = convolve(grad_image, w, h, gaussian, 5);
+    boost::shared_ptr<std::vector<float> > grad_image = gradientImage(distmap, w, h, size);
+    boost::shared_ptr<std::vector<float> > smooth_grad_image = convolve(grad_image, w, h, gaussian, 5);
 
     // Threshold && Erode
 
@@ -1080,7 +1080,7 @@ void VDepth::myFunc(){
         0, 1, 0,
     };
 
-    std::shared_ptr<std::vector<float> > dilated_image =  morphology(
+    boost::shared_ptr<std::vector<float> > dilated_image =  morphology(
             smooth_grad_image,
             w, h, strct, 3, Morphology::ERODE,
             grad_image); // <-- reuse

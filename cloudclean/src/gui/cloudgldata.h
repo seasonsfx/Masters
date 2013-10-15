@@ -10,7 +10,7 @@
 class GUI_API CloudGLData : public QObject{
     Q_OBJECT
  public:
-    CloudGLData(std::shared_ptr<PointCloud> pc);
+    CloudGLData(boost::shared_ptr<PointCloud> pc);
     ~CloudGLData();
 
     void setVAO(GLuint vao);
@@ -25,11 +25,11 @@ class GUI_API CloudGLData : public QObject{
 
  public slots:
     void syncCloud();
-    void syncLabels(std::shared_ptr<std::vector<int> > idxs = nullptr);
-    void syncFlags(std::shared_ptr<std::vector<int> > idxs = nullptr);
+    void syncLabels(boost::shared_ptr<std::vector<int> > idxs = nullptr);
+    void syncFlags(boost::shared_ptr<std::vector<int> > idxs = nullptr);
 
  public:
-    std::shared_ptr<PointCloud> pc_;
+    boost::shared_ptr<PointCloud> pc_;
     std::unique_ptr<QGLBuffer> label_buffer_;
     std::unique_ptr<QGLBuffer> point_buffer_;
     std::unique_ptr<QGLBuffer> flag_buffer_;
@@ -41,10 +41,10 @@ class GUI_API CloudGLData : public QObject{
     bool dirty_flags_;
     bool dirty_grid_;
 
-    std::shared_ptr<std::vector<int> > dirty_label_list_;
-    std::shared_ptr<std::vector<int> > dirty_point_list_;
-    std::shared_ptr<std::vector<int> > dirty_flag_list_;
-    std::shared_ptr<std::vector<int> > dirty_grid_list_;
+    boost::shared_ptr<std::vector<int> > dirty_label_list_;
+    boost::shared_ptr<std::vector<int> > dirty_point_list_;
+    boost::shared_ptr<std::vector<int> > dirty_flag_list_;
+    boost::shared_ptr<std::vector<int> > dirty_grid_list_;
 };
 
 

@@ -15,6 +15,7 @@
 #include <QStackedWidget>
 #include <QSlider>
 #include <QDockWidget>
+#include <boost/make_shared.hpp>
 #include "model/layerlist.h"
 #include "model/cloudlist.h"
 #include "gui/glwidget.h"
@@ -81,9 +82,9 @@ bool Lasso2D::mouseDblClickEvent(QMouseEvent * event){
 
     auto cloud = cl_->active_;
 
-    std::shared_ptr<std::vector<int> > empty = std::make_shared<std::vector<int>>();
-    std::shared_ptr<std::vector<int>> selected_indices = std::make_shared<std::vector<int>>();
-    std::shared_ptr<std::vector<int>> removed_indices= std::make_shared<std::vector<int>>();
+    boost::shared_ptr<std::vector<int> > empty = boost::make_shared<std::vector<int>>();
+    boost::shared_ptr<std::vector<int>> selected_indices = boost::make_shared<std::vector<int>>();
+    boost::shared_ptr<std::vector<int>> removed_indices= boost::make_shared<std::vector<int>>();
 
     lasso_->getIndices2D(cloud->scan_height(), flatview_->getCamera(),
                          cloud->cloudToGridMap(), selected_indices,

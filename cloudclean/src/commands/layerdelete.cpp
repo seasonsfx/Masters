@@ -3,7 +3,7 @@
 #include <model/layerlist.h>
 #include <model/layer.h>
 
-LayerDelete::LayerDelete(std::shared_ptr<Layer> layer, LayerList * ll) {
+LayerDelete::LayerDelete(boost::shared_ptr<Layer> layer, LayerList * ll) {
     const std::set<uint16_t> & source_labels = layer->getLabelSet();
     std::copy(source_labels.begin(), source_labels.end(), std::back_inserter(labels_));
     col_ = layer->color_;
@@ -17,7 +17,7 @@ QString LayerDelete::actionText(){
 }
 
 void LayerDelete::undo(){
-    std::shared_ptr<Layer> layer = ll_->addLayerWithId(id_);
+    boost::shared_ptr<Layer> layer = ll_->addLayerWithId(id_);
     layer->setName(name_);
     layer->setColor(col_);
     for(uint16_t label : labels_){

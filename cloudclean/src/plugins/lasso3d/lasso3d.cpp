@@ -15,6 +15,7 @@
 #include <QStackedWidget>
 #include <QSlider>
 #include <QDockWidget>
+#include <boost/make_shared.hpp>
 #include "model/layerlist.h"
 #include "model/cloudlist.h"
 #include "gui/glwidget.h"
@@ -84,9 +85,9 @@ bool Lasso3D::mouseDblClickEvent(QMouseEvent * event){
 
     Eigen::Matrix4f ndc = (cam.projectionMatrix() *  cam.modelviewMatrix() * cloud->modelview()).matrix();
 
-    std::shared_ptr<std::vector<int> > empty = std::make_shared<std::vector<int>>();
-    std::shared_ptr<std::vector<int>> selected_indices = std::make_shared<std::vector<int>>();
-    std::shared_ptr<std::vector<int>> removed_indices= std::make_shared<std::vector<int>>();
+    boost::shared_ptr<std::vector<int> > empty = boost::make_shared<std::vector<int>>();
+    boost::shared_ptr<std::vector<int>> selected_indices = boost::make_shared<std::vector<int>>();
+    boost::shared_ptr<std::vector<int>> removed_indices= boost::make_shared<std::vector<int>>();
 
     lasso_->getIndices(ndc, cloud.get(), selected_indices, removed_indices);
 

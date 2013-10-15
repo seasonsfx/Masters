@@ -78,7 +78,7 @@ void Brush2D::select(QMouseEvent * event){
 
     bool negative_select = QApplication::keyboardModifiers() == Qt::ControlModifier;
 
-    std::shared_ptr<PointCloud> pc = cl_->active_;
+    boost::shared_ptr<PointCloud> pc = cl_->active_;
 
     Eigen::Vector3f coord;
     coord << 2.0f* (event->x()/float(flatview_->width()) - 0.5),
@@ -87,10 +87,10 @@ void Brush2D::select(QMouseEvent * event){
 
     coord[1] = cl_->active_->scan_height()-coord[1];
 
-    std::shared_ptr<std::vector<int> > selected;
+    boost::shared_ptr<std::vector<int> > selected;
     selected.reset(new std::vector<int>());
 
-    std::shared_ptr<std::vector<int> > deselected;
+    boost::shared_ptr<std::vector<int> > deselected;
     deselected.reset(new std::vector<int>());
 
     for(int x = -radius_/2; x < radius_/2; x++){

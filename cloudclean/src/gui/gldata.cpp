@@ -22,19 +22,19 @@ GLData::GLData(QGLContext * glcontext, CloudList *cl, LayerList *ll, QObject *pa
     color_lookup_buffer_->release(); CE();
 
     CloudList * clp = cl_;
-    connect(clp, SIGNAL(deletingCloud(std::shared_ptr<PointCloud>)),
-            this, SLOT(deleteCloud(std::shared_ptr<PointCloud>)));
+    connect(clp, SIGNAL(deletingCloud(boost::shared_ptr<PointCloud>)),
+            this, SLOT(deleteCloud(boost::shared_ptr<PointCloud>)));
 
 }
 
 
-void GLData::reloadCloud(std::shared_ptr<PointCloud> cloud){
+void GLData::reloadCloud(boost::shared_ptr<PointCloud> cloud){
     glcontext_->makeCurrent();
     cloudgldata_[cloud].reset(new CloudGLData(cloud));
     emit update();
 }
 
-void GLData::deleteCloud(std::shared_ptr<PointCloud> cloud){
+void GLData::deleteCloud(boost::shared_ptr<PointCloud> cloud){
     cloudgldata_.erase(cloudgldata_.find(cloud));
 }
 
@@ -61,8 +61,8 @@ void GLData::reloadColorLookupBuffer(){
             if(!layer->isVisible())
                 return QColor(0, 0, 0, 0);
 
-            for(std::weak_ptr<Layer> l : ll_->selection_){
-                std::shared_ptr<Layer> selected_layer = l.lock();
+            for(boost::weak_ptr<Layer> l : ll_->selection_){
+                boost::shared_ptr<Layer> selected_layer = l.lock();
                 if(layer == selected_layer.get()){
                     selected.push_back(layer);
                     break;
@@ -105,6 +105,6 @@ void GLData::reloadColorLookupBuffer(){
 }
 
 GLData::~GLData(){
-    //disconnect(cl_, SIGNAL(deletingCloud(std::shared_ptr<PointCloud>)),
-    //        this, SLOT(deleteCloud(std::shared_ptr<PointCloud>)));
+    //disconnect(cl_, SIGNAL(deletingCloud(boost::shared_ptr<PointCloud>)),
+    //        this, SLOT(deleteCloud(boost::shared_ptr<PointCloud>)));
 }

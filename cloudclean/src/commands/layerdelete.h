@@ -7,7 +7,10 @@
 #include <QUndoCommand>
 #include <QColor>
 #include <QString>
+#include <boost/shared_ptr.hpp>
+#include <boost/weak_ptr.hpp>
 #include "commands/export.h"
+
 
 class LayerList;
 class PointCloud;
@@ -15,7 +18,7 @@ class Layer;
 
 class COMMAND_API LayerDelete : public QUndoCommand {
  public:
-    LayerDelete(std::shared_ptr<Layer> layer, LayerList * ll);
+    LayerDelete(boost::shared_ptr<Layer> layer, LayerList * ll);
     QString actionText();
     virtual void undo();
     virtual void redo();
@@ -28,7 +31,7 @@ class COMMAND_API LayerDelete : public QUndoCommand {
     QString name_;
     LayerList * ll_;
     uint id_;
-    std::weak_ptr<Layer> layer_;
+    boost::weak_ptr<Layer> layer_;
 };
 
 #endif // LayerFromLabels_H

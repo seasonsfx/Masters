@@ -99,7 +99,7 @@ void Markov::graphcut(int idx){
         return;
     }
 */
-    std::shared_ptr<PointCloud> cloud = core_->cl_->active_;
+    boost::shared_ptr<PointCloud> cloud = core_->cl_->active_;
     if(cloud == nullptr)
         return;
 
@@ -109,7 +109,7 @@ void Markov::graphcut(int idx){
     pcl::PointCloud<pcl::PointXYZI>::Ptr smaller_cloud = octreeDownsample(cloud.get(), 0.02, pca_idxs);
 
     // PCA
-    std::shared_ptr<std::vector<Eigen::Vector3f> > pca = getPCA(smaller_cloud.get(), 0.2f, 0);
+    boost::shared_ptr<std::vector<Eigen::Vector3f> > pca = getPCA(smaller_cloud.get(), 0.2f, 0);
 
     // Determine veg
     std::vector<bool> likely_veg(smaller_cloud->size());
@@ -180,7 +180,7 @@ void Markov::graphcut(int idx){
     std::vector<pcl::PointIndices> clusters;
     mc.extract (clusters);
 
-    auto select = std::make_shared<std::vector<int>>();
+    auto select = boost::make_shared<std::vector<int>>();
 
     // GAH!!!! inefficient
 

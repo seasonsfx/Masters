@@ -142,7 +142,7 @@ void VisualiseNormals::paint(const Eigen::Affine3f& proj, const Eigen::Affine3f&
     glBindVertexArray(vao_);
 
     for(uint i = 0; i < cl_->clouds_.size(); i++){
-        std::shared_ptr<PointCloud> pc = cl_->clouds_[i];
+        boost::shared_ptr<PointCloud> pc = cl_->clouds_[i];
         std::unique_ptr<QGLBuffer> & pb =
                 glwidget_->getGLData()->cloudgldata_[pc]->point_buffer_;
         pb->bind();

@@ -69,18 +69,18 @@ bool CloudList::setData(const QModelIndex & index, const QVariant & value,
     return true;
 }
 
-std::shared_ptr<PointCloud> CloudList::addCloud() {
-    std::shared_ptr<PointCloud> pc(new PointCloud());
+boost::shared_ptr<PointCloud> CloudList::addCloud() {
+    boost::shared_ptr<PointCloud> pc(new PointCloud());
     return addCloud(pc);
 }
 
-std::shared_ptr<PointCloud> CloudList::addCloud(const char* filename) {
-    std::shared_ptr<PointCloud> pc(new PointCloud());
+boost::shared_ptr<PointCloud> CloudList::addCloud(const char* filename) {
+    boost::shared_ptr<PointCloud> pc(new PointCloud());
     pc->load_ptx(filename);
     return addCloud(pc);
 }
 
-std::shared_ptr<PointCloud> CloudList::addCloud(std::shared_ptr<PointCloud> pc) {
+boost::shared_ptr<PointCloud> CloudList::addCloud(boost::shared_ptr<PointCloud> pc) {
     mtx_->lock();
     beginInsertRows(QModelIndex(), clouds_.size(), clouds_.size());
     clouds_.push_back(pc);
@@ -103,7 +103,7 @@ void CloudList::removeCloud(){
 }
 
 void CloudList::removeCloud(int idx){
-    std::shared_ptr<PointCloud> pc = clouds_[idx];
+    boost::shared_ptr<PointCloud> pc = clouds_[idx];
     if(pc == active_)
         active_.reset();
 
@@ -135,8 +135,8 @@ void CloudList::selectionChanged(const QItemSelection &sel,
         emit updatedActive(active_);
 }
 
-std::shared_ptr<PointCloud> CloudList::loadFile(QString filename){
-    std::shared_ptr<PointCloud> pc;
+boost::shared_ptr<PointCloud> CloudList::loadFile(QString filename){
+    boost::shared_ptr<PointCloud> pc;
     pc.reset(new PointCloud());
     pc->moveToThread(QApplication::instance()->thread());
 

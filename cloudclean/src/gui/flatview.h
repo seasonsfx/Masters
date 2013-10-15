@@ -28,7 +28,7 @@ class GUI_API FlatView : public QGLWidget {
     QPoint cloudToImageCoord(int idx);
 
  public slots:
-    void setCloud(std::shared_ptr<PointCloud> new_pc);
+    void setCloud(boost::shared_ptr<PointCloud> new_pc);
     void rotate90() {
         rotate(M_PI/2.0f);
     }
@@ -56,7 +56,7 @@ class GUI_API FlatView : public QGLWidget {
 
  private:
     std::vector<int> cloud_idx_lookup_;
-    std::weak_ptr<PointCloud> pc_;
+    boost::weak_ptr<PointCloud> pc_;
     CloudList * cl_;
     LayerList * ll_;
     GLData * gld_;

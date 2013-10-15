@@ -12,30 +12,30 @@
 
 enum class Morphology{ERODE, DILATE};
 
-UTIL_API std::shared_ptr<std::vector<float>> makeDistmap(
-        std::shared_ptr<PointCloud> cloud,
-        std::shared_ptr<std::vector<float>> distmap = nullptr
+UTIL_API boost::shared_ptr<std::vector<float>> makeDistmap(
+        boost::shared_ptr<PointCloud> cloud,
+        boost::shared_ptr<std::vector<float>> distmap = nullptr
 );
 
-UTIL_API std::shared_ptr<std::vector<float> > gradientImage(std::shared_ptr<std::vector<float>> image,
+UTIL_API boost::shared_ptr<std::vector<float> > gradientImage(boost::shared_ptr<std::vector<float>> image,
         int w, int h,
-        std::shared_ptr<std::vector<float>> out_image = nullptr);
+        boost::shared_ptr<std::vector<float>> out_image = nullptr);
 
-UTIL_API std::shared_ptr<std::vector<float> > convolve(
-        std::shared_ptr<std::vector<float>> image,
+UTIL_API boost::shared_ptr<std::vector<float> > convolve(
+        boost::shared_ptr<std::vector<float>> image,
         int w, int h, const double * filter, const int filter_size,
-        std::shared_ptr<std::vector<float>> out_image = nullptr);
+        boost::shared_ptr<std::vector<float>> out_image = nullptr);
 
-UTIL_API std::shared_ptr<std::vector<float> > morphology(
-        std::shared_ptr<std::vector<float>> image,
+UTIL_API boost::shared_ptr<std::vector<float> > morphology(
+        boost::shared_ptr<std::vector<float>> image,
         int w, int h, const int * strct, int strct_size,
         Morphology type,
-        std::shared_ptr<std::vector<float>> out_image = nullptr);
+        boost::shared_ptr<std::vector<float>> out_image = nullptr);
 
-UTIL_API std::shared_ptr<std::vector<float> > stdev(
-        std::shared_ptr<std::vector<float>> image,
+UTIL_API boost::shared_ptr<std::vector<float> > stdev(
+        boost::shared_ptr<std::vector<float>> image,
         int w, int h, const int local_size,
-        std::shared_ptr<std::vector<float>> out_image = nullptr);
+        boost::shared_ptr<std::vector<float>> out_image = nullptr);
 
 template <typename T>
 UTIL_API void minmax(const std::vector<T> & v, T & min, T & max){
@@ -50,22 +50,22 @@ UTIL_API void minmax(const std::vector<T> & v, T & min, T & max){
 
 }
 
-UTIL_API std::shared_ptr<std::vector<float> > interpolate(
-        std::shared_ptr<std::vector<float>> image,
+UTIL_API boost::shared_ptr<std::vector<float> > interpolate(
+        boost::shared_ptr<std::vector<float>> image,
         int w, int h, const int nsize,
-        std::shared_ptr<std::vector<float>> out_image = nullptr);
+        boost::shared_ptr<std::vector<float>> out_image = nullptr);
 
-UTIL_API std::shared_ptr<std::vector<float> > stdev_dist(std::shared_ptr<PointCloud> cloud,
+UTIL_API boost::shared_ptr<std::vector<float> > stdev_dist(boost::shared_ptr<PointCloud> cloud,
                                  const double radius, int max_nn = 0, bool use_depth = false);
 
-UTIL_API std::shared_ptr<std::vector<float>> cloudToGrid(const std::vector<int> & map, uint img_size,
-        std::shared_ptr<std::vector<float>> input,
-        std::shared_ptr<std::vector<float>> img = nullptr);
+UTIL_API boost::shared_ptr<std::vector<float>> cloudToGrid(const std::vector<int> & map, uint img_size,
+        boost::shared_ptr<std::vector<float>> input,
+        boost::shared_ptr<std::vector<float>> img = nullptr);
 
-UTIL_API std::shared_ptr<std::vector<Eigen::Vector3f> > getHist(std::shared_ptr<PointCloud> cloud, double radius, uint max_nn = 0);
-UTIL_API std::shared_ptr<std::vector<Eigen::Vector3f> > getPCA(pcl::PointCloud<pcl::PointXYZI> *, double radius, uint max_nn = 0);
+UTIL_API boost::shared_ptr<std::vector<Eigen::Vector3f> > getHist(boost::shared_ptr<PointCloud> cloud, double radius, uint max_nn = 0);
+UTIL_API boost::shared_ptr<std::vector<Eigen::Vector3f> > getPCA(pcl::PointCloud<pcl::PointXYZI> *, double radius, uint max_nn = 0);
 
-UTIL_API std::shared_ptr<std::vector<float> > normal_stdev(std::shared_ptr<PointCloud> cloud,
+UTIL_API boost::shared_ptr<std::vector<float> > normal_stdev(boost::shared_ptr<PointCloud> cloud,
                   pcl::PointCloud<pcl::Normal>::Ptr normals,
                   double radius, int max_nn);
 
@@ -269,7 +269,7 @@ inline void grid_nn_op(int idx,
     int h = cloud.scan_height();
     int w = cloud.scan_width();
 
-    std::shared_ptr<const std::vector<int>> grid_to_cloud = cloud.gridToCloudMap();
+    boost::shared_ptr<const std::vector<int>> grid_to_cloud = cloud.gridToCloudMap();
 
     int grid_idx = cloud.cloudToGridMap()[idx];
     int x = grid_idx / h;

@@ -2,10 +2,10 @@
 
 #include <QDebug>
 
-Select::Select(std::shared_ptr<PointCloud> pc,
-        std::shared_ptr<std::vector<int> > selected,
-        std::shared_ptr<std::vector<int> > deselected,
-        std::shared_ptr<std::vector<uint16_t> > exclude_labels,
+Select::Select(boost::shared_ptr<PointCloud> pc,
+        boost::shared_ptr<std::vector<int> > selected,
+        boost::shared_ptr<std::vector<int> > deselected,
+        boost::shared_ptr<std::vector<uint16_t> > exclude_labels,
         QUndoCommand *parent)
         : QUndoCommand(parent) {
     selected_.reset(new std::vector<int>());
@@ -46,9 +46,9 @@ void Select::undo(){
     if(pc_.expired())
         return;
 
-    std::shared_ptr<PointCloud> pc = pc_.lock();
+    boost::shared_ptr<PointCloud> pc = pc_.lock();
 
-    std::shared_ptr<std::vector<int> > update;
+    boost::shared_ptr<std::vector<int> > update;
     update.reset(new std::vector<int>());
 
     //TODO(Rickert): Make sure points that are already selected/deselected
@@ -73,9 +73,9 @@ void Select::redo(){
     if(pc_.expired())
         return;
 
-    std::shared_ptr<PointCloud> pc = pc_.lock();
+    boost::shared_ptr<PointCloud> pc = pc_.lock();
 
-    std::shared_ptr<std::vector<int> > update;
+    boost::shared_ptr<std::vector<int> > update;
     update.reset(new std::vector<int>());
 
     //TODO(Rickert): Make sure points that are already selected/deselected
@@ -96,9 +96,9 @@ void Select::redo(){
 
 }
 
-std::shared_ptr<std::vector<int> > mergeUnique(
-        std::shared_ptr<std::vector<int> > a,
-        std::shared_ptr<std::vector<int> > b){
+boost::shared_ptr<std::vector<int> > mergeUnique(
+        boost::shared_ptr<std::vector<int> > a,
+        boost::shared_ptr<std::vector<int> > b){
 
     std::copy(b->begin(), b->end(), std::back_inserter(*a));
     std::sort(a->begin(), a->end());

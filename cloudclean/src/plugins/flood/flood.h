@@ -3,6 +3,7 @@
 
 #include "pluginsystem/iplugin.h"
 #include <memory>
+#include <boost/shared_ptr.hpp>
 class QAction;
 class QWidget;
 class Core;
@@ -27,7 +28,7 @@ class Flood : public IPlugin {
     ~Flood();
     bool eventFilter(QObject *object, QEvent *event);
 
-    std::shared_ptr<std::vector<int> > getLayerIndices();
+    boost::shared_ptr<std::vector<int> > getLayerIndices();
 
  private:
     bool mouseReleaseEvent(QMouseEvent * event);

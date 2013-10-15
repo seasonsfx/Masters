@@ -21,17 +21,17 @@ class MODEL_API CloudList : public QAbstractListModel {
     int rowCount(const QModelIndex & parent = QModelIndex()) const;
     QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
     bool setData(const QModelIndex & index, const QVariant & value, int role);
-    std::shared_ptr<PointCloud> addCloud();
-    std::shared_ptr<PointCloud> addCloud(const char* filename);
-    std::shared_ptr<PointCloud> addCloud(std::shared_ptr<PointCloud> pc);
+    boost::shared_ptr<PointCloud> addCloud();
+    boost::shared_ptr<PointCloud> addCloud(const char* filename);
+    boost::shared_ptr<PointCloud> addCloud(boost::shared_ptr<PointCloud> pc);
     void removeCloud(int idx);
     
  signals:
-    void cloudUpdate(std::shared_ptr<PointCloud> pc);
+    void cloudUpdate(boost::shared_ptr<PointCloud> pc);
     void updated(); // Very vague
     void changedSelection(std::vector<int> selection);
-    void updatedActive(std::shared_ptr<PointCloud> pc);
-    void deletingCloud(std::shared_ptr<PointCloud> cloud);
+    void updatedActive(boost::shared_ptr<PointCloud> pc);
+    void deletingCloud(boost::shared_ptr<PointCloud> cloud);
 
     void progressUpdate(int percentage);
     void startNonDetJob();
@@ -40,16 +40,16 @@ class MODEL_API CloudList : public QAbstractListModel {
  public slots:
     void removeCloud();
     void selectionChanged(const QItemSelection &sel, const QItemSelection &des);
-    std::shared_ptr<PointCloud> loadFile(QString filename);
+    boost::shared_ptr<PointCloud> loadFile(QString filename);
     bool saveFile(QString filename, std::vector<uint16_t> labels);
     
  private:
     std::mutex * mtx_;
 
  public:
-    std::vector<std::shared_ptr<PointCloud> > clouds_;
+    std::vector<boost::shared_ptr<PointCloud> > clouds_;
     std::vector<int> selection_;
-    std::shared_ptr<PointCloud> active_;
+    boost::shared_ptr<PointCloud> active_;
 };
 
 #endif // CLOUDLIST_H

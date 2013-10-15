@@ -3,6 +3,7 @@
 #include <QDebug>
 #include <QColorDialog>
 #include <QMenu>
+#include <boost/make_shared.hpp>
 
 #include "commands/newlayer.h"
 #include "commands/select.h"
@@ -40,7 +41,7 @@ LayerListView::~LayerListView() {
     delete ui_;
 }
 
-void LayerListView::selectLayer(std::shared_ptr<Layer> layer) {
+void LayerListView::selectLayer(boost::shared_ptr<Layer> layer) {
 
 }
 
@@ -52,11 +53,11 @@ void LayerListView::selectLayer(std::shared_ptr<Layer> layer) {
 void LayerListView::selectionToLayer(){
     us_->beginMacro("Layer from selection");
     // Remap all selected points
-    for(std::shared_ptr<PointCloud> & pc : cl_->clouds_){
-        std::shared_ptr<std::vector<int> > idxs;
+    for(boost::shared_ptr<PointCloud> & pc : cl_->clouds_){
+        boost::shared_ptr<std::vector<int> > idxs;
         idxs.reset(new std::vector<int>());
 
-        std::shared_ptr<std::vector<int> > empty;
+        boost::shared_ptr<std::vector<int> > empty;
         empty.reset(new std::vector<int>());
 
         for(uint i = 0; i < pc->points.size(); i++){
@@ -87,7 +88,7 @@ void LayerListView::intersectSelectedLayers(){
     uint intersection_count = 0;
 
     // Find intersecting labels
-    std::shared_ptr<std::vector<uint16_t> > intersecting_labels;
+    boost::shared_ptr<std::vector<uint16_t> > intersecting_labels;
     intersecting_labels.reset(new std::vector<uint16_t>());
 
     // For every label index in the first layer
@@ -95,7 +96,7 @@ void LayerListView::intersectSelectedLayers(){
         intersection_count = 0;
         // For every other selected layer
         for(uint i = 1; i < ll_->selection_.size(); i++){
-            std::shared_ptr<Layer> layer = ll_->selection_[i].lock();
+            boost::shared_ptr<Layer> layer = ll_->selection_[i].lock();
             // For every label in the orther layer
             for(uint8_t qlabel : layer->labels_){
                 if(label == qlabel){
@@ -125,18 +126,18 @@ void LayerListView::intersectSelectedLayers(){
 
 void LayerListView::mergeSelectedLayers() {
     // Mark for deletion
-    std::vector<std::shared_ptr<Layer> > merge_these;
-    for(std::weak_ptr<Layer> l: ll_->selection_) {
+    std::vector<boost::shared_ptr<Layer> > merge_these;
+    for(boost::weak_ptr<Layer> l: ll_->selection_) {
         merge_these.push_back(l.lock());
     }
 
 
-    std::shared_ptr<std::vector<uint16_t> > labels;
+    boost::shared_ptr<std::vector<uint16_t> > labels;
     labels.reset(new std::vector<uint16_t>());
 
 
-    for(std::weak_ptr<Layer> l: ll_->selection_){
-        std::shared_ptr<Layer> layer = l.lock();
+    for(boost::weak_ptr<Layer> l: ll_->selection_){
+        boost::shared_ptr<Layer> layer = l.lock();
         for(int label : layer->labels_){
             labels->push_back(label);
         }
@@ -151,7 +152,7 @@ void LayerListView::mergeSelectedLayers() {
 
 
     // Delete marked labels
-    for(std::shared_ptr<Layer> dl : merge_these) {
+    for(boost::shared_ptr<Layer> dl : merge_these) {
         us_->push(new LayerDelete(dl, ll_));
     }
 
@@ -198,16 +199,16 @@ void LayerListView::contextMenu(const QPoint &pos) {
         connect(&select_layer, &QAction::triggered, [=] () {
 
             std::set<uint16_t> selected_labels;
-            for(std::weak_ptr<Layer> wl : ll_->selection_) {
-                std::shared_ptr<Layer> l = wl.lock();
+            for(boost::weak_ptr<Layer> wl : ll_->selection_) {
+                boost::shared_ptr<Layer> l = wl.lock();
                 for(uint16_t label  : l->getLabelSet()) {
                     selected_labels.insert(label);
                 }
             }
 
             us_->beginMacro("Select layer");
-            for(std::shared_ptr<PointCloud> pc : cl_->clouds_){
-                std::shared_ptr<std::vector<int>> points = std::make_shared<std::vector<int>>();
+            for(boost::shared_ptr<PointCloud> pc : cl_->clouds_){
+                boost::shared_ptr<std::vector<int>> points = boost::make_shared<std::vector<int>>();
                 for(uint idx = 0; idx < pc->size(); ++idx) {
                     for(uint16_t slabel : selected_labels) {
                         if(slabel == pc->labels_[idx]){

@@ -164,10 +164,10 @@ void Brush3D::select(QMouseEvent * event){
     if(idx == -1)
         return;
 
-    std::shared_ptr<std::vector<int> > indices;
+    boost::shared_ptr<std::vector<int> > indices;
     indices.reset(new std::vector<int>());
 
-    std::shared_ptr<std::vector<int> > empty;
+    boost::shared_ptr<std::vector<int> > empty;
     empty.reset(new std::vector<int>());
 
     std::vector<float> distsq;

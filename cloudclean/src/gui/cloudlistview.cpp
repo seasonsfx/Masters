@@ -30,7 +30,7 @@ CloudListView::CloudListView(QUndoStack *us, LayerList * ll,
     connect(ui_->tableView, SIGNAL(customContextMenuRequested(const QPoint&)),
             this, SLOT(contextMenu(const QPoint &)));
 
-    connect(cl_, SIGNAL(cloudUpdate(std::shared_ptr<PointCloud>)), this, SLOT(dataChanged()));
+    connect(cl_, SIGNAL(cloudUpdate(boost::shared_ptr<PointCloud>)), this, SLOT(dataChanged()));
 
     ui_->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui_->tableView->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -98,11 +98,11 @@ void CloudListView::contextMenu(const QPoint &pos) {
 
 void CloudListView::deselectAllPoints(){
     us_->beginMacro("Deselect All");
-    for(std::shared_ptr<PointCloud> cloud : cl_->clouds_){
-        std::shared_ptr<std::vector<int> > indices;
+    for(boost::shared_ptr<PointCloud> cloud : cl_->clouds_){
+        boost::shared_ptr<std::vector<int> > indices;
         indices.reset(new std::vector<int>());
 
-        std::shared_ptr<std::vector<int> > empty;
+        boost::shared_ptr<std::vector<int> > empty;
         empty.reset(new std::vector<int>());
 
         for(uint idx = 0; idx < cloud->flags_.size(); idx++){
@@ -118,11 +118,11 @@ void CloudListView::deselectAllPoints(){
 
 void CloudListView::selectAllPoints(){
     us_->beginMacro("Select All");
-    for(std::shared_ptr<PointCloud> cloud : cl_->clouds_){
-        std::shared_ptr<std::vector<int> > indices;
+    for(boost::shared_ptr<PointCloud> cloud : cl_->clouds_){
+        boost::shared_ptr<std::vector<int> > indices;
         indices.reset(new std::vector<int>());
 
-        std::shared_ptr<std::vector<int> > empty;
+        boost::shared_ptr<std::vector<int> > empty;
         empty.reset(new std::vector<int>());
 
         for(uint idx = 0; idx < cloud->flags_.size(); idx++){

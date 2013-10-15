@@ -125,19 +125,19 @@ void NormalEstimator::initialize(Core *core){
     cmd_queue = clCreateCommandQueue(clcontext, device, 0, NULL);
 
 
-    connect(cl_, SIGNAL(cloudUpdate(std::shared_ptr<PointCloud>)),
-            this, SLOT(addedCloud(std::shared_ptr<PointCloud>)));
+    connect(cl_, SIGNAL(cloudUpdate(boost::shared_ptr<PointCloud>)),
+            this, SLOT(addedCloud(boost::shared_ptr<PointCloud>)));
 
-    connect(cl_, SIGNAL(deletingCloud(std::shared_ptr<PointCloud>)),
-            this, SLOT(removingCloud(std::shared_ptr<PointCloud>)));
+    connect(cl_, SIGNAL(deletingCloud(boost::shared_ptr<PointCloud>)),
+            this, SLOT(removingCloud(boost::shared_ptr<PointCloud>)));
 
 }
 
 void NormalEstimator::cleanup(){
-    disconnect(cl_, SIGNAL(cloudUpdate(std::shared_ptr<PointCloud>)),
-            this, SLOT(addedCloud(std::shared_ptr<PointCloud>)));
-    disconnect(cl_, SIGNAL(deletingCloud(std::shared_ptr<PointCloud>)),
-            this, SLOT(removingCloud(std::shared_ptr<PointCloud>)));
+    disconnect(cl_, SIGNAL(cloudUpdate(boost::shared_ptr<PointCloud>)),
+            this, SLOT(addedCloud(boost::shared_ptr<PointCloud>)));
+    disconnect(cl_, SIGNAL(deletingCloud(boost::shared_ptr<PointCloud>)),
+            this, SLOT(removingCloud(boost::shared_ptr<PointCloud>)));
 }
 
 void NormalEstimator::enablePremptiveEstimation(bool enable) {
@@ -152,8 +152,8 @@ void NormalEstimator::enablePremptiveEstimation(bool enable) {
     }
 }
 
-pcl::PointCloud<pcl::Normal>::Ptr NormalEstimator::getNormals(std::shared_ptr<PointCloud> cloud) {
-    std::weak_ptr<PointCloud> wcloud = cloud;
+pcl::PointCloud<pcl::Normal>::Ptr NormalEstimator::getNormals(boost::shared_ptr<PointCloud> cloud) {
+    boost::weak_ptr<PointCloud> wcloud = cloud;
     auto it = normal_map_.find(wcloud);
     if (it != normal_map_.end())
         return it->second;
@@ -170,8 +170,8 @@ pcl::PointCloud<pcl::Normal>::Ptr NormalEstimator::getNormals(std::shared_ptr<Po
     return normal_map_[wcloud];
 }
 
-bool NormalEstimator::normalsAvailible(std::shared_ptr<PointCloud> cloud) {
-    std::weak_ptr<PointCloud> wcloud = cloud;
+bool NormalEstimator::normalsAvailible(boost::shared_ptr<PointCloud> cloud) {
+    boost::weak_ptr<PointCloud> wcloud = cloud;
     auto it = normal_map_.find(wcloud);
     if (it != normal_map_.end())
         return true;
@@ -184,17 +184,17 @@ bool NormalEstimator::normalsAvailible(std::shared_ptr<PointCloud> cloud) {
     return false;
 }
 
-void NormalEstimator::addedCloud(std::shared_ptr<PointCloud> cloud) {
+void NormalEstimator::addedCloud(boost::shared_ptr<PointCloud> cloud) {
     if(!premptive_estimation_)
         return;
-    std::weak_ptr<PointCloud> wpc = cloud;
+    boost::weak_ptr<PointCloud> wpc = cloud;
     future_normal_map_[wpc] = std::async(std::launch::async, &NormalEstimator::estimateNormals, this, cloud);
 }
 
-void NormalEstimator::removingCloud(std::shared_ptr<PointCloud> cloud) {
+void NormalEstimator::removingCloud(boost::shared_ptr<PointCloud> cloud) {
     // Todo stop future calc
     // delete data
-    std::weak_ptr<PointCloud> wpc = cloud;
+    boost::weak_ptr<PointCloud> wpc = cloud;
     const auto it = normal_map_.find(wpc); // TODO: Bug! Freezes on delete
     if(it != normal_map_.end()) {
         normal_map_.erase(it);
@@ -261,7 +261,7 @@ bool isValidPoint(PointIdx & point, int width, int height,
 }
 
 pcl::PointCloud<pcl::Normal>::Ptr
-NormalEstimator::estimateNormals(std::shared_ptr<PointCloud> cloud) {
+NormalEstimator::estimateNormals(boost::shared_ptr<PointCloud> cloud) {
 
     qDebug() << "Starting normal estimation";
 

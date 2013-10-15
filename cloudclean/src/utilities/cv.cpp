@@ -6,14 +6,15 @@
 #include <QTime>
 #include <vector>
 #include <memory>
+#include <boost/make_shared.hpp>
 #include <pcl/common/pca.h>
 #include <pcl/search/flann_search.h>
 #include <pcl/kdtree/kdtree_flann.h>
 #include "plugins/visualisedepth/gridsearch.h"
 
-std::shared_ptr<std::vector<int>> makeLookup(std::shared_ptr<PointCloud> cloud) {
+boost::shared_ptr<std::vector<int>> makeLookup(boost::shared_ptr<PointCloud> cloud) {
     int size = cloud->scan_width() * cloud->scan_height();
-    auto grid_to_cloud = std::make_shared<std::vector<int>>(size, -1);
+    auto grid_to_cloud = boost::make_shared<std::vector<int>>(size, -1);
     for(uint i = 0; i < cloud->size(); i++) {
         int grid_idx = cloud->cloudToGridMap()[i];
         (*grid_to_cloud)[grid_idx] = i;
@@ -21,13 +22,13 @@ std::shared_ptr<std::vector<int>> makeLookup(std::shared_ptr<PointCloud> cloud) 
     return grid_to_cloud;
 }
 
-std::shared_ptr<std::vector<float>> makeDistmap(
-        std::shared_ptr<PointCloud> cloud,
-        std::shared_ptr<std::vector<float>> distmap) {
+boost::shared_ptr<std::vector<float>> makeDistmap(
+        boost::shared_ptr<PointCloud> cloud,
+        boost::shared_ptr<std::vector<float>> distmap) {
     uint size = cloud->scan_width() * cloud->scan_height();
 
     if(distmap == nullptr || distmap->size() != size)
-        distmap = std::make_shared<std::vector<float>>(size, 0.0f);
+        distmap = boost::make_shared<std::vector<float>>(size, 0.0f);
 
     float max_dist = 0.0;
 
@@ -55,14 +56,14 @@ static const double sobel_y[9] = {
     -1, -2, -1,
 };
 
-std::shared_ptr<std::vector<float> > gradientImage(std::shared_ptr<std::vector<float>> image,
+boost::shared_ptr<std::vector<float> > gradientImage(boost::shared_ptr<std::vector<float>> image,
         int w, int h,
-        std::shared_ptr<std::vector<float>> out_image) {
+        boost::shared_ptr<std::vector<float>> out_image) {
 
     uint size = w*h;
 
     if(out_image == nullptr || out_image->size() != size) {
-        out_image = std::make_shared<std::vector<float>>(size, 0);
+        out_image = boost::make_shared<std::vector<float>>(size, 0);
     }
 
     float * grad_mag = &out_image->at(0);
@@ -79,14 +80,14 @@ std::shared_ptr<std::vector<float> > gradientImage(std::shared_ptr<std::vector<f
     return out_image;
 }
 
-std::shared_ptr<std::vector<float> > convolve(
-        std::shared_ptr<std::vector<float>> image,
+boost::shared_ptr<std::vector<float> > convolve(
+        boost::shared_ptr<std::vector<float>> image,
         int w, int h, const double * filter, const int filter_size,
-        std::shared_ptr<std::vector<float>> out_image) {
+        boost::shared_ptr<std::vector<float>> out_image) {
 
     uint size = w*h;
     if(out_image == nullptr || out_image->size() != size) {
-        out_image = std::make_shared<std::vector<float>>(size, 0);
+        out_image = boost::make_shared<std::vector<float>>(size, 0);
     }
 
     float * img = &out_image->at(0);
@@ -101,14 +102,14 @@ std::shared_ptr<std::vector<float> > convolve(
 }
 
 
-std::shared_ptr<std::vector<float> > morphology(std::shared_ptr<std::vector<float>> image,
+boost::shared_ptr<std::vector<float> > morphology(boost::shared_ptr<std::vector<float>> image,
         int w, int h, const int *strct, int strct_size,
         Morphology type,
-        std::shared_ptr<std::vector<float>> out_image) {
+        boost::shared_ptr<std::vector<float>> out_image) {
 
     uint size = w*h;
     if(out_image == nullptr || out_image->size() != size) {
-        out_image = std::make_shared<std::vector<float>>(size, 0);
+        out_image = boost::make_shared<std::vector<float>>(size, 0);
     }
 
     //float * img = &out_image->at(0);
@@ -124,14 +125,14 @@ std::shared_ptr<std::vector<float> > morphology(std::shared_ptr<std::vector<floa
 }
 
 // stdev on depth image
-std::shared_ptr<std::vector<float> > stdev(
-        std::shared_ptr<std::vector<float>> image,
+boost::shared_ptr<std::vector<float> > stdev(
+        boost::shared_ptr<std::vector<float>> image,
         int w, int h, const int local_size,
-        std::shared_ptr<std::vector<float>> out_image) {
+        boost::shared_ptr<std::vector<float>> out_image) {
 
     uint size = w*h;
     if(out_image == nullptr || out_image->size() != size) {
-        out_image = std::make_shared<std::vector<float>>(size, 0);
+        out_image = boost::make_shared<std::vector<float>>(size, 0);
     }
 
     float * img = &out_image->at(0);
@@ -145,14 +146,14 @@ std::shared_ptr<std::vector<float> > stdev(
     return out_image;
 }
 
-std::shared_ptr<std::vector<float> > interpolate(
-        std::shared_ptr<std::vector<float>> image,
+boost::shared_ptr<std::vector<float> > interpolate(
+        boost::shared_ptr<std::vector<float>> image,
         int w, int h, const int nsize,
-        std::shared_ptr<std::vector<float>> out_image) {
+        boost::shared_ptr<std::vector<float>> out_image) {
 
     uint size = w*h;
     if(out_image == nullptr || out_image->size() != size) {
-        out_image = std::make_shared<std::vector<float>>(size, 0);
+        out_image = boost::make_shared<std::vector<float>>(size, 0);
     }
 
     //float * img = &out_image->at(0);
@@ -167,11 +168,11 @@ std::shared_ptr<std::vector<float> > interpolate(
     return out_image;
 }
 
-std::shared_ptr<std::vector<float> > stdev_dist(std::shared_ptr<PointCloud> cloud,
+boost::shared_ptr<std::vector<float> > stdev_dist(boost::shared_ptr<PointCloud> cloud,
                             const double radius, int max_nn, bool use_depth) {
 
-    std::shared_ptr<std::vector<float>> stdevs
-                        = std::make_shared<std::vector<float>>(cloud->size());
+    boost::shared_ptr<std::vector<float>> stdevs
+                        = boost::make_shared<std::vector<float>>(cloud->size());
 
     std::vector<int> idxs(0);
     std::vector<float> dists(0);
@@ -228,13 +229,13 @@ std::shared_ptr<std::vector<float> > stdev_dist(std::shared_ptr<PointCloud> clou
 }
 
 
-std::shared_ptr<std::vector<float>> cloudToGrid(const std::vector<int> &map,
+boost::shared_ptr<std::vector<float>> cloudToGrid(const std::vector<int> &map,
         uint img_size,
-        std::shared_ptr<std::vector<float>> input,
-        std::shared_ptr<std::vector<float>> img) {
+        boost::shared_ptr<std::vector<float>> input,
+        boost::shared_ptr<std::vector<float>> img) {
 
     if(img == nullptr || img->size() != img_size)
-        img = std::make_shared<std::vector<float>>(img_size, 0.0f);
+        img = boost::make_shared<std::vector<float>>(img_size, 0.0f);
 
     for(uint i = 0; i < map.size(); i++) {
         int grid_idx = map[i];
@@ -244,10 +245,10 @@ std::shared_ptr<std::vector<float>> cloudToGrid(const std::vector<int> &map,
     return img;
 }
 
-std::shared_ptr<std::vector<Eigen::Vector3f> > getHist(std::shared_ptr<PointCloud> cloud, double radius, uint max_nn) {
+boost::shared_ptr<std::vector<Eigen::Vector3f> > getHist(boost::shared_ptr<PointCloud> cloud, double radius, uint max_nn) {
 
-    std::shared_ptr<std::vector<Eigen::Vector3f> > eigen_vals =
-            std::make_shared<std::vector<Eigen::Vector3f>>(cloud->size());
+    boost::shared_ptr<std::vector<Eigen::Vector3f> > eigen_vals =
+            boost::make_shared<std::vector<Eigen::Vector3f>>(cloud->size());
 
     pcl::KdTreeFLANN<pcl::PointXYZI> search;
     search.setInputCloud(pcl::PointCloud<pcl::PointXYZI>::ConstPtr(cloud.get(), boost::serialization::null_deleter()));
@@ -305,10 +306,10 @@ std::shared_ptr<std::vector<Eigen::Vector3f> > getHist(std::shared_ptr<PointClou
     return eigen_vals;
 }
 
-std::shared_ptr<std::vector<Eigen::Vector3f> > getPCA(pcl::PointCloud<pcl::PointXYZI> * cloud, double radius, uint max_nn) {
+boost::shared_ptr<std::vector<Eigen::Vector3f> > getPCA(pcl::PointCloud<pcl::PointXYZI> * cloud, double radius, uint max_nn) {
 
-    std::shared_ptr<std::vector<Eigen::Vector3f> > eigen_vals =
-            std::make_shared<std::vector<Eigen::Vector3f>>(cloud->size());
+    boost::shared_ptr<std::vector<Eigen::Vector3f> > eigen_vals =
+            boost::make_shared<std::vector<Eigen::Vector3f>>(cloud->size());
 
     //GridSearch search(*cloud);
     //pcl::search::FlannSearch<pcl::PointXYZI> search;
@@ -387,12 +388,12 @@ std::shared_ptr<std::vector<Eigen::Vector3f> > getPCA(pcl::PointCloud<pcl::Point
     return eigen_vals;
 }
 
-std::shared_ptr<std::vector<float> > normal_stdev(std::shared_ptr<PointCloud> cloud,
+boost::shared_ptr<std::vector<float> > normal_stdev(boost::shared_ptr<PointCloud> cloud,
                   pcl::PointCloud<pcl::Normal>::Ptr normals,
                   double radius, int max_nn) {
 
-    std::shared_ptr<std::vector<float> > std_devs =
-            std::make_shared<std::vector<float>>(cloud->size(), 0);
+    boost::shared_ptr<std::vector<float> > std_devs =
+            boost::make_shared<std::vector<float>>(cloud->size(), 0);
 
     pcl::KdTreeFLANN<pcl::PointXYZI> search;
     search.setInputCloud(pcl::PointCloud<pcl::PointXYZI>::ConstPtr(cloud.get(), boost::serialization::null_deleter()));

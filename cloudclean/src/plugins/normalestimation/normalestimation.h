@@ -10,6 +10,8 @@
 #include <Eigen/Dense>
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
+#include <boost/weak_ptr.hpp>
+#include <boost/smart_ptr/owner_less.hpp>
 #include "plugins/normalestimation/export.h"
 #include "pluginsystem/pluginmanager.h"
 
@@ -22,8 +24,8 @@
 #include <CL/cl_gl.h>
 
 template<typename T>
-struct WeakPtrHash : public std::unary_function<std::weak_ptr<T>, size_t> {
-   size_t operator()(const std::weak_ptr<T>& wp) const
+struct WeakPtrHash : public std::unary_function<boost::weak_ptr<T>, size_t> {
+   size_t operator()(const boost::weak_ptr<T>& wp) const
    {
       auto sp = wp.lock();
       return std::hash<decltype(sp)>()(sp);
@@ -31,9 +33,9 @@ struct WeakPtrHash : public std::unary_function<std::weak_ptr<T>, size_t> {
 };
 
 template<typename T>
-struct WeakPtrEqual : public std::unary_function<std::weak_ptr<T>, bool> {
+struct WeakPtrEqual : public std::unary_function<boost::weak_ptr<T>, bool> {
 
-   bool operator()(const std::weak_ptr<T>& left, const std::weak_ptr<T>& right) const
+   bool operator()(const boost::weak_ptr<T>& left, const boost::weak_ptr<T>& right) const
    {
       return !left.owner_before(right) && !right.owner_before(left);
    }
@@ -44,14 +46,14 @@ class CloudList;
 class QUndoStack;
 class PointCloud;
 
-typedef std::map<std::weak_ptr<PointCloud>, pcl::PointCloud<pcl::Normal>::Ptr,
-    std::owner_less<std::weak_ptr<PointCloud>>> NormalMap;
+typedef std::map<boost::weak_ptr<PointCloud>, pcl::PointCloud<pcl::Normal>::Ptr,
+    boost::owner_less<boost::weak_ptr<PointCloud>>> NormalMap;
 
-//typedef std::unordered_map<std::weak_ptr<PointCloud>, pcl::PointCloud<pcl::Normal>::Ptr, WeakPtrHash<PointCloud>, WeakPtrEqual<PointCloud>> NormalMap;
+//typedef std::unordered_map<boost::weak_ptr<PointCloud>, pcl::PointCloud<pcl::Normal>::Ptr, WeakPtrHash<PointCloud>, WeakPtrEqual<PointCloud>> NormalMap;
 
-typedef std::map<std::weak_ptr<PointCloud>,
+typedef std::map<boost::weak_ptr<PointCloud>,
     std::future<pcl::PointCloud<pcl::Normal>::Ptr>,
-    std::owner_less<std::weak_ptr<PointCloud>>> FutureNormalMap;
+    boost::owner_less<boost::weak_ptr<PointCloud>>> FutureNormalMap;
 
 class NE_API NormalEstimator : public IPlugin {
     Q_INTERFACES(IPlugin)
@@ -62,15 +64,15 @@ class NE_API NormalEstimator : public IPlugin {
     void initialize(Core * core);
     void cleanup();
     void enablePremptiveEstimation(bool enable);
-    pcl::PointCloud<pcl::Normal>::Ptr getNormals(std::shared_ptr<PointCloud> cloud);
-    bool normalsAvailible(std::shared_ptr<PointCloud> cloud);
+    pcl::PointCloud<pcl::Normal>::Ptr getNormals(boost::shared_ptr<PointCloud> cloud);
+    bool normalsAvailible(boost::shared_ptr<PointCloud> cloud);
 
  public slots:
-    void addedCloud(std::shared_ptr<PointCloud> cloud);
-    void removingCloud(std::shared_ptr<PointCloud> cloud);
+    void addedCloud(boost::shared_ptr<PointCloud> cloud);
+    void removingCloud(boost::shared_ptr<PointCloud> cloud);
 
  private:
-    pcl::PointCloud<pcl::Normal>::Ptr estimateNormals(std::shared_ptr<PointCloud> cloud);
+    pcl::PointCloud<pcl::Normal>::Ptr estimateNormals(boost::shared_ptr<PointCloud> cloud);
 
  private:
     bool premptive_estimation_;

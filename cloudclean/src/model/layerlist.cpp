@@ -72,7 +72,7 @@ bool LayerList::setData(const QModelIndex & index, const QVariant & value,
     return true;
 }
 
-std::shared_ptr<Layer> LayerList::addLayer(std::shared_ptr<Layer> layer){
+boost::shared_ptr<Layer> LayerList::addLayer(boost::shared_ptr<Layer> layer){
     mtx_->lock();
     beginInsertRows(QModelIndex(), layers_.size(), layers_.size());
     layer_id_map_[layer->id_] = layer;
@@ -85,25 +85,25 @@ std::shared_ptr<Layer> LayerList::addLayer(std::shared_ptr<Layer> layer){
     return layer;
 }
 
-std::shared_ptr<Layer> LayerList::addLayerWithId(uint id) {
-    std::shared_ptr<Layer> layer(new Layer(layer_lookup_table_));
+boost::shared_ptr<Layer> LayerList::addLayerWithId(uint id) {
+    boost::shared_ptr<Layer> layer(new Layer(layer_lookup_table_));
     layer->id_ = id;
     return addLayer(layer);
 }
 
-std::shared_ptr<Layer> LayerList::addLayer() {
-    std::shared_ptr<Layer> layer(new Layer(layer_lookup_table_));
+boost::shared_ptr<Layer> LayerList::addLayer() {
+    boost::shared_ptr<Layer> layer(new Layer(layer_lookup_table_));
     return addLayer(layer);
 }
 
-std::shared_ptr<Layer> LayerList::addLayer(QString name) {
-    std::shared_ptr<Layer> layer(new Layer(layer_lookup_table_));
+boost::shared_ptr<Layer> LayerList::addLayer(QString name) {
+    boost::shared_ptr<Layer> layer(new Layer(layer_lookup_table_));
     layer->name_ = name;
     return addLayer(layer);
 }
 
-int LayerList::getLayerIndex(std::shared_ptr<Layer> layer){
-    auto isEq = [&layer] (std::shared_ptr<Layer> layer2) {
+int LayerList::getLayerIndex(boost::shared_ptr<Layer> layer){
+    auto isEq = [&layer] (boost::shared_ptr<Layer> layer2) {
             return layer == layer2;
     };
 
@@ -120,7 +120,7 @@ void LayerList::deleteLayer(){
     deleteLayer(sender()->property("layer_id").toInt());
 }
 
-void LayerList::deleteLayer(std::shared_ptr<Layer> layer) {
+void LayerList::deleteLayer(boost::shared_ptr<Layer> layer) {
     int idx = getLayerIndex(layer);
 
     if(idx != -1) {
@@ -133,7 +133,7 @@ void LayerList::deleteLayer(int idx){
                this, SIGNAL(lookupTableUpdate()));
     beginRemoveRows(QModelIndex(), idx, idx);
 
-    auto toDel = [&idx, this] (std::weak_ptr<Layer> l) {
+    auto toDel = [&idx, this] (boost::weak_ptr<Layer> l) {
             if(l.expired())
                 return true;
         return false;
@@ -201,7 +201,7 @@ void LayerList::selectionChanged(const QItemSelection &sel,
                                      const QItemSelection &des) {
 
     // Labda to remove selection
-    auto toDel = [&des, this] (std::weak_ptr<Layer> l) {
+    auto toDel = [&des, this] (boost::weak_ptr<Layer> l) {
         for(QModelIndex d : des.indexes()){
             if(l.expired())
                 return true; // this should not happen, just in case take care of it

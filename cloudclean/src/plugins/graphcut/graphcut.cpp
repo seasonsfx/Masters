@@ -177,8 +177,8 @@ void GraphCut::segment(int idx){
     std::vector <pcl::PointIndices> clusters;
     mc.extract (clusters);
 
-    auto select = std::make_shared<std::vector<int>>(clusters[1].indices.size());
-    auto deselect = std::make_shared<std::vector<int>>(clusters[0].indices.size());
+    auto select = boost::make_shared<std::vector<int>>(clusters[1].indices.size());
+    auto deselect = boost::make_shared<std::vector<int>>(clusters[0].indices.size());
     std::copy(clusters[0].indices.begin(), clusters[0].indices.end(), deselect->begin());
     std::copy(clusters[1].indices.begin(), clusters[1].indices.end(), select->begin());
 

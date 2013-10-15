@@ -24,13 +24,13 @@ class GUI_API GLData : public QObject {
     void update();
     
  public slots:
-    void reloadCloud(std::shared_ptr<PointCloud> cloud);
+    void reloadCloud(boost::shared_ptr<PointCloud> cloud);
     void reloadColorLookupBuffer();
-    void deleteCloud(std::shared_ptr<PointCloud> cloud);
+    void deleteCloud(boost::shared_ptr<PointCloud> cloud);
     
  public:
-    std::shared_ptr<QGLBuffer> color_lookup_buffer_;
-    std::map<std::shared_ptr<PointCloud>, std::shared_ptr<CloudGLData> > cloudgldata_;
+    boost::shared_ptr<QGLBuffer> color_lookup_buffer_;
+    std::map<boost::shared_ptr<PointCloud>, boost::shared_ptr<CloudGLData> > cloudgldata_;
     float selection_color_[4];
 
 

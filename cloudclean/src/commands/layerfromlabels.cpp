@@ -4,7 +4,7 @@
 #include <model/pointcloud.h>
 #include <model/layer.h>
 
-LayerFromLabels::LayerFromLabels(std::shared_ptr<std::vector<uint16_t> > labels,
+LayerFromLabels::LayerFromLabels(boost::shared_ptr<std::vector<uint16_t> > labels,
                                  LayerList * ll, bool subtractive) {
     subtractive_ = subtractive;
     labels_ = labels;
@@ -37,7 +37,7 @@ void LayerFromLabels::undo(){
 }
 
 void LayerFromLabels::redo(){
-    std::shared_ptr<Layer> layer = ll_->addLayer();
+    boost::shared_ptr<Layer> layer = ll_->addLayer();
     new_layer_ = layer;
 
     if(subtractive_){

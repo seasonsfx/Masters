@@ -4,8 +4,8 @@
 #include <model/pointcloud.h>
 #include <model/layer.h>
 
-NewLayer::NewLayer(std::shared_ptr<PointCloud> pc,
-                                 std::shared_ptr<std::vector<int> > idxs,
+NewLayer::NewLayer(boost::shared_ptr<PointCloud> pc,
+                                 boost::shared_ptr<std::vector<int> > idxs,
                                  LayerList * ll) {
     pc_ = pc;
     idxs_ = idxs;
@@ -31,7 +31,7 @@ void NewLayer::undo(){
     }
 }
 
-uint16_t NewLayer::getNewLabel(uint16_t old, std::shared_ptr<Layer> layer) {
+uint16_t NewLayer::getNewLabel(uint16_t old, boost::shared_ptr<Layer> layer) {
     auto new_label_it = old_to_new.find(old);
 
     bool unknown_mapping = new_label_it == old_to_new.cend();
@@ -53,7 +53,7 @@ uint16_t NewLayer::getNewLabel(uint16_t old, std::shared_ptr<Layer> layer) {
 }
 
 void NewLayer::redo(){
-    std::shared_ptr<Layer> layer = ll_->addLayer();
+    boost::shared_ptr<Layer> layer = ll_->addLayer();
     new_layer_ = layer;
     if(new_to_old.size() != 0)
         layer->setColor(layer_color_);

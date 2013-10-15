@@ -4,7 +4,7 @@
 #include <model/pointcloud.h>
 #include <model/layer.h>
 
-LayerGuiSelect::LayerGuiSelect(std::shared_ptr<std::vector<uint16_t> > labels,
+LayerGuiSelect::LayerGuiSelect(boost::shared_ptr<std::vector<uint16_t> > labels,
                                  LayerList * ll, bool subtractive) {
     subtractive_ = subtractive;
     labels_ = labels;
@@ -36,7 +36,7 @@ void LayerGuiSelect::undo(){
 }
 
 void LayerGuiSelect::redo(){
-    std::shared_ptr<Layer> layer = ll_->addLayer();
+    boost::shared_ptr<Layer> layer = ll_->addLayer();
     new_layer_ = layer;
 
     if(subtractive_){

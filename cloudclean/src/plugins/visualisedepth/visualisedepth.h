@@ -32,15 +32,15 @@ class VDepth : public IPlugin {
     ~VDepth();
 
  private:
-    void drawFloats(std::shared_ptr<const std::vector<float> > out_img, std::shared_ptr<PointCloud> cloud);
-    void drawVector3f(std::shared_ptr<const std::vector<Eigen::Vector3f> > out_img, std::shared_ptr<PointCloud> cloud);
+    void drawFloats(boost::shared_ptr<const std::vector<float> > out_img, boost::shared_ptr<PointCloud> cloud);
+    void drawVector3f(boost::shared_ptr<const std::vector<Eigen::Vector3f> > out_img, boost::shared_ptr<PointCloud> cloud);
 
     pcl::PointCloud<pcl::PointXYZINormal>::Ptr downsample(
-            std::shared_ptr<PointCloud> input,
+            boost::shared_ptr<PointCloud> input,
             float resolution, std::vector<int> & sub_idxs);
 
 
-    pcl::PointCloud<pcl::PointXYZINormal>::Ptr gridDownsample(std::shared_ptr<PointCloud> input, float resolution, std::vector<int>& sub_idxs);
+    pcl::PointCloud<pcl::PointXYZINormal>::Ptr gridDownsample(boost::shared_ptr<PointCloud> input, float resolution, std::vector<int>& sub_idxs);
 
  private slots:
     void don_vis();

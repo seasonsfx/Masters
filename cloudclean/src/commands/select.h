@@ -5,16 +5,17 @@
 #include <map>
 #include <memory>
 #include <QUndoCommand>
+#include <boost/weak_ptr.hpp>
 #include "model/pointcloud.h"
 #include "commands/export.h"
 
 class COMMAND_API Select : public QUndoCommand
 {
 public:
-    explicit Select(std::shared_ptr<PointCloud> pc,
-                           std::shared_ptr<std::vector<int> > selected,
-                           std::shared_ptr<std::vector<int> > deselected = std::shared_ptr<std::vector<int> >(new std::vector<int>()),
-                           std::shared_ptr<std::vector<uint16_t> > exclude_labels = std::shared_ptr<std::vector<uint16_t> >(new std::vector<uint16_t>()),
+    explicit Select(boost::shared_ptr<PointCloud> pc,
+                           boost::shared_ptr<std::vector<int> > selected,
+                           boost::shared_ptr<std::vector<int> > deselected = boost::shared_ptr<std::vector<int> >(new std::vector<int>()),
+                           boost::shared_ptr<std::vector<uint16_t> > exclude_labels = boost::shared_ptr<std::vector<uint16_t> >(new std::vector<uint16_t>()),
                            QUndoCommand *parent = 0);
     QString actionText();
     virtual void undo();
@@ -23,9 +24,9 @@ public:
     virtual int id() const;
     
 private:
-    std::weak_ptr<PointCloud> pc_;
-    std::shared_ptr<std::vector<int> > selected_;
-    std::shared_ptr<std::vector<int> > deselected_;
+    boost::weak_ptr<PointCloud> pc_;
+    boost::shared_ptr<std::vector<int> > selected_;
+    boost::shared_ptr<std::vector<int> > deselected_;
 };
 
 #endif // SELECTCOMMAND_H

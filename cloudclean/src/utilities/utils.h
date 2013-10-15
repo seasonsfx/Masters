@@ -7,6 +7,7 @@
 #include <pcl/octree/octree_iterator.h>
 #include <pcl/octree/octree_container.h>
 #include <boost/serialization/shared_ptr.hpp>
+#include "utilities/export.h"
 
 template <typename PointT>
 typename pcl::PointCloud<PointT>::Ptr octreeDownsample(
@@ -68,8 +69,7 @@ void map(std::vector<T, T2> & small, std::vector<T, T2>& big, std::vector<int> &
     }
 }
 
-pcl::PointCloud<pcl::PointXYZINormal>::Ptr zipNormals(
-        pcl::PointCloud<pcl::PointXYZI> & cloud,
-        pcl::PointCloud<pcl::Normal> & normals);
+UTIL_API pcl::PointCloud<pcl::PointXYZINormal>::Ptr zipNormals(pcl::PointCloud<pcl::PointXYZI>::Ptr cloud,
+        pcl::PointCloud<pcl::Normal>::Ptr normals);
 
 #endif  // ULTILITIES_FILTERS_H

@@ -12,6 +12,7 @@ target_link_libraries(
     cloudclean_util
     ${OPENGL_LIBRARIES}
     ${PCL_LIBRARIES}
+    ${Boost_LIBRARIES}
     cloudclean_model
 )
 

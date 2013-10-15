@@ -14,6 +14,7 @@ target_link_libraries(flood
     cloudclean_gui
     normalestimator
     ${PCL_LIBRARIES}
+    ${Boost_LIBRARIES}
 )
 
 

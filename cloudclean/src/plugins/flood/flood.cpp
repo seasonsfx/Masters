@@ -153,27 +153,30 @@ void Flood::flood(int source_idx){
     // get normals
     pcl::PointCloud<pcl::Normal>::Ptr normals = ne_->getNormals(cl_->active_);
 
-    // downsample
-    //zipNormals()
+    // zip and downsample
+    pcl::PointCloud<pcl::PointXYZINormal>::Ptr smallcloud = zipNormals(cl_->active_, normals);
+    std::vector<int> big_to_small;
+    smallcloud = octreeDownsample(smallcloud.get(), 0.05, big_to_small);
 
-    pcl::Normal & n = (*normals)[source_idx];
+
+
+
+    pcl::PointXYZINormal & n = (*smallcloud)[big_to_small[source_idx]];
     Eigen::Map<Eigen::Vector3f> source_normal(&n.normal_x);
 
     qDebug() << "Source normal: " << source_normal.x() << source_normal.y() << source_normal.z();
 
     std::queue<int> flood_queue;
-    flood_queue.push(source_idx);
+    flood_queue.push(big_to_small[source_idx]);
     int current_idx;
 
     //boost::shared_ptr<std::vector<int> > indices = getLayerIndices();
 
     //Octree search = *(cl_->active_->octree());
-    pcl::KdTreeFLANN<pcl::PointXYZI> search;
-    search.setInputCloud(pcl::PointCloud<pcl::PointXYZI>::ConstPtr(cl_->active_.get(), boost::serialization::null_deleter()));
+    pcl::KdTreeFLANN<pcl::PointXYZINormal> search;
+    search.setInputCloud(smallcloud);
 
     std::set<int> visited;
-
-    boost::shared_ptr<std::vector<int> > selected = boost::make_shared<std::vector<int> >();
 
     int count = 0;
     int dist_count = 0;
@@ -188,7 +191,6 @@ void Flood::flood(int source_idx){
 
         count++;
 
-        selected->push_back(current_idx);
 
         std::vector<int> idxs;
         std::vector<float> dists;
@@ -213,6 +215,18 @@ void Flood::flood(int source_idx){
             }
 
             flood_queue.push(idx);
+        }
+    }
+
+    // create selection
+    boost::shared_ptr<std::vector<int> > selected = boost::make_shared<std::vector<int> >();
+
+    // map back to original cloud
+    for(int big_idx = 0; big_idx < big_to_small.size(); big_idx++){
+        int small_idx = big_to_small[big_idx];
+        bool seen = visited.find(small_idx) != visited.end();
+        if(seen){
+            selected->push_back(big_idx);
         }
     }
 

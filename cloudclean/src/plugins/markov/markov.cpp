@@ -106,6 +106,7 @@ void Markov::graphcut(int idx){
 
     // Downsample
     std::vector<int> pca_idxs;
+
     pcl::PointCloud<pcl::PointXYZI>::Ptr smaller_cloud = octreeDownsample(cloud.get(), 0.02, pca_idxs);
 
     // PCA

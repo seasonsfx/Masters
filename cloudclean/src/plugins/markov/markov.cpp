@@ -14,7 +14,7 @@
 #include "commands/select.h"
 #include "pluginsystem/core.h"
 #include "plugins/markov/mincut.h"
-#include "utilities/filters.h"
+#include "utilities/utils.h"
 #include "utilities/picker.h"
 #include "utilities/cv.h"
 

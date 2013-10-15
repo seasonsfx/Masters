@@ -503,10 +503,10 @@ MinCut::calculateUnaryPotential (int point, double& source_weight, double& sink_
   // If the point is not pinnned
 
   // Apply background penalty
-  sink_weight = number_of_neighbours_;
+  sink_weight = 20*number_of_neighbours_;
 
   // Apply forground penalty
-  source_weight = number_of_neighbours_;
+  source_weight = 20*number_of_neighbours_;
 
   return;
 }
@@ -561,7 +561,7 @@ MinCut::calculateBinaryPotential (int source, int target) const
 
     weight = exp(-distance);
 
-    weight *= 0.2;
+    weight *= 0.5;
 
     return (weight);
 

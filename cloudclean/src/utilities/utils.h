@@ -68,4 +68,8 @@ void map(std::vector<T, T2> & small, std::vector<T, T2>& big, std::vector<int> &
     }
 }
 
+pcl::PointCloud<pcl::PointXYZINormal>::Ptr zipNormals(
+        pcl::PointCloud<pcl::PointXYZI> & cloud,
+        pcl::PointCloud<pcl::Normal> & normals);
+
 #endif  // ULTILITIES_FILTERS_H

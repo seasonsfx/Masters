@@ -19,6 +19,7 @@
 #include "pluginsystem/core.h"
 #include "plugins/normalestimation/normalestimation.h"
 #include "utilities/pointpicker.h"
+#include "utilities/utils.h"
 #include "commands/select.h"
 
 #include <pcl/kdtree/kdtree_flann.h>
@@ -150,6 +151,9 @@ void Flood::flood(int source_idx){
 
     // get normals
     pcl::PointCloud<pcl::Normal>::Ptr normals = ne_->getNormals(cl_->active_);
+
+    // downsample
+    //zipNormals()
 
     pcl::Normal & n = (*normals)[source_idx];
     Eigen::Map<Eigen::Vector3f> source_normal(&n.normal_x);

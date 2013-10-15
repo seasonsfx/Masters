@@ -158,8 +158,15 @@ void Flood::flood(int source_idx){
     std::vector<int> big_to_small;
     smallcloud = octreeDownsample(smallcloud.get(), 0.05, big_to_small);
 
-
-
+/*
+    // write normals back so we can see
+    for(int big_idx = 0; big_idx < normals->size(); ++big_idx){
+        int small_idx = big_to_small[big_idx];
+        pcl::Normal & n = normals->points[big_idx];
+        pcl::PointXYZINormal & pn = smallcloud->points[small_idx];
+        n.getNormalVector4fMap() = pn.getNormalVector4fMap();
+    }
+*/
 
     pcl::PointXYZINormal & n = (*smallcloud)[big_to_small[source_idx]];
     Eigen::Map<Eigen::Vector3f> source_normal(&n.normal_x);
@@ -197,7 +204,7 @@ void Flood::flood(int source_idx){
         search.radiusSearch(current_idx, radius, idxs, dists, max_nn);
 
         for (int idx : idxs) {
-            pcl::Normal & n = (*normals)[idx];
+            pcl::PointXYZINormal & n = (*smallcloud)[idx];
             Eigen::Map<Eigen::Vector3f> normal(&n.normal_x);
 
             float dist = (normal-source_normal).norm();
@@ -222,7 +229,7 @@ void Flood::flood(int source_idx){
     boost::shared_ptr<std::vector<int> > selected = boost::make_shared<std::vector<int> >();
 
     // map back to original cloud
-    for(int big_idx = 0; big_idx < big_to_small.size(); big_idx++){
+    for(size_t big_idx = 0; big_idx < big_to_small.size(); big_idx++){
         int small_idx = big_to_small[big_idx];
         bool seen = visited.find(small_idx) != visited.end();
         if(seen){

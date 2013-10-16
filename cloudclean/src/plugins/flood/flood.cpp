@@ -79,13 +79,21 @@ void Flood::initialize2(PluginManager * pm) {
     global_flood_ = new QAction(QIcon(":/images/flood2.jpg"), "Global floodfill", 0);
     connect(global_flood_, &QAction::triggered, this, &Flood::global_flood);
     mw_->toolbar_->addAction(global_flood_);
+
+    global_flood2_ = new QAction(QIcon(":/images/flood2.jpg"), "Global floodfill 2", 0);
+    connect(global_flood2_, &QAction::triggered, this, &Flood::global_flood2);
+    mw_->toolbar_->addAction(global_flood2_);
+
 }
 
 void Flood::cleanup(){
     mw_->toolbar_->removeAction(enable_);
     mw_->removeMenu(enable_, "Edit");
     delete enable_;
+    mw_->toolbar_->removeAction(global_flood_);
     delete global_flood_;
+    mw_->toolbar_->removeAction(global_flood2_);
+    delete global_flood2_;
 }
 
 Flood::~Flood(){
@@ -313,12 +321,14 @@ void Flood::global_flood(){
 }
 
 void Flood::global_flood2(){
-    float max_dist = 1.0f;
+    float max_dist = 0.7f;
     int max_nn = 8;
     float radius = 0.10f;
-    int min_region = 1000;
+    int min_region = 500;
 
     float subsample_density = 0.05;
+    float seed_curvature_max = 0.8f;
+
 
     //// downsample
     // get normals
@@ -338,34 +348,6 @@ void Flood::global_flood2(){
     }
 
     //// compute curvature
-
-    // Setup the principal curvatures computation
-
-    /*
-    pcl::PrincipalCurvaturesEstimation<pcl::PointXYZINormal, pcl::PointXYZINormal, pcl::PrincipalCurvatures> principal_curvatures_estimation;
-
-    principal_curvatures_estimation.setInputCloud (smallcloud);
-    principal_curvatures_estimation.setInputNormals (smallcloud);
-
-    pcl::search::KdTree<pcl::PointXYZINormal>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZINormal>);
-    principal_curvatures_estimation.setSearchMethod (tree);
-    principal_curvatures_estimation.setRadiusSearch (0.5);
-
-    // Actually compute the principal curvatures
-    pcl::PointCloud<pcl::PrincipalCurvatures>::Ptr principal_curvatures (new pcl::PointCloud<pcl::PrincipalCurvatures> ());
-    principal_curvatures_estimation.compute (*principal_curvatures);
-
-    // Filter out NaNs
-    int nans = 0;
-    for(pcl::PrincipalCurvatures & pc : principal_curvatures->points) {
-        if(pc.principal_curvature_x != pc.principal_curvature_x){
-            pc.principal_curvature_x = 0;
-            pc.principal_curvature_y = 0;
-            pc.principal_curvature_z = 0;
-            nans++;
-        }
-    }
-    */
 
     // PCA
     boost::shared_ptr<std::vector<Eigen::Vector3f> > pca = getPCA(smallcloud.get(), 0.5f, 0);
@@ -388,14 +370,13 @@ void Flood::global_flood2(){
     }
 
     //// set seeds
-
-    float curvature_max = 0.5f;
+    ///
     std::vector<int> seeds;
 
     int run = 10;
 
     for(size_t i = 0; i < smallcloud->size(); i++){
-        if(smallcloud->points[i].curvature < curvature_max)
+        if(smallcloud->points[i].curvature < seed_curvature_max)
             seeds.push_back(i);
         else {
             if(--run > 0){
@@ -453,13 +434,21 @@ void Flood::global_flood2(){
 
                 float dist = (normal-source_normal).norm();
 
+                if(dist_count++ < 10){
+                    qDebug() << "dist:" << dist;
+                }
+
+                if(dist != dist) {
+                    qDebug() << "source normal map" << source_normal[0] << source_normal[1] << source_normal[2];
+                    qDebug() << "normal map" << normal[0] << normal[1] << normal[2];
+                    qDebug() << "normal.." << (*smallcloud)[idx].normal_x << (*smallcloud)[idx].normal_y << (*smallcloud)[idx].normal_z;
+                }
+
                 // skip points out of range
-                if(dist > max_dist) {
-                    if(dist_count++ < 10){
-                        qDebug() << "too big:" << dist;
-                    }
+                if(dist > max_dist || dist != dist) {
                     continue;
                 }
+
 
                 flood_queue.push(idx);
             }

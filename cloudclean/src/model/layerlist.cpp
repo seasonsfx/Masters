@@ -144,8 +144,9 @@ void LayerList::deleteLayer(int idx){
                       selection_.end() );
 
     // this is a bug! if the labels go to a free list then a new layer
-    // will have funky selections
+    // will have funky selection
     // Add labels to free list (Label should maybe do this)
+    /*
     for(int label : layers_[idx]->labels_) {
         LayerSet & ls = layer_lookup_table_[label];
         bool is_free = true;
@@ -157,7 +158,7 @@ void LayerList::deleteLayer(int idx){
         }
         if(is_free)
             this->free_labels_.push_back(label);
-    }
+    }*/
 
     // Do actual deleting of layer
     layer_id_map_.erase(layers_[idx]->id_);

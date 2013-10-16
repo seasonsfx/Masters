@@ -52,6 +52,7 @@ class Flood : public IPlugin {
 
     QAction * enable_;
     QAction * global_flood_;
+    QAction * global_flood2_;
     QWidget * settings_;
     bool is_enabled_;
     NormalEstimator * ne_;

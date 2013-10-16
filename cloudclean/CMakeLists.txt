@@ -96,7 +96,7 @@ FIND_PACKAGE(PCL 1.7 REQUIRED COMPONENTS
      features
      filters
 #     visualization # depends on qt4?
-#    segmentation
+     segmentation
 )
 
 FIND_PACKAGE(Boost COMPONENTS system iostreams REQUIRED)

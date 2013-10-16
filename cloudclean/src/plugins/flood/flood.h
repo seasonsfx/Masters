@@ -15,6 +15,7 @@ class MainWindow;
 class Event;
 class QMouseEvent;
 class NormalEstimator;
+class Picker;
 
 class Flood : public IPlugin {
     Q_INTERFACES(IPlugin)
@@ -26,18 +27,16 @@ class Flood : public IPlugin {
     void initialize2(PluginManager * pm);
     void cleanup();
     ~Flood();
-    bool eventFilter(QObject *object, QEvent *event);
 
     boost::shared_ptr<std::vector<int> > getLayerIndices();
-
- private:
-    bool mouseReleaseEvent(QMouseEvent * event);
 
  signals:
    void enabling();
 
  private slots:
     void flood(int source_idx);
+    void global_flood();
+    void global_flood2();
 
  public slots:
    void enable();
@@ -52,9 +51,11 @@ class Flood : public IPlugin {
     MainWindow * mw_;
 
     QAction * enable_;
+    QAction * global_flood_;
     QWidget * settings_;
     bool is_enabled_;
     NormalEstimator * ne_;
+    Picker * picker_;
 };
 
 #endif  // GRAPH_CUT_H

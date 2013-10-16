@@ -6,8 +6,14 @@
 #include <cassert>
 #include <limits>
 #include <QDebug>
-#include "model/pointcloud.h"
+#include <boost/make_shared.hpp>
+#include <boost/serialization/shared_ptr.hpp>
 
+#include <pcl/common/pca.h>
+#include <pcl/search/flann_search.h>
+#include <pcl/kdtree/kdtree_flann.h>
+
+#include "model/pointcloud.h"
 #include "utilities/export.h"
 
 enum class Morphology{ERODE, DILATE};
@@ -63,7 +69,65 @@ UTIL_API boost::shared_ptr<std::vector<float>> cloudToGrid(const std::vector<int
         boost::shared_ptr<std::vector<float>> img = nullptr);
 
 UTIL_API boost::shared_ptr<std::vector<Eigen::Vector3f> > getHist(boost::shared_ptr<PointCloud> cloud, double radius, uint max_nn = 0);
-UTIL_API boost::shared_ptr<std::vector<Eigen::Vector3f> > getPCA(pcl::PointCloud<pcl::PointXYZI> *, double radius, uint max_nn = 0);
+
+template <typename PointT>
+boost::shared_ptr<std::vector<Eigen::Vector3f> > getPCA(pcl::PointCloud<PointT> * cloud, double radius, uint max_nn = 0) {
+
+    boost::shared_ptr<std::vector<Eigen::Vector3f> > eigen_vals =
+            boost::make_shared<std::vector<Eigen::Vector3f>>(cloud->size());
+
+    pcl::KdTreeFLANN<PointT> search;
+    typename pcl::PointCloud<PointT>::ConstPtr cptr(cloud, boost::serialization::null_deleter());
+    search.setInputCloud(cptr);
+
+    int less_than_three_points_count = 0;
+
+    boost::shared_ptr <std::vector<int> > kIdxs;
+    kIdxs = boost::shared_ptr <std::vector<int> >(new std::vector<int>);
+    std::vector<float> kDist;
+
+    // For every point
+    for(unsigned int i = 0; i < cloud->size(); i++){
+
+        search.radiusSearch(i, radius, *kIdxs, kDist, max_nn);
+
+        if(kIdxs->size() > max_nn && max_nn > 0){
+            qDebug() << "Whoops! Too many";
+            continue;
+        }
+
+        if(kIdxs->size() < 3) {
+            less_than_three_points_count++;
+            (*eigen_vals)[i] = Eigen::Vector3f(0, 0, 1.0f); // Assume isolated point
+            continue;
+        }
+
+        pcl::PCA<PointT> pcEstimator(true);
+        pcEstimator.setInputCloud (cptr);
+        pcEstimator.setIndices(kIdxs);
+        (*eigen_vals)[i] = pcEstimator.getEigenValues();
+
+/*
+        for(int j = 0; j < 3; j++ ){
+            float val = (*eigen_vals)[i][j];
+            if(val > max)
+                max = val;
+            else if(val < min)
+                min = val;
+        }
+*/
+        //(*eigen_vals)[i].normalize(); // SHOULD THIS BE NORMALISED?
+
+    }
+
+    /*
+    for(unsigned int i = 0; i < cloud->size(); i++){
+        (*eigen_vals)[i] = ((*eigen_vals)[i] - Eigen::Vector3f(min, min, min) ) / (max - min);
+    }
+    */
+
+    return eigen_vals;
+}
 
 UTIL_API boost::shared_ptr<std::vector<float> > normal_stdev(boost::shared_ptr<PointCloud> cloud,
                   pcl::PointCloud<pcl::Normal>::Ptr normals,

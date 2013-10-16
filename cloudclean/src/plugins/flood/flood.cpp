@@ -77,7 +77,7 @@ void Flood::initialize2(PluginManager * pm) {
     mw_->toolbar_->addAction(enable_);
 
     global_flood_ = new QAction(QIcon(":/images/flood2.jpg"), "Global floodfill", 0);
-    connect(global_flood_, &QAction::triggered, this, &Flood::global_flood2);
+    connect(global_flood_, &QAction::triggered, this, &Flood::global_flood);
     mw_->toolbar_->addAction(global_flood_);
 }
 
@@ -292,7 +292,7 @@ void Flood::global_flood(){
     // create small to big map
     std::vector<std::vector<int>> small_to_big(smallcloud->size());
 
-    for(size_t big_idx = 0; big_idx++ < big_to_small.size(); big_idx++) {
+    for(size_t big_idx = 0; big_idx < big_to_small.size(); big_idx++) {
         int small_idx = big_to_small[big_idx];
         small_to_big[small_idx].push_back(big_idx);
     }
@@ -332,7 +332,7 @@ void Flood::global_flood2(){
     // create small to big map
     std::vector<std::vector<int>> small_to_big(smallcloud->size());
 
-    for(size_t big_idx = 0; big_idx++ < big_to_small.size(); big_idx++) {
+    for(size_t big_idx = 0; big_idx < big_to_small.size(); big_idx++) {
         int small_idx = big_to_small[big_idx];
         small_to_big[small_idx].push_back(big_idx);
     }
@@ -341,7 +341,7 @@ void Flood::global_flood2(){
 
     // Setup the principal curvatures computation
 
-
+    /*
     pcl::PrincipalCurvaturesEstimation<pcl::PointXYZINormal, pcl::PointXYZINormal, pcl::PrincipalCurvatures> principal_curvatures_estimation;
 
     principal_curvatures_estimation.setInputCloud (smallcloud);
@@ -365,16 +365,22 @@ void Flood::global_flood2(){
             nans++;
         }
     }
-
+    */
 
     // PCA
-    //boost::shared_ptr<std::vector<Eigen::Vector3f> > pca = getPCA(smallcloud.get(), 0.5f, 0);
+    boost::shared_ptr<std::vector<Eigen::Vector3f> > pca = getPCA(smallcloud.get(), 0.5f, 0);
 
 
     // Set largest curvature on normal
     for(size_t i = 0; i < smallcloud->size(); i++){
         // assume curvature x is the biggests
-        float curv = principal_curvatures->points[i].principal_curvature_x;
+        Eigen::Vector3f & pc = (*pca)[i];
+        float curv = fabs(pc[0] / (pc[0] + pc[1] + pc[2]));
+
+        if(pc[0] < pc[1]) {
+            qDebug() << "Damnit!";
+        }
+
         if(!pcl_isnan(curv))
             smallcloud->points[i].curvature = curv;
         else
@@ -409,6 +415,9 @@ void Flood::global_flood2(){
     // keep track of points that are in regions already
     std::set<int> seen;
 
+    pcl::KdTreeFLANN<pcl::PointXYZINormal> search;
+    search.setInputCloud(smallcloud);
+
     auto fill = [&] (int source_idx) {
 
         std::vector<int> region;
@@ -418,9 +427,6 @@ void Flood::global_flood2(){
         std::queue<int> flood_queue;
         flood_queue.push(big_to_small[source_idx]);
         int current_idx;
-
-        pcl::KdTreeFLANN<pcl::PointXYZINormal> search;
-        search.setInputCloud(smallcloud);
 
         // debugging variable
         int dist_count = 0;
@@ -469,7 +475,7 @@ void Flood::global_flood2(){
         int seed_idx = seeds[idx];
 
         // Skip seeds already visited
-        if(seen.insert(seed_idx).second == true)
+        if(seen.insert(seed_idx).second != true)
             continue;
 
         std::vector<int> region = fill(seed_idx);

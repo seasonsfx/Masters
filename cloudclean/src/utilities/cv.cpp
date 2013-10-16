@@ -6,10 +6,6 @@
 #include <QTime>
 #include <vector>
 #include <memory>
-#include <boost/make_shared.hpp>
-#include <pcl/common/pca.h>
-#include <pcl/search/flann_search.h>
-#include <pcl/kdtree/kdtree_flann.h>
 #include "plugins/visualisedepth/gridsearch.h"
 
 boost::shared_ptr<std::vector<int>> makeLookup(boost::shared_ptr<PointCloud> cloud) {
@@ -289,88 +285,6 @@ boost::shared_ptr<std::vector<Eigen::Vector3f> > getHist(boost::shared_ptr<Point
         (*eigen_vals)[i] = pcEstimator.getEigenValues();
 
 
-        (*eigen_vals)[i].normalize(); // SHOULD THIS BE NORMALISED?
-
-    }
-
-    /*
-    for(unsigned int i = 0; i < cloud->size(); i++){
-        (*eigen_vals)[i] = ((*eigen_vals)[i] - Eigen::Vector3f(min, min, min) ) / (max - min);
-    }
-    */
-
-    qDebug() << "Radius: " << radius << " Max_nn: " << max_nn << " Time: " << total.elapsed()/1000.0f << "Sec";
-    qDebug("Points with less than %d neighbours: %d", max_nn, less_than_three_points_count);
-    qDebug("Max: %f, Min: %f", max, min);
-
-    return eigen_vals;
-}
-
-boost::shared_ptr<std::vector<Eigen::Vector3f> > getPCA(pcl::PointCloud<pcl::PointXYZI> * cloud, double radius, uint max_nn) {
-
-    boost::shared_ptr<std::vector<Eigen::Vector3f> > eigen_vals =
-            boost::make_shared<std::vector<Eigen::Vector3f>>(cloud->size());
-
-    //GridSearch search(*cloud);
-    //pcl::search::FlannSearch<pcl::PointXYZI> search;
-    pcl::KdTreeFLANN<pcl::PointXYZI> search;
-    pcl::PointCloud<pcl::PointXYZI>::ConstPtr cptr(cloud, boost::serialization::null_deleter());
-    search.setInputCloud(cptr);
-
-
-    QTime total;
-    total.start();
-
-    QTime t;
-    t.start();
-
-    int less_than_three_points_count = 0;
-
-    boost::shared_ptr <std::vector<int> > kIdxs;
-    kIdxs = boost::shared_ptr <std::vector<int> >(new std::vector<int>);
-    std::vector<float> kDist;
-
-    float min = FLT_MAX;
-    float max = FLT_MIN;
-
-    // For every point
-    for(unsigned int i = 0; i < cloud->size(); i++){
-
-        if(i % 200000 == 0) {
-            int ms = t.restart();
-            qDebug() << "so " << less_than_three_points_count << "out of " << i << "points have less than 2 neighbours";
-            qDebug() << "Radius: " << radius << "Max nn: " << max_nn;
-            qDebug() << "% done: " << float(i) / cloud->size();
-            qDebug() << "MS per loop" << float(ms)/200000.0f;
-        }
-
-        search.radiusSearch(i, radius, *kIdxs, kDist, max_nn);
-
-        if(kIdxs->size() > max_nn && max_nn > 0){
-            qDebug() << "Whoops! Too many";
-            continue;
-        }
-
-        if(kIdxs->size() < 3) {
-            less_than_three_points_count++;
-            (*eigen_vals)[i] = Eigen::Vector3f(0, 0, 1.0f); // Assume isolated point
-            continue;
-        }
-
-        pcl::PCA<pcl::PointXYZI> pcEstimator(true);
-        pcEstimator.setInputCloud (cptr);
-        pcEstimator.setIndices(kIdxs);
-        (*eigen_vals)[i] = pcEstimator.getEigenValues();
-
-/*
-        for(int j = 0; j < 3; j++ ){
-            float val = (*eigen_vals)[i][j];
-            if(val > max)
-                max = val;
-            else if(val < min)
-                min = val;
-        }
-*/
         (*eigen_vals)[i].normalize(); // SHOULD THIS BE NORMALISED?
 
     }

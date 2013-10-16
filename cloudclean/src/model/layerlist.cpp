@@ -143,6 +143,8 @@ void LayerList::deleteLayer(int idx){
     selection_.erase( remove_if(selection_.begin(), selection_.end(), toDel),
                       selection_.end() );
 
+    // this is a bug! if the labels go to a free list then a new layer
+    // will have funky selections
     // Add labels to free list (Label should maybe do this)
     for(int label : layers_[idx]->labels_) {
         LayerSet & ls = layer_lookup_table_[label];

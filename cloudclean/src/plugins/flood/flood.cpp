@@ -460,7 +460,7 @@ void Flood::global_flood2(){
 
     core_->us_->beginMacro("Global flood fill 2");
 
-    for(size_t idx = 0; idx < seeds.size(); idx++) {
+    for(uint idx = 0; idx < seeds.size(); idx++) {
         int seed_idx = seeds[idx];
 
         // Skip seeds already visited

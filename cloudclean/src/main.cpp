@@ -29,7 +29,7 @@ void customMessageHandler(QtMsgType type, const QMessageLogContext& context, con
     }
     */
 
-    txt = QString("MESSAGE (%1:%2 %3): %4\n").arg(context.file).arg(context.line).arg(context.function).arg(msg);
+    txt = QString("MESSAGE (%1:%2 %3):\n\t %4\n").arg(context.file).arg(context.line).arg(context.function).arg(msg);
 
     QFile outFile("debuglog.txt");
     outFile.open(QIODevice::WriteOnly | QIODevice::Append);

@@ -321,13 +321,13 @@ void Flood::global_flood(){
 }
 
 void Flood::global_flood2(){
-    float max_dist = 0.7f;
-    int max_nn = 8;
-    float radius = 0.10f;
-    int min_region = 500;
+    float max_dist = 1.0f;
+    int max_nn = 30;
+    float radius = 0.1f;
+    uint min_region = 4000;
 
     float subsample_density = 0.05;
-    float seed_curvature_max = 0.8f;
+    float seed_curvature_max = 1.2f;
 
 
     //// downsample
@@ -373,16 +373,9 @@ void Flood::global_flood2(){
     ///
     std::vector<int> seeds;
 
-    int run = 10;
-
     for(size_t i = 0; i < smallcloud->size(); i++){
         if(smallcloud->points[i].curvature < seed_curvature_max)
             seeds.push_back(i);
-        else {
-            if(--run > 0){
-                qDebug() << smallcloud->points[i].curvature;
-            }
-        }
     }
 
     // sort seeds
@@ -406,16 +399,19 @@ void Flood::global_flood2(){
         Eigen::Map<Eigen::Vector3f> source_normal = (*smallcloud)[source_idx].getNormalVector3fMap();
 
         std::queue<int> flood_queue;
-        flood_queue.push(big_to_small[source_idx]);
-        int current_idx;
-
-        // debugging variable
-        int dist_count = 0;
+        flood_queue.push(source_idx);
+        int current_idx = -1;
 
         while (!flood_queue.empty()){
             current_idx = flood_queue.front(); flood_queue.pop();
 
+            //qDebug() << "prelength(seen): " << seen.size();
+
             bool visited = !seen.insert(current_idx).second;
+
+            //qDebug() << "length(seen): " << seen.size();
+            //qDebug() << "vistited: " << visited;
+            //qDebug() << "current_idx" << current_idx;
 
             if(visited)
                 continue;
@@ -426,7 +422,6 @@ void Flood::global_flood2(){
 
             std::vector<int> idxs;
             std::vector<float> dists;
-            //search.nearestKSearch(current_idx, radius, k, dists, max_nn);
             search.radiusSearch(current_idx, radius, idxs, dists, max_nn);
 
             for (int idx : idxs) {
@@ -434,28 +429,16 @@ void Flood::global_flood2(){
 
                 float dist = (normal-source_normal).norm();
 
-                if(dist_count++ < 10){
-                    qDebug() << "dist:" << dist;
-                }
-
-                if(dist != dist) {
-                    qDebug() << "source normal map" << source_normal[0] << source_normal[1] << source_normal[2];
-                    qDebug() << "normal map" << normal[0] << normal[1] << normal[2];
-                    qDebug() << "normal.." << (*smallcloud)[idx].normal_x << (*smallcloud)[idx].normal_y << (*smallcloud)[idx].normal_z;
-                }
-
                 // skip points out of range
                 if(dist > max_dist || dist != dist) {
                     continue;
                 }
-
 
                 flood_queue.push(idx);
             }
         }
 
         return region;
-
     };
 
     core_->us_->beginMacro("Global flood fill 2");
@@ -463,19 +446,24 @@ void Flood::global_flood2(){
     for(uint idx = 0; idx < seeds.size(); idx++) {
         int seed_idx = seeds[idx];
 
-        // Skip seeds already visited
-        if(seen.insert(seed_idx).second != true)
-            continue;
-
         std::vector<int> region = fill(seed_idx);
+
+
+
 
         // Remove the region from the seen points if the region is too small
         if(region.size() < min_region) {
             for(int re_idx : region) {
                 seen.erase(seen.find(re_idx));
             }
+            //qDebug() << "Too small";
             continue;
         }
+
+        qDebug() << "Curvature" << smallcloud->points[seed_idx].curvature;
+        qDebug() << "Region: " << region.size();
+
+        qDebug() << "Big enough";
 
         // Create a big layer
         boost::shared_ptr<std::vector<int>> big_idxs = boost::make_shared<std::vector<int>>();

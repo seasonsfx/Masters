@@ -324,10 +324,10 @@ void Flood::global_flood2(){
     float max_dist = 0.7f;
     int max_nn = 8;
     float radius = 0.10f;
-    int min_region = 500;
+    int min_region = 10;
 
     float subsample_density = 0.05;
-    float seed_curvature_max = 0.8f;
+    float seed_curvature_max = 0.2f;
 
 
     //// downsample
@@ -349,40 +349,39 @@ void Flood::global_flood2(){
 
     //// compute curvature
 
-    // PCA
-    boost::shared_ptr<std::vector<Eigen::Vector3f> > pca = getPCA(smallcloud.get(), 0.5f, 0);
+
+    // Setup the principal curvatures computation
+    pcl::PrincipalCurvaturesEstimation<pcl::PointXYZINormal, pcl::PointXYZINormal, pcl::PrincipalCurvatures> principal_curvatures_estimation;
+
+    principal_curvatures_estimation.setInputCloud (smallcloud);
+    principal_curvatures_estimation.setInputNormals (smallcloud);
+
+    pcl::search::KdTree<pcl::PointXYZINormal>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZINormal>);
+    principal_curvatures_estimation.setSearchMethod (tree);
+    principal_curvatures_estimation.setRadiusSearch (0.5);
+
+    // Actually compute the principal curvatures
+    pcl::PointCloud<pcl::PrincipalCurvatures>::Ptr principal_curvatures (new pcl::PointCloud<pcl::PrincipalCurvatures> ());
+    principal_curvatures_estimation.compute (*principal_curvatures);
 
 
     // Set largest curvature on normal
     for(size_t i = 0; i < smallcloud->size(); i++){
         // assume curvature x is the biggests
-        Eigen::Vector3f & pc = (*pca)[i];
-        float curv = fabs(pc[0] / (pc[0] + pc[1] + pc[2]));
+        pcl::PrincipalCurvatures & pc = (*principal_curvatures)[i];
 
-        if(pc[0] < pc[1]) {
-            qDebug() << "Damnit!";
-        }
-
-        if(!pcl_isnan(curv))
-            smallcloud->points[i].curvature = curv;
-        else
-            smallcloud->points[i].curvature = INFINITY;
+        float mean_curv = (pc.pc1 + pc.pc2)/2;
+        smallcloud->points[i].curvature = mean_curv;
     }
 
     //// set seeds
     ///
     std::vector<int> seeds;
 
-    int run = 10;
 
     for(size_t i = 0; i < smallcloud->size(); i++){
-        if(smallcloud->points[i].curvature < seed_curvature_max)
+        if(smallcloud->points[i].curvature < seed_curvature_max && smallcloud->points[i].curvature > 0)
             seeds.push_back(i);
-        else {
-            if(--run > 0){
-                qDebug() << smallcloud->points[i].curvature;
-            }
-        }
     }
 
     // sort seeds
@@ -391,6 +390,18 @@ void Flood::global_flood2(){
         return smallcloud->points[a].curvature < smallcloud->points[b].curvature;
     });
 
+    qDebug() << "Number of seeds: " << seeds.size();
+
+    int debugs = 10;
+    for(int seed : seeds){
+        if(--debugs > 0){
+            qDebug() << smallcloud->points[seed].curvature;
+        }
+        else {
+            break;
+        }
+    }
+
     //// Run the fill
 
     // keep track of points that are in regions already
@@ -398,6 +409,9 @@ void Flood::global_flood2(){
 
     pcl::KdTreeFLANN<pcl::PointXYZINormal> search;
     search.setInputCloud(smallcloud);
+
+    // debugging variable
+    int debug_dist_count = 0;
 
     auto fill = [&] (int source_idx) {
 
@@ -409,15 +423,12 @@ void Flood::global_flood2(){
         flood_queue.push(big_to_small[source_idx]);
         int current_idx;
 
-        // debugging variable
-        int dist_count = 0;
-
         while (!flood_queue.empty()){
             current_idx = flood_queue.front(); flood_queue.pop();
 
-            bool visited = !seen.insert(current_idx).second;
+            bool not_seen = seen.insert(current_idx).second;
 
-            if(visited)
+            if(!not_seen)
                 continue;
 
             region.push_back(current_idx);
@@ -434,7 +445,8 @@ void Flood::global_flood2(){
 
                 float dist = (normal-source_normal).norm();
 
-                if(dist_count++ < 10){
+
+                if(debug_dist_count++ < 10){
                     qDebug() << "dist:" << dist;
                 }
 
@@ -474,6 +486,7 @@ void Flood::global_flood2(){
             for(int re_idx : region) {
                 seen.erase(seen.find(re_idx));
             }
+            qDebug() << "Deleted region of size" << region.size();
             continue;
         }
 

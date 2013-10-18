@@ -47,6 +47,7 @@ class VDepth : public IPlugin {
     void hist_vis();
     void fpfh_vis();
     void curve_vis();
+    void curve_diff_vis();
     void normalnoise();
     void dist_stdev();
     void sutract_lowfreq_noise();

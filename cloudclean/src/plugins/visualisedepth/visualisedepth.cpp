@@ -61,7 +61,7 @@ void VDepth::initialize(Core *core){
     connect(myaction_,&QAction::triggered, [this] (bool on) {
         qDebug() << "Click!";
     });
-    connect(myaction_, SIGNAL(triggered()), this, SLOT(eigen_ratio()));
+    connect(myaction_, SIGNAL(triggered()), this, SLOT(curve_vis()));
     mw_->toolbar_->addAction(myaction_);
 
 }
@@ -632,6 +632,55 @@ void VDepth::curve_vis(){
         return;
 
     pcl::PointCloud<pcl::PointXYZINormal>::Ptr filt_cloud;
+    std::vector<int> big_to_small;
+    filt_cloud = downsample(_cloud, 0.1, big_to_small);
+
+
+    //pcl::io::savePCDFileASCII ("test_pcd.pcd", *filt_cloud);
+
+
+    // Setup the principal curvatures computation
+    pcl::PrincipalCurvaturesEstimation<pcl::PointXYZINormal, pcl::PointXYZINormal, pcl::PrincipalCurvatures> principal_curvatures_estimation;
+
+    principal_curvatures_estimation.setInputCloud (filt_cloud);
+    principal_curvatures_estimation.setInputNormals (filt_cloud);
+
+    pcl::search::KdTree<pcl::PointXYZINormal>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZINormal>);
+    principal_curvatures_estimation.setSearchMethod (tree);
+    principal_curvatures_estimation.setRadiusSearch (0.5);
+
+    // Actually compute the principal curvatures
+    pcl::PointCloud<pcl::PrincipalCurvatures>::Ptr principal_curvatures (new pcl::PointCloud<pcl::PrincipalCurvatures> ());
+    principal_curvatures_estimation.compute (*principal_curvatures);
+
+
+    int w = _cloud->scan_width();
+    int h = _cloud->scan_height();
+
+    boost::shared_ptr<std::vector<float>> grid = boost::make_shared<std::vector<float>>(w*h, 0.0f);
+    const std::vector<int> & cloudtogrid = _cloud->cloudToGridMap();
+
+    for(uint big_idx = 0; big_idx < _cloud->size(); big_idx++) {
+        int small_idx = big_to_small[big_idx];
+        int grid_idx = cloudtogrid[big_idx];
+        pcl::PrincipalCurvatures & pc = (*principal_curvatures)[small_idx];
+        (*grid)[grid_idx] = pc.pc1 + pc.pc2;
+    }
+
+
+    //boost::shared_ptr<const std::vector<float>> img = cloudToGrid(cloudtogrid, w*h, grid);
+
+    qDebug() << "about to draw";
+    drawFloats(grid, _cloud);
+
+}
+
+void VDepth::curve_diff_vis(){
+    boost::shared_ptr<PointCloud> _cloud = core_->cl_->active_;
+    if(_cloud == nullptr)
+        return;
+
+    pcl::PointCloud<pcl::PointXYZINormal>::Ptr filt_cloud;
     std::vector<int> sub_idxs;
     filt_cloud = downsample(_cloud, 0.1, sub_idxs);
 
@@ -824,10 +873,10 @@ void VDepth::eigen_ratio(){
 
     // Downsample
     std::vector<int> sub_idxs;
-    pcl::PointCloud<pcl::PointXYZI>::Ptr smaller_cloud = octreeDownsample(cloud.get(), 0.02, sub_idxs);
+    pcl::PointCloud<pcl::PointXYZI>::Ptr smaller_cloud = octreeDownsample(cloud.get(), 0.1, sub_idxs);
 
 
-    boost::shared_ptr<std::vector<Eigen::Vector3f> > pca = getPCA(smaller_cloud.get(), 0.2f, 0);
+    boost::shared_ptr<std::vector<Eigen::Vector3f> > pca = getPCA(smaller_cloud.get(), 0.3f, 0);
 
     boost::shared_ptr<std::vector<float>> likely_veg =
                boost::make_shared<std::vector<float>>(pca->size(), 0.0f);
@@ -841,19 +890,33 @@ void VDepth::eigen_ratio(){
             continue;
         }
 
+        /*
         float eig_sum = eig.sum();
-
         eig /= eig_sum;
-
         float fudge_factor = 5.0f;
-        if(eig[1] < 0.05 * fudge_factor || eig[2] < 0.01 * fudge_factor) {
+
+        bool is_planar = eig[1] < 0.05 * fudge_factor || eig[2] < 0.01 * fudge_factor;
+
+        if(!is_planar) {
             (*likely_veg)[i] = 0;
         } else {
             (*likely_veg)[i] = 1;
         }
 
+        */
+
+        float curvature;
+        if(eig[0] > eig[2])
+            curvature = eig[1] / (eig[0]);
+        else
+            curvature = 1;
+
+
+        (*likely_veg)[i] = curvature;
+
     }
 
+    /*
     // 2nd check
     pca = getPCA(smaller_cloud.get(), 0.1f, 0);
 
@@ -881,7 +944,7 @@ void VDepth::eigen_ratio(){
         }
 
     }
-
+    */
 
 
     boost::shared_ptr<std::vector<float>> likely_veg2 =

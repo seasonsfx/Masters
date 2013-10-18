@@ -1,6 +1,10 @@
 #include "plugins/normalestimation/normalestimation.h"
 #include <QDebug>
 #include <pcl/features/normal_3d.h>
+#include <pcl/search/search.h>
+#include <pcl/search/kdtree.h>
+#include <pcl/kdtree/kdtree_flann.h>
+
 #include "gui/flatview.h"
 #include "gui/mainwindow.h"
 #include "commands/select.h"
@@ -362,13 +366,10 @@ NormalEstimator::estimateNormals(boost::shared_ptr<PointCloud> cloud) {
             int idx2 = (cur_y+relativePair.p2.y)*width
                     + (cur_x+relativePair.p2.x);
 
-            pcl::PointXYZI & cp0 = cloud->points[grid_to_cloud[i]];
-            pcl::PointXYZI & cp1 = cloud->points[grid_to_cloud[idx1]];
-            pcl::PointXYZI & cp2 = cloud->points[grid_to_cloud[idx2]];
 
-            Eigen::Vector3f p0(cp0.x, cp0.y, cp0.z);
-            Eigen::Vector3f p1(cp1.x, cp1.y, cp1.z);
-            Eigen::Vector3f p2(cp2.x, cp2.y, cp2.z);
+            Eigen::Map<Eigen::Vector3f> p0 = cloud->points[grid_to_cloud[i]].getVector3fMap();
+            Eigen::Map<Eigen::Vector3f> p1 = cloud->points[grid_to_cloud[idx1]].getVector3fMap();
+            Eigen::Map<Eigen::Vector3f> p2 = cloud->points[grid_to_cloud[idx2]].getVector3fMap();
 
             // Cross product to get normal
             Eigen::Vector3f vec1 = p1 - p0;
@@ -413,13 +414,46 @@ NormalEstimator::estimateNormals(boost::shared_ptr<PointCloud> cloud) {
 
     // Deal with missing normals here
 
+    pcl::KdTreeFLANN<pcl::PointXYZI> search;
+    search.setInputCloud(cloud);
+    int k = 50;
+
+    int missing = missing_normals.size();
+
+    qDebug() << "Normals WAS missing" << missing;
+
+    for(int idx :  missing_normals){
+        std::vector<int> neighbours;
+        std::vector<float> dists;
+        search.nearestKSearch(idx, k, neighbours, dists);
+
+        Eigen::Vector3f sum(0, 0, 0);
+
+        int count = 0;
+
+        for(int n : neighbours) {
+            Eigen::Map<Eigen::Vector3f> nb = (*normals)[n].getNormalVector3fMap();
+            if(std::isnan(nb[0]))
+                continue;
+
+            ++count;
+            sum += nb;
+        }
+
+        if(count == 0)
+            continue;
+
+        (*normals)[idx].getNormalVector3fMap() = sum / count;
+        --missing;
+    }
+
 
     // Check if result is still needed
 
     qDebug() << "Completed normal estimation";
-    qDebug() << "Normals missing" << missing_normals.size();
+    qDebug() << "Normals missing" << missing;
     qDebug() << " % Normals missing" <<
-                missing_normals.size()/(float)normals->size();
+                missing/(float)normals->size();
 
     return normals;
 }

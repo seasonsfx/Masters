@@ -321,13 +321,13 @@ void Flood::global_flood(){
 }
 
 void Flood::global_flood2(){
-    float max_dist = 0.7f;
+    float max_dist = 1.0f;
     int max_nn = 8;
     float radius = 0.10f;
-    int min_region = 10;
+    size_t min_region = 100;
 
     float subsample_density = 0.05;
-    float seed_curvature_max = 0.2f;
+    float seed_curvature_max = 0.02f;
 
 
     //// downsample
@@ -379,7 +379,7 @@ void Flood::global_flood2(){
     std::vector<int> seeds;
 
     for(size_t i = 0; i < smallcloud->size(); i++){
-        if(smallcloud->points[i].curvature < seed_curvature_max && smallcloud->points[i].curvature > 0)
+        if(smallcloud->points[i].curvature < seed_curvature_max /*&& smallcloud->points[i].curvature > 0*/)
             seeds.push_back(i);
     }
 
@@ -416,10 +416,21 @@ void Flood::global_flood2(){
 
         std::vector<int> region;
 
-        Eigen::Map<Eigen::Vector3f> source_normal = (*smallcloud)[source_idx].getNormalVector3fMap();
+        std::vector<int> idxs;
+        std::vector<float> dists;
+        search.radiusSearch(source_idx, radius, idxs, dists, max_nn);
+
+        Eigen::Vector3f source_normal(0, 0, 0);
+
+        for(int idx : idxs) {
+            source_normal += (*smallcloud)[idx].getNormalVector3fMap();
+        }
+
+        source_normal /= idxs.size();
+
+        //Eigen::Map<Eigen::Vector3f> source_normal = (*smallcloud)[source_idx].getNormalVector3fMap();
 
         std::queue<int> flood_queue;
-
         flood_queue.push(source_idx);
         int current_idx = -1;
 
@@ -429,7 +440,7 @@ void Flood::global_flood2(){
             bool not_seen = seen.insert(current_idx).second;
 
             if(!not_seen)
-
+                continue;
 
             region.push_back(current_idx);
 

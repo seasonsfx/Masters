@@ -64,7 +64,6 @@ class GUI_API FlatView : public QGLWidget {
     QGLShaderProgram program_;
 
     int uni_sampler_;
-    int uni_select_color_;
     int uni_width_;
     int uni_height_;
     int uni_camera_;

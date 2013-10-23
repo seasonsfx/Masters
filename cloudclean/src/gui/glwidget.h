@@ -64,7 +64,6 @@ protected:
     int uni_sampler_;
     int uni_projection_;
     int uni_modelview_;
-    int uni_select_color_;
 
     float translate_unit_;
     QVector2D mouse_drag_start_;

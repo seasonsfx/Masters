@@ -37,6 +37,8 @@ void Brush3D::initialize(Core *core){
     mw_ = core_->mw_;
     initialized_gl = false;
 
+    select_mode_ = 1;
+
     enable_ = new QAction(QIcon(":/images/brush3d.png"), "3d Brush Tool", 0);
     enable_->setCheckable(true);
     enable_->setChecked(false);
@@ -176,9 +178,9 @@ void Brush3D::select(QMouseEvent * event){
     bool negative_select = QApplication::keyboardModifiers() == Qt::ControlModifier;
 
     if(negative_select)
-        core_->us_->push(new Select(cl_->active_, empty, indices));
+        core_->us_->push(new Select(cl_->active_, empty, indices, select_mode_));
     else
-        core_->us_->push(new Select(cl_->active_, indices, empty));
+        core_->us_->push(new Select(cl_->active_, indices, empty, select_mode_));
 
 }
 
@@ -270,6 +272,12 @@ bool Brush3D::eventFilter(QObject *object, QEvent *event){
     case QEvent::KeyPress:
         if(static_cast<QKeyEvent*>(event)->key() == Qt::Key_Control)
             return true;
+        if(static_cast<QKeyEvent*>(event)->key() == Qt::Key_M) {
+            if(select_mode_ == 1)
+                select_mode_ = 2;
+            else
+                select_mode_ = 1;
+        }
     default:
         return false;
     }

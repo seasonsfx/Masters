@@ -248,15 +248,9 @@ void FlatView::initializeGL() {
     program_.bind(); CE();
     uni_sampler_ = program_.uniformLocation("sampler"); RC(uni_sampler_);
     uni_height_ = program_.uniformLocation("height"); RC(uni_height_);
-    uni_select_color_ = program_.uniformLocation("select_color"); RC(uni_select_color_);
     uni_camera_ = program_.uniformLocation("camera"); RC(uni_camera_);
     program_.release();
-    //
-    // Selection color
-    //
-    program_.bind(); CE();
-    glUniform4fv(uni_select_color_, 1, gld_->selection_color_); CE();
-    program_.release(); CE();
+
     //
     // Set up textures & point size
     //

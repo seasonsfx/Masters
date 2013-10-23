@@ -5,6 +5,7 @@
 Select::Select(boost::shared_ptr<PointCloud> pc,
         boost::shared_ptr<std::vector<int> > selected,
         boost::shared_ptr<std::vector<int> > deselected,
+        int selection_type,
         boost::shared_ptr<std::vector<uint16_t> > exclude_labels,
         QUndoCommand *parent)
         : QUndoCommand(parent) {
@@ -14,8 +15,13 @@ Select::Select(boost::shared_ptr<PointCloud> pc,
 
     // Check that select and deselect are not already in desired state
 
-    auto is_selected = [&pc] (int idx) {
-        return bool((uint8_t)PointFlags::selected & uint8_t(pc->flags_[idx]));
+    if(selection_type == 1)
+        selectmask_ = (uint8_t)PointFlags::selected;
+    else
+        selectmask_ = (uint8_t)PointFlags::selected2;
+
+    auto is_selected = [this, &pc] (int idx) {
+        return bool(selectmask_ & uint8_t(pc->flags_[idx]));
     };
 
     auto is_excluded = [&exclude_labels, &pc] (int idx) {
@@ -27,7 +33,7 @@ Select::Select(boost::shared_ptr<PointCloud> pc,
     };
 
     for(int idx : *deselected) {
-    if(is_selected(idx) && !is_excluded(idx))
+        if(is_selected(idx) && !is_excluded(idx))
             deselected_->push_back(idx);
     }
 
@@ -55,13 +61,13 @@ void Select::undo(){
 
     for(int idx : *deselected_) {
         PointFlags &pf = pc->flags_[idx];
-        pf = PointFlags((uint8_t(PointFlags::selected)) | uint8_t(pf));
+        pf = PointFlags(selectmask_ | uint8_t(pf));
         update->push_back(idx);
     }
 
     for(int idx : *selected_) {
         PointFlags &pf = pc->flags_[idx];
-        pf = PointFlags(~(uint8_t(PointFlags::selected)) & uint8_t(pf));
+        pf = PointFlags(~(selectmask_) & uint8_t(pf));
         update->push_back(idx);
     }
 
@@ -82,13 +88,13 @@ void Select::redo(){
 
     for(int idx : *selected_) {
         PointFlags &pf = pc->flags_[idx];
-        pf = PointFlags((uint8_t(PointFlags::selected)) | uint8_t(pf));
+        pf = PointFlags((selectmask_) | uint8_t(pf));
         update->push_back(idx);
     }
 
     for(int idx : *deselected_) {
         PointFlags &pf = pc->flags_[idx];
-        pf = PointFlags(~(uint8_t(PointFlags::selected)) & uint8_t(pf));
+        pf = PointFlags(~(selectmask_) & uint8_t(pf));
         update->push_back(idx);
     }
 
@@ -113,6 +119,9 @@ bool Select::mergeWith(const QUndoCommand *other){
         return false;
 
     const Select * o = static_cast<const Select *>(other);
+
+    if(this->selectmask_ != o->selectmask_)
+        return false;
 
     if (o->pc_.lock() != pc_.lock())
         return false;

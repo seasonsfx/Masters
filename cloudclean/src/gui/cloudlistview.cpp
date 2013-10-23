@@ -99,19 +99,20 @@ void CloudListView::contextMenu(const QPoint &pos) {
 void CloudListView::deselectAllPoints(){
     us_->beginMacro("Deselect All");
     for(boost::shared_ptr<PointCloud> cloud : cl_->clouds_){
-        boost::shared_ptr<std::vector<int> > indices;
-        indices.reset(new std::vector<int>());
 
-        boost::shared_ptr<std::vector<int> > empty;
-        empty.reset(new std::vector<int>());
+        std::vector<std::vector<int> > selections = cloud->getSelections();
 
-        for(uint idx = 0; idx < cloud->flags_.size(); idx++){
-            PointFlags & flag =  cloud->flags_[idx];
-            if(uint8_t(PointFlags::selected) & uint8_t(flag))
-                indices->push_back(idx);
+        for(int sel_idx = 0; sel_idx < selections.size(); sel_idx++){
+            std::vector<int> & selection = selections[sel_idx];
+
+            boost::shared_ptr<std::vector<int> > indices;
+            indices.reset(new std::vector<int>(selection));
+
+            boost::shared_ptr<std::vector<int> > empty;
+            empty.reset(new std::vector<int>());
+
+            us_->push(new Select(cloud, empty, indices, sel_idx+1));
         }
-
-        us_->push(new Select(cloud, empty, indices));
     }
     us_->endMacro();
 }

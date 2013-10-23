@@ -86,12 +86,7 @@ void GLWidget::initializeGL() {
     uni_sampler_ = program_.uniformLocation("sampler"); RC(uni_sampler_);
     uni_projection_ = program_.uniformLocation("projection"); RC(uni_projection_);
     uni_modelview_ = program_.uniformLocation("modelview"); RC(uni_modelview_);
-    uni_select_color_ = program_.uniformLocation("select_color"); RC(uni_select_color_);
 
-    //
-    // Selection color
-    //
-    glUniform4fv(uni_select_color_, 1, gld_->selection_color_); CE();
     program_.release(); CE();
 
     //

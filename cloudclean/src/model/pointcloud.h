@@ -16,7 +16,7 @@ typedef pcl::octree::OctreePointCloudSearch<pcl::PointXYZI> Octree;
 
 enum class MODEL_API PointFlags : int8_t {
     selected = 0x001,
-    reserved1 = 0x002,
+    selected2 = 0x002,
     reserved2 = 0x006,
     reserved3 = 0x008,
     reserved4 = 0x010,
@@ -58,14 +58,16 @@ class MODEL_API PointCloud : public QObject, public pcl::PointCloud<pcl::PointXY
     void flagsUpdated(boost::shared_ptr<std::vector<int> > idxs = nullptr);
     void labelsUpdated(boost::shared_ptr<std::vector<int> > idxs = nullptr);
 
+    std::vector<std::vector<int>> getSelections();
+
  signals:
-   void transformed();
-   void progress(int percentage);
-   void flagUpdate(boost::shared_ptr<std::vector<int> > idxs = nullptr);
-   void labelUpdate(boost::shared_ptr<std::vector<int> > idxs = nullptr);
+    void transformed();
+    void progress(int percentage);
+    void flagUpdate(boost::shared_ptr<std::vector<int> > idxs = nullptr);
+    void labelUpdate(boost::shared_ptr<std::vector<int> > idxs = nullptr);
 
  public slots:
-  void resetOrientation();
+    void resetOrientation();
 
  private:
     std::future<Octree::Ptr> fut_octree_;

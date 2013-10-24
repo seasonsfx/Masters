@@ -32,10 +32,10 @@ class PerfTest : public ::testing::Test {
 };
 
 TEST_F(PerfTest, NearestNeighbours) {
-  //EXPECT_EQ(0, 0);
+    //EXPECT_EQ(0, 0);
 
     PointCloud cloud;
-    bool succ = cloud.load_ptx("/home/rickert/Masters/misc/testdata/plane4x5.ptx");
+    bool succ = cloud.load_ptx("../../../misc/testdata/plane4x5.ptx");
 
     EXPECT_EQ(succ, true);
 

@@ -75,6 +75,7 @@ SET(CMAKE_MODULE_PATH "${MAINFOLDER}/tools/share/cmake")
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src)
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/build/src)
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/thirdparty/include)
+INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/thirdparty/onlineforest/include)
 
 #
 # Locate Project Prerequisites 
@@ -155,6 +156,7 @@ ENDFOREACH(CONFIGINPUT ${CONFIGINPUTS})
 #
 # Add Build Targets
 #
+ADD_SUBDIRECTORY(thirdparty/onlineforest ${CMAKE_CURRENT_BINARY_DIR}/onlineforest)
 ADD_SUBDIRECTORY(src)
 ADD_SUBDIRECTORY(thirdparty/gtest ${CMAKE_CURRENT_BINARY_DIR}/gtest)
 ADD_SUBDIRECTORY(test)

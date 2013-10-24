@@ -14,6 +14,7 @@
 #include "commands/select.h"
 #include "pluginsystem/core.h"
 #include "plugins/markov/mincut.h"
+#include "plugins/normalestimation/normalestimation.h"
 #include "utilities/utils.h"
 #include "utilities/picker.h"
 #include "utilities/cv.h"
@@ -34,6 +35,15 @@ void Markov::initialize(Core *core){
     flatview_ = core_->mw_->flatview_;
     mw_ = core_->mw_;
 
+}
+
+void Markov::initialize2(PluginManager * pm) {
+    ne_ = pm->findPlugin<NormalEstimator>();
+    if (ne_ == nullptr) {
+        qDebug() << "Normal estimator plugin needed for markov";
+        return;
+    }
+
     enable_ = new QAction(QIcon(":/markov.png"), "markov action", 0);
     enable_->setCheckable(true);
 
@@ -43,20 +53,23 @@ void Markov::initialize(Core *core){
 
     mw_->toolbar_->addAction(enable_);
     std::function<void(int)> func = std::bind(&Markov::graphcut, this, std::placeholders::_1);
-
+    picker_ = new Picker(glwidget_, cl_, func);
 
     forrest_action_ = new QAction(QIcon(":/randomforest.png"), "forrest action", 0);
     connect(forrest_action_, &QAction::triggered, [this] (bool on) {
         randomforest();
     });
 
-    picker_ = new Picker(glwidget_, cl_, func);
+    mw_->toolbar_->addAction(forrest_action_);
+
+
     enabled_ = false;
     fg_idx_ = -1;
 }
 
 void Markov::cleanup(){
     mw_->toolbar_->removeAction(enable_);
+    mw_->toolbar_->removeAction(forrest_action_);
     delete enable_;
     delete picker_;
     delete forrest_action_;
@@ -228,6 +241,27 @@ void Markov::graphcut(int idx){
     disable();
 }
 
+double timeIt(int reset) {
+    static time_t startTime, endTime;
+    static int timerWorking = 0;
+
+    if (reset) {
+        startTime = time(NULL);
+        timerWorking = 1;
+        return -1;
+    } else {
+        if (timerWorking) {
+            endTime = time(NULL);
+            timerWorking = 0;
+            return (double) (endTime - startTime);
+        } else {
+            startTime = time(NULL);
+            timerWorking = 1;
+            return -1;
+        }
+    }
+}
+
 void Markov::randomforest(){
     qDebug() << "Random forest";
 
@@ -236,14 +270,108 @@ void Markov::randomforest(){
         return;
 
 
-    // Downsample
-    std::vector<int> pca_idxs;
+    // get normals
+    pcl::PointCloud<pcl::Normal>::Ptr normals = ne_->getNormals(cl_->active_);
 
-    pcl::PointCloud<pcl::PointXYZI>::Ptr smaller_cloud = octreeDownsample(cloud.get(), 0.02, pca_idxs);
+    // zip and downsample
+    pcl::PointCloud<pcl::PointXYZINormal>::Ptr smallcloud = zipNormals(cl_->active_, normals);
+    std::vector<int> big_to_small;
+    smallcloud = octreeDownsample(smallcloud.get(), 0.05, big_to_small);
+
+    // Downsample
+    //std::vector<int> big_to_small;
+    //pcl::PointCloud<pcl::PointXYZI>::Ptr smallcloud = octreeDownsample(cloud.get(), 0.02, big_to_small);
+
+    /// Setup features
 
     // PCA
-    boost::shared_ptr<std::vector<Eigen::Vector3f> > pca = getPCA(smaller_cloud.get(), 0.2f, 0);
+    boost::shared_ptr<std::vector<Eigen::Vector3f> > pca = getPCA(smallcloud.get(), 0.2f, 0);
 
+    /// Random forest
+
+    // Hyperparameters
+    Hyperparameters hp;
+    hp.maxDepth = 10;
+    hp.numRandomTests = 10;
+    hp.numProjectionFeatures = 2;
+    hp.counterThreshold = 140;
+    hp.numTrees = 100;
+    hp.numEpochs = 10;
+    hp.useSoftVoting = 1;
+    hp.verbose = 1;
+
+    // Load selection
+    std::vector<std::vector<int>> selections = cloud->getSelections();
+
+    if(selections[0].size() < 30 || selections[1].size() < 30) {
+        qDebug() << "Not enough data";
+        return;
+    }
+
+    // Creating the train data
+    DataSet dataset_train, dataset_test;
+
+    //dataset_train.m_numSamples = selections[0].size() + selections[1].size();
+    dataset_train.m_numFeatures = 10;
+    dataset_train.m_numClasses = 2;
+
+    dataset_test.m_numFeatures = 10;
+    dataset_test.m_numClasses = 2;
+
+    std::set<int> seen;
+
+    bool test = false;
+    for(uint y = 0; y < selections.size(); y++){
+        for(int big_idx : selections[y]){
+            Sample sample;
+            sample.x.resize(dataset_train.m_numFeatures);
+            resize(sample.x, dataset_train.m_numFeatures);
+
+            int idx = big_to_small[big_idx];
+            if(!seen.insert(idx).second)
+                break;
+
+            //set samples
+            sample.x[0] = smallcloud->at(idx).x;
+            sample.x[1] = smallcloud->at(idx).y;
+            sample.x[2] = smallcloud->at(idx).z;
+            sample.x[3] = smallcloud->at(idx).intensity;
+            sample.x[4] = smallcloud->at(idx).normal_x;
+            sample.x[5] = smallcloud->at(idx).normal_y;
+            sample.x[6] = smallcloud->at(idx).normal_z;
+            sample.x[7] = (*pca)[idx][0];
+            sample.x[8] = (*pca)[idx][1];
+            sample.x[9] = (*pca)[idx][2];
+
+            sample.y = y;
+
+            if((test = !test))
+                dataset_train.m_samples.push_back(sample);
+            else
+                dataset_test.m_samples.push_back(sample);
+        }
+
+    }
+
+    qDebug() << "Size tr:" << dataset_train.m_samples.size();
+    qDebug() << "Size ts:" << dataset_test.m_samples.size();
+
+    dataset_train.m_numSamples = dataset_train.m_samples.size();
+    dataset_test.m_numSamples = dataset_test.m_samples.size();
+
+    dataset_train.findFeatRange();
+    dataset_test.findFeatRange();
+
+    OnlineRF model(hp, dataset_train.m_numClasses, dataset_train.m_numFeatures, dataset_train.m_minFeatRange, dataset_train.m_maxFeatRange);
+    timeIt(1);
+    model.trainAndTest(dataset_train, dataset_test);
+    cout << "Training/Test time: " << timeIt(0) << endl;
+
+    // fill in datasets
+
+
+
+/*
     // Determine veg
     std::vector<bool> likely_veg(smaller_cloud->size());
 
@@ -268,16 +396,14 @@ void Markov::randomforest(){
         }
 
     }
+*/
 
-    // Downsample for graph cut
-    std::vector<int> big_to_small_map;
-    smaller_cloud = octreeDownsample(cloud.get(), 0.1, big_to_small_map);
-
+/*
     std::set<int> foreground_points;
 
     // Map veg to foreground points in 2nd downsampled cloud
     for(uint i = 0; i < cloud->size(); i++) {
-        uint pca_idx = pca_idxs[i];
+        uint pca_idx = big_to_small_map[i];
         if(likely_veg[pca_idx] == true){
             uint small_idx = big_to_small_map[i];
             foreground_points.insert(small_idx);
@@ -347,6 +473,7 @@ void Markov::randomforest(){
     // Need a layer for the pixels pinned to the bg
     fg_idx_ = -1;
     disable();
+    */
 }
 
 Q_PLUGIN_METADATA(IID "za.co.circlingthesun.cloudclean.iplugin")

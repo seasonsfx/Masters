@@ -1,6 +1,7 @@
 include_directories(
     ${PCL_INCLUDE_DIRS}
     ${FLANN_INCLUDE_DIRS}
+    ${OPENCL_INCLUDE_DIRS}
 )
 
 QT5_ADD_RESOURCES(markov_RESOURCES_RCC markov.qrc)
@@ -14,6 +15,7 @@ target_link_libraries(
     cloudclean_pluginsystem
     cloudclean_model
     cloudclean_gui
+    normalestimator
     onlineforest
     ${PCL_LIBRARIES}
 )

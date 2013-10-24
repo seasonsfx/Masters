@@ -11,6 +11,7 @@ class FlatView;
 class GLWidget;
 class MainWindow;
 class Picker;
+class NormalEstimator;
 
 class Markov : public IPlugin {
     Q_INTERFACES(IPlugin)
@@ -19,6 +20,7 @@ class Markov : public IPlugin {
  public:
     QString getName();
     void initialize(Core * core);
+    void initialize2(PluginManager * pm);
     void cleanup();
 
     ~Markov();
@@ -44,6 +46,7 @@ class Markov : public IPlugin {
     MainWindow * mw_;
 
     Picker * picker_;
+    NormalEstimator * ne_;
 
     QAction * enable_;
     QAction * forrest_action_;

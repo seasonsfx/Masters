@@ -320,7 +320,7 @@ void Markov::randomforest(){
 
     std::set<int> seen;
 
-    bool test = false;
+    int count = 0;
     for(uint y = 0; y < selections.size(); y++){
         for(int big_idx : selections[y]){
             Sample sample;
@@ -329,7 +329,7 @@ void Markov::randomforest(){
 
             int idx = big_to_small[big_idx];
             if(!seen.insert(idx).second)
-                break;
+                continue;
 
             //set samples
             sample.x[0] = smallcloud->at(idx).x;
@@ -345,7 +345,7 @@ void Markov::randomforest(){
 
             sample.y = y;
 
-            if((test = !test))
+            if((count++%2==0))
                 dataset_train.m_samples.push_back(sample);
             else
                 dataset_test.m_samples.push_back(sample);
@@ -353,11 +353,17 @@ void Markov::randomforest(){
 
     }
 
-    qDebug() << "Size tr:" << dataset_train.m_samples.size();
-    qDebug() << "Size ts:" << dataset_test.m_samples.size();
-
-    dataset_train.m_numSamples = dataset_train.m_samples.size();
     dataset_test.m_numSamples = dataset_test.m_samples.size();
+    dataset_train.m_numSamples = dataset_train.m_samples.size();
+
+    qDebug() << "Size tr:" << dataset_train.m_numSamples;
+    qDebug() << "Size ts:" << dataset_test.m_numSamples;
+
+    if(dataset_train.m_numSamples < 10 || dataset_test.m_numSamples < 10){
+        qDebug() << "Not enough samples";
+        return;
+    }
+
 
     dataset_train.findFeatRange();
     dataset_test.findFeatRange();
@@ -369,7 +375,55 @@ void Markov::randomforest(){
 
     // fill in datasets
 
+    // Inference here!
+    // for all the other points
 
+    std::vector<Result> results(smallcloud->points.size());
+
+    for(int idx = 0; idx < smallcloud->points.size(); ++idx) {
+        Sample sample;
+        sample.x.resize(dataset_train.m_numFeatures);
+        resize(sample.x, dataset_train.m_numFeatures);
+
+        //set samples
+        sample.x[0] = smallcloud->at(idx).x;
+        sample.x[1] = smallcloud->at(idx).y;
+        sample.x[2] = smallcloud->at(idx).z;
+        sample.x[3] = smallcloud->at(idx).intensity;
+        sample.x[4] = smallcloud->at(idx).normal_x;
+        sample.x[5] = smallcloud->at(idx).normal_y;
+        sample.x[6] = smallcloud->at(idx).normal_z;
+        sample.x[7] = (*pca)[idx][0];
+        sample.x[8] = (*pca)[idx][1];
+        sample.x[9] = (*pca)[idx][2];
+
+        results[idx] = model.eval(sample);
+    }
+
+    // Select fg and bg
+
+    auto fgselect = boost::make_shared<std::vector<int>>();
+    auto bgselect = boost::make_shared<std::vector<int>>();
+
+    for(int idx = 0; idx < cloud->points.size(); ++idx) {
+        int idx_small = big_to_small[idx];
+        Result & res = results[idx_small];
+
+        if(res.prediction == 0)
+            fgselect->push_back(idx);
+        else
+            bgselect->push_back(idx);
+    }
+
+    auto empty = boost::make_shared<std::vector<int> >();
+
+    Select * fgselectcmd = new Select(cl_->active_, fgselect);
+    Select * bgselectcmd = new Select(cl_->active_, bgselect, empty, 1);
+
+    core_->us_->beginMacro("Random forest");
+    core_->us_->push(fgselectcmd);
+    core_->us_->push(bgselectcmd);
+    core_->us_->endMacro();
 
 /*
     // Determine veg

@@ -1,3 +1,3 @@
 [submodule "OnlineForest"]
       path = cloudclean/thirdparty/onlineforest
-      url = git://github.com/circlingthesun/OnlineForest.git
+      url = https://github.com/circlingthesun/OnlineForest

@@ -39,14 +39,15 @@ MainWindow::MainWindow(QUndoStack *us, CloudList * cl, LayerList * ll, QWidget *
     tabs_ = new QTabWidget(this);
 
     QGLFormat base_format;
-    base_format.setVersion(3, 3);
-    // Compatibility profile breaks gl context sharing on AMD cards
+    // Core profile breaks qpainter
     base_format.setProfile(QGLFormat::CompatibilityProfile);
-    // Core profile breaks qpainter on windows
-    // base_format.setProfile(QGLFormat::CoreProfile);
+    // This can be set to 3.3 but setting the version gets us core profile on amd
+    //base_format.setVersion(4, 3);
+
+
     base_format.setSampleBuffers(true);
 
-    QGLFormat::setDefaultFormat(base_format);
+    //QGLFormat::setDefaultFormat(base_format);
 
     // Important! Context invalidates when reparenting the glwidget on windows
     glwidget_ = new GLWidget(base_format, cl, ll, tabs_);
@@ -54,7 +55,7 @@ MainWindow::MainWindow(QUndoStack *us, CloudList * cl, LayerList * ll, QWidget *
     flatview_ = new FlatView(base_format, cl, ll, tabs_, glwidget_);
     tabs_->addTab(flatview_, "2D View");
 
-    qDebug() << "Format: " << glwidget_->format().majorVersion() << glwidget_->format().minorVersion();
+    qDebug() << "Format: " << glwidget_->format().majorVersion() << glwidget_->format().minorVersion() << "Core:" << (glwidget_->format().profile() == QGLFormat::CoreProfile);
 
     QGLContext * ctx = const_cast<QGLContext *>(glwidget_->context());
     gld_ = new GLData(ctx, cl, ll);

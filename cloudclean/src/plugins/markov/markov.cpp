@@ -296,7 +296,7 @@ void Markov::randomforest(){
     hp.numProjectionFeatures = 2;
     hp.counterThreshold = 140;
     hp.numTrees = 100;
-    hp.numEpochs = 10;
+    hp.numEpochs = 1;
     hp.useSoftVoting = 1;
     hp.verbose = 1;
 
@@ -369,6 +369,12 @@ void Markov::randomforest(){
     dataset_test.findFeatRange();
 
     OnlineRF model(hp, dataset_train.m_numClasses, dataset_train.m_numFeatures, dataset_train.m_minFeatRange, dataset_train.m_maxFeatRange);
+
+    for(int i = 0; i < dataset_train.m_numFeatures; i++){
+        qDebug() << "Min" << dataset_train.m_minFeatRange[i] << "Max" << dataset_train.m_maxFeatRange[i];
+    }
+
+
     timeIt(1);
     model.trainAndTest(dataset_train, dataset_test);
     cout << "Training/Test time: " << timeIt(0) << endl;
@@ -378,9 +384,13 @@ void Markov::randomforest(){
     // Inference here!
     // for all the other points
 
-    std::vector<Result> results(smallcloud->points.size());
+    Result invalid;
+    //invalid.confidence.at(0) = 0;
+    invalid.prediction = -1;
 
-    for(int idx = 0; idx < smallcloud->points.size(); ++idx) {
+    std::vector<Result> results(smallcloud->points.size(), invalid);
+
+    for(size_t idx = 0; idx < smallcloud->points.size(); ++idx) {
         Sample sample;
         sample.x.resize(dataset_train.m_numFeatures);
         resize(sample.x, dataset_train.m_numFeatures);
@@ -398,6 +408,16 @@ void Markov::randomforest(){
         sample.x[9] = (*pca)[idx][2];
 
         results[idx] = model.eval(sample);
+
+        if(idx % 10000 == 0){
+            for(int i = 0; i < 10; i++){
+                qDebug() << "Sample " << i << ": " << sample.x[i];
+            }
+
+            qDebug() << "Label" << results[idx].prediction << "Confidence: " << results[idx].confidence.at(0) << results[idx].confidence.at(1);
+
+        }
+
     }
 
     // Select fg and bg
@@ -405,7 +425,7 @@ void Markov::randomforest(){
     auto fgselect = boost::make_shared<std::vector<int>>();
     auto bgselect = boost::make_shared<std::vector<int>>();
 
-    for(int idx = 0; idx < cloud->points.size(); ++idx) {
+    for(size_t idx = 0; idx < cloud->points.size(); ++idx) {
         int idx_small = big_to_small[idx];
         Result & res = results[idx_small];
 

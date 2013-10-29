@@ -1,1 +1,1 @@
-![status](https://travis-ci.org/circlingthesun/Masters.png)
+[![status](https://travis-ci.org/circlingthesun/Masters.png)](https://travis-ci.org/circlingthesun/Masters)

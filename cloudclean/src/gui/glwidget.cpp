@@ -325,6 +325,7 @@ void GLWidget::keyPressEvent(QKeyEvent * event) {
     update();
 }
 
+
 bool GLWidget::eventFilter(QObject *object, QEvent *event) {
     Q_UNUSED(object);
     if (event->type() == QEvent::KeyPress) {

@@ -60,6 +60,7 @@ class Brush2D : public IPlugin {
 
     bool is_enabled_;
     int radius_;
+    uint8_t select_mask_;
 
     QWidget * settings_;
 

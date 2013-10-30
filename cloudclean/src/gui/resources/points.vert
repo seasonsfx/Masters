@@ -38,9 +38,7 @@ void main( void ) {
     }
 
     if(select_count != 0){
-        colour = colour * 0.7f + select_colour/select_count * 0.15f;
-    } else {
-        colour = colour * 0.7f + select_colour * 0.3f;
+        colour = colour * 0.7f + select_colour/select_count * 0.3f;
     }
 
 

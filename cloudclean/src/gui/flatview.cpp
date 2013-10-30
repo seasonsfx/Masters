@@ -10,6 +10,7 @@
 FlatView::FlatView(QGLFormat & fmt, CloudList * cl,
                    LayerList * ll, QWidget *parent, QGLWidget *sharing)
     : QGLWidget(fmt, parent, sharing), rotation_(0.0f) {
+    setFocusPolicy(Qt::StrongFocus);
     cl_ = cl;
     ll_ = ll;
     current_scale_ = 1;
@@ -95,8 +96,7 @@ int binary_search(std::vector<int> A, int key) {
     return -1;
 }
 
-int FlatView::imageToCloudIdx(int x, int y){
-    boost::shared_ptr<PointCloud> pc = pc_.lock();
+int FlatView::imageToCloudIdx(int x, int y, boost::shared_ptr<PointCloud> &pc){
     if(x < 0 || x > pc->scan_width()){
         return -1;
     }

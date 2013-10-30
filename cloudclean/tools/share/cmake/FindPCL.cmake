@@ -61,7 +61,7 @@ set(pcl_octree_int_dep common)
 set(pcl_visualization_int_dep common io kdtree octree range_image octree filters)
 #list each component external dependencies (ext means mandatory and opt means optional)
 set(pcl_common_ext_dep eigen)
-set(pcl_io_opt_dep openni-dev)
+set(pcl_io_opt_dep openni)
 set(pcl_kdtree_ext_dep flann)
 #set(pcl_sample_consensus_ext_dep cminpack)
 set(pcl_surface_opt_dep qhull)
@@ -191,30 +191,30 @@ macro(find_qhull)
   endif(QHULL_FOUND)
 endmacro(find_qhull)
 
-#remove this as soon as openni-dev is shipped with FindOpenni.cmake
+#remove this as soon as openni is shipped with FindOpenni.cmake
 macro(find_openni)
   if(PkgConfig_FOUND)
-    pkg_check_modules(PC_OPENNI-DEV openni-dev)
+    pkg_check_modules(PC_OPENNI openni)
   endif(PkgConfig_FOUND)
-  find_path(OPENNI-DEV_INCLUDE_DIRS XnStatus.h
-    HINTS ${PC_OPENNI-DEV_INCLUDEDIR} ${PC_OPENNI-DEV_INCLUDE_DIRS} 
-          "${OPENNI-DEV_ROOT}" "$ENV{OPENNI-DEV_ROOT}"
+  find_path(OPENNI_INCLUDE_DIRS XnStatus.h
+    HINTS ${PC_OPENNI_INCLUDEDIR} ${PC_OPENNI_INCLUDE_DIRS}
+          "${OPENNI_ROOT}" "$ENV{OPENNI_ROOT}"
     PATHS "$ENV{PROGRAMFILES}/OpenNI/Include" "$ENV{PROGRAMW6432}/OpenNI/Include"
     PATH_SUFFIXES include/openni Include)
   #add a hint so that it can find it without the pkg-config
-  find_library(OPENNI-DEV_LIBRARY 
+  find_library(OPENNI_LIBRARY
     NAMES OpenNI64 OpenNI 
-    HINTS ${PC_OPENNI-DEV_LIBDIR} ${PC_OPENNI-DEV_LIBRARY_DIRS} 
-              "${OPENNI-DEV_ROOT}" "$ENV{OPENNI-DEV_ROOT}"
+    HINTS ${PC_OPENNI_LIBDIR} ${PC_OPENNI_LIBRARY_DIRS}
+              "${OPENNI_ROOT}" "$ENV{OPENNI_ROOT}"
     PATHS "$ENV{PROGRAMFILES}/OpenNI/Lib" "$ENV{PROGRAMW6432}/OpenNI/Lib64"
     PATH_SUFFIXES lib Lib Lib64)
 
-  find_package_handle_standard_args(openni-dev DEFAULT_MSG OPENNI-DEV_LIBRARY OPENNI-DEV_INCLUDE_DIRS)
+  find_package_handle_standard_args(openni DEFAULT_MSG OPENNI_LIBRARY OPENNI_INCLUDE_DIRS)
 
-  if(OPENNI-DEV_FOUND)
-    get_filename_component(OPENNI-DEV_LIBRARY_PATH ${OPENNI-DEV_LIBRARY} PATH)
-    set(OPENNI-DEV_LIBRARY_DIRS ${OPENNI-DEV_LIBRARY_PATH}) 
-  endif(OPENNI-DEV_FOUND)    
+  if(OPENNI_FOUND)
+    get_filename_component(OPENNI_LIBRARY_PATH ${OPENNI_LIBRARY} PATH)
+    set(OPENNI_LIBRARY_DIRS ${OPENNI_LIBRARY_PATH})
+  endif(OPENNI_FOUND)
 endmacro(find_openni)
 
 #remove this as soon as flann is shipped with FindFlann.cmake
@@ -280,7 +280,7 @@ macro(find_external_library _component _lib _is_optional)
     find_flann()
   elseif("${_lib}" STREQUAL "qhull")
     find_qhull()
-  elseif("${_lib}" STREQUAL "openni-dev")
+  elseif("${_lib}" STREQUAL "openni")
     find_openni()
   elseif("${_lib}" STREQUAL "cminpack")
     find_cminpack()

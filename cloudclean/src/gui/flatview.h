@@ -24,7 +24,7 @@ class GUI_API FlatView : public QGLWidget {
     const Eigen::Affine2f getCamera();
     const Eigen::Affine2f getNDCCamera();
 
-    int imageToCloudIdx(int x, int y);
+    int imageToCloudIdx(int x, int y, boost::shared_ptr<PointCloud> & pc);
     QPoint cloudToImageCoord(int idx);
 
  public slots:

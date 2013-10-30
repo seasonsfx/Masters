@@ -29,6 +29,8 @@ void Brush2D::initialize(Core *core){
     mw_ = core_->mw_;
     us_ = core->us_;
 
+    select_mask_ = 1;
+
     enable_ = new QAction(QIcon(":/images/brush.png"), "2d Brush Tool", 0);
     enable_->setCheckable(true);
     enable_->setChecked(false);
@@ -70,6 +72,9 @@ void Brush2D::setRad(int val) {
 }
 
 void Brush2D::cleanup(){
+    mw_->removeMenu(enable_, "Edit");
+    mw_->toolbar_->removeAction(enable_);
+    mw_->tooloptions_->removeWidget(settings_);
     disconnect(this, SIGNAL(enabling()), core_, SIGNAL(endEdit()));
     disconnect(enable_, SIGNAL(triggered()), this, SLOT(enable()));
 }
@@ -99,7 +104,7 @@ void Brush2D::select(QMouseEvent * event){
                 continue;
 
             int idx = flatview_->imageToCloudIdx(int(coord.x() + x + 0.5),
-                                      int(coord.y() + y + 0.5));
+                                      int(coord.y() + y + 0.5), pc);
             if (idx != -1){
                 if(negative_select)
                     deselected->push_back(idx);
@@ -109,7 +114,7 @@ void Brush2D::select(QMouseEvent * event){
         }
     }
 
-    us_->push(new Select(pc, selected, deselected));
+    us_->push(new Select(pc, selected, deselected, select_mask_));
 
 }
 
@@ -183,7 +188,6 @@ void Brush2D::disable() {
 }
 
 bool Brush2D::eventFilter(QObject *object, QEvent *event){
-
     // Bypass plugin via shift
     if(QApplication::keyboardModifiers() == Qt::SHIFT)
         return false;
@@ -195,6 +199,36 @@ bool Brush2D::eventFilter(QObject *object, QEvent *event){
         return mouseReleaseEvent(static_cast<QMouseEvent*>(event));
     case QEvent::MouseMove:
         return mouseMoveEvent(static_cast<QMouseEvent*>(event));
+    case QEvent::KeyPress:
+        if(static_cast<QKeyEvent*>(event)->key() == Qt::Key_Control)
+            return true;
+
+        switch(static_cast<QKeyEvent*>(event)->key()){
+        case Qt::Key_1:
+            select_mask_ = 1;
+            return true;
+        case Qt::Key_2:
+            select_mask_ = 2;
+            return true;
+        case Qt::Key_3:
+            select_mask_ = 4;
+            return true;
+        case Qt::Key_4:
+            select_mask_ = 8;
+            return true;
+        case Qt::Key_5:
+            select_mask_ = 16;
+            return true;
+        case Qt::Key_6:
+            select_mask_ = 32;
+            return true;
+        case Qt::Key_7:
+            select_mask_ = 64;
+            return true;
+        case Qt::Key_8:
+            select_mask_ = 128;
+            return true;
+        }
     //case QEvent::Wheel:
     //    return mouseWheelEvent(static_cast<QWheelEvent*>(event));
     default:

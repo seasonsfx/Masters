@@ -314,7 +314,7 @@ void FlatView::paintEvent(QPaintEvent *event) {
     // Grid buffer
     IF_FAIL("buffer bind") = cd->grid_buffer_->bind(); CE();
     glEnableVertexAttribArray(3); CE();
-    glVertexAttribIPointer(3, 1, GL_INT, 0, 0); CE();
+    glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 0, 0); CE();
     cd->grid_buffer_->release(); CE();
 
     cd->draw(vao_); CE();

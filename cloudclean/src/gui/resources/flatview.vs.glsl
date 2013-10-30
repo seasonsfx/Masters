@@ -2,7 +2,7 @@
 layout(location = 0) in float intensity;
 layout(location = 1) in int color_index;
 layout(location = 2) in int flags;
-layout(location = 3) in int position;
+layout(location = 3) in vec2 position;
 
 uniform samplerBuffer sampler;
 uniform int height;
@@ -41,10 +41,7 @@ void main( void ) {
         colour = colour * 0.7f + select_colour/select_count * 0.3f;
     }
 
-    vec3 pos;
-    pos.y = mod(position, height);
-    pos.x = float(position/float(height));
-    pos.z = 1;
+    vec3 pos = vec3(position, 1.0f);
 
     gl_Position = vec4((camera*pos).xy, 0, 1);
 }

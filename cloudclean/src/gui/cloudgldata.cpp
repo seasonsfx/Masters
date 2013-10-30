@@ -44,7 +44,7 @@ CloudGLData::CloudGLData(boost::shared_ptr<PointCloud> pc) {
     grid_buffer_.reset(new QGLBuffer(QGLBuffer::VertexBuffer)); CE();
     grid_buffer_->create(); CE();
     grid_buffer_->bind(); CE();
-    size_t gb_size = sizeof(int)*pc->size();
+    size_t gb_size = sizeof(float)*2*pc->size();
     grid_buffer_->allocate(gb_size); CE();
     grid_buffer_->release(); CE();
 
@@ -67,6 +67,7 @@ CloudGLData::~CloudGLData() {
                this, SLOT(syncLabels(boost::shared_ptr<std::vector<int> >)));
 }
 
+/*
 void CloudGLData::setVAO(GLuint vao){
     glBindVertexArray(vao);
 
@@ -95,11 +96,12 @@ void CloudGLData::setVAO(GLuint vao){
     // Grid pos buffer
     grid_buffer_->bind(); CE();
     glEnableVertexAttribArray(4); CE();
-    glVertexAttribIPointer(4, 1, GL_INT, 0, 0); CE();
+    glVertexAttribPointer(4, 2, GL_FLOAT, GL_FALSE, 0, 0); CE();
     grid_buffer_->release(); CE();
 
     glBindVertexArray(0);
 }
+*/
 
 void CloudGLData::copyCloud(){
     point_buffer_->bind(); CE();
@@ -157,10 +159,17 @@ void CloudGLData::copyFlags(){
 
 void CloudGLData::copyGrid(){
     grid_buffer_->bind(); CE();
-    int * gridbuff =
-            static_cast<int *>(glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY)); CE();
+    float * gridbuff =
+            static_cast<float *>(glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY)); CE();
     for(uint i = 0; i < pc_->cloudToGridMap().size(); i++){
-        gridbuff[i] = pc_->cloudToGridMap()[i];
+        int grid_idx = pc_->cloudToGridMap()[i];
+        float y = grid_idx % pc_->scan_height();
+        float x = grid_idx/float(pc_->scan_height());
+
+        //if(i%1000 == 0)
+        //    qDebug() << "x, y = " << x << y;
+        gridbuff[i*2] = x;
+        gridbuff[i*2+1] = y;
     }
     glUnmapBuffer(GL_ARRAY_BUFFER);
     grid_buffer_->release(); CE();

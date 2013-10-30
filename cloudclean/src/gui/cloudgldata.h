@@ -13,7 +13,7 @@ class GUI_API CloudGLData : public QObject{
     CloudGLData(boost::shared_ptr<PointCloud> pc);
     ~CloudGLData();
 
-    void setVAO(GLuint vao);
+    //void setVAO(GLuint vao);
 
     void draw(GLint vao);
 

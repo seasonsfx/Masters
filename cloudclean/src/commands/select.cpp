@@ -5,7 +5,7 @@
 Select::Select(boost::shared_ptr<PointCloud> pc,
         boost::shared_ptr<std::vector<int> > selected,
         boost::shared_ptr<std::vector<int> > deselected,
-        int selection_type,
+        uint8_t selection_mask,
         boost::shared_ptr<std::vector<uint16_t> > exclude_labels,
         QUndoCommand *parent)
         : QUndoCommand(parent) {
@@ -15,10 +15,7 @@ Select::Select(boost::shared_ptr<PointCloud> pc,
 
     // Check that select and deselect are not already in desired state
 
-    if(selection_type == 1)
-        selectmask_ = (uint8_t)PointFlags::selected;
-    else
-        selectmask_ = (uint8_t)PointFlags::selected2;
+    selectmask_ = selection_mask;
 
     auto is_selected = [this, &pc] (int idx) {
         return bool(selectmask_ & uint8_t(pc->flags_[idx]));

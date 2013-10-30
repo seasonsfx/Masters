@@ -7,25 +7,40 @@ layout(location = 3) in int position;
 uniform samplerBuffer sampler;
 uniform int height;
 uniform mat3 camera;
-
 out vec4 colour;
 
-const vec4 select_color = vec4(0.0f, 0.0f, 1.0f, 1.0f);
-const vec4 select_color2 = vec4(1.0f, 0.0f, 0.0f, 1.0f);
-
-const int SELECTED = 0x001;
-const int SELECTED2 = 0x002;
+const vec4 select_colours[8] = vec4[8](
+        vec4(1.0f, 0.0f, 0.0f, 1.0f), // Red
+        vec4(0.0f, 1.0f, 0.0f, 1.0f), // Green
+        vec4(0.0f, 0.0f, 1.0f, 1.0f), // Blue
+        vec4(1.0f, 1.0f, 0.0f, 1.0f), // Yellow
+        vec4(0.0f, 1.0f, 1.0f, 1.0f), // Cyan
+        vec4(1.0f, 0.0f, 1.0f, 1.0f), // Magenta
+        vec4(1.0f, 0.5f, 0.0f, 1.0f), // Orange
+        vec4(0.5f, 0.0f, 1.0f, 1.0f) // Purple
+);
 
 void main( void ) {
+    // Fetch the colour from the buffer texture
     vec4 layer_colour = texelFetch(sampler, color_index);
+
+    // Adjust the colour intensity
     colour = layer_colour * intensity;
 
-    if(bool(flags & SELECTED) && bool(flags & SELECTED2)){
-        colour = colour * 0.7f + select_color * 0.15f + select_color2 * 0.15f;
-    } else if (bool(flags & SELECTED)) {
-        colour = colour * 0.7f + select_color * 0.3f;
-    } else if (bool(flags & SELECTED2)) {
-        colour = colour * 0.7f + select_color2 * 0.3f;
+    int select_count = 0;
+    vec4 select_colour = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+    for(int i = 0; i < 8; i++){
+        int mask = 1 << i;
+        if( bool(mask & flags) ) {
+            select_colour += select_colours[i];
+            select_count ++;
+        }
+    }
+
+    if(select_count != 0){
+        colour = colour * 0.7f + select_colour/select_count * 0.15f;
+    } else {
+        colour = colour * 0.7f + select_colour * 0.3f;
     }
 
     vec3 pos;

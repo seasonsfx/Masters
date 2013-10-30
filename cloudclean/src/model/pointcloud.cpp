@@ -405,8 +405,8 @@ std::vector<std::vector<int> > PointCloud::getSelections() {
         return bool(mask & uint8_t(flags_[idx]));
     };
 
-    for(int idx = 0; idx < flags_.size(); idx++) {
-        for(int maskid = 0; maskid < selection_masks.size(); maskid++) {
+    for(size_t idx = 0; idx < flags_.size(); idx++) {
+        for(size_t maskid = 0; maskid < selection_masks.size(); maskid++) {
             if(is_selected(idx, selection_masks[maskid]))
                 selections[maskid].push_back(idx);
         }

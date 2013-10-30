@@ -463,7 +463,7 @@ void Markov::randomforest(){
     auto empty = boost::make_shared<std::vector<int> >();
 
     Select * fgselectcmd = new Select(cl_->active_, fgselect);
-    Select * bgselectcmd = new Select(cl_->active_, bgselect, empty, 2);
+    Select * bgselectcmd = new Select(cl_->active_, bgselect, empty, 1);
 
     core_->us_->beginMacro("Random forest");
     core_->us_->push(fgselectcmd);

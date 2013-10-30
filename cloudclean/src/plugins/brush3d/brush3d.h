@@ -74,7 +74,7 @@ class Brush3D : public IPlugin {
     bool is_enabled_;
     float radius_;
 
-    int select_mode_;
+    uint8_t select_mask_;
 
     QWidget * settings_;
 };

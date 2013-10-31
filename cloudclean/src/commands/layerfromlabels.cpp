@@ -23,7 +23,7 @@ void LayerFromLabels::undo(){
         ll_->deleteLayer(layer);
     }
 
-    // TODO: Freelist is not updated
+    // TODO: Freelist is not updated. Feelist is bs! For now
 
     // Undo subtractive
     if(subtractive_) {

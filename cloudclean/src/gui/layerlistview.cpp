@@ -177,7 +177,16 @@ void LayerListView::contextMenu(const QPoint &pos) {
 
         QAction del("Delete", 0);
         del.setProperty("layer_id", row);
-        connect(&del, SIGNAL(triggered()), ll_, SLOT(deleteLayer()));
+        connect(&del, &QAction::triggered, [&] (bool triggered) {
+            us_->beginMacro("Delete Layer(s)");
+            for(boost::weak_ptr<Layer> wp : ll_->selection_) {
+                if(wp.expired())
+                    continue;
+                boost::shared_ptr<Layer> l = wp.lock();
+                us_->push(new LayerDelete(l, ll_));
+            }
+            us_->endMacro();
+        });
         menu.addAction(&del);
 
         QAction merge("Merge", 0);

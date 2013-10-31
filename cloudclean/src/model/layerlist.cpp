@@ -134,8 +134,8 @@ void LayerList::deleteLayer(int idx){
     beginRemoveRows(QModelIndex(), idx, idx);
 
     auto toDel = [&idx, this] (boost::weak_ptr<Layer> l) {
-            if(l.expired())
-                return true;
+        if(l.expired())
+            return true;
         return false;
     };
 

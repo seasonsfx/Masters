@@ -17,6 +17,7 @@ QString LayerDelete::actionText(){
 }
 
 void LayerDelete::undo(){
+    // Add layer back
     boost::shared_ptr<Layer> layer = ll_->addLayerWithId(id_);
     layer->setName(name_);
     layer->setColor(col_);
@@ -27,6 +28,7 @@ void LayerDelete::undo(){
 }
 
 void LayerDelete::redo(){
+    // Delete layer
     boost::shared_ptr<Layer> layer = layer_.lock();
     id_ = layer->id_;
     ll_->deleteLayer(layer);

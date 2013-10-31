@@ -114,7 +114,7 @@ void LayerListView::intersectSelectedLayers(){
     }
 
     us_->beginMacro("Layer intersection");
-    us_->push(new LayerFromLabels(intersecting_labels, ll_, true));
+    us_->push(new LayerFromLabels(intersecting_labels, ll_, "Intersection", false));
     us_->endMacro();
 
     ui_->tableView->selectRow(ll_->getLayers().size()-1);
@@ -141,7 +141,7 @@ void LayerListView::mergeSelectedLayers() {
     labels->erase( unique(labels->begin(), labels->end()), labels->end());
 
     us_->beginMacro("Merge layers");
-    us_->push(new LayerFromLabels(labels, ll_, true));
+    us_->push(new LayerFromLabels(labels, ll_, "Merged layer", true));
 
     // Delete marked layers
     for(boost::weak_ptr<Layer> sel : selections) {

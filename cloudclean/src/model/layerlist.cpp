@@ -42,6 +42,7 @@ QVariant LayerList::data(const QModelIndex & index, int role) const {
 
     if (col == 1) {
         switch (role) {
+        case Qt::EditRole:
         case Qt::DisplayRole:
         {
             QString re;
@@ -72,7 +73,6 @@ bool LayerList::setData(const QModelIndex & index, const QVariant & value,
         emit lookupTableUpdate();
         return true;
     } else if (role == Qt::EditRole && col == 1) {
-        //qDebug() << "Weeee: " << value.toString();
         layers_[row]->setName(value.toString());
         return true;
     }

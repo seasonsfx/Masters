@@ -19,7 +19,7 @@ class COMMAND_API LayerFromLabels : public QUndoCommand
 {
  public:
     LayerFromLabels(boost::shared_ptr<std::vector<uint16_t> > labels,
-                    LayerList * ll, bool subtractive = true);
+                    LayerList * ll, QString layer_name = "New Layer", bool subtractive = true);
     QString actionText();
     virtual void undo();
     virtual void redo();
@@ -32,6 +32,7 @@ class COMMAND_API LayerFromLabels : public QUndoCommand
     LayerList * ll_;
     boost::weak_ptr<Layer> new_layer_;
     std::map<uint, std::vector<uint16_t> > removed_from_;
+    QString layer_name_;
 };
 
 #endif // LayerFromLabels_H

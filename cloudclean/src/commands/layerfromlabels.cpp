@@ -5,10 +5,11 @@
 #include <model/layer.h>
 
 LayerFromLabels::LayerFromLabels(boost::shared_ptr<std::vector<uint16_t> > labels,
-                                 LayerList * ll, bool subtractive) {
+                                 LayerList * ll, QString layer_name, bool subtractive) {
     subtractive_ = subtractive;
     labels_ = labels;
     ll_ = ll;
+    layer_name_ = layer_name;
 }
 
 QString LayerFromLabels::actionText(){
@@ -38,6 +39,7 @@ void LayerFromLabels::undo(){
 
 void LayerFromLabels::redo(){
     boost::shared_ptr<Layer> layer = ll_->addLayer();
+    layer->setName(layer_name_);
     new_layer_ = layer;
 
     if(subtractive_){

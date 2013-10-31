@@ -21,9 +21,11 @@ Qt::ItemFlags LayerList::flags(const QModelIndex & index) const {
     if (col == 0) {
         return Qt::ItemIsUserCheckable | Qt::ItemIsEnabled
                 | Qt::ItemIsSelectable;
+    } else if (col == 1) {
+        return Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable;
     }
 
-    return Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled;
+    return Qt::ItemIsEnabled;
 }
 
 int LayerList::columnCount(const QModelIndex &) const {
@@ -43,7 +45,7 @@ QVariant LayerList::data(const QModelIndex & index, int role) const {
         case Qt::DisplayRole:
         {
             QString re;
-            QTextStream(&re) << layers_[row]->name_;
+            QTextStream(&re) << layers_[row]->getName();
             return re;
         }
         case Qt::DecorationRole:
@@ -68,8 +70,13 @@ bool LayerList::setData(const QModelIndex & index, const QVariant & value,
         layers_[row]->toggleVisible();
         emit dataChanged(index, index);
         emit lookupTableUpdate();
+        return true;
+    } else if (role == Qt::EditRole && col == 1) {
+        //qDebug() << "Weeee: " << value.toString();
+        layers_[row]->setName(value.toString());
+        return true;
     }
-    return true;
+    return false;
 }
 
 boost::shared_ptr<Layer> LayerList::addLayer(boost::shared_ptr<Layer> layer){

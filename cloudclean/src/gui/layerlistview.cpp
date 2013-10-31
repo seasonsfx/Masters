@@ -35,6 +35,8 @@ LayerListView::LayerListView(QUndoStack * us, LayerList * ll,
         "QTableView::indicator:unchecked {image: url(:/eye_closed.png);}"
         "QTableView::indicator:checked {image: url(:/eye_open.png);}"
     );
+
+    ui_->tableView->setEditTriggers(QAbstractItemView::SelectedClicked | QAbstractItemView::DoubleClicked);
 }
 
 LayerListView::~LayerListView() {

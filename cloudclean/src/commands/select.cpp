@@ -107,12 +107,16 @@ boost::shared_ptr<std::vector<int> > mergeUnique(
         boost::shared_ptr<std::vector<int> > a,
         boost::shared_ptr<std::vector<int> > b){
 
-    std::copy(b->begin(), b->end(), std::back_inserter(*a));
-    std::sort(a->begin(), a->end());
-    auto it = std::unique(a->begin(), a->end());
-    a->resize(std::distance( a->begin(), it));
+    boost::shared_ptr<std::vector<int> > c;
+    c.reset(new std::vector<int>(a->size() + b->size()));
 
-    return a;
+    std::copy(a->begin(), a->end(), c->begin());
+    std::copy(b->begin(), b->end(), c->begin() + a->size());
+    std::sort(c->begin(), c->end());
+    auto it = std::unique(c->begin(), c->end());
+    c->resize(std::distance( c->begin(), it));
+
+    return c;
 }
 
 bool Select::mergeWith(const QUndoCommand *other){

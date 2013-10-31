@@ -61,8 +61,6 @@ void LayerListView::selectionToLayer(){
             if(selection->size() == 0)
                 continue;
 
-            qDebug() << "Selection " << sel_idx << " has " << selection->size() << "selections";
-
             us_->push(new NewLayer(pc, selection, ll_));
             us_->push(new Select(pc, nullptr, selection, 1 << sel_idx));
         }

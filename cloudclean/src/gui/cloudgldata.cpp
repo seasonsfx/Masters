@@ -190,7 +190,12 @@ void CloudGLData::syncLabels(boost::shared_ptr<std::vector<int> > idxs) {
 }
 
 void CloudGLData::syncFlags(boost::shared_ptr<std::vector<int> > idxs) {
-    if(idxs != nullptr && dirty_flags_ && dirty_flag_list_.get() != nullptr && dirty_flag_list_->size() !=0){
+    if(idxs == nullptr) {
+        qDebug() << "Attempted to sync a nullptr!";
+        return;
+    }
+
+    if(dirty_flags_ && dirty_flag_list_.get() != nullptr && dirty_flag_list_->size() !=0){
         dirty_flag_list_->insert(dirty_flag_list_->end(), idxs->begin(), idxs->end());
     }
     else {

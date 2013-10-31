@@ -15,7 +15,7 @@ public:
     explicit Select(boost::shared_ptr<PointCloud> pc,
                            boost::shared_ptr<std::vector<int> > selected,
                            boost::shared_ptr<std::vector<int> > deselected = nullptr,
-                           uint8_t selection_type = 0,
+                           uint8_t selection_type = 1,
                            boost::shared_ptr<std::vector<uint16_t> > exclude_labels = boost::shared_ptr<std::vector<uint16_t> >(new std::vector<uint16_t>()),
                            QUndoCommand *parent = 0);
     QString actionText();

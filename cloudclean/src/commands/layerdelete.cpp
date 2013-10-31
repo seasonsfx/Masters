@@ -27,7 +27,7 @@ void LayerDelete::undo(){
 }
 
 void LayerDelete::redo(){
-    auto layer = layer_.lock();
+    boost::shared_ptr<Layer> layer = layer_.lock();
     id_ = layer->id_;
     ll_->deleteLayer(layer);
 }

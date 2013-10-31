@@ -34,40 +34,53 @@ void NewLayer::undo(){
 uint16_t NewLayer::getNewLabel(uint16_t old, boost::shared_ptr<Layer> layer) {
     auto new_label_it = old_to_new.find(old);
 
-    bool unknown_mapping = new_label_it == old_to_new.cend();
+    bool unknown_mapping = (new_label_it == old_to_new.cend());
 
     if (unknown_mapping) {
         // Create a new label
         uint16_t new_label = ll_->newLabelId();
         layer->addLabel(new_label);
 
+        // Add all layers assocatied with the old label
+        // to the new label
         ll_->copyLayerSet(old, new_label);
 
-        // Set cache
+        // Keep track of what happened
         old_to_new[old] = new_label;
         new_to_old[new_label] = old;
 
         return new_label;
+    } else {
+        // this will happen in a redo
+        //layer->addLabel(old_to_new[old]);
+        //ll_->copyLayerSet(old, old_to_new[old]);
     }
     return old_to_new[old];
 }
 
 void NewLayer::redo(){
+    // When redoing we need to make sure that the same labling is achieved
+    // every time, as subsequent command might reference the labled it their redo
+    // lables can be freed when the command is deleted, assuming the stack is infinite
+    // also, disregarding deletions for merges
+
     boost::shared_ptr<Layer> layer = ll_->addLayer();
     new_layer_ = layer;
     if(new_to_old.size() != 0)
         layer->setColor(layer_color_);
 
 
-    // Relabel
+    // Assign new labels to points in the new layer
     for(int idx : *idxs_){
         pc_->labels_[idx] = getNewLabel(pc_->labels_[idx], layer);
     }
 
+    // Need to do work that getNewLabel doesnt do on a redo
     if(applied_once_) {
-        // Add labels to layers
+        //Add labels to layers
         for(auto it: new_to_old) {
             layer->addLabel(it.first);
+            ll_->copyLayerSet(it.second, it.first);
         }
     }
     applied_once_ = true;

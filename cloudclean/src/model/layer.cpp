@@ -11,8 +11,9 @@ Layer::Layer(std::map<uint16_t, LayerSet> & layer_lookup_table)
 }
 
 Layer::~Layer(){
+    // Delete all references in layer_lookup_table_
     for(int16_t label : labels_){
-        // Why would this fail?... think aout it
+        // Why would this fail?... think about it
         auto it = layer_lookup_table_[label].find(this);
         if(it != layer_lookup_table_[label].end())
             layer_lookup_table_[label].erase(it);

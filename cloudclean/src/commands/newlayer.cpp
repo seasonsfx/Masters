@@ -26,7 +26,7 @@ void NewLayer::undo(){
     // Delete layer
     if(!new_layer_.expired()){
         auto layer = new_layer_.lock();
-        layer_color_ = layer->color_;
+        layer_color_ = layer->getColor();
         ll_->deleteLayer(layer);
     }
 }
@@ -38,7 +38,7 @@ uint16_t NewLayer::getNewLabel(uint16_t old, boost::shared_ptr<Layer> layer) {
 
     if (unknown_mapping) {
         // Create a new label
-        uint16_t new_label = ll_->newLabelId();
+        uint16_t new_label = ll_->createLabelId();
         layer->addLabel(new_label);
 
         // Add all layers assocatied with the old label

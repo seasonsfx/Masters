@@ -102,7 +102,7 @@ boost::shared_ptr<Layer> LayerList::addLayer(QString name) {
     return addLayer(layer);
 }
 
-int LayerList::getLayerIndex(boost::shared_ptr<Layer> layer){
+int LayerList::getLayerIndex(boost::shared_ptr<Layer> layer) const{
     auto isEq = [&layer] (boost::shared_ptr<Layer> layer2) {
             return layer == layer2;
     };
@@ -116,8 +116,27 @@ int LayerList::getLayerIndex(boost::shared_ptr<Layer> layer){
     return idx;
 }
 
+
+uint LayerList::getLastLabel() const {
+    return last_label_;
+}
+
+const std::vector<boost::weak_ptr<Layer> > & LayerList::getSelection() const {
+    return selection_;
+}
+
+boost::shared_ptr<Layer> LayerList::getDefaultLayer() const {
+    return default_layer_;
+}
+
+const std::vector<boost::shared_ptr<Layer> > & LayerList::getLayers() {
+    return layers_;
+}
+
+
 void LayerList::deleteLayer(){
-    deleteLayer(sender()->property("layer_id").toInt());
+    int id = sender()->property("layer_id").toInt();
+    deleteLayer(id);
 }
 
 void LayerList::deleteLayer(boost::shared_ptr<Layer> layer) {
@@ -168,7 +187,7 @@ void LayerList::deleteLayer(int idx){
     emit lookupTableUpdate();
 }
 
-int16_t LayerList::newLabelId() {
+int16_t LayerList::createLabelId() {
     if(last_label_ == 0xFFFF){
         qDebug() << "Whoops, we ran out of shorts";
         exit(1);
@@ -184,7 +203,7 @@ int16_t LayerList::newLabelId() {
     return last_label_;
 }
 
-const LayerSet & LayerList::getLayersForLabel(int i){
+const LayerSet & LayerList::getLayersForLabel(int i) {
     return layer_lookup_table_[i];
 }
 

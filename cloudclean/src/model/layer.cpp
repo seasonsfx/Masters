@@ -20,6 +20,10 @@ Layer::~Layer(){
     }
 }
 
+QColor Layer::getColor() const {
+    return color_;
+}
+
 void Layer::setColor(QColor color){
     color_ = color;
     emit colorChanged();
@@ -28,6 +32,10 @@ void Layer::setColor(QColor color){
 void Layer::setRandomColor(){
     color_.setHsl(rand()%359, rand()%55 + 200, 127);
     emit colorChanged();
+}
+
+QString Layer::getName() const {
+    return name_;
 }
 
 void Layer::setName(QString name) {
@@ -45,7 +53,7 @@ void Layer::removeLabel(uint16_t id) {
         layer_lookup_table_[id].erase(it);
 }
 
-const std::set<uint16_t> &Layer::getLabelSet(){
+const std::set<uint16_t> &Layer::getLabelSet() const{
     return labels_;
 }
 
@@ -55,6 +63,10 @@ bool Layer::isVisible() const {
 
 void Layer::toggleVisible() {
     visible_ = !visible_;
+}
+
+uint Layer::getId() const {
+    return id_;
 }
 
 uint Layer::last_id_ = 0;

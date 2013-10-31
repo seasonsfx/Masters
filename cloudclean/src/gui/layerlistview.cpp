@@ -68,18 +68,18 @@ void LayerListView::selectionToLayer(){
 
     us_->endMacro();
     emit update();
-    ui_->tableView->selectRow(ll_->layers_.size()-1);
+    ui_->tableView->selectRow(ll_->getLayers().size()-1);
 }
 
 void LayerListView::intersectSelectedLayers(){
-    if(ll_->selection_.size() < 2){
+    if(ll_->getSelection().size() < 2){
         qDebug() << "Select at least 2 layers";
         return;
     }
 
 
     // First selected label
-    std::set<uint16_t> & labels = ll_->selection_[0].lock()->labels_;
+    std::set<uint16_t> & labels = ll_->getSelection()[0].lock()->labels_;
     uint intersection_count = 0;
 
     // Find intersecting labels
@@ -90,8 +90,8 @@ void LayerListView::intersectSelectedLayers(){
     for(uint8_t label : labels){
         intersection_count = 0;
         // For every other selected layer
-        for(uint i = 1; i < ll_->selection_.size(); i++){
-            boost::shared_ptr<Layer> layer = ll_->selection_[i].lock();
+        for(uint i = 1; i < ll_->getSelection().size(); i++){
+            boost::shared_ptr<Layer> layer = ll_->getSelection()[i].lock();
             // For every label in the orther layer
             for(uint8_t qlabel : layer->labels_){
                 if(label == qlabel){
@@ -100,7 +100,7 @@ void LayerListView::intersectSelectedLayers(){
                 }
             }
         }
-        if(intersection_count == ll_->selection_.size()-1) {
+        if(intersection_count == ll_->getSelection().size()-1) {
             intersecting_labels->push_back(label);
         }
     }
@@ -115,23 +115,19 @@ void LayerListView::intersectSelectedLayers(){
     us_->push(new LayerFromLabels(intersecting_labels, ll_, true));
     us_->endMacro();
 
-    ui_->tableView->selectRow(ll_->layers_.size()-1);
+    ui_->tableView->selectRow(ll_->getLayers().size()-1);
 
 }
 
 void LayerListView::mergeSelectedLayers() {
     // Mark for deletion
-    std::vector<boost::shared_ptr<Layer> > merge_these;
-    for(boost::weak_ptr<Layer> l: ll_->selection_) {
-        merge_these.push_back(l.lock());
-    }
 
+    std::vector<boost::weak_ptr<Layer>> selections = ll_->getSelection();
 
     boost::shared_ptr<std::vector<uint16_t> > labels;
     labels.reset(new std::vector<uint16_t>());
 
-
-    for(boost::weak_ptr<Layer> l: ll_->selection_){
+    for(boost::weak_ptr<Layer> l: selections){
         boost::shared_ptr<Layer> layer = l.lock();
         for(int label : layer->labels_){
             labels->push_back(label);
@@ -145,15 +141,18 @@ void LayerListView::mergeSelectedLayers() {
     us_->beginMacro("Merge layers");
     us_->push(new LayerFromLabels(labels, ll_, true));
 
+    // Delete marked layers
+    for(boost::weak_ptr<Layer> sel : selections) {
+        if(sel.expired()){
+            qDebug() << "Damn selected layer expired";
+            continue;
+        }
 
-    // Delete marked labels
-    for(boost::shared_ptr<Layer> dl : merge_these) {
-        us_->push(new LayerDelete(dl, ll_));
+        us_->push(new LayerDelete(sel.lock(), ll_));
     }
 
-
     us_->endMacro();
-    ui_->tableView->selectRow(ll_->layers_.size()-1);
+    ui_->tableView->selectRow(ll_->getLayers().size()-1);
 }
 
 void LayerListView::contextMenu(const QPoint &pos) {
@@ -179,7 +178,10 @@ void LayerListView::contextMenu(const QPoint &pos) {
         del.setProperty("layer_id", row);
         connect(&del, &QAction::triggered, [&] (bool triggered) {
             us_->beginMacro("Delete Layer(s)");
-            for(boost::weak_ptr<Layer> wp : ll_->selection_) {
+
+            std::vector<boost::weak_ptr<Layer>> selections = ll_->getSelection();
+
+            for(boost::weak_ptr<Layer> wp : selections) {
                 if(wp.expired())
                     continue;
                 boost::shared_ptr<Layer> l = wp.lock();
@@ -187,6 +189,7 @@ void LayerListView::contextMenu(const QPoint &pos) {
             }
             us_->endMacro();
         });
+
         menu.addAction(&del);
 
         QAction merge("Merge", 0);
@@ -203,7 +206,7 @@ void LayerListView::contextMenu(const QPoint &pos) {
         connect(&select_layer, &QAction::triggered, [=] () {
 
             std::set<uint16_t> selected_labels;
-            for(boost::weak_ptr<Layer> wl : ll_->selection_) {
+            for(boost::weak_ptr<Layer> wl : ll_->getSelection()) {
                 boost::shared_ptr<Layer> l = wl.lock();
                 for(uint16_t label  : l->getLabelSet()) {
                     selected_labels.insert(label);
@@ -236,7 +239,7 @@ void LayerListView::contextMenu(const QPoint &pos) {
 void LayerListView::setColor() {
     int id = sender()->property("layer_id").toInt();
     bool random = sender()->property("random").toBool();
-    Layer & l = *ll_->layers_[id];
+    Layer & l = *ll_->getLayers()[id];
     if(random)
         l.setRandomColor();
     else

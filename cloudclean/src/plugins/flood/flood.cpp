@@ -136,7 +136,7 @@ boost::shared_ptr<std::vector<int> > Flood::getLayerIndices() {
 
     boost::shared_ptr<PointCloud> active = cl_->active_;
 
-    if(ll_->selection_.size() == 0){
+    if(ll_->getSelection().size() == 0){
         for(uint i = 0; i < active->size(); i++) {
             indices->push_back(i);
         }
@@ -146,7 +146,7 @@ boost::shared_ptr<std::vector<int> > Flood::getLayerIndices() {
     // get labels in selected layers
     std::set<uint16_t> selected_labels;
 
-    for(boost::weak_ptr<Layer> wl: ll_->selection_) {
+    for(boost::weak_ptr<Layer> wl: ll_->getSelection()) {
         boost::shared_ptr<Layer> l = wl.lock();
         if(l == nullptr)
             continue;

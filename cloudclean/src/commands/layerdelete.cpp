@@ -6,8 +6,8 @@
 LayerDelete::LayerDelete(boost::shared_ptr<Layer> layer, LayerList * ll) {
     const std::set<uint16_t> & source_labels = layer->getLabelSet();
     std::copy(source_labels.begin(), source_labels.end(), std::back_inserter(labels_));
-    col_ = layer->color_;
-    name_ = layer->name_;
+    col_ = layer->getColor();
+    name_ = layer->getName();
     ll_ = ll;
     layer_ = layer;
 }
@@ -30,7 +30,7 @@ void LayerDelete::undo(){
 void LayerDelete::redo(){
     // Delete layer
     boost::shared_ptr<Layer> layer = layer_.lock();
-    id_ = layer->id_;
+    id_ = layer->getId();
     ll_->deleteLayer(layer);
 }
 

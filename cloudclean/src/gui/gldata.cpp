@@ -46,7 +46,7 @@ void GLData::reloadColorLookupBuffer(){
     //
     glcontext_->makeCurrent();
     IF_FAIL("bind failed") = color_lookup_buffer_->bind(); CE();
-    size_t label_buff_size = (ll_->last_label_+1)*sizeof(float)*4;
+    size_t label_buff_size = (ll_->getLastLabel()+1)*sizeof(float)*4;
     color_lookup_buffer_->allocate(label_buff_size); CE();
 
     float * color_lookup_buffer =
@@ -61,7 +61,7 @@ void GLData::reloadColorLookupBuffer(){
             if(!layer->isVisible())
                 return QColor(0, 0, 0, 0);
 
-            for(boost::weak_ptr<Layer> l : ll_->selection_){
+            for(boost::weak_ptr<Layer> l : ll_->getSelection()){
                 boost::shared_ptr<Layer> selected_layer = l.lock();
                 if(layer == selected_layer.get()){
                     selected.push_back(layer);
@@ -71,16 +71,17 @@ void GLData::reloadColorLookupBuffer(){
         }
 
         if(selected.size() == 0){
-            selected.push_back(ll_->default_layer_.get());
+            selected.push_back(ll_->getDefaultLayer().get());
         }
 
         float r = 0, g = 0, b = 0;
         float weight = 1.0/selected.size();
 
         for(const Layer * l : selected) {
-            r += l->color_.red() * weight;
-            g += l->color_.green() * weight;
-            b += l->color_.blue() * weight;
+            QColor col = l->getColor();
+            r += col.red() * weight;
+            g += col.green() * weight;
+            b += col.blue() * weight;
         }
 
         // Round up
@@ -89,7 +90,7 @@ void GLData::reloadColorLookupBuffer(){
 
     };
 
-    for(uint i = 0; i < ll_->last_label_+1; i++) {
+    for(uint i = 0; i < ll_->getLastLabel()+1; i++) {
         const LayerSet &ll = ll_->getLayersForLabel(i);
         QColor color = mix(ll);
         color_lookup_buffer[i*4] = color.red()/255.0f;

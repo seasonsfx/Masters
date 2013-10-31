@@ -44,7 +44,7 @@ void LayerGuiSelect::redo(){
         for(uint16_t label : *labels_) {
             const LayerSet & ls = ll_->getLayersForLabel(label);
             for(Layer * l : ls){
-                if(l != ll_->default_layer_.get()){
+                if(l != ll_->getDefaultLayer().get()){
                     removed_from_[l].push_back(label);
                     l->removeLabel(label);
                 }

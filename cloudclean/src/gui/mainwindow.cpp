@@ -241,7 +241,7 @@ void MainWindow::saveFile(){
         return;
 
     std::set<uint16_t> slabels;
-    for(boost::weak_ptr<Layer> wl : ll_->selection_) {
+    for(boost::weak_ptr<Layer> wl : ll_->getSelection()) {
         boost::shared_ptr<Layer> l = wl.lock();
         for(uint16_t label : l->getLabelSet()){
             slabels.insert(label);

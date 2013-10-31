@@ -27,12 +27,19 @@ class MODEL_API LayerList : public QAbstractListModel {
     boost::shared_ptr<Layer> addLayerWithId(uint id);
     boost::shared_ptr<Layer> addLayer();
     boost::shared_ptr<Layer> addLayer(QString name);
-    int16_t newLabelId();
+    int16_t createLabelId();
 
     const LayerSet &getLayersForLabel(int i);
     void copyLayerSet(uint8_t source_label, uint8_t dest_label);
 
-    int getLayerIndex(boost::shared_ptr<Layer> layer);
+    int getLayerIndex(boost::shared_ptr<Layer> layer) const;
+
+    uint getLastLabel() const;
+    const std::vector<boost::weak_ptr<Layer>> & getSelection() const;
+    boost::shared_ptr<Layer> getDefaultLayer() const;
+    const std::vector<boost::shared_ptr<Layer>> & getLayers();
+
+
 
  signals:
     void layerUpdate(boost::shared_ptr<Layer> layer);
@@ -50,12 +57,14 @@ class MODEL_API LayerList : public QAbstractListModel {
     std::map<uint16_t, LayerSet> layer_lookup_table_; // label associated with layer
     std::vector<uint16_t> free_labels_;
 
- public:
     uint last_label_;
-    std::vector<boost::weak_ptr<Layer> > selection_;
+    std::vector<boost::weak_ptr<Layer>> selection_;
     boost::shared_ptr<Layer> default_layer_;
-    std::vector<boost::shared_ptr<Layer> > layers_; // a layer is a group of labels
-    std::map<uint, boost::shared_ptr<Layer> > layer_id_map_;
+    std::vector<boost::shared_ptr<Layer>> layers_; // a layer is a group of labels
+
+ public:
+
+    std::map<uint, boost::shared_ptr<Layer>> layer_id_map_;
 };
 
 #endif // LAYERLIST_H

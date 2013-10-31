@@ -19,15 +19,22 @@ class MODEL_API Layer : public QObject {
 
  public:
     ~Layer();
+
+    QColor getColor() const;
     void setColor(QColor color);
     void setRandomColor();
+
+    QString getName() const;
     void setName(QString name);
+
     void addLabel(uint16_t id);
     void removeLabel(uint16_t id);
-    const std::set<uint16_t> &getLabelSet();
+    const std::set<uint16_t>& getLabelSet() const;
 
     bool isVisible() const;
     void toggleVisible();
+
+    uint getId() const;
 
  signals:
     void colorChanged();
@@ -40,11 +47,10 @@ class MODEL_API Layer : public QObject {
     static uint last_id_;
 
     bool visible_;
-
- public:
     QString name_;
     QColor color_;
-    uint id_;
+    uint id_; // Id because weak pointers are deleted
+
 
     friend class LayerListView;
     friend class LayerList;

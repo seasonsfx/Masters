@@ -5,7 +5,6 @@ layout(location = 2) in int flags;
 layout(location = 3) in vec2 position;
 
 uniform samplerBuffer sampler;
-uniform int height;
 uniform mat3 camera;
 out vec4 colour;
 

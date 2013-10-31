@@ -54,23 +54,20 @@ void LayerListView::selectionToLayer(){
     us_->beginMacro("Layer from selection");
     // Remap all selected points
     for(boost::shared_ptr<PointCloud> & pc : cl_->clouds_){
-        boost::shared_ptr<std::vector<int> > idxs;
-        idxs.reset(new std::vector<int>());
+        std::vector<boost::shared_ptr<std::vector<int> >> selections = pc->getSelections();
 
-        boost::shared_ptr<std::vector<int> > empty;
-        empty.reset(new std::vector<int>());
+        for(size_t sel_idx = 0; sel_idx < selections.size(); sel_idx++){
+            boost::shared_ptr<std::vector<int> > selection = selections[sel_idx];
+            if(selection->size() == 0)
+                continue;
 
-        for(uint i = 0; i < pc->points.size(); i++){
-            bool selected = uint8_t(pc->flags_[i]) & uint8_t(PointFlags::selected);
+            qDebug() << "Selection " << sel_idx << " has " << selection->size() << "selections";
 
-            if(selected)
-                idxs->push_back(i);
+            us_->push(new NewLayer(pc, selection, ll_));
+            us_->push(new Select(pc, nullptr, selection, 1 << sel_idx));
         }
-
-        us_->push(new NewLayer(pc, idxs, ll_));
-        us_->push(new Select(pc, empty, idxs));
-
     }
+
     us_->endMacro();
     emit update();
     ui_->tableView->selectRow(ll_->layers_.size()-1);

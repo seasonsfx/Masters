@@ -315,9 +315,9 @@ void Markov::randomforest(){
     hp.verbose = 1;
 
     // Load selection
-    std::vector<std::vector<int>> selections = cloud->getSelections();
+    std::vector<boost::shared_ptr<std::vector<int>>> selections = cloud->getSelections();
 
-    if(selections[0].size() < 30 || selections[1].size() < 30) {
+    if(selections[0]->size() < 30 || selections[1]->size() < 30) {
         qDebug() << "Not enough data";
         return;
     }
@@ -336,7 +336,7 @@ void Markov::randomforest(){
 
     int count = 0;
     for(uint y = 0; y < selections.size(); y++){
-        for(int big_idx : selections[y]) {
+        for(int big_idx : *selections[y]) {
             wsvector<double> x(dataset_train.m_numFeatures);
             Sample sample;
             resize(sample.x, dataset_train.m_numFeatures);

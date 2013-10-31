@@ -247,7 +247,6 @@ void FlatView::initializeGL() {
     //
     program_.bind(); CE();
     uni_sampler_ = program_.uniformLocation("sampler"); RC(uni_sampler_);
-    uni_height_ = program_.uniformLocation("height"); RC(uni_height_);
     uni_camera_ = program_.uniformLocation("camera"); RC(uni_camera_);
     program_.release();
 
@@ -284,7 +283,6 @@ void FlatView::paintEvent(QPaintEvent *event) {
 
     program_.bind(); CE();
     glUniformMatrix3fv(uni_camera_, 1, GL_FALSE, getCamera().data()); CE();
-    glUniform1i(uni_height_, pc->scan_height()); CE();
     glUniform1i(uni_sampler_, 0); CE();
     glBindTexture(GL_TEXTURE_BUFFER, texture_id_); CE();
     glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, gld_->color_lookup_buffer_->bufferId()); CE();

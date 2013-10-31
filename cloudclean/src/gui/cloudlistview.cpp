@@ -100,18 +100,11 @@ void CloudListView::deselectAllPoints(){
     us_->beginMacro("Deselect All");
     for(boost::shared_ptr<PointCloud> cloud : cl_->clouds_){
 
-        std::vector<std::vector<int> > selections = cloud->getSelections();
+        std::vector<boost::shared_ptr<std::vector<int> > > selections = cloud->getSelections();
 
         for(size_t sel_idx = 0; sel_idx < selections.size(); sel_idx++){
-            std::vector<int> & selection = selections[sel_idx];
-
-            boost::shared_ptr<std::vector<int> > indices;
-            indices.reset(new std::vector<int>(selection));
-
-            boost::shared_ptr<std::vector<int> > empty;
-            empty.reset(new std::vector<int>());
-
-            us_->push(new Select(cloud, empty, indices, sel_idx+1));
+            boost::shared_ptr<std::vector<int> > selection = selections[sel_idx];
+            us_->push(new Select(cloud, nullptr, selection, 1 << sel_idx));
         }
     }
     us_->endMacro();

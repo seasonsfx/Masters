@@ -14,7 +14,7 @@ class COMMAND_API Select : public QUndoCommand
 public:
     explicit Select(boost::shared_ptr<PointCloud> pc,
                            boost::shared_ptr<std::vector<int> > selected,
-                           boost::shared_ptr<std::vector<int> > deselected = boost::shared_ptr<std::vector<int> >(new std::vector<int>()),
+                           boost::shared_ptr<std::vector<int> > deselected = nullptr,
                            uint8_t selection_type = 0,
                            boost::shared_ptr<std::vector<uint16_t> > exclude_labels = boost::shared_ptr<std::vector<uint16_t> >(new std::vector<uint16_t>()),
                            QUndoCommand *parent = 0);

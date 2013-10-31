@@ -397,18 +397,22 @@ void PointCloud::labelsUpdated(boost::shared_ptr<std::vector<int> > idxs) {
     emit labelUpdate(idxs);
 }
 
-std::vector<std::vector<int> > PointCloud::getSelections() {
-    std::vector<uint8_t> selection_masks{(uint8_t)PointFlags::selected, (uint8_t)PointFlags::selected2};
-    std::vector<std::vector<int> > selections(selection_masks.size());
+std::vector<boost::shared_ptr<std::vector<int> > > PointCloud::getSelections() {
+    std::vector<boost::shared_ptr<std::vector<int> > > selections(8);
+
+    for(boost::shared_ptr<std::vector<int> > & sel : selections)
+        sel.reset(new std::vector<int>());
 
     auto is_selected = [this] (int idx, uint8_t mask) {
         return bool(mask & uint8_t(flags_[idx]));
     };
 
     for(size_t idx = 0; idx < flags_.size(); idx++) {
-        for(size_t maskid = 0; maskid < selection_masks.size(); maskid++) {
-            if(is_selected(idx, selection_masks[maskid]))
-                selections[maskid].push_back(idx);
+        for(uint8_t maskid = 0; maskid < 8; maskid++) {
+            uint8_t mask = 1 << maskid;
+            if(is_selected(idx, mask)) {
+                selections[maskid]->push_back(idx);
+            }
         }
 
     }

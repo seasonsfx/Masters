@@ -58,7 +58,7 @@ class MODEL_API PointCloud : public QObject, public pcl::PointCloud<pcl::PointXY
     void flagsUpdated(boost::shared_ptr<std::vector<int> > idxs = nullptr);
     void labelsUpdated(boost::shared_ptr<std::vector<int> > idxs = nullptr);
 
-    std::vector<std::vector<int>> getSelections();
+    std::vector<boost::shared_ptr<std::vector<int> > > getSelections();
 
  signals:
     void transformed();

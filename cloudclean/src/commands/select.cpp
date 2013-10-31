@@ -29,14 +29,18 @@ Select::Select(boost::shared_ptr<PointCloud> pc,
         return false;
     };
 
-    for(int idx : *deselected) {
-        if(is_selected(idx) && !is_excluded(idx))
-            deselected_->push_back(idx);
+    if(deselected != nullptr){
+        for(int idx : *deselected) {
+            if(is_selected(idx) && !is_excluded(idx))
+                deselected_->push_back(idx);
+        }
     }
 
-    for(int idx : *selected) {
-        if(!is_selected(idx) && !is_excluded(idx))
-            selected_->push_back(idx);
+    if(selected != nullptr){
+        for(int idx : *selected) {
+            if(!is_selected(idx) && !is_excluded(idx))
+                selected_->push_back(idx);
+        }
     }
 
 }

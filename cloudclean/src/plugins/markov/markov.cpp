@@ -440,32 +440,31 @@ void Markov::randomforest(){
             //}
 
             qDebug() << "Label" << results[idx].prediction << "Confidence: " << results[idx].confidence.at(0) << results[idx].confidence.at(1);
-
         }
 
     }
 
     // Select fg and bg
-
-    auto fgselect = boost::make_shared<std::vector<int>>();
-    auto bgselect = boost::make_shared<std::vector<int>>();
+    std::vector<boost::shared_ptr<std::vector<int>>> seg_selections(8);
+    for(int i = 0; i < 8; i++){
+        seg_selections[i] = boost::make_shared<std::vector<int>>();
+    }
 
     for(size_t idx = 0; idx < cloud->points.size(); ++idx) {
         int idx_small = big_to_small[idx];
         Result & res = results[idx_small];
-
-        if(res.prediction == 0)
-            fgselect->push_back(idx);
-        else
-            bgselect->push_back(idx);
+        seg_selections[res.prediction]->push_back(idx);
     }
 
-    Select * fgselectcmd = new Select(cl_->active_, fgselect, nullptr, 1);
-    Select * bgselectcmd = new Select(cl_->active_, bgselect, nullptr, 2);
 
     core_->us_->beginMacro("Random forest");
-    core_->us_->push(fgselectcmd);
-    core_->us_->push(bgselectcmd);
+
+    for(int i = 0; i < 8; i++){
+        if(seg_selections[i]->size() > 0) {
+            core_->us_->push(new Select(cl_->active_, seg_selections[i], nullptr, 1 << i));
+        }
+    }
+
     core_->us_->endMacro();
 
 /*

@@ -4,10 +4,10 @@
 
 Layer::Layer(std::map<uint16_t, LayerSet> & layer_lookup_table)
     : layer_lookup_table_(layer_lookup_table) {
-    name_ = "New Layer";
+    name_ = QString("New Layer ") + QString::number(last_id_);
     color_.setHsl(rand()%359, rand()%55 + 200, 127);
-    id_ = ++last_id_;
     visible_ = true;
+    id_ = last_id_++;
 }
 
 Layer::~Layer(){

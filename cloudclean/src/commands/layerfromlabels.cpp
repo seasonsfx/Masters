@@ -30,7 +30,7 @@ void LayerFromLabels::undo(){
     if(subtractive_) {
         for(auto it : removed_from_){
             for(uint16_t label : it.second) {
-                ll_->layer_id_map_[it.first]->addLabel(label);
+                ll_->getLayer(it.first)->addLabel(label);
             }
         }
     }

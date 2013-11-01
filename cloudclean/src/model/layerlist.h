@@ -33,6 +33,7 @@ class MODEL_API LayerList : public QAbstractListModel {
     void copyLayerSet(uint8_t source_label, uint8_t dest_label);
 
     int getLayerIndex(boost::shared_ptr<Layer> layer) const;
+    boost::shared_ptr<Layer> getLayer(uint id);
 
     uint getLastLabel() const;
     const std::vector<boost::weak_ptr<Layer>> & getSelection() const;
@@ -61,9 +62,6 @@ class MODEL_API LayerList : public QAbstractListModel {
     std::vector<boost::weak_ptr<Layer>> selection_;
     boost::shared_ptr<Layer> default_layer_;
     std::vector<boost::shared_ptr<Layer>> layers_; // a layer is a group of labels
-
- public:
-
     std::map<uint, boost::shared_ptr<Layer>> layer_id_map_;
 };
 

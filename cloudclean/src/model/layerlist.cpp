@@ -123,6 +123,19 @@ int LayerList::getLayerIndex(boost::shared_ptr<Layer> layer) const{
     return idx;
 }
 
+boost::shared_ptr<Layer> LayerList::getLayer(uint id) {
+    auto result = std::find_if(layers_.begin(), layers_.end(), [&] (boost::shared_ptr<Layer> l) {
+        if(l->getId() == id)
+            return true;
+        return false;
+    });
+
+    if(result == layers_.end())
+        return nullptr;
+
+    return *result;
+}
+
 
 uint LayerList::getLastLabel() const {
     return last_label_;

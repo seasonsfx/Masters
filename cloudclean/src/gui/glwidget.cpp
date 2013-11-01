@@ -294,8 +294,10 @@ void GLWidget::keyPressEvent(QKeyEvent * event) {
     // Reset
     //
     case Qt::Key_R:
-        if (event->modifiers() == Qt::ControlModifier && cl_->active_ != nullptr)
+        if (event->modifiers() == Qt::ControlModifier && cl_->active_ != nullptr){
             camera_.setPosition(0, 0, 0);
+            camera_.setRotate3D(-M_PI/2, M_PI/4, 0);
+        }
         return;
 
     //

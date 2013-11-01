@@ -70,8 +70,6 @@ class GUI_API Camera : public QObject {
         setPosition(Eigen::Vector3f(x, y, z));
     }
 
-    void setProjectionMatrix(const Eigen::Affine3f& projection);
-
     Eigen::Affine3f modelviewMatrix();
     Eigen::Affine3f projectionMatrix() const;
 
@@ -80,9 +78,17 @@ class GUI_API Camera : public QObject {
         translate(Eigen::Vector3f(x, y, z));
     }
 
+    void setRotate3D(const Eigen::Vector3f& rot);
+    void setRotate3D(float yaw, float pitch, float roll) {
+        setRotate3D(Eigen::Vector3f(yaw, pitch, roll));
+    }
+
     void rotate2D(float x, float y);
     void rotate3D(float _yaw, float _pitch, float _roll);
     void adjustFov(int val);
+
+ public slots:
+    void birds_eye();
 
  signals:
     void updated();
@@ -97,7 +103,10 @@ class GUI_API Camera : public QObject {
     Eigen::Vector3f translation_current_;
     Eigen::Vector3f translation_future_;
 
-    float fov_, aspect_, depth_near_, depth_far_;
+    float fov_current_;
+    float fov_future_;
+
+    float aspect_, depth_near_, depth_far_;
 
     Eigen::Affine3f projection_matrix_;
 

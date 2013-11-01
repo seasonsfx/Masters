@@ -286,6 +286,7 @@ void MainWindow::contextMenu(const QPoint &pos) {
     if(flatview_->isVisible())
         menu.addAction("Rotate", flatview_, SLOT(rotate90()));
 
+    menu.addAction("Bird's eye", &glwidget_->camera_, SLOT(birds_eye()));
 
     menu.exec(glwidget_->mapToGlobal(pos));
 }

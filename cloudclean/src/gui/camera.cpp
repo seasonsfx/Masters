@@ -54,13 +54,15 @@ Camera::Camera() {
     fov_future_ = 60.0f;
     aspect_ = 1.0f;
     depth_near_ = 1.0f;
-    depth_far_ = 10000.0f;
+    depth_far_ = 1000000.0f;
 
     rotation_current_ = AngleAxis<float>(-M_PI/2, Vector3f(1, 0, 0));
     rotation_future_ = AngleAxis<float>(-M_PI/2, Vector3f(1, 0, 0));
 
     translation_current_ = Vector3f(0, 0, 0);
     translation_future_ = Vector3f(0, 0, 0);
+
+    translation_speed_ = 1;
 
     projection_dirty_ = true;
     update_pending_ = false;
@@ -78,6 +80,9 @@ Camera::Camera() {
             rotation_current_ = rotation_current_.slerp(0.5, rotation_future_);
             fov_current_ = fov_current_ + fov_diff * 0.1;
             emit updated();
+        }
+        else {
+            translation_speed_ = 1;
         }
     });
 
@@ -142,7 +147,8 @@ Eigen::Affine3f Camera::projectionMatrix() const {
 }
 
 void Camera::translate(const Eigen::Vector3f& pos) {
-    translation_future_ = Eigen::Translation3f(rotation_current_.inverse() * pos) * translation_current_;
+    translation_future_ = Eigen::Translation3f(rotation_current_.inverse() * (translation_speed_ * pos)) * translation_current_;
+    translation_speed_ *= 1.1; // If succesive tranlations are performed, speed things up
 }
 
 void Camera::setRotate3D(const Eigen::Vector3f& rot) {

@@ -115,6 +115,8 @@ class GUI_API Camera : public QObject {
 
     QTimer *timer_;
 
+    float translation_speed_;
+
     bool update_pending_;
     //std::mutex * mtx_;
 

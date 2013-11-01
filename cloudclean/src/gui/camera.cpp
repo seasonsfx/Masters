@@ -141,7 +141,7 @@ Eigen::Affine3f Camera::projectionMatrix() const {
 }
 
 void Camera::translate(const Eigen::Vector3f& pos) {
-    translation_future_ = Eigen::Translation3f(rotation_current_.inverse() * pos) * translation_future_;
+    translation_future_ = Eigen::Translation3f(rotation_current_.inverse() * pos) * translation_current_;
 }
 
 void Camera::rotate2D(float x, float y) {

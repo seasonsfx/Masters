@@ -317,7 +317,14 @@ void Markov::randomforest(){
     // Load selection
     std::vector<boost::shared_ptr<std::vector<int>>> selections = cloud->getSelections();
 
-    if(selections[0]->size() < 30 || selections[1]->size() < 30) {
+    std::vector<int> selection_sources;
+
+    for(int i = 0; i < selections.size(); i++) {
+        if(selections[i]->size() > 30)
+            selection_sources.push_back(i);
+    }
+
+    if(selection_sources.size() < 2) {
         qDebug() << "Not enough data";
         return;
     }
@@ -325,17 +332,16 @@ void Markov::randomforest(){
     // Creating the train data
     DataSet dataset_train, dataset_test;
 
-    //dataset_train.m_numSamples = selections[0].size() + selections[1].size();
     dataset_train.m_numFeatures = 10;
-    dataset_train.m_numClasses = 2;
+    dataset_train.m_numClasses = 8;
 
     dataset_test.m_numFeatures = 10;
-    dataset_test.m_numClasses = 2;
+    dataset_test.m_numClasses = 8;
 
     std::set<int> seen;
 
     int count = 0;
-    for(uint y = 0; y < selections.size(); y++){
+    for(uint y : selection_sources){
         for(int big_idx : *selections[y]) {
             wsvector<double> x(dataset_train.m_numFeatures);
             Sample sample;

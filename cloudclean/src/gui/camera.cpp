@@ -148,7 +148,9 @@ Eigen::Affine3f Camera::projectionMatrix() const {
 
 void Camera::translate(const Eigen::Vector3f& pos) {
     translation_future_ = Eigen::Translation3f(rotation_current_.inverse() * (translation_speed_ * pos)) * translation_current_;
-    translation_speed_ *= 1.1; // If succesive tranlations are performed, speed things up
+
+    if(translation_speed_ < 10)
+        translation_speed_ *= 1.1; // If succesive tranlations are performed, speed things up
 }
 
 void Camera::setRotate3D(const Eigen::Vector3f& rot) {

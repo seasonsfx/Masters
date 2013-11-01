@@ -23,6 +23,9 @@ GLWidget::GLWidget(QGLFormat &fmt, CloudList *cl,
     setAutoFillBackground(false);
     setAutoBufferSwap(false);
     gl_init_ = false;
+
+    connect(&camera_, SIGNAL(updated()), this, SLOT(update()));
+
 }
 
 GLWidget::~GLWidget() {
@@ -223,11 +226,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent * event) {
     else if(event->buttons() /* ==  Qt::RightButton */ ||   event->modifiers() == Qt::ControlModifier){
         boost::shared_ptr<PointCloud> pc = cl_->active_;
         pc->rotate2D(rot.x(), -rot.y());
-        //qDebug() << "Why?";
     }
-
-    if(event->buttons())
-        update();
 }
 
 void GLWidget::mousePressEvent(QMouseEvent * event) {
@@ -236,16 +235,10 @@ void GLWidget::mousePressEvent(QMouseEvent * event) {
 }
 
 void GLWidget::mouseReleaseEvent(QMouseEvent * event) {
-    //float dist = (Eigen::Vector2d(event->x(), event->y()) - last_mouse_pos_).norm();
     last_mouse_pos_ << event->x(), event->y();
-
-    update();
 }
 
 void GLWidget::wheelEvent(QWheelEvent * event) {
-    //float x = 2.0f* ((event->x()/float(width())) - 0.5);
-    //float y = -2.0f* ((event->y()/float(height())) - 0.5);
-
     camera_.adjustFov(event->delta());
     update();
 }
@@ -262,40 +255,40 @@ void GLWidget::keyPressEvent(QKeyEvent * event) {
             cl_->active_->translate(translate_unit_ * camera_.rotation_.matrix().inverse() * Vector3f::UnitX());
         else if(event->modifiers() != Qt::ControlModifier)
             camera_.translate(-translate_unit_ * Vector3f::UnitX());
-        break;
+        return;
     case Qt::Key_A:
     case Qt::Key_Left:
         if (event->modifiers() == Qt::ControlModifier && cl_->active_ != nullptr)
             cl_->active_->translate(-translate_unit_ * camera_.rotation_.matrix().inverse() * Vector3f::UnitX());
         else if (event->modifiers() != Qt::ControlModifier)
             camera_.translate(translate_unit_ * Vector3f::UnitX());
-        break;
+        return;
     case Qt::Key_W:
     case Qt::Key_Up:
         if (event->modifiers() == Qt::ControlModifier && cl_->active_ != nullptr)
             cl_->active_->translate(-translate_unit_ * camera_.rotation_.matrix().inverse() * Vector3f::UnitZ());
         else if (event->modifiers() != Qt::ControlModifier)
             camera_.translate(translate_unit_ * Vector3f::UnitZ());
-        break;
+        return;
     case Qt::Key_S:
     case Qt::Key_Down:
         if (event->modifiers() == Qt::ControlModifier && cl_->active_ != nullptr)
             cl_->active_->translate(translate_unit_ * camera_.rotation_.matrix().inverse() * Vector3f::UnitZ());
         else if (event->modifiers() != Qt::ControlModifier)
             camera_.translate(-translate_unit_ * Vector3f::UnitZ());
-        break;
+        return;
     case Qt::Key_Q:
         if (event->modifiers() == Qt::ControlModifier && cl_->active_ != nullptr)
             cl_->active_->translate(-translate_unit_ * camera_.rotation_.matrix().inverse() * Vector3f::UnitY());
         else if (event->modifiers() != Qt::ControlModifier)
             camera_.translate(translate_unit_ * Vector3f::UnitY());
-        break;
+        return;
     case Qt::Key_E:
         if (event->modifiers() == Qt::ControlModifier && cl_->active_ != nullptr)
             cl_->active_->translate(translate_unit_ * camera_.rotation_.matrix().inverse() * Vector3f::UnitY());
         else if (event->modifiers() != Qt::ControlModifier)
             camera_.translate(-translate_unit_ * Vector3f::UnitY());
-        break;
+        return;
 
     //
     // Reset
@@ -303,7 +296,7 @@ void GLWidget::keyPressEvent(QKeyEvent * event) {
     case Qt::Key_R:
         if (event->modifiers() == Qt::ControlModifier && cl_->active_ != nullptr)
             camera_.setPosition(0, 0, 0);
-        break;
+        return;
 
     //
     // Zoom

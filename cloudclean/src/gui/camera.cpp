@@ -41,6 +41,7 @@
 #include <Eigen/LU>
 #include <Eigen/Dense>
 #include <QDebug>
+#include <QTimer>
 #include <iostream>
 
 using Eigen::Vector3f;
@@ -54,11 +55,27 @@ Camera::Camera() {
     depth_near_ = 1.0f;
     depth_far_ = 10000.0f;
 
-    rotation_ = AngleAxis<float>(-M_PI/2, Vector3f(1, 0, 0));
+    rotation_current_ = AngleAxis<float>(-M_PI/2, Vector3f(1, 0, 0));
 
-    translation_ = Vector3f(0, 0, 0);
+    translation_current_ = Vector3f(0, 0, 0);
+    translation_future_ = Vector3f(0, 0, 0);
 
     projection_dirty_ = true;
+    update_pending_ = false;
+
+
+    timer_ = new QTimer();
+    timer_->connect(timer_, &QTimer::timeout, [&] () {
+        Eigen::Vector3f diff = translation_future_ - translation_current_;
+        float dist = diff.norm();
+        if(dist > 1e-4 || update_pending_) {
+            update_pending_ = false;
+            translation_current_ = translation_current_ + diff * 0.5;
+            emit updated();
+        }
+    });
+
+    timer_->start(1000/160);
 }
 
 Camera::~Camera() {
@@ -82,7 +99,7 @@ void Camera::setDepthRange(float near, float far) {
 }
 
 void Camera::setPosition(const Eigen::Vector3f& pos) {
-    translation_ = pos;
+    translation_current_ = pos;
 }
 
 
@@ -113,7 +130,7 @@ void Camera::setProjectionMatrix(const Eigen::Affine3f& projection) {
 }
 
 Eigen::Affine3f Camera::modelviewMatrix() {
-    return rotation_  * Eigen::Translation3f(translation_) * Eigen::Affine3f::Identity();
+    return rotation_current_  * Eigen::Translation3f(translation_current_) * Eigen::Affine3f::Identity();
 }
 
 Eigen::Affine3f Camera::projectionMatrix() const {
@@ -124,7 +141,7 @@ Eigen::Affine3f Camera::projectionMatrix() const {
 }
 
 void Camera::translate(const Eigen::Vector3f& pos) {
-    translation_ = Eigen::Translation3f(rotation_.inverse() * pos) * translation_;
+    translation_future_ = Eigen::Translation3f(rotation_current_.inverse() * pos) * translation_future_;
 }
 
 void Camera::rotate2D(float x, float y) {
@@ -133,7 +150,7 @@ void Camera::rotate2D(float x, float y) {
     AngleAxis<float> rotX(rot.x(), Vector3f::UnitY()); // look left right
     AngleAxis<float> rotY(rot.y(), Vector3f::UnitX()); // look up down
 
-    rotation_ = (rotX * rotY) * rotation_;
+    rotation_current_ = (rotX * rotY) * rotation_current_;
 
     auto clamp = [] (double num, double low, double high) {
         if (num > high)
@@ -143,25 +160,18 @@ void Camera::rotate2D(float x, float y) {
         return num;
     };
 
-    Eigen::Matrix3f r = rotation_.toRotationMatrix();
+    Eigen::Matrix3f r = rotation_current_.toRotationMatrix();
     double roll = -atan2(r(0,2), r(1, 2));
     double pitch = acos(r(2,2));
     //double yaw = atan2(r(2, 0), r(2, 1));
 
 
-    Vector3f dir = rotation_ * Vector3f::UnitZ();
+    Vector3f dir = rotation_current_ * Vector3f::UnitZ();
     double dotp = dir.dot(Vector3f::UnitZ());
 
     double sign = dir.dot(Vector3f::UnitY()) > 0 ? 1.0 : -1.0;
     double angle = sign * acos(dotp);
 
-/*
-    qDebug() << "Y angle" << angle;
-    qDebug() << "Y angle (DEG)" << (angle/M_PI) * 180;
-    qDebug() << "Roll" << roll;
-    qDebug() << "Pitch" << pitch;
-    qDebug() << "Yaw" << yaw;
-*/
     double correction_factor = 1.0 - fabs(pitch-M_PI/2)/(M_PI/2);
     correction_factor = -0.5 + 1.5 * correction_factor;
     correction_factor = clamp(correction_factor, 0, 1);
@@ -169,11 +179,11 @@ void Camera::rotate2D(float x, float y) {
     if(angle < 0)
         correction_factor = 0;
 
-    //qDebug() << "Correction factor:" << correction_factor;
-
     AngleAxis<float> roll_correction(correction_factor*-roll, Vector3f::UnitZ());
-    rotation_ = roll_correction * rotation_;
-    rotation_.normalize();
+    rotation_current_ = roll_correction * rotation_current_;
+    rotation_current_.normalize();
+
+    update_pending_ = true;
 }
 
 void Camera::rotate3D(float _yaw, float _pitch, float _roll) {
@@ -181,7 +191,7 @@ void Camera::rotate3D(float _yaw, float _pitch, float _roll) {
     AngleAxis<float> rotX(_yaw, Vector3f::UnitY()); // look left right
     AngleAxis<float> rotY(_pitch, Vector3f::UnitX()); // look up down
 
-    rotation_ = (rotX * rotY) * rotation_;
+    rotation_current_ = (rotX * rotY) * rotation_current_;
 
     auto clamp = [] (double num, double low, double high) {
         if (num > high)
@@ -191,13 +201,13 @@ void Camera::rotate3D(float _yaw, float _pitch, float _roll) {
         return num;
     };
 
-    Eigen::Matrix3f r = rotation_.toRotationMatrix();
+    Eigen::Matrix3f r = rotation_current_.toRotationMatrix();
     double roll = -atan2(r(0,2), r(1, 2));
     double pitch = acos(r(2,2));
     //double yaw = atan2(r(2, 0), r(2, 1));
 
 
-    Vector3f dir = rotation_ * Vector3f::UnitZ();
+    Vector3f dir = rotation_current_ * Vector3f::UnitZ();
     double dotp = dir.dot(Vector3f::UnitZ());
 
     double sign = dir.dot(Vector3f::UnitY()) > 0 ? 1.0 : -1.0;
@@ -220,8 +230,9 @@ void Camera::rotate3D(float _yaw, float _pitch, float _roll) {
     //qDebug() << "Correction factor:" << correction_factor;
 
     AngleAxis<float> roll_correction(correction_factor*-roll, Vector3f::UnitZ());
-    rotation_ = roll_correction * rotation_;
-    rotation_.normalize();
+    rotation_current_ = roll_correction * rotation_current_;
+    rotation_current_.normalize();
+    update_pending_ = true;
 }
 
 void Camera::adjustFov(int val) {
@@ -229,4 +240,5 @@ void Camera::adjustFov(int val) {
     val = -val/60.0f;
     if (fov_ + val < 170.0f && fov_ + val > 2.0f)
         setFoV(fov_ + val);
+    update_pending_ = true;
 }

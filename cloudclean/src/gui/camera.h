@@ -39,16 +39,19 @@
 #define CLOUDCLEAN_SRC_CLOUDCLEAN_CAMERA_H_
 
 #include <Eigen/Geometry>
+#include <QObject>
 #include "gui/export.h"
 
+class QTimer;
 class GLWidget;
 
-// Contains code from kgllib
 namespace std {
     class mutex;
 }
 
-class GUI_API Camera {
+class GUI_API Camera : public QObject {
+    Q_OBJECT
+
  public:
     Camera();
 
@@ -81,12 +84,18 @@ class GUI_API Camera {
     void rotate3D(float _yaw, float _pitch, float _roll);
     void adjustFov(int val);
 
+ signals:
+    void updated();
+
  private:
     void recalculateProjectionMatrix();
 
  private:
-    Eigen::Quaternion<float> rotation_;
-    Eigen::Vector3f translation_;
+    Eigen::Quaternion<float> rotation_current_;
+    Eigen::Quaternion<float> rotation_future_;
+
+    Eigen::Vector3f translation_current_;
+    Eigen::Vector3f translation_future_;
 
     float fov_, aspect_, depth_near_, depth_far_;
 
@@ -95,6 +104,9 @@ class GUI_API Camera {
     bool projection_dirty_;
     bool modelview_dirty_;
 
+    QTimer *timer_;
+
+    bool update_pending_;
     //std::mutex * mtx_;
 
     friend class GLWidget;

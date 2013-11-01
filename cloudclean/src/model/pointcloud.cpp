@@ -322,6 +322,7 @@ void PointCloud::rotate2D(float x, float y) {
     AngleAxis<float> rotX(-x, Vector3f::UnitZ());
     AngleAxis<float> rotY(-y, Vector3f::UnitY());
     sensor_orientation_ = (rotX * rotY) * sensor_orientation_;
+    emit transformed();
 }
 
 Eigen::Affine3f PointCloud::modelview() {

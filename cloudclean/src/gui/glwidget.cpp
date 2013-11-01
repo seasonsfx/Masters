@@ -300,6 +300,13 @@ void GLWidget::keyPressEvent(QKeyEvent * event) {
         }
         return;
 
+    // Birds eye view
+    case Qt::Key_B:
+        if (event->modifiers() == Qt::ControlModifier && cl_->active_ != nullptr){
+            camera_.birds_eye();
+        }
+        return;
+
     //
     // Zoom
     //

@@ -68,7 +68,7 @@ bool Picker::eventFilter(QObject *object, QEvent *event){
 bool Picker::mouseReleaseEvent(QMouseEvent * event){
 
     int idx = pick(event->x(), event->y(), glwidget_->width(),
-                   glwidget_->height(), 1e-04,
+                   glwidget_->height(), 0.02,
                    glwidget_->camera_.projectionMatrix(),
                    glwidget_->camera_.modelviewMatrix(),
                    cl_->active_);

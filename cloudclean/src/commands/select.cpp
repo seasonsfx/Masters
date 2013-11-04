@@ -31,7 +31,7 @@ Select::Select(boost::shared_ptr<PointCloud> pc,
 
     if(deselected != nullptr){
         for(int idx : *deselected) {
-            if(is_selected(idx) && !is_excluded(idx))
+            if(idx > 0 && is_selected(idx) && !is_excluded(idx))
                 deselected_->push_back(idx);
         }
     }

@@ -105,12 +105,16 @@ void Brush2D::select(QMouseEvent * event){
 
             int idx = flatview_->imageToCloudIdx(int(coord.x() + x + 0.5),
                                       int(coord.y() + y + 0.5), pc);
-            if (idx != -1){
-                if(negative_select)
-                    deselected->push_back(idx);
-                else
-                    selected->push_back(idx);
+            if (idx < 0) {
+                if(idx < -1)
+                    qDebug() << "Bug! Idx < -1 : idx = " << idx;
+                continue;
             }
+            else if(negative_select)
+                deselected->push_back(idx);
+            else
+                selected->push_back(idx);
+
         }
     }
 

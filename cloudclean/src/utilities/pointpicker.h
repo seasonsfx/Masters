@@ -52,7 +52,7 @@ UTIL_API void screenToRay(int x, int y, int win_width, int win_height, const Eig
                               Eigen::Vector3f& p1,
                               Eigen::Vector3f& p2);
 
-UTIL_API int pick(int win_x, int win_y, int win_width, int win_height, float min_dist,
+UTIL_API int pick(int win_x, int win_y, int win_width, int win_height, float max_dist,
         const Eigen::Affine3f& proj, const Eigen::Affine3f& cam_mv,
         boost::shared_ptr<PointCloud> pc,
         std::set<uint8_t> labels = std::set<uint8_t>());

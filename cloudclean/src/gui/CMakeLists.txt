@@ -43,6 +43,7 @@ target_link_libraries(
     ${OPENGL_LIBRARIES}
     cloudclean_model
     cloudclean_commands
+    Leap
 )
 
 if($(LEAP_SUPPORT))

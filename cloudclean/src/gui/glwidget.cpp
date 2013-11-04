@@ -58,7 +58,7 @@ void GLWidget::initializeGL() {
 
     CE();
 
-    glClearColor(0.8, 0.8, 0.8, 1.0);
+    glClearColor(1.0, 1.0, 1.0, 1.0);
     glEnable(GL_DEPTH_TEST);
     //glEnable(GL_CULL_FACE);
     glEnable(GL_MULTISAMPLE);

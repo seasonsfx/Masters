@@ -124,19 +124,17 @@ int pick(int win_x, int win_y, int win_width, int win_height, float max_dist,
 
         pcl::PointXYZI & p = pc->points[i];
 
-        // Save some memory by using map
-        // MSVC bug I think
-        Eigen::Map<Eigen::Vector3f> point = Eigen::Vector3f::Map(p.data, 3);
+
         //Eigen::Vector3f point(p.x(), p.y(), p.z());
 
         // Skip points to far from the line
         // Totod make parameter
-        float dist_to_line = pointToLineDist(point, p1, p2);
+        float dist_to_line = pointToLineDist(p.getVector3fMap(), p1, p2);
         if(dist_to_line > max_dist)
             continue;
 
         // Point distance to camera
-        float dist_to_cam = (point-p1).norm();
+        float dist_to_cam = (p.getVector3fMap()-p1).norm();
 
         if (dist_to_cam < min_val) {
             min_index = i;

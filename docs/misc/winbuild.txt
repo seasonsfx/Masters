@@ -1,0 +1,133 @@
+use cmd not mingw prompt
+
+rubyenv mingw64:
+	extraxt to c:\mingw64
+
+install minsys:
+	intstall to c:\minsys
+
+boost build:
+	download boost 1.50
+
+	b2 toolset=gcc --build-type=complete --libdir=C:\boost\lib\x64 architecture=x86 address-model=64 --with-regex --with-date_time --with-thread --with-signals --with-system --with-filesystem --with-program_options --with-iostreams --with-serialization -j2 install
+
+flann
+	administrator cmd
+	mkdir build
+	cd build
+	cmake .. -G "MSYS Makefiles" -DBUILD_CUDA_LIB=OFF -DBUILD_PYTHON_BINDINGS=OFF -DBUILD_MATLAB_BINDINGS=OFF -DCMAKE_BUILD_TYPE=release -DBUILD_C_BINDINGS=OFF
+
+	make install
+
+eigen
+	administrator cmd
+	mkdir build
+	cd build
+	cmake .. -G "MSYS Makefiles"
+	make install
+
+pcl
+	mkdir build
+	cd build
+//
+	cmake .. -G "MSYS Makefiles" -DEIGEN_INCLUDE_DIR="C:\Program Files (x86)\Eigen\include\eigen3" -DBOOST_INCLUDEDIR="C:/boost/include/boost-1_50" -DBOOST_LIBRARYDIR="C:/boost/lib/x64" -DBoost_USE_STATIC_LIBS=ON -DFLANN_ROOT="C:/Program Files/flann" -DFLANN_LIBRARY="C:/Program Files/flann/lib/libflann_cpp_s.a" -DCMAKE_SYSTEM_NAME="Windows-GNU"
+
+	-DBOOST_THREAD_USE_LIB=ON
+	-DCMAKE_CXX_LINK_FLAGS="-fopenmp -lgomp"
+
+// 
+
+	cmake .. -G "MSYS Makefiles" -DEIGEN_INCLUDE_DIR="C:\Program Files (x86)\Eigen\include\eigen3" -DBOOST_INCLUDEDIR="C:/boost/include/boost-1_50" -DBOOST_LIBRARYDIR="C:/boost/lib/x64" -DBoost_USE_STATIC_LIBS=ON -DFLANN_ROOT="C:/Program Files/flann" -DFLANN_LIBRARY="C:/Program Files/flann/lib/libflann_cpp_s.a" -DCMAKE_CXX_LINK_FLAGS="-lgomp" -DCMAKE_CXX_FLAGS="-fopenmp"
+//
+	cmake .. -G "MSYS Makefiles" -DEIGEN_INCLUDE_DIR="C:\Program Files (x86)\Eigen\include\eigen3" -DBOOST_INCLUDEDIR="C:/boost/include/boost-1_50" -DBOOST_LIBRARYDIR="C:/boost/lib/x64" -DBoost_USE_STATIC_LIBS=ON -DFLANN_USE_STATIC=ON -DCMAKE_TOOLCHAIN_FILE="C:\PCL\toolchains\fix.cmake" -DFLANN_LIBRARY="C:/Program Files/flann/lib/libflann_cpp_s.a"
+//
+	cmake .. -G "MSYS Makefiles" -DEIGEN_INCLUDE_DIR="C:\Program Files (x86)\Eigen\include\eigen3" -DBOOST_INCLUDEDIR="C:/boost/include/boost-1_50" -DBOOST_LIBRARYDIR="C:/boost/lib/x64" -DBoost_USE_STATIC_LIBS=ON -DFLANN_ROOT="C:/Program Files/flann" -DFLANN_LIBRARY="C:/Program Files/flann/lib/libflann_cpp_s.a" -DCMAKE_CXX_LINK_FLAGS="-lgomp" -DCMAKE_CXX_FLAGS="-fopenmp"
+
+make install
+
+cloudclean
+	cmake .. -G "MSYS Makefiles" -DBOOST_INCLUDEDIR="C:/boost/include/boost-1_50" -DBOOST_LIBRARYDIR="C:/boost/lib/x64" -DEIGEN_INCLUDE_DIRS="C:\Program Files (x86)\Eigen\include\eigen3" -DCMAKE_SYSTEM_NAME="Windows-GNU"
+
+
+// Need this because win32 is not defined
+ADD_DEFINITIONS(-DBOOST_THREAD_USE_LIB)
+
+b2 toolset=gcc address-model=64 variant=debug,release link=static threading=multi --libdir=C:\boost\lib\x64 --with-regex --with-date_time --with-thread --with-signals --with-system --with-filesystem --with-program_options --with-iostreams --with-serialization --with-chronos -j4 install
+
+
+pcl_find_boost.cmake
+<if(WIN32 AND Boost_VERSION VERSION_GREATER "104900")
+-----
+>if(__WINDOWS_GNU OR WIN32 AND Boost_VERSION VERSION_GREATER "104900")
+
+Platforms/WindowsGNU is messed up
+The set .dll extension needs to be after the macros
+
+
+Problem with GNU is that win32 is not set?
+
+Might have to use mingw terminal
+
+cmake .. -G "MSYS Makefiles" -DEIGEN_INCLUDE_DIR="C:\Program Files (x86)Eigen\include\eigen3" -DBOOST_INCLUDEDIR="C:/boost/include/boost-1_50" -DBOOST_LIBRARYDIR="C:/boost/lib/x64" -DBoost_USE_STATIC_LIBS=ON -DFLANN_USE_STATIC=ON
+
+
+\\ MSVC 11
+
+environment:
+    "C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\x86_amd64\vcvarsx86_amd64.bat"
+
+    set PATH=%PATH%;C:\Qt\Qt5.0.2\5.0.2\msvc2012_64\bin
+
+	set GLEWROOT=C:\PCL\dependencies\glew-1.9.0 # can be set via paths
+	#set EIGEN_ROOT="C:\Program Files\Eigen"
+	#set BOOST_ROOT="C:\boost"
+	#set FLANN_ROOT="C:\Program Files\Flann"
+	#set PCL_ROOT="C:/Program Files/PCL"
+
+qt5 (http://qt-project.org/wiki/Building-Qt-5-from-Git)
+	..\qt\configure -mp -opensource -nomake demos -nomake examples -no-webkit -no-qt3support -debug-and-release -platform win32-msvc2012
+
+boost (http://www.boost.org/users/download/)
+	src:
+		http://downloads.sourceforge.net/project/boost/boost/1.54.0/boost_1_54_0.zip
+	
+	build:
+		b2 toolset=msvc-11.0 --build-type=complete --libdir=C:\boost\lib architecture=x86 address-model=64 --with-regex --with-date_time --with-thread --with-signals --with-system --with-filesystem --with-program_options --with-iostreams --with-serialization --with-chrono -j2 install
+
+flann (http://www.cs.ubc.ca/research/flann/#download)
+    src:
+    	http://www.cs.ubc.ca/research/flann/uploads/FLANN/flann-1.8.4-src.zip
+    build:
+		cmake ..\flann-1.7.1-src -G "NMake Makefiles" -DBUILD_CUDA_LIB=OFF -DBUILD_PYTHON_BINDINGS=OFF -DBUILD_MATLAB_BINDINGS=OFF -DCMAKE_BUILD_TYPE=release -DBUILD_C_BINDINGS=OFF -DCMAKE_INSTALL_PREFIX="C:\Program Files\Flann"
+
+eigen
+	src:
+		http://bitbucket.org/eigen/eigen/get/3.2.0.zip
+	build:
+		cmake ..\eigen -G "NMake Makefiles" -DCMAKE_INSTALL_PREFIX="C:\Program Files\Eigen"
+
+pcl
+	git:
+		https://github.com/circlingthesun/pcl.git
+
+	build:
+		cmake .. -G "NMake Makefiles" -DBoost_USE_STATIC_LIBS=ON -DFLANN_LIBRARY="C:/Program Files/Flann/lib/libflann_cpp_s.lib"
+
+glew
+	bin:
+		http://downloads.sourceforge.net/project/glew/glew/1.10.0/glew-1.10.0-win32.zip
+
+lapack
+	src:
+		http://netlib.org/lapack/lapack.tgz
+    build:
+    	cmake .. -G "NMake Makefiles"
+    	nmake
+
+cloudclean
+
+	cmake .. -G "NMake Makefiles" -DBoost_USE_STATIC_LIBS=ON -DCMAKE_BUILD_TYPE=Release
+
+	-DCMAKE_CXX_FLAGS=-O2
+
+	cmake .. -G "Visual Studio 11 Win64"

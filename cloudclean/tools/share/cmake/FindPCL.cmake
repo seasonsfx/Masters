@@ -40,6 +40,9 @@ set(PCL_SUFFIX pcl-1.7)
 #set a suffix for debug libraries
 #set(PCL_DEBUG_SUFFIX "-gd")
 set(PCL_DEBUG_SUFFIX "_debug")
+if(WIN32)
+  set(PCL_RELEASE_SUFFIX "_release")
+endif(WIN32)
 
 #set all pcl component and their account into variables
 set(pcl_all_components io common kdtree keypoints filters range_image registration sample_consensus segmentation features surface octree visualization )
@@ -98,19 +101,6 @@ else(NOT Boost_FOUND)
   link_directories(${Boost_LIBRARY_DIRS})
 endif(NOT Boost_FOUND)
 
-#remove this as soon as eigen is shipped with FindEigen.cmake
-macro(find_eigen)
-  if(PkgConfig_FOUND)
-    pkg_check_modules(PC_EIGEN eigen3)
-  endif(PkgConfig_FOUND)
-  find_path(EIGEN_INCLUDE_DIRS Eigen/Core
-    HINTS ${PC_EIGEN_INCLUDEDIR} ${PC_EIGEN_INCLUDE_DIRS} 
-          "${EIGEN_ROOT}" "$ENV{EIGEN_ROOT}"
-    PATHS "$ENV{PROGRAMFILES}/Eigen 3.0.0" "$ENV{PROGRAMW6432}/Eigen 3.0.0"
-    PATH_SUFFIXES eigen3 include/eigen3)
-  find_package_handle_standard_args(eigen DEFAULT_MSG EIGEN_INCLUDE_DIRS)
-endmacro(find_eigen)
-
 #remove this as soon as cminpack is shipped with FindCminpack.cmake
 macro(find_cminpack)
   if(PkgConfig_FOUND)
@@ -152,106 +142,6 @@ macro(find_cminpack)
   endif(CMINPACK_FOUND)
 endmacro(find_cminpack)
 
-#remove this as soon as qhull is shipped with FindQhull.cmake
-macro(find_qhull)
-  set(QHULL_MAJOR_VERSION 6)
-
-  find_path(QHULL_INCLUDE_DIRS
-    NAMES libqhull/libqhull.h qhull.h
-    HINTS "${QHULL_ROOT}" "$ENV{QHULL_ROOT}"
-    PATHS "$ENV{PROGRAMFILES}/qhull 6.2.0.1373" "$ENV{PROGRAMW6432}/qhull 6.2.0.1373" 
-    PATH_SUFFIXES qhull src/libqhull libqhull include)
-
-  # Most likely we are on windows so prefer static libraries over shared ones (Mourad's recommend)
-  find_library(QHULL_LIBRARY 
-    NAMES qhullstatic qhull qhull${QHULL_MAJOR_VERSION}
-    HINTS "${QHULL_ROOT}" "$ENV{QHULL_ROOT}"
-    PATHS "$ENV{PROGRAMFILES}/qhull 6.2.0.1373" "$ENV{PROGRAMW6432}/qhull 6.2.0.1373" 
-    PATH_SUFFIXES project build bin lib)
-  
-  find_library(QHULL_LIBRARY_DEBUG 
-    NAMES qhullstatic_d qhull_d qhull_d${QHULL_MAJOR_VERSION} 
-              qhull qhull${QHULL_MAJOR_VERSION}
-    HINTS "${QHULL_ROOT}" "$ENV{QHULL_ROOT}"
-    PATHS "$ENV{PROGRAMFILES}/qhull 6.2.0.1373" "$ENV{PROGRAMW6432}/qhull 6.2.0.1373" 
-    PATH_SUFFIXES project build bin lib)
-  
-  if(NOT QHULL_LIBRARY_DEBUG)
-    set(QHULL_LIBRARY_DEBUG ${QHULL_LIBRARY})
-  endif(NOT QHULL_LIBRARY_DEBUG)
-
-  set(QHULL_LIBRARIES optimized ${QHULL_LIBRARY} debug ${QHULL_LIBRARY_DEBUG})
-
-  find_package_handle_standard_args(qhull DEFAULT_MSG QHULL_LIBRARY QHULL_INCLUDE_DIRS)
-
-  if(QHULL_FOUND)
-    get_filename_component(QHULL_LIBRARY_PATH ${QHULL_LIBRARY} PATH)
-    get_filename_component(QHULL_LIBRARY_DEBUG_PATH ${QHULL_LIBRARY_DEBUG} PATH)
-    set(QHULL_LIBRARY_DIRS ${QHULL_LIBRARY_PATH} ${QHULL_LIBRARY_DEBUG_PATH}) 
-  endif(QHULL_FOUND)
-endmacro(find_qhull)
-
-#remove this as soon as openni is shipped with FindOpenni.cmake
-macro(find_openni)
-  if(PkgConfig_FOUND)
-    pkg_check_modules(PC_OPENNI openni)
-  endif(PkgConfig_FOUND)
-  find_path(OPENNI_INCLUDE_DIRS XnStatus.h
-    HINTS ${PC_OPENNI_INCLUDEDIR} ${PC_OPENNI_INCLUDE_DIRS}
-          "${OPENNI_ROOT}" "$ENV{OPENNI_ROOT}"
-    PATHS "$ENV{PROGRAMFILES}/OpenNI/Include" "$ENV{PROGRAMW6432}/OpenNI/Include"
-    PATH_SUFFIXES include/openni Include)
-  #add a hint so that it can find it without the pkg-config
-  find_library(OPENNI_LIBRARY
-    NAMES OpenNI64 OpenNI 
-    HINTS ${PC_OPENNI_LIBDIR} ${PC_OPENNI_LIBRARY_DIRS}
-              "${OPENNI_ROOT}" "$ENV{OPENNI_ROOT}"
-    PATHS "$ENV{PROGRAMFILES}/OpenNI/Lib" "$ENV{PROGRAMW6432}/OpenNI/Lib64"
-    PATH_SUFFIXES lib Lib Lib64)
-
-  find_package_handle_standard_args(openni DEFAULT_MSG OPENNI_LIBRARY OPENNI_INCLUDE_DIRS)
-
-  if(OPENNI_FOUND)
-    get_filename_component(OPENNI_LIBRARY_PATH ${OPENNI_LIBRARY} PATH)
-    set(OPENNI_LIBRARY_DIRS ${OPENNI_LIBRARY_PATH})
-  endif(OPENNI_FOUND)
-endmacro(find_openni)
-
-#remove this as soon as flann is shipped with FindFlann.cmake
-macro(find_flann)
-  if(PkgConfig_FOUND)
-    pkg_check_modules(PC_FLANN flann)
-  endif(PkgConfig_FOUND)
-
-  find_path(FLANN_INCLUDE_DIRS flann/flann.hpp
-    HINTS ${PC_FLANN_INCLUDEDIR} ${PC_FLANN_INCLUDE_DIRS} 
-          "${FLANN_ROOT}" "$ENV{FLANN_ROOT}"
-    PATHS "$ENV{PROGRAMFILES}/flann" "$ENV{PROGRAMW6432}/flann"
-    PATH_SUFFIXES include)
-
-  find_library(FLANN_LIBRARY
-    NAMES flann_cpp_s flann_cpp
-    HINTS ${PC_FLANN_LIBDIR} ${PC_FLANN_LIBRARY_DIRS} "${FLANN_ROOT}" "$ENV{FLANN_ROOT}"
-    PATHS "$ENV{PROGRAMFILES}/flann" "$ENV{PROGRAMW6432}/flann" 
-    PATH_SUFFIXES lib)
-
-  find_library(FLANN_LIBRARY_DEBUG 
-    NAMES flann_cpp_s-gd flann_cpp-gd flann_cpp_s flann_cpp
-    HINTS ${PC_FLANN_LIBDIR} ${PC_FLANN_LIBRARY_DIRS} "${FLANN_ROOT} $ENV{FLANN_ROOT}"
-    PATHS "$ENV{PROGRAMFILES}/flann" "$ENV{PROGRAMW6432}/flann" 
-    PATH_SUFFIXES lib)
-  if(NOT FLANN_LIBRARY_DEBUG)
-    set(FLANN_LIBRARY_DEBUG ${FLANN_LIBRARY})
-  endif(NOT FLANN_LIBRARY_DEBUG)
-
-  find_package_handle_standard_args(Flann DEFAULT_MSG FLANN_LIBRARY FLANN_INCLUDE_DIRS)
-  if(FLANN_FOUND)
-    get_filename_component(FLANN_LIBRARY_PATH ${FLANN_LIBRARY} PATH)
-    get_filename_component(FLANN_LIBRARY_DEBUG_PATH ${FLANN_LIBRARY_DEBUG} PATH)
-    set(FLANN_LIBRARY_DIRS ${FLANN_LIBRARY_PATH} ${FLANN_LIBRARY_DEBUG_PATH}) 
-  endif(FLANN_FOUND)
-endmacro(find_flann)
-
 macro(find_wxWidgets)
   find_package(wxWidgets)
 endmacro(find_wxWidgets)
@@ -274,21 +164,13 @@ endmacro(find_VTK)
 #                                                                     from the list
 
 macro(find_external_library _component _lib _is_optional)
-  if("${_lib}" STREQUAL "eigen")
-    find_eigen()
-  elseif("${_lib}" STREQUAL "flann")
-    find_flann()
-  elseif("${_lib}" STREQUAL "qhull")
-    find_qhull()
-  elseif("${_lib}" STREQUAL "openni")
-    find_openni()
-  elseif("${_lib}" STREQUAL "cminpack")
+  if("${_lib}" STREQUAL "cminpack")
     find_cminpack()
   elseif("${_lib}" STREQUAL "VTK")
     find_VTK()
   elseif("${_lib}" STREQUAL "wxWidgets")
     find_wxWidgets()
-  endif("${_lib}" STREQUAL "eigen")
+  endif("${_lib}" STREQUAL "cminpack")
 
   string(TOUPPER "${_lib}" LIB)
   if(${LIB}_FOUND)
@@ -334,7 +216,6 @@ find_file(PCL_CONFIG_H pcl/pcl_config.h
 if(NOT EXISTS ${PCL_CONFIG_H})
   message(FATAL_ERROR "PCL can not be found on this machine")
 endif(NOT EXISTS ${PCL_CONFIG_H})
-
 
 # we did find pcl_config.h
 # extract PCL_VERSION
@@ -418,21 +299,21 @@ foreach(component ${PCL_TO_FIND_COMPONENTS})
   find_path(${PCL_COMPONENT_INCLUDE_DIR}
     NAMES pcl/${component} pcl/${${component}_parent}
     HINTS ${PCL_DIR}
-    PATHS /usr /usr/local
-    "$ENV{PROGRAMFILES}/PCL" "$ENV{PROGRAMW6432}/PCL"
+    PATHS /usr /usr/local "$ENV{PROGRAMFILES}/PCL" "$ENV{PROGRAMW6432}/PCL"
     ${${PC_PCL_COMPONENT}_INCLUDEDIR} ${${PC_PCL_COMPONENT}_INCLUDE_DIRS}
     PATH_SUFFIXES include/${PCL_SUFFIX}
     DOC "path to ${component} headers")
 
   get_filename_component(component_header_path ${${PCL_COMPONENT_INCLUDE_DIR}} PATH)
 
+
   #check that the found path is same as found PCL_DIR 
   if(NOT "${${PCL_COMPONENT_INCLUDE_DIR}}" STREQUAL "${PCL_DIR}")
     message(FATAL_ERROR "${${PCL_COMPONENT_INCLUDE_DIR}} is not a valid include directory")
   endif(NOT "${${PCL_COMPONENT_INCLUDE_DIR}}" STREQUAL "${PCL_DIR}")
 
-  find_library(${PCL_COMPONENT_LIBRARY} ${pcl_component}
-    HINTS ${PCL_DIR} "$ENV{PROGRAMFILES}/PCL" "$ENV{PROGRAMW6432}/PCL"
+  find_library(${PCL_COMPONENT_LIBRARY} ${pcl_component}${PCL_RELEASE_SUFFIX}
+    HINTS ${PCL_DIR} "$ENV{PROGRAMFILES}/PCL" "$ENV{PROGRAMW6432}/PCL" 
     ${${PC_PCL_COMPONENT}_LIBDIR} ${${PC_PCL_COMPONENT}_LIBRARY_DIRS}
     "${PCL_ROOT}" "$ENV{PCL_ROOT}"
     PATH_SUFFIXES lib bin

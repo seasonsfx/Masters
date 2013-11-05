@@ -17,7 +17,7 @@ endif()
 FILE (GLOB app_SRCS *.cpp *.cxx *.cc *.C *.c *.h *.hpp)
 FILE (GLOB app_FORMS *.ui)
 
-if(Leap_NOTFOUND)
+if(NOT Leap_FOUND)
     foreach(file ${app_SRCS})
         if(file MATCHES ".*leaplistener.cpp|.*leaplistener.h")
             list(REMOVE_ITEM app_SRCS ${file})

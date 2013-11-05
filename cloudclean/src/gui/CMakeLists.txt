@@ -8,17 +8,21 @@ include_directories(
     ${CMAKE_CURRENT_BINARY_DIR}
     ${PCL_INCLUDE_DIRS}
     ${FLANN_INCLUDE_DIRS}
+    ${Leap_INCLUDE_DIR}
 )
 
 FILE (GLOB app_SRCS *.cpp *.cxx *.cc *.C *.c *.h *.hpp)
 FILE (GLOB app_FORMS *.ui)
 
-if(NOT LEAP_SUPPORT)
+if(NOT Leap_FOUND)
     foreach(file ${app_SRCS})
         if(file MATCHES ".*leaplistener.cpp|.*leaplistener.h")
             list(REMOVE_ITEM app_SRCS ${file})
         endif()
     endforeach()
+    MESSAGE("NO LEAP SUPPORT!")
+else()
+    MESSAGE("YAY FOR LEAP SUPPORT!")
 endif()
 
 QT5_WRAP_UI(app_FORMS_HEADERS ${app_FORMS})
@@ -43,7 +47,7 @@ target_link_libraries(
     ${OPENGL_LIBRARIES}
     cloudclean_model
     cloudclean_commands
-    Leap
+    ${Leap_LIBRARIES}
 )
 
 if($(LEAP_SUPPORT))

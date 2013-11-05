@@ -8,13 +8,16 @@ include_directories(
     ${CMAKE_CURRENT_BINARY_DIR}
     ${PCL_INCLUDE_DIRS}
     ${FLANN_INCLUDE_DIRS}
-    ${Leap_INCLUDE_DIR}
 )
+
+if(Leap_FOUND)
+    include_directories(${Leap_INCLUDE_DIR})
+endif()
 
 FILE (GLOB app_SRCS *.cpp *.cxx *.cc *.C *.c *.h *.hpp)
 FILE (GLOB app_FORMS *.ui)
 
-if(NOT Leap_FOUND)
+if(Leap_NOTFOUND)
     foreach(file ${app_SRCS})
         if(file MATCHES ".*leaplistener.cpp|.*leaplistener.h")
             list(REMOVE_ITEM app_SRCS ${file})
@@ -47,11 +50,10 @@ target_link_libraries(
     ${OPENGL_LIBRARIES}
     cloudclean_model
     cloudclean_commands
-    ${Leap_LIBRARIES}
 )
 
-if($(LEAP_SUPPORT))
-    TARGET_LINK_LIBRARIES(Leap)
+if(Leap_FOUND)
+    TARGET_LINK_LIBRARIES(cloudclean_gui ${Leap_LIBRARIES})
 endif()
 
 QT5_USE_MODULES(cloudclean_gui Widgets Gui OpenGL)

@@ -29,7 +29,7 @@ void NormalEstimator::initialize(Core *core){
     cl_ = core_->cl_;
     premptive_estimation_ = true;
 
-
+/*
     // Setup OpenCL
     cl_uint num_platforms;
     cl_platform_id clPlatformIDs[20];
@@ -59,10 +59,10 @@ void NormalEstimator::initialize(Core *core){
         result = clGetPlatformInfo(clPlatformIDs[i], CL_PLATFORM_VENDOR, 1024, &chBuffer, NULL);
         qDebug("platform %d: %s", i, chBuffer);
 
-        /*if(strstr(chBuffer, "NVIDIA") || strstr(chBuffer, "AMD")) {
-            platform = clPlatformIDs[i];
-            qDebug("Using platform: %s", chBuffer);
-        }*/
+        //if(strstr(chBuffer, "NVIDIA") || strstr(chBuffer, "AMD")) {
+        //    platform = clPlatformIDs[i];
+        //    qDebug("Using platform: %s", chBuffer);
+        //}
 
         result = clGetDeviceIDs(clPlatformIDs[i], CL_DEVICE_TYPE_GPU, 100, devices, &devices_n);
 
@@ -127,7 +127,7 @@ void NormalEstimator::initialize(Core *core){
 
     clcontext = clCreateContext(props, 1, &device, NULL, NULL, NULL);
     cmd_queue = clCreateCommandQueue(clcontext, device, 0, NULL);
-
+*/
 
     connect(cl_, SIGNAL(cloudUpdate(boost::shared_ptr<PointCloud>)),
             this, SLOT(addedCloud(boost::shared_ptr<PointCloud>)));

@@ -46,7 +46,7 @@ target_link_libraries(
     cloudclean_gui
     ${PCL_LIBRARIES}
     ${FLANN_LIBRARY}
-    ${OPENCL_LIBRARIES}
+    #${OPENCL_LIBRARIES}
     ${OPENGL_LIBRARIES}
     cloudclean_model
     cloudclean_commands

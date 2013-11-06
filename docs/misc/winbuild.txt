@@ -73,25 +73,38 @@ cmake .. -G "MSYS Makefiles" -DEIGEN_INCLUDE_DIR="C:\Program Files (x86)Eigen\in
 
 \\ MSVC 11
 
+Visual Studio Express 2012 for Windows Desktop
+
 environment:
     "C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\x86_amd64\vcvarsx86_amd64.bat"
 
-    set PATH=%PATH%;C:\Qt\Qt5.0.2\5.0.2\msvc2012_64\bin
+    set PATH=%PATH%;C:\qt\bin
 
 	set GLEWROOT=C:\PCL\dependencies\glew-1.9.0 # can be set via paths
+	set CONFIG_ROOT=C:\Users\rickert\Downloads\libconfig
 	#set EIGEN_ROOT="C:\Program Files\Eigen"
 	#set BOOST_ROOT="C:\boost"
 	#set FLANN_ROOT="C:\Program Files\Flann"
 	#set PCL_ROOT="C:/Program Files/PCL"
 
 qt5 (http://qt-project.org/wiki/Building-Qt-5-from-Git)
-	..\qt\configure -mp -opensource -nomake demos -nomake examples -no-webkit -no-qt3support -debug-and-release -platform win32-msvc2012
+    cd \
+    git clone git://gitorious.org/qt/qt5.git qt5
+	cd qt5
+	perl init-repository --no-webkit --module-subset=qtbase,qtwinextras
+	cd \
+	mkdir qt
+	cd qt
+	c:\qt5\configure -mp -opensource -debug-and-release -nomake examples -nomake tests -opengl desktop -platform win32-msvc2012
+	nmake
 
 boost (http://www.boost.org/users/download/)
 	src:
 		http://downloads.sourceforge.net/project/boost/boost/1.54.0/boost_1_54_0.zip
 	
 	build:
+		bootstrap.bat
+
 		b2 toolset=msvc-11.0 --build-type=complete --libdir=C:\boost\lib architecture=x86 address-model=64 --with-regex --with-date_time --with-thread --with-signals --with-system --with-filesystem --with-program_options --with-iostreams --with-serialization --with-chrono -j2 install
 
 flann (http://www.cs.ubc.ca/research/flann/#download)
@@ -111,7 +124,7 @@ pcl
 		https://github.com/circlingthesun/pcl.git
 
 	build:
-		cmake .. -G "NMake Makefiles" -DBoost_USE_STATIC_LIBS=ON -DFLANN_LIBRARY="C:/Program Files/Flann/lib/libflann_cpp_s.lib"
+		cmake .. -G "NMake Makefiles" -DBoost_USE_STATIC_LIBS=ON
 
 glew
 	bin:
@@ -123,6 +136,10 @@ lapack
     build:
     	cmake .. -G "NMake Makefiles"
     	nmake
+
+libconfig
+		download and build x64 .sln
+		C:\Users\rickert\Downloads\libconfig-1.4.9\x64\Release
 
 cloudclean
 

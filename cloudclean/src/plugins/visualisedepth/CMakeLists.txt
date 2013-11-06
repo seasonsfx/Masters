@@ -1,7 +1,6 @@
 include_directories(
     ${PCL_INCLUDE_DIRS}
     ${FLANN_INCLUDE_DIRS}
-    ${OPENCL_INCLUDE_DIRS}
 )
 
 QT5_ADD_RESOURCES(visualisedepth_RESOURCES_RCC visualisedepth.qrc)

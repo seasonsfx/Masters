@@ -15,6 +15,7 @@
 #include "plugins/normalestimation/export.h"
 #include "pluginsystem/pluginmanager.h"
 
+/*
 #include "glheaders.h"
 #ifdef __APPLE__
     #include <OpenCL/opencl.h>
@@ -22,6 +23,7 @@
     #include <CL/cl.h>
 #endif
 #include <CL/cl_gl.h>
+*/
 
 template<typename T>
 struct WeakPtrHash : public std::unary_function<boost::weak_ptr<T>, size_t> {

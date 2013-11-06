@@ -2,7 +2,6 @@
 include_directories(
     ${PCL_INCLUDE_DIRS}
     ${FLANN_INCLUDE_DIRS}
-    ${OPENCL_INCLUDE_DIRS}
 )
 
 FILE (GLOB plugin_SOURCE *.cpp *.cxx *.cc *.C *.c *.h *.hpp)

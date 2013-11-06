@@ -1,6 +1,6 @@
 #ifndef GLHEADERS_H_
 #define GLHEADERS_H_
-//#define QT_NO_OPENGL_ES_2
+#define QT_NO_OPENGL_ES_2
 #ifdef _WIN32
 #include <GL/glew.h>
 #else

@@ -44,7 +44,7 @@ UTIL_API boost::shared_ptr<std::vector<float> > stdev(
         boost::shared_ptr<std::vector<float>> out_image = nullptr);
 
 template <typename T>
-UTIL_API void minmax(const std::vector<T> & v, T & min, T & max){
+void min_max(const std::vector<T> & v, T & min, T & max){
     min = std::numeric_limits<T>::max();
     max = std::numeric_limits<T>::min();
     for(auto val : v){

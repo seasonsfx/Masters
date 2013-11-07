@@ -149,10 +149,10 @@ void GraphCut::segment(int idx){
 
     pcl::IndicesPtr source_indices(new std::vector<int>);
 
-    for(uint idx = 0; idx < cl_->active_->flags_.size(); idx++){
-        PointFlags & flag = cl_->active_->flags_[idx];
+    for(uint idx2 = 0; idx2 < cl_->active_->flags_.size(); idx2++){
+        PointFlags & flag = cl_->active_->flags_[idx2];
         if((uint8_t)flag && (uint8_t)PointFlags::selected)
-            source_indices->push_back(idx);
+            source_indices->push_back(idx2);
     }
 
     if(source_indices->size() < 10) {

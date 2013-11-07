@@ -1,4 +1,5 @@
 #include "plugins/normalestimation/normalestimation.h"
+#include <cmath>
 #include <QDebug>
 #include <pcl/features/normal_3d.h>
 #include <pcl/search/search.h>

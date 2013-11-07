@@ -101,7 +101,7 @@ void Snake::drawFloats(boost::shared_ptr<const std::vector<float> > out_img, boo
     }
 
     float min, max;
-    minmax(*out_img, min, max);
+    min_max(*out_img, min, max);
     qDebug() << "Minmax" << min << max;
 
     // Draw image

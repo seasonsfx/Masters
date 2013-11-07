@@ -78,7 +78,7 @@ Visual Studio Express 2012 for Windows Desktop
 environment:
     "C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\x86_amd64\vcvarsx86_amd64.bat"
 
-    set PATH=%PATH%;C:\qt\bin
+    set PATH=%PATH%;C:\qt\qtbase\bin
 
 	set GLEWROOT=C:\PCL\dependencies\glew-1.9.0 # can be set via paths
 	set CONFIG_ROOT=C:\Users\rickert\Downloads\libconfig

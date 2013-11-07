@@ -6,6 +6,8 @@
 CMAKE_MINIMUM_REQUIRED (VERSION 2.8.6)
 PROJECT (cloudclean)
 
+cmake_policy(SET CMP0020 OLD)
+
 ENABLE_TESTING()
 
 SET(APPLICATION_NAME "CloudClean")
@@ -124,6 +126,15 @@ IF(MSVC)
     SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} /W2") # Mute warnings in ms
     add_definitions(-DNOMINMAX) # Workaround for windows.h bug
     add_definitions(-D_VARIADIC_MAX=10) # MSVC11 needs this to run gtest
+
+#    foreach(flag_var
+#            CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
+#            CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
+#       if(${flag_var} MATCHES "/MD")
+#          string(REGEX REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
+#       endif(${flag_var} MATCHES "/MD")
+#    endforeach(flag_var)
+
 ELSE()
     SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -Wall -gdwarf-3")
     SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -std=c++0x")
@@ -164,8 +175,8 @@ ENDFOREACH(CONFIGINPUT ${CONFIGINPUTS})
 #
 #ADD_SUBDIRECTORY(thirdparty/onlineforest ${CMAKE_CURRENT_BINARY_DIR}/onlineforest)
 ADD_SUBDIRECTORY(src)
-ADD_SUBDIRECTORY(thirdparty/gtest ${CMAKE_CURRENT_BINARY_DIR}/gtest)
-ADD_SUBDIRECTORY(test)
+#ADD_SUBDIRECTORY(thirdparty/gtest ${CMAKE_CURRENT_BINARY_DIR}/gtest)
+#ADD_SUBDIRECTORY(test)
 
 #
 # Add Documentation Targets

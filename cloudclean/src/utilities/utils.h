@@ -1,6 +1,7 @@
-#ifndef ULTILITIES_FILTERS_H
-#define ULTILITIES_FILTERS_H
+#ifndef ULTILITIES_UTILS_H
+#define ULTILITIES_UTILS_H
 
+#include <vector>
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
 #include <pcl/octree/octree.h>
@@ -72,4 +73,4 @@ void map(std::vector<T, T2> & small, std::vector<T, T2>& big, std::vector<int> &
 UTIL_API pcl::PointCloud<pcl::PointXYZINormal>::Ptr zipNormals(pcl::PointCloud<pcl::PointXYZI>::Ptr cloud,
         pcl::PointCloud<pcl::Normal>::Ptr normals);
 
-#endif  // ULTILITIES_FILTERS_H
+#endif  // ULTILITIES_UTILS_H

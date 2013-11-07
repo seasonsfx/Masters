@@ -41,7 +41,8 @@ set(PCL_SUFFIX pcl-1.7)
 #set(PCL_DEBUG_SUFFIX "-gd")
 set(PCL_DEBUG_SUFFIX "_debug")
 if(WIN32)
-  set(PCL_RELEASE_SUFFIX "_release")
+  #set(PCL_RELEASE_SUFFIX "_release")
+  set(PCL_RELEASE_SUFFIX "")
 endif(WIN32)
 
 #set all pcl component and their account into variables

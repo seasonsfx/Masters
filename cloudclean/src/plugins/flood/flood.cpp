@@ -274,7 +274,8 @@ void Flood::global_flood(){
     pcl::PointCloud<pcl::Normal>::Ptr normals = ne_->getNormals(cl_->active_);
 
     // zip and downsample
-    pcl::PointCloud<pcl::PointXYZINormal>::Ptr smallcloud = zipNormals(cl_->active_, normals);
+	pcl::PointCloud<pcl::PointXYZI>::Ptr ptr(cl_->active_.get(), boost::serialization::null_deleter());
+    pcl::PointCloud<pcl::PointXYZINormal>::Ptr smallcloud = zipNormals(ptr, normals);
     std::vector<int> big_to_small;
     smallcloud = octreeDownsample(smallcloud.get(), 0.05, big_to_small);
 
@@ -335,7 +336,8 @@ void Flood::global_flood2(){
     pcl::PointCloud<pcl::Normal>::Ptr normals = ne_->getNormals(cl_->active_);
 
     // zip and downsample
-    pcl::PointCloud<pcl::PointXYZINormal>::Ptr smallcloud = zipNormals(cl_->active_, normals);
+	pcl::PointCloud<pcl::PointXYZI>::Ptr ptr(cl_->active_.get(), boost::serialization::null_deleter());
+    pcl::PointCloud<pcl::PointXYZINormal>::Ptr smallcloud = zipNormals(ptr, normals);
     std::vector<int> big_to_small;
     smallcloud = octreeDownsample(smallcloud.get(), subsample_density, big_to_small);
 

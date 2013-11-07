@@ -56,8 +56,8 @@ Camera::Camera() {
     depth_near_ = 1.0f;
     depth_far_ = 1000000.0f;
 
-    rotation_current_ = AngleAxis<float>(-M_PI/2, Vector3f(1, 0, 0));
-    rotation_future_ = AngleAxis<float>(-M_PI/2, Vector3f(1, 0, 0));
+    rotation_current_ = AngleAxis<float>(-M_PI/2.0, Vector3f(1.0f, 0.0f, 0.0f));
+    rotation_future_ = AngleAxis<float>(-M_PI/2.0, Vector3f(1.0f, 0.0f, 0.0f));
 
     translation_current_ = Vector3f(0, 0, 0);
     translation_future_ = Vector3f(0, 0, 0);
@@ -150,7 +150,7 @@ void Camera::translate(const Eigen::Vector3f& pos) {
     translation_future_ = Eigen::Translation3f(rotation_current_.inverse() * (translation_speed_ * pos)) * translation_current_;
 
     if(translation_speed_ < 10)
-        translation_speed_ *= 1.1; // If succesive tranlations are performed, speed things up
+        translation_speed_ *= 1.1f; // If succesive tranlations are performed, speed things up
 }
 
 void Camera::setRotate3D(const Eigen::Vector3f& rot) {

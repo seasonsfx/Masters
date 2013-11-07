@@ -75,7 +75,7 @@ class VDepth : public IPlugin {
     QImage * image_;
 
     NormalEstimator * ne_;
-    float time = 0;
+    float time;
 
 };
 

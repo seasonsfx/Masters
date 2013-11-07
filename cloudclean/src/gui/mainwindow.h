@@ -5,7 +5,6 @@
 #include <QHash>
 #include <memory>
 #include "gui/export.h"
-#include "gui/leaplistener.h"
 
 class QUndoStack;
 class CloudList;
@@ -23,10 +22,11 @@ class QStackedWidget;
 class QToolBox;
 
 #ifdef LEAP_SUPPORT
-class LeapListener;
-namespace Leap {
-    class Controller;
-}
+    #include "gui/leaplistener.h"
+    class LeapListener;
+    namespace Leap {
+        class Controller;
+    }
 #endif
 
 class GUI_API MainWindow : public QMainWindow {

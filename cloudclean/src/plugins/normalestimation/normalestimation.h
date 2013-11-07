@@ -84,8 +84,8 @@ class NE_API NormalEstimator : public IPlugin {
     NormalMap normal_map_;
     FutureNormalMap future_normal_map_;
 
-    cl_context clcontext;
-    cl_command_queue cmd_queue;
+    //cl_context clcontext;
+    //cl_command_queue cmd_queue;
 
 };
 

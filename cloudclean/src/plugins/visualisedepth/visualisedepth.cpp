@@ -63,6 +63,7 @@ void VDepth::initialize(Core *core){
     });
     connect(myaction_, SIGNAL(triggered()), this, SLOT(curve_vis()));
     mw_->toolbar_->addAction(myaction_);
+	time = 0;
 
 }
 
@@ -94,27 +95,6 @@ int gridToCloudIdx(int x, int y, boost::shared_ptr<PointCloud> pc, int * lookup)
     return lookup[x + y*pc->scan_width()];
 }
 
-pcl::PointCloud<pcl::PointXYZINormal>::Ptr zipNormals(
-        pcl::PointCloud<pcl::PointXYZI> & cloud,
-        pcl::PointCloud<pcl::Normal> & normals){
-
-    pcl::PointCloud<pcl::PointXYZINormal>::Ptr zipped (new pcl::PointCloud<pcl::PointXYZINormal>());
-    zipped->resize(cloud.size());
-
-    for(uint i = 0; i < cloud.size(); i ++){
-        pcl::PointXYZI & p = cloud[i];
-        pcl::Normal & n = normals[i];
-
-        pcl::PointXYZINormal & pn = (*zipped)[i];
-        pn.getNormalVector4fMap() = n.getNormalVector4fMap();
-        pn.getVector4fMap() = p.getVector4fMap();
-        pn.intensity = p.intensity;
-    }
-
-    return zipped;
-}
-
-
 void VDepth::drawFloats(boost::shared_ptr<const std::vector<float> > out_img, boost::shared_ptr<PointCloud> cloud){
     qDebug() << "DRAW!";
     // translates grid idx to cloud idx
@@ -129,7 +109,7 @@ void VDepth::drawFloats(boost::shared_ptr<const std::vector<float> > out_img, bo
     }
 
     float min, max;
-    minmax(*out_img, min, max);
+    min_max(*out_img, min, max);
     qDebug() << "Minmax" << min << max;
 
     // Draw image

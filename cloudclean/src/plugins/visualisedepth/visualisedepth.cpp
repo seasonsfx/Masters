@@ -242,6 +242,26 @@ inline float EuclidianDist(float * feature1, float * feature2, int size) {
     return dist;
 }
 
+pcl::PointCloud<pcl::PointXYZINormal>::Ptr zipNormals(
+        pcl::PointCloud<pcl::PointXYZI> & cloud,
+        pcl::PointCloud<pcl::Normal> & normals){
+
+    pcl::PointCloud<pcl::PointXYZINormal>::Ptr zipped (new pcl::PointCloud<pcl::PointXYZINormal>());
+    zipped->resize(cloud.size());
+
+    for(uint i = 0; i < cloud.size(); i ++){
+        pcl::PointXYZI & p = cloud[i];
+        pcl::Normal & n = normals[i];
+
+        pcl::PointXYZINormal & pn = (*zipped)[i];
+        pn.getNormalVector4fMap() = n.getNormalVector4fMap();
+        pn.getVector4fMap() = p.getVector4fMap();
+        pn.intensity = p.intensity;
+    }
+
+    return zipped;
+}
+
 pcl::PointCloud<pcl::PointXYZINormal>::Ptr VDepth::gridDownsample(boost::shared_ptr<PointCloud> input, float resolution, std::vector<int>& sub_idxs) {
     pcl::PointCloud<pcl::Normal>::Ptr normals = ne_->getNormals(input);
 

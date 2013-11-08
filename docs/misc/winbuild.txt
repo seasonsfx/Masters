@@ -71,9 +71,12 @@ Might have to use mingw terminal
 cmake .. -G "MSYS Makefiles" -DEIGEN_INCLUDE_DIR="C:\Program Files (x86)Eigen\include\eigen3" -DBOOST_INCLUDEDIR="C:/boost/include/boost-1_50" -DBOOST_LIBRARYDIR="C:/boost/lib/x64" -DBoost_USE_STATIC_LIBS=ON -DFLANN_USE_STATIC=ON
 
 
+
 \\ MSVC 11
 
 Visual Studio Express 2012 for Windows Desktop
+
+SLN build add : -G "Visual Studio 11 Win64"
 
 environment:
     "C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\x86_amd64\vcvarsx86_amd64.bat"

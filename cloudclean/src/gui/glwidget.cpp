@@ -153,7 +153,9 @@ void GLWidget::paintEvent(QPaintEvent *event) {
 
     glUniform1i(uni_sampler_, 0); CE();
     glBindTexture(GL_TEXTURE_BUFFER, texture_id_); CE();
-    glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, gld_->color_lookup_buffer_->bufferId()); CE();
+	auto buff = gld_->color_lookup_buffer_;
+	auto id = buff->bufferId();
+    glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, id); CE(); // PROBLEM HERE SOME MULTI THREADED WITCHCRAFT! WINDOZE!
 
     // Draw all clouds
     for(std::pair<boost::shared_ptr<PointCloud>, boost::shared_ptr<CloudGLData> > pair: gld_->cloudgldata_) {

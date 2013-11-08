@@ -43,7 +43,9 @@ MainWindow::MainWindow(QUndoStack *us, CloudList * cl, LayerList * ll, QWidget *
     base_format.setProfile(QGLFormat::CompatibilityProfile);
     // This can be set to 3.3 but setting the version gets us core profile on amd
     //base_format.setVersion(4, 3);
-
+#ifdef _WIN32
+    base_format.setVersion(3, 3);
+#endif
 
     base_format.setSampleBuffers(true);
 

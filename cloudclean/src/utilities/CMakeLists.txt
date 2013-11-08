@@ -12,7 +12,7 @@ add_library(cloudclean_util SHARED ${util_SOURCE})
 target_link_libraries(
     cloudclean_util
     ${OPENGL_LIBRARIES}
-    #${PCL_LIBRARIES}
+    ${PCL_LIBRARIES}
     ${Boost_LIBRARIES}
     cloudclean_model
     cloudclean_gui

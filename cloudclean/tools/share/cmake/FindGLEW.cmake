@@ -13,6 +13,7 @@ FIND_PATH(GLEW_INCLUDE_DIR NAMES GL/glew.h
    PATHS
    /usr/include
    /usr/local/include
+   ${GLEWROOT}/include
    $ENV{INCLUDE}
    $ENV{GLEWROOT}/include
    $ENV{GLEW_ROOT}/include
@@ -26,6 +27,7 @@ FIND_LIBRARY(GLEW_LIBRARIES NAMES glew64 GLEW glew glew32
    /usr/lib64
    /usr/local/lib
    /usr/local/lib64
+   ${GLEWROOT}/lib
    $ENV{LIBPATH}
    $ENV{GLEWROOT}/lib
    $ENV{GLEW_ROOT}/lib

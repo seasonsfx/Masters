@@ -3,8 +3,8 @@
 
 #include "pluginsystem/iplugin.h"
 
+#include <cstdint>
 #include <Eigen/Dense>
-
 #include "glheaders.h"
 
 class QMouseEvent;

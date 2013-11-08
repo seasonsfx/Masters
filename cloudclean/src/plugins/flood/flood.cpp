@@ -19,9 +19,9 @@
 #include <pcl/kdtree/kdtree_flann.h>
 #include <pcl/features/principal_curvatures.h>
 
-#define PCL_NO_PRECOMPILE
+//#define PCL_NO_PRECOMPILE
 #include <pcl/segmentation/region_growing.h>
-#undef PCL_NO_PRECOMPILE
+//#undef PCL_NO_PRECOMPILE
 
 #include "model/layerlist.h"
 #include "model/cloudlist.h"

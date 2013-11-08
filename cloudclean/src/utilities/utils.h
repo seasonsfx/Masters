@@ -58,7 +58,7 @@ typename pcl::PointCloud<PointT>::Ptr octreeDownsample(
     return output;
 }
 
-
+/*
 template <typename T, typename T2>
 void map(std::vector<T, T2> & small, std::vector<T, T2>& big, std::vector<int> & map){
 
@@ -69,6 +69,7 @@ void map(std::vector<T, T2> & small, std::vector<T, T2>& big, std::vector<int> &
         memcpy(&big[i], &small[small_idx], sizeof(T));
     }
 }
+*/
 
 UTIL_API pcl::PointCloud<pcl::PointXYZINormal>::Ptr zipNormals(pcl::PointCloud<pcl::PointXYZI>::Ptr cloud,
         pcl::PointCloud<pcl::Normal>::Ptr normals);

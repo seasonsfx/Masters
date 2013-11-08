@@ -126,7 +126,7 @@ IF(MSVC)
     SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} /W2") # Mute warnings in ms
     add_definitions(-DNOMINMAX) # Workaround for windows.h bug
     add_definitions(-D_VARIADIC_MAX=10) # MSVC11 needs this to run gtest
-
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /FORCE:MULTIPLE")
 #    foreach(flag_var
 #            CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
 #            CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)

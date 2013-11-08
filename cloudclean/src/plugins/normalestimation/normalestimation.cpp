@@ -434,7 +434,7 @@ NormalEstimator::estimateNormals(boost::shared_ptr<PointCloud> cloud) {
 
         for(int n : neighbours) {
             Eigen::Map<Eigen::Vector3f> nb = (*normals)[n].getNormalVector3fMap();
-            if(std::isnan(nb[0]))
+            if(nb[0] != nb[0])
                 continue;
 
             ++count;

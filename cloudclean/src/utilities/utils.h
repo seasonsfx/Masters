@@ -7,6 +7,9 @@
 #include <pcl/octree/octree.h>
 #include <pcl/octree/octree_iterator.h>
 #include <pcl/octree/octree_container.h>
+#if _WIN32
+    #include <pcl/octree/impl/octree_iterator.hpp>
+#endif
 #include <boost/serialization/shared_ptr.hpp>
 #include "utilities/export.h"
 
@@ -58,18 +61,18 @@ typename pcl::PointCloud<PointT>::Ptr octreeDownsample(
     return output;
 }
 
-/*
-template <typename T, typename T2>
-void map(std::vector<T, T2> & small, std::vector<T, T2>& big, std::vector<int> & map){
+
+template <typename T1, typename T2>
+void map(std::vector<T1, T2> & small, std::vector<T1, T2>& big, std::vector<int> & map){
 
     big.resize(map.size());
     for(uint i = 0; i < map.size(); i++) {
         int small_idx = map[i];
 
-        memcpy(&big[i], &small[small_idx], sizeof(T));
+        memcpy(&big[i], &small[small_idx], sizeof(T1));
     }
 }
-*/
+
 
 UTIL_API pcl::PointCloud<pcl::PointXYZINormal>::Ptr zipNormals(pcl::PointCloud<pcl::PointXYZI>::Ptr cloud,
         pcl::PointCloud<pcl::Normal>::Ptr normals);

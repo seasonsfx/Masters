@@ -20,7 +20,7 @@
 #include <pcl/features/principal_curvatures.h>
 
 //#define PCL_NO_PRECOMPILE
-#include <pcl/segmentation/region_growing.h>
+//#include <pcl/segmentation/region_growing.h>
 //#undef PCL_NO_PRECOMPILE
 
 #include "model/layerlist.h"
@@ -76,9 +76,9 @@ void Flood::initialize2(PluginManager * pm) {
 
     mw_->toolbar_->addAction(enable_);
 
-    global_flood_ = new QAction(QIcon(":/images/flood2.jpg"), "Global floodfill", 0);
-    connect(global_flood_, &QAction::triggered, this, &Flood::global_flood);
-    mw_->toolbar_->addAction(global_flood_);
+    //global_flood_ = new QAction(QIcon(":/images/flood2.jpg"), "Global floodfill", 0);
+    //connect(global_flood_, &QAction::triggered, this, &Flood::global_flood);
+    //mw_->toolbar_->addAction(global_flood_);
 
     global_flood2_ = new QAction(QIcon(":/images/flood2.jpg"), "Global floodfill 2", 0);
     connect(global_flood2_, &QAction::triggered, this, &Flood::global_flood2);
@@ -90,8 +90,8 @@ void Flood::cleanup(){
     mw_->toolbar_->removeAction(enable_);
     mw_->removeMenu(enable_, "Edit");
     delete enable_;
-    mw_->toolbar_->removeAction(global_flood_);
-    delete global_flood_;
+    //mw_->toolbar_->removeAction(global_flood_);
+    //delete global_flood_;
     mw_->toolbar_->removeAction(global_flood2_);
     delete global_flood2_;
 }
@@ -267,6 +267,7 @@ void Flood::flood(int source_idx){
     qDebug("Time to fill : %d ms", t.elapsed());
 }
 
+/*
 void Flood::global_flood(){
     qDebug() << "Booya!";
 
@@ -320,6 +321,7 @@ void Flood::global_flood(){
     }
     core_->us_->endMacro();
 }
+*/
 
 void Flood::global_flood2(){
     float max_dist = 1.0f;

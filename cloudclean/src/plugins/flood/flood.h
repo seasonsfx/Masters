@@ -35,7 +35,7 @@ class Flood : public IPlugin {
 
  private slots:
     void flood(int source_idx);
-    void global_flood();
+    //void global_flood();
     void global_flood2();
 
  public slots:

@@ -39,6 +39,7 @@
 #include <cassert>
 #include <QString>
 #include <QJsonObject>
+#include <QJsonArray>
 #include <QApplication>
 #include <QPluginLoader>
 #include <QDebug>
@@ -232,14 +233,86 @@ QString PluginManager::getFileName(IPlugin * plugin){
     return "";
 }
 
-IPlugin * PluginManager::loadPlugin(QString path){
-    PluginResource * pr = new PluginResource(path, core_, this);
-    if(pr->instance_ != nullptr) {
-        plugins_.push_back(pr);
-    } else {
-        qDebug() << "Failed to load: " << path;
+IPlugin * PluginManager::loadPlugin(PluginMetaData & meta, std::map<QString, PluginMetaData> & dep_graph){
+
+    // Load all dependencies
+    for(QString dep :meta.deps_) {
+        auto dep_it = dep_graph.find(dep);
+        if(dep_it == dep_graph.end()){
+            qDebug() << "Cannot load " << meta.name_ << ",dependency " << dep << "cannot be found";
+            return nullptr;
+        }
+
+        PluginMetaData & dep_meta = (*dep_it).second;
+        if(dep_meta.failed_) {
+            qDebug() << "Cannot load " << meta.name_ << ", dependency " << dep << "failed to load";
+            return nullptr;
+        }
+        if(dep_meta.loaded_)
+            continue;
+        if(loadPlugin(dep_meta, dep_graph) != nullptr)
+            continue;
+
+        qDebug() << "Loaded: " << dep << " (dependency of " << meta.name_ << ")";
     }
+
+    PluginResource * pr = new PluginResource(meta.path_, core_, this);
+    if(pr->instance_ == nullptr) {
+        qDebug() << "Failed to load: " << meta.path_;
+        return nullptr;
+    }
+
+    plugins_.push_back(pr);
+    meta.loaded_ = true;
     return pr->instance_;
+}
+
+PluginMetaData::PluginMetaData(){
+    name_ = "";
+    path_ = "";
+    loaded_ = false;
+    failed_ = true;
+}
+
+PluginMetaData::PluginMetaData(QString path){
+    path_ = path;
+    loaded_ = false;
+    failed_ = false;
+    QPluginLoader loader;
+    loader.setFileName(path);
+    QJsonObject meta = loader.metaData().find("MetaData").value().toObject();
+
+    QJsonObject::Iterator name_it = meta.find("name");
+    name_ = name_it.value().toString();
+
+    QJsonObject::Iterator dep_it = meta.find("dependencies");
+    bool has_deps = dep_it != meta.end();
+    if(!has_deps)
+        return;
+
+    QJsonArray dep_arr = dep_it.value().toArray();
+
+    qDebug() << "Deps for " << name_ << " " << dep_arr;
+
+    for(QJsonValueRef valref : dep_arr){
+        QString name = valref.toObject().find("name").value().toString();
+        deps_.push_back(name);
+    }
+}
+
+void PluginManager::updateDepGraph() {
+    // Update dependency graph
+    for (QString fileName : plugins_dir_->entryList(QDir::Files)) {
+        QString absfilepath = plugins_dir_->absoluteFilePath(fileName);
+        PluginMetaData meta(absfilepath);
+
+        qDebug() << "Found: " << absfilepath;
+        qDebug() << "Name: " << meta.name_;
+
+        // If meta data does not exists
+        if(dep_graph_.find(meta.name_) == dep_graph_.end())
+            dep_graph_[meta.name_] = meta;
+    }
 }
 
 void PluginManager::loadPlugins() {
@@ -249,19 +322,33 @@ void PluginManager::loadPlugins() {
     QStringList pluginfilters("*." + DLLExtension());
     plugins_dir_->setNameFilters(pluginfilters);
 
-    for (QString fileName : plugins_dir_->entryList(QDir::Files)) {
-        QString absfilepath = plugins_dir_->absoluteFilePath(fileName);
-        loadPlugin(absfilepath);
+    updateDepGraph();
+
+    // Load plugins
+    for (auto node : dep_graph_) {
+        PluginMetaData & meta = node.second;
+        if(meta.loaded_ != false)
+            continue;
+        if(loadPlugin(meta, dep_graph_) == nullptr) {
+            qDebug() << "Failed to load " << meta.name_;
+            continue;
+        }
+
+        qDebug() << "Loaded " << meta.name_;
     }
+
     plugins_loaded_ = true;
 
-    // Watch for updates
+    // Setup watcher to look for updates
     watcher_ = new QFileSystemWatcher();
     watcher_->addPath(plugins_dir_->path());
     watcher_->connect(watcher_, &QFileSystemWatcher::directoryChanged, [this] (QString path) {
-        // Delay so compilation completes
+        // Delay so compilation can complete
         timer_->connect(timer_, &QTimer::timeout, [this, path] () {
             timer_->stop();
+
+            updateDepGraph();
+
             for (QString fileName : plugins_dir_->entryList(QDir::Files)) {
                 QString absfilepath = plugins_dir_->absoluteFilePath(fileName);
                 bool already_loaded = false;
@@ -278,13 +365,14 @@ void PluginManager::loadPlugins() {
                 if(already_loaded)
                     continue;
 
-                qDebug() << "Detected new plugin at" << absfilepath;
-                IPlugin * instance = loadPlugin(absfilepath);
-                // Todo: need to wait a bit so that the file an be compiled
+                PluginMetaData meta(absfilepath);
+                qDebug() << "Detected new plugin: " << meta.name_;
+                IPlugin * instance = loadPlugin(meta, dep_graph_);
+
                 if(instance != nullptr) {
                     instance->initialize(core_);
                     instance->initialize2(this);
-                    qDebug() << "Loaded new plugin";
+                    qDebug() << "Loaded new plugin " << meta.name_;
                 }
             }
         });

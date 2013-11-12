@@ -30,7 +30,7 @@
 #include "plugins/snake/algo.h"
 
 QString Snake::getName(){
-    return "3D Brush Tool";
+    return "Snake Tool";
 }
 
 void Snake::initialize(Core *core){

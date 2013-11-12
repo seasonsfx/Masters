@@ -61,15 +61,27 @@ typename pcl::PointCloud<PointT>::Ptr octreeDownsample(
     return output;
 }
 
-
+#undef small
+#ifdef small
+#error "small defined"
+#endif
+#ifdef big
+#error "big defined"
+#endif
+#ifdef map
+#error "map defined"
+#endif
 template <typename T1, typename T2>
-void map(std::vector<T1, T2> & small, std::vector<T1, T2>& big, std::vector<int> & map){
+void map_small_to_big(
+        std::vector<T1, T2> & small_,
+                      std::vector<T1, T2>& big_,
+                      std::vector<int> & map_){
 
-    big.resize(map.size());
-    for(uint i = 0; i < map.size(); i++) {
-        int small_idx = map[i];
+    big_.resize(map_.size());
+    for(unsigned int i = 0; i < map_.size(); i++) {
+        int small_idx = map_[i];
 
-        memcpy(&big[i], &small[small_idx], sizeof(T1));
+        memcpy(&big_[i], &small_[small_idx], sizeof(T1));
     }
 }
 

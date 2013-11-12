@@ -23,7 +23,7 @@ class NormalEstimator;
 class VDepth : public IPlugin {
     Q_INTERFACES(IPlugin)
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "za.co.circlingthesun.cloudclean.iplugin" FILE "visualisedepth.json")
+    Q_PLUGIN_METADATA(IID "za.co.circlingthesun.cloudclean.visualisedepth" FILE "visualisedepth.json")
  public:
     QString getName();
     void initialize(Core * core);

@@ -26,7 +26,7 @@
 #include "pluginsystem/core.h"
 
 QString Lasso2D::getName(){
-    return "3D Brush Tool";
+    return "2D Lasso tool";
 }
 
 void Lasso2D::initialize(Core *core){

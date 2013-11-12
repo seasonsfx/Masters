@@ -365,7 +365,9 @@ pcl::PointCloud<pcl::Normal>::Ptr don(pcl::PointCloud<PointT> & cloud,
     t.start();
 
     for(uint idx = 0; idx < cloud.size(); idx++){
-        std::vector<float> rads{radius1, radius2};
+        std::vector<float> rads;
+        rads.push_back(radius1);
+        rads.push_back(radius2);
         std::vector<pcl::Normal> avgs;
         for(float rad : rads){
             idxs.clear();
@@ -403,7 +405,7 @@ void VDepth::don_vis(){
 
     pcl::PointCloud<pcl::Normal> big_donormals;
 
-    map((*donormals).points, big_donormals.points, sub_idxs);
+    map_small_to_big((*donormals).points, big_donormals.points, sub_idxs);
 
     const std::vector<int> & cloudtogrid = _cloud->cloudToGridMap();
 
@@ -1158,4 +1160,4 @@ void VDepth::myFunc(){
 
 }
 
-Q_PLUGIN_METADATA(IID "za.co.circlingthesun.cloudclean.iplugin")
+Q_PLUGIN_METADATA(IID "za.co.circlingthesun.cloudclean.visualisedepth")

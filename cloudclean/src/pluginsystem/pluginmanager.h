@@ -41,16 +41,30 @@ class PluginResource {
 
 };
 
+class PluginMetaData {
+ public:
+    bool failed_;
+    bool loaded_;
+    QString name_;
+    std::vector<QString> deps_;
+    QString path_;
+ public:
+    PluginMetaData(QString path);
+    PluginMetaData();
+};
+
 class PLUGINSYS_API PluginManager : public QObject{
     Q_OBJECT
  public:
     PluginManager(Core * core);
     ~PluginManager();
 
+    std::map<QString, PluginMetaData> dep_graph_;
     IPlugin * findPluginByName(QString name);
     QString getFileName(IPlugin * plugin);
-    IPlugin * loadPlugin(QString path);
+    IPlugin * loadPlugin(PluginMetaData &meta, std::map<QString, PluginMetaData> &dep_graph_);
     bool unloadPlugin(IPlugin * plugin);
+    void PluginManager::updateDepGraph();
     void loadPlugins();
     void initializePlugins();
 

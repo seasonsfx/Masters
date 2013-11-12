@@ -1,6 +1,6 @@
 {
-            "name" : "brush3d",
+            "name" : "visualisedepth",
          "version" : "0.0.1",
-    "dependencies" : [],
+    "dependencies" : [{ "name" : "normalestimation", "version" : "0.0.1" }],
     "export_symbols" : false
 }

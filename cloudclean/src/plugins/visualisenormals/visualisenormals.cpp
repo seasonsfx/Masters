@@ -17,7 +17,7 @@
 #include "pluginsystem/core.h"
 
 QString VisualiseNormals::getName(){
-    return "3D Brush Tool";
+    return "Normal visualisation";
 }
 
 void VisualiseNormals::initialize(Core *core){

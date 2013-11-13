@@ -64,7 +64,7 @@ class PLUGINSYS_API PluginManager : public QObject{
     QString getFileName(IPlugin * plugin);
     IPlugin * loadPlugin(PluginMetaData &meta, std::map<QString, PluginMetaData> &dep_graph_);
     bool unloadPlugin(IPlugin * plugin);
-    void PluginManager::updateDepGraph();
+    void updateDepGraph();
     void loadPlugins();
     void initializePlugins();
 

@@ -14,8 +14,9 @@ class COMMAND_API Select : public QUndoCommand
 public:
     explicit Select(boost::shared_ptr<PointCloud> pc,
                            boost::shared_ptr<std::vector<int> > selected,
-                           boost::shared_ptr<std::vector<int> > deselected = nullptr,
+                           bool deselect = false,
                            uint8_t selection_type = 1,
+                           bool destructive = true,
                            boost::shared_ptr<std::vector<uint16_t> > exclude_labels = boost::shared_ptr<std::vector<uint16_t> >(new std::vector<uint16_t>()),
                            QUndoCommand *parent = 0);
     QString actionText();
@@ -26,9 +27,10 @@ public:
     
 private:
     boost::weak_ptr<PointCloud> pc_;
-    boost::shared_ptr<std::vector<int> > selected_;
-    boost::shared_ptr<std::vector<int> > deselected_;
+    boost::shared_ptr<std::vector<int> > indices_;
     uint8_t selectmask_;
+    bool deselect_action_;
+    bool destructive_;
 };
 
 #endif // SELECTCOMMAND_H

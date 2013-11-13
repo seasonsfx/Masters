@@ -177,10 +177,7 @@ void Brush3D::select(QMouseEvent * event){
 
     bool negative_select = QApplication::keyboardModifiers() == Qt::ControlModifier;
 
-    if(negative_select)
-        core_->us_->push(new Select(cl_->active_, empty, indices, select_mask_));
-    else
-        core_->us_->push(new Select(cl_->active_, indices, empty, select_mask_));
+    core_->us_->push(new Select(cl_->active_, indices, negative_select, select_mask_));
 
 }
 

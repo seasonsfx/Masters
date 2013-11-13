@@ -92,11 +92,8 @@ void Brush2D::select(QMouseEvent * event){
 
     coord[1] = cl_->active_->scan_height()-coord[1];
 
-    boost::shared_ptr<std::vector<int> > selected;
-    selected.reset(new std::vector<int>());
-
-    boost::shared_ptr<std::vector<int> > deselected;
-    deselected.reset(new std::vector<int>());
+    boost::shared_ptr<std::vector<int> > indices;
+    indices.reset(new std::vector<int>());
 
     for(int x = -radius_/2; x < radius_/2; x++){
         for(int y = -radius_/2; y < radius_/2; y++){
@@ -110,15 +107,13 @@ void Brush2D::select(QMouseEvent * event){
                     qDebug() << "Bug! Idx < -1 : idx = " << idx;
                 continue;
             }
-            else if(negative_select)
-                deselected->push_back(idx);
-            else
-                selected->push_back(idx);
+
+            indices->push_back(idx);
 
         }
     }
 
-    us_->push(new Select(pc, selected, deselected, select_mask_));
+    us_->push(new Select(pc, indices, negative_select, select_mask_));
 
 }
 

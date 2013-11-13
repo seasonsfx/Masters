@@ -461,7 +461,7 @@ void Markov::randomforest(){
 
     for(int i = 0; i < 8; i++){
         if(seg_selections[i]->size() > 0) {
-            core_->us_->push(new Select(cl_->active_, seg_selections[i], nullptr, 1 << i));
+            core_->us_->push(new Select(cl_->active_, seg_selections[i], false, 1 << i));
         }
     }
 

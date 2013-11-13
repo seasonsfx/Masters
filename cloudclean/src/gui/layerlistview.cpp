@@ -64,7 +64,7 @@ void LayerListView::selectionToLayer(){
                 continue;
 
             us_->push(new NewLayer(pc, selection, ll_));
-            us_->push(new Select(pc, nullptr, selection, 1 << sel_idx));
+            us_->push(new Select(pc,selection, true, 1 << sel_idx));
         }
     }
 

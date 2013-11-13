@@ -3,15 +3,17 @@
 #include <QDebug>
 
 Select::Select(boost::shared_ptr<PointCloud> pc,
-        boost::shared_ptr<std::vector<int> > selected,
-        boost::shared_ptr<std::vector<int> > deselected,
+        boost::shared_ptr<std::vector<int> > indices,
+        bool deselect_action,
         uint8_t selection_mask,
+        bool destructive,
         boost::shared_ptr<std::vector<uint16_t> > exclude_labels,
         QUndoCommand *parent)
         : QUndoCommand(parent) {
-    selected_.reset(new std::vector<int>());
-    deselected_.reset(new std::vector<int>());
+    indices_.reset(new std::vector<int>());
     pc_ = pc;
+    deselect_action_ = deselect_action;
+    destructive_ = destructive;
 
     // Check that select and deselect are not already in desired state
 
@@ -29,17 +31,16 @@ Select::Select(boost::shared_ptr<PointCloud> pc,
         return false;
     };
 
-    if(deselected != nullptr){
-        for(int idx : *deselected) {
-            if(idx > 0 && is_selected(idx) && !is_excluded(idx))
-                deselected_->push_back(idx);
-        }
-    }
+    if(indices != nullptr){
+        for(int idx : *indices) {
+            if(is_excluded(idx))
+                continue;
+            if(!is_selected(idx) && deselect_action_)
+                continue;
+            if(is_selected(idx) && !deselect_action_)
+                continue;
 
-    if(selected != nullptr){
-        for(int idx : *selected) {
-            if(!is_selected(idx) && !is_excluded(idx))
-                selected_->push_back(idx);
+            indices_->push_back(idx);
         }
     }
 
@@ -58,17 +59,12 @@ void Select::undo(){
     boost::shared_ptr<std::vector<int> > update;
     update.reset(new std::vector<int>());
 
-    //TODO(Rickert): Make sure points that are already selected/deselected
-
-    for(int idx : *deselected_) {
+    for(int idx : *indices_) {
         PointFlags &pf = pc->flags_[idx];
-        pf = PointFlags(selectmask_ | uint8_t(pf));
-        update->push_back(idx);
-    }
-
-    for(int idx : *selected_) {
-        PointFlags &pf = pc->flags_[idx];
-        pf = PointFlags(~(selectmask_) & uint8_t(pf));
+        if(deselect_action_)
+            pf = PointFlags(selectmask_ | uint8_t(pf));
+        else
+            pf = PointFlags(~(selectmask_) & uint8_t(pf));
         update->push_back(idx);
     }
 
@@ -85,17 +81,12 @@ void Select::redo(){
     boost::shared_ptr<std::vector<int> > update;
     update.reset(new std::vector<int>());
 
-    //TODO(Rickert): Make sure points that are already selected/deselected
-
-    for(int idx : *selected_) {
+    for(int idx : *indices_) {
         PointFlags &pf = pc->flags_[idx];
-        pf = PointFlags((selectmask_) | uint8_t(pf));
-        update->push_back(idx);
-    }
-
-    for(int idx : *deselected_) {
-        PointFlags &pf = pc->flags_[idx];
-        pf = PointFlags(~(selectmask_) & uint8_t(pf));
+        if(deselect_action_)
+            pf = PointFlags(~(selectmask_) & uint8_t(pf));
+        else
+            pf = PointFlags((selectmask_) | uint8_t(pf));
         update->push_back(idx);
     }
 
@@ -131,8 +122,7 @@ bool Select::mergeWith(const QUndoCommand *other){
     if (o->pc_.lock() != pc_.lock())
         return false;
 
-    selected_ = mergeUnique(selected_, o->selected_);
-    deselected_ = mergeUnique(deselected_, o->deselected_);
+    indices_ = mergeUnique(indices_, o->indices_);
     return true;
 }
 

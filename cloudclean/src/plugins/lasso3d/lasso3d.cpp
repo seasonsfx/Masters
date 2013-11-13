@@ -92,7 +92,7 @@ bool Lasso3D::mouseDblClickEvent(QMouseEvent * event){
     lasso_->getIndices(ndc, cloud.get(), selected_indices, removed_indices);
 
     core_->us_->beginMacro("3d lasso tool");
-    core_->us_->push(new Select(cl_->active_, selected_indices, empty));
+    core_->us_->push(new Select(cl_->active_, selected_indices));
     core_->us_->endMacro();
 
     disable();

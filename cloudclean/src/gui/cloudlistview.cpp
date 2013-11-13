@@ -104,7 +104,7 @@ void CloudListView::deselectAllPoints(){
 
         for(size_t sel_idx = 0; sel_idx < selections.size(); sel_idx++){
             boost::shared_ptr<std::vector<int> > selection = selections[sel_idx];
-            us_->push(new Select(cloud, nullptr, selection, 1 << sel_idx));
+            us_->push(new Select(cloud, selection, true, 1 << sel_idx));
         }
     }
     us_->endMacro();
@@ -125,7 +125,7 @@ void CloudListView::selectAllPoints(){
                 indices->push_back(idx);
         }
 
-        us_->push(new Select(cloud, indices, empty));
+        us_->push(new Select(cloud, indices));
     }
     us_->endMacro();
 }

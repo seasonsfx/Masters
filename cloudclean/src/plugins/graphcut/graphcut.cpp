@@ -182,11 +182,14 @@ void GraphCut::segment(int idx){
     std::copy(clusters[0].indices.begin(), clusters[0].indices.end(), deselect->begin());
     std::copy(clusters[1].indices.begin(), clusters[1].indices.end(), select->begin());
 
-    Select * selectCmd = new Select(cl_->active_, select, deselect);
+    Select * selectcmd = new Select(cl_->active_, select);
+    Select * deselectcmd = new Select(cl_->active_, select, true);
 
     qRegisterMetaType<Select *>("Select *");
     QMetaObject::invokeMethod(this, "completeSegment", Qt::QueuedConnection,
-                              Q_ARG( Select *, selectCmd));
+                              Q_ARG( Select *, selectcmd));
+    QMetaObject::invokeMethod(this, "completeSegment", Qt::QueuedConnection,
+                              Q_ARG( Select *, deselectcmd));
 
 }
 

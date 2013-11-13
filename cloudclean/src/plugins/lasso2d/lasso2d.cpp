@@ -91,7 +91,7 @@ bool Lasso2D::mouseDblClickEvent(QMouseEvent * event){
                          removed_indices);
 
     core_->us_->beginMacro("2d lasso tool");
-    core_->us_->push(new Select(cl_->active_, selected_indices, empty));
+    core_->us_->push(new Select(cl_->active_, selected_indices));
     core_->us_->endMacro();
 
     disable();

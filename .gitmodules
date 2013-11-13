@@ -1,3 +1,8 @@
 [submodule "OnlineForest"]
       path = cloudclean/thirdparty/onlineforest
       url = https://github.com/circlingthesun/OnlineForest
+
+[submodule "OMCLBoost"]
+      path = cloudclean/thirdparty/omclboost
+      url = https://github.com/circlingthesun/omclboost
+

@@ -20,8 +20,8 @@
 #include "utilities/cv.h"
 
 #include "data.h"
-#include "onlinetree.h"
-#include "onlinerf.h"
+#include "online_rf.h"
+#include "experimenter.h"
 
 QString Markov::getName(){
     return "markov";
@@ -269,7 +269,7 @@ void saveSVM(DataSet ds, const char * file){
     for(Sample sample : ds.m_samples) {
         out << sample.y;
         for(int i = 0; i < ds.m_numFeatures; i++){
-            out << " " << i << ":" << sample.x[i];
+            out << " " << i << ":" << sample.x(i);
         }
         out << std::endl;
     }
@@ -307,11 +307,10 @@ void Markov::randomforest(){
     Hyperparameters hp;
     hp.maxDepth = 10;
     hp.numRandomTests = 10;
-    hp.numProjectionFeatures = 2;
+    hp.numBases = 10;
     hp.counterThreshold = 140;
     hp.numTrees = 100;
     hp.numEpochs = 5;
-    hp.useSoftVoting = 1;
     hp.verbose = 1;
 
     // Load selection
@@ -343,30 +342,29 @@ void Markov::randomforest(){
     int count = 0;
     for(uint y : selection_sources){
         for(int big_idx : *selections[y]) {
-            wsvector<double> x(dataset_train.m_numFeatures);
-            Sample sample;
-            resize(sample.x, dataset_train.m_numFeatures);
-
-            sample.w = 1.0;
-            sample.y = y;
-
             int idx = big_to_small[big_idx];
+
             if(!seen.insert(idx).second)
                 continue;
 
-            //set samples
-            x[0] = smallcloud->at(idx).x;
-            x[1] = smallcloud->at(idx).y;
-            x[2] = smallcloud->at(idx).z;
-            x[3] = smallcloud->at(idx).intensity;
-            x[4] = smallcloud->at(idx).normal_x;
-            x[5] = smallcloud->at(idx).normal_y;
-            x[6] = smallcloud->at(idx).normal_z;
-            x[7] = (*pca)[idx][0];
-            x[8] = (*pca)[idx][1];
-            x[9] = (*pca)[idx][2];
+            Sample sample;
+            sample.x = Eigen::VectorXd(dataset_train.m_numFeatures);
+            sample.id = idx;
+            sample.w = 1.0;
+            sample.y = y;
 
-            copy(x, sample.x);
+            //set samples
+            sample.x(0) = smallcloud->at(idx).x;
+            sample.x(1) = smallcloud->at(idx).y;
+            sample.x(2) = smallcloud->at(idx).z;
+            sample.x(3) = smallcloud->at(idx).intensity;
+            sample.x(4) = smallcloud->at(idx).normal_x;
+            sample.x(5) = smallcloud->at(idx).normal_y;
+            sample.x(6) = smallcloud->at(idx).normal_z;
+            sample.x(7) = (*pca)[idx][0];
+            sample.x(8) = (*pca)[idx][1];
+            sample.x(9) = (*pca)[idx][2];
+
 
             if((count++%2==0))
                 dataset_train.m_samples.push_back(sample);
@@ -404,7 +402,7 @@ void Markov::randomforest(){
 
 
     timeIt(1);
-    model.trainAndTest(dataset_train, dataset_test);
+    trainAndTest(&model, dataset_train, dataset_test, hp);
     cout << "Training/Test time: " << timeIt(0) << endl;
 
     // fill in datasets
@@ -419,33 +417,29 @@ void Markov::randomforest(){
     std::vector<Result> results(smallcloud->points.size(), invalid);
 
     for(size_t idx = 0; idx < smallcloud->points.size(); ++idx) {
-        wsvector<double> x(dataset_train.m_numFeatures);
         Sample sample;
-        resize(sample.x, dataset_train.m_numFeatures);
+        sample.x = Eigen::VectorXd(dataset_train.m_numFeatures);
+        sample.id = idx;
         sample.w = 1.0;
 
+
         //set samples
-        x[0] = smallcloud->at(idx).x;
-        x[1] = smallcloud->at(idx).y;
-        x[2] = smallcloud->at(idx).z;
-        x[3] = smallcloud->at(idx).intensity;
-        x[4] = smallcloud->at(idx).normal_x;
-        x[5] = smallcloud->at(idx).normal_y;
-        x[6] = smallcloud->at(idx).normal_z;
-        x[7] = (*pca)[idx][0];
-        x[8] = (*pca)[idx][1];
-        x[9] = (*pca)[idx][2];
+        sample.x(0) = smallcloud->at(idx).x;
+        sample.x(1) = smallcloud->at(idx).y;
+        sample.x(2) = smallcloud->at(idx).z;
+        sample.x(3) = smallcloud->at(idx).intensity;
+        sample.x(4) = smallcloud->at(idx).normal_x;
+        sample.x(5) = smallcloud->at(idx).normal_y;
+        sample.x(6) = smallcloud->at(idx).normal_z;
+        sample.x(7) = (*pca)[idx][0];
+        sample.x(8) = (*pca)[idx][1];
+        sample.x(9) = (*pca)[idx][2];
 
-        copy(x, sample.x);
 
-        results[idx] = model.eval(sample);
+        model.eval(sample, results[idx]);
 
         if(idx % 10000 == 0){
-            //for(int i = 0; i < 10; i++){
-            //    qDebug() << "Sample " << i << ": " << sample.x[i];
-            //}
-
-            qDebug() << "Label" << results[idx].prediction << "Confidence: " << results[idx].confidence.at(0) << results[idx].confidence.at(1);
+            qDebug() << "Label" << results[idx].prediction << "Confidence: " << results[idx].confidence(0) << results[idx].confidence(1);
         }
 
     }

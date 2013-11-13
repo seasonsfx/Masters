@@ -4,6 +4,8 @@ include_directories(
     ${OPENCL_INCLUDE_DIRS}
 )
 
+INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/thirdparty/omclboost/src)
+
 QT5_ADD_RESOURCES(markov_RESOURCES_RCC markov.qrc)
 FILE (GLOB plugin_SOURCE *.cpp *.cxx *.cc *.C *.c *.h *.hpp)
 add_library(markov SHARED ${plugin_SOURCE} ${markov_RESOURCES_RCC} ../../pluginsystem/iplugin.h)
@@ -16,7 +18,7 @@ target_link_libraries(
     cloudclean_model
     cloudclean_gui
     normalestimator
-    onlineforest
+    omclboost
     ${PCL_LIBRARIES}
 )
 

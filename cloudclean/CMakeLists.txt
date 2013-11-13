@@ -177,6 +177,7 @@ ENDFOREACH(CONFIGINPUT ${CONFIGINPUTS})
 # Add Build Targets
 #
 #ADD_SUBDIRECTORY(thirdparty/onlineforest ${CMAKE_CURRENT_BINARY_DIR}/onlineforest)
+ADD_SUBDIRECTORY(thirdparty/omclboost ${CMAKE_CURRENT_BINARY_DIR}/omclboost)
 ADD_SUBDIRECTORY(src)
 #ADD_SUBDIRECTORY(thirdparty/gtest ${CMAKE_CURRENT_BINARY_DIR}/gtest)
 #ADD_SUBDIRECTORY(test)

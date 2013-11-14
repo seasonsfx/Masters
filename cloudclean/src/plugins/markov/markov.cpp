@@ -305,13 +305,33 @@ void Markov::randomforest(){
 
     // Hyperparameters
     Hyperparameters hp;
+
+    // Forrest
     hp.maxDepth = 10;
     hp.numRandomTests = 10;
-    hp.numBases = 10;
     hp.counterThreshold = 140;
     hp.numTrees = 100;
+
+    // Boosting
+    hp.numBases = 10;
+    hp.weakLearner = WEAK_ORF; // WEAK_LARANK; // 0: ORF, 1: LaRank
+    hp.shrinkage = 0.5;
+    hp.lossFunction = EXPONENTIAL; // LOGIT; // 0 = Exponential Loss, 1 = Logit Loss
+    hp.cacheSize = 1;
+    hp.C = 5.0;
+    hp.nuD = 2.0;
+    hp.nuP = 1e-6;
+    hp.annealingRate = 0.9999999;
+    hp.theta = 1.0;
+    hp.numIterations = 1;
+
+    // Experimenter
     hp.numEpochs = 5;
+    hp.findTrainError = 1;
+
+    // Output
     hp.verbose = 1;
+    //hp.savePath = "/tmp/online-mcboost-";
 
     // Load selection
     std::vector<boost::shared_ptr<std::vector<int>>> selections = cloud->getSelections();
@@ -332,11 +352,10 @@ void Markov::randomforest(){
     DataSet dataset_train, dataset_test;
 
     dataset_train.m_numFeatures = 10;
-    dataset_train.m_numClasses = 8;
-
     dataset_test.m_numFeatures = 10;
-    dataset_test.m_numClasses = 8;
 
+
+    std::set<int> labels;
     std::set<int> seen;
 
     int count = 0;
@@ -353,6 +372,8 @@ void Markov::randomforest(){
             sample.w = 1.0;
             sample.y = y;
 
+            labels.insert(y);
+
             //set samples
             sample.x(0) = smallcloud->at(idx).x;
             sample.x(1) = smallcloud->at(idx).y;
@@ -366,6 +387,9 @@ void Markov::randomforest(){
             sample.x(9) = (*pca)[idx][2];
 
 
+            //std::cout << "sample:" << sample.x << endl;
+
+
             if((count++%2==0))
                 dataset_train.m_samples.push_back(sample);
             else
@@ -374,13 +398,17 @@ void Markov::randomforest(){
 
     }
 
+
+
+    dataset_test.m_numClasses = labels.size();
     dataset_test.m_numSamples = dataset_test.m_samples.size();
+    dataset_train.m_numClasses = labels.size();
     dataset_train.m_numSamples = dataset_train.m_samples.size();
 
 
     // Write out to file
-    saveSVM(dataset_test, "test.svm");
-    saveSVM(dataset_test, "train.svm");
+    //saveSVM(dataset_test, "test.svm");
+    //saveSVM(dataset_test, "train.svm");
 
     qDebug() << "Size tr:" << dataset_train.m_numSamples;
     qDebug() << "Size ts:" << dataset_test.m_numSamples;

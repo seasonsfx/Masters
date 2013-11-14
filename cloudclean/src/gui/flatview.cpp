@@ -104,7 +104,7 @@ int FlatView::imageToCloudIdx(int x, int y, boost::shared_ptr<PointCloud> &pc){
         return -1;
     }
 
-    int idx = x + y*pc->scan_width();
+    uint idx = x + y*pc->scan_width();
 
     if(idx < 0 || idx > cloud_idx_lookup_.size())
         return -1;

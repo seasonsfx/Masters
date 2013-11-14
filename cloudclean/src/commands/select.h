@@ -28,6 +28,7 @@ public:
 private:
     boost::weak_ptr<PointCloud> pc_;
     boost::shared_ptr<std::vector<int> > indices_;
+    std::map<uint, uint8_t> old_selection_;
     uint8_t selectmask_;
     bool deselect_action_;
     bool destructive_;

@@ -1,6 +1,7 @@
 #include "select.h"
 
 #include <QDebug>
+#include <boost/make_shared.hpp>
 
 Select::Select(boost::shared_ptr<PointCloud> pc,
         boost::shared_ptr<std::vector<int> > indices,
@@ -43,7 +44,6 @@ Select::Select(boost::shared_ptr<PointCloud> pc,
             indices_->push_back(idx);
         }
     }
-
 }
 
 QString Select::actionText(){
@@ -61,7 +61,10 @@ void Select::undo(){
 
     for(int idx : *indices_) {
         PointFlags &pf = pc->flags_[idx];
-        if(deselect_action_)
+
+        if(destructive_)
+            pf = PointFlags(old_selection_[idx]);
+        else if(deselect_action_)
             pf = PointFlags(selectmask_ | uint8_t(pf));
         else
             pf = PointFlags(~(selectmask_) & uint8_t(pf));
@@ -83,7 +86,16 @@ void Select::redo(){
 
     for(int idx : *indices_) {
         PointFlags &pf = pc->flags_[idx];
-        if(deselect_action_)
+
+        if(destructive_) {
+            old_selection_[idx] = (uint8_t)pf;
+            if(deselect_action_)
+                pf = PointFlags(0);
+            else
+                pf = PointFlags(selectmask_);
+
+        }
+        else if(deselect_action_)
             pf = PointFlags(~(selectmask_) & uint8_t(pf));
         else
             pf = PointFlags((selectmask_) | uint8_t(pf));
@@ -116,13 +128,25 @@ bool Select::mergeWith(const QUndoCommand *other){
 
     const Select * o = static_cast<const Select *>(other);
 
+    if(destructive_ != o->destructive_)
+        return false;
+
     if(this->selectmask_ != o->selectmask_)
         return false;
 
     if (o->pc_.lock() != pc_.lock())
         return false;
 
+    // transfer new mappings
+    if(destructive_) {
+        for(int idx : *o->indices_){
+            if(old_selection_.find(idx) == old_selection_.end())
+                old_selection_[idx] = (*o->old_selection_.find(idx)).second;
+        }
+    }
+
     indices_ = mergeUnique(indices_, o->indices_);
+
     return true;
 }
 

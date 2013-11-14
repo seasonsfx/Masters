@@ -318,7 +318,7 @@ void Markov::randomforest(){
 
     std::vector<int> selection_sources;
 
-    for(int i = 0; i < selections.size(); i++) {
+    for(uint i = 0; i < selections.size(); i++) {
         if(selections[i]->size() > 30)
             selection_sources.push_back(i);
     }

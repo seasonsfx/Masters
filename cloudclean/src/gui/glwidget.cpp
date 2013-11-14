@@ -95,7 +95,7 @@ void GLWidget::initializeGL() {
     //
     // Set camera
     //
-    camera_.setDepthRange(0.1f, 100.0f);
+    camera_.setDepthRange(0.1f, 100000.0f);
     camera_.setAspect(width() / static_cast<float>(height()));
 
     //

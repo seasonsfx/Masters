@@ -54,7 +54,7 @@ Camera::Camera() {
     fov_future_ = 60.0f;
     aspect_ = 1.0f;
     depth_near_ = 1.0f;
-    depth_far_ = 1000000.0f;
+    depth_far_ = 1000.f;
 
     rotation_current_ = AngleAxis<float>(-M_PI/2.0, Vector3f(1.0f, 0.0f, 0.0f));
     rotation_future_ = AngleAxis<float>(-M_PI/2.0, Vector3f(1.0f, 0.0f, 0.0f));
@@ -65,8 +65,6 @@ Camera::Camera() {
     translation_speed_ = 1;
 
     projection_dirty_ = true;
-    update_pending_ = false;
-
 
     timer_ = new QTimer();
     timer_->connect(timer_, &QTimer::timeout, [&] () {
@@ -74,11 +72,15 @@ Camera::Camera() {
         bool good_enough_rotation = rotation_current_.isApprox(rotation_future_);
         float fov_diff = fov_future_ - fov_current_;
 
-        if(trans_diff.norm() > 1e-4 || !good_enough_rotation || update_pending_ || fabs(fov_diff) > 1e-10) {
-            update_pending_ = false;
+        if(trans_diff.norm() > 1e-4 || !good_enough_rotation || fabs(fov_diff) > 1e-10) {
+            //update_pending_ = false;
             translation_current_ = translation_current_ + trans_diff * 0.5;
             rotation_current_ = rotation_current_.slerp(0.5, rotation_future_);
-            fov_current_ = fov_current_ + fov_diff * 0.1;
+            fov_current_ = fov_future_ * 0.5 + fov_current_ * 0.5;
+
+            if(fabs(fov_diff) > 1e-10)
+                projection_dirty_ = true;
+
             emit updated();
         }
         else {
@@ -200,7 +202,7 @@ void Camera::rotate2D(float x, float y) {
     rotation_future_ = roll_correction * rotation_future_;
     rotation_future_.normalize();
 
-    //update_pending_ = true;
+
 }
 
 void Camera::rotate3D(float _yaw, float _pitch, float _roll) {
@@ -249,7 +251,7 @@ void Camera::rotate3D(float _yaw, float _pitch, float _roll) {
     AngleAxis<float> roll_correction(correction_factor*-roll, Vector3f::UnitZ());
     rotation_future_ = roll_correction * rotation_future_;
     rotation_future_.normalize();
-    //update_pending_ = true;
+
 }
 
 void Camera::adjustFov(int val) {
@@ -257,7 +259,7 @@ void Camera::adjustFov(int val) {
     val = -val/60.0f;
     if (fov_future_ + val < 170.0f && fov_future_ + val > 2.0f)
         setFoV(fov_future_ + val);
-    //update_pending_ = true;
+
 }
 
 void Camera::birds_eye() {

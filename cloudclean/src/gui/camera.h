@@ -117,7 +117,6 @@ class GUI_API Camera : public QObject {
 
     float translation_speed_;
 
-    bool update_pending_;
     //std::mutex * mtx_;
 
     friend class GLWidget;

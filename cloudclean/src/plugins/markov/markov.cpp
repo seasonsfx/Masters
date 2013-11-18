@@ -358,12 +358,32 @@ void Markov::randomforest(){
     std::set<int> labels;
     std::set<int> seen;
 
+    int sample_size = 0;
+    for(uint s : selection_sources) {
+        sample_size += selections[s]->size();
+    }
+
+    int max_samples = 1000000;
+    int nth = 1;
+    if(sample_size > max_samples) {
+        nth = sample_size / max_samples;
+        qDebug() << "Points: " << sample_size << ", Max: " << max_samples;
+        qDebug() << "Too many points, using every " << nth << "'th point";
+    }
+
+
     int count = 0;
+    int count2 = 0;
     for(uint y : selection_sources){
         for(int big_idx : *selections[y]) {
             int idx = big_to_small[big_idx];
 
             if(!seen.insert(idx).second)
+                continue;
+
+            count++;
+
+            if(count % nth != 0)
                 continue;
 
             Sample sample;
@@ -390,19 +410,20 @@ void Markov::randomforest(){
             //std::cout << "sample:" << sample.x << endl;
 
 
-            if((count++%2==0))
+            if((count2++%2==0))
                 dataset_train.m_samples.push_back(sample);
             else
                 dataset_test.m_samples.push_back(sample);
+
         }
 
     }
 
 
 
-    dataset_test.m_numClasses = labels.size();
+    dataset_test.m_numClasses = 8;
     dataset_test.m_numSamples = dataset_test.m_samples.size();
-    dataset_train.m_numClasses = labels.size();
+    dataset_train.m_numClasses = 8;
     dataset_train.m_numSamples = dataset_train.m_samples.size();
 
 
@@ -424,13 +445,16 @@ void Markov::randomforest(){
 
     OnlineRF model(hp, dataset_train.m_numClasses, dataset_train.m_numFeatures, dataset_train.m_minFeatRange, dataset_train.m_maxFeatRange);
 
+    /*
     for(int i = 0; i < dataset_train.m_numFeatures; i++){
         qDebug() << "Min" << dataset_train.m_minFeatRange[i] << "Max" << dataset_train.m_maxFeatRange[i];
     }
+    */
 
 
     timeIt(1);
-    trainAndTest(&model, dataset_train, dataset_test, hp);
+    train(&model, dataset_train, hp);
+    //trainAndTest(&model, dataset_train, dataset_test, hp);
     cout << "Training/Test time: " << timeIt(0) << endl;
 
     // fill in datasets
@@ -438,7 +462,7 @@ void Markov::randomforest(){
     // Inference here!
     // for all the other points
 
-    Result invalid;
+    Result invalid(8);
     //invalid.confidence.at(0) = 0;
     invalid.prediction = -1;
 

@@ -1,5 +1,5 @@
 #include "layerfromlabels.h"
-
+#include <QDebug>
 #include <model/layerlist.h>
 #include <model/pointcloud.h>
 #include <model/layer.h>
@@ -19,9 +19,11 @@ QString LayerFromLabels::actionText(){
 void LayerFromLabels::undo(){
 
     // Delete layer
-    if(!new_layer_.expired()){
-        auto layer = new_layer_.lock();
-        ll_->deleteLayer(layer);
+    boost::shared_ptr<Layer> new_layer = ll_->getLayer(new_layer_id_);
+    if(new_layer == nullptr){
+        qDebug() << "Layer went missing, can't undo new layer";
+    } else {
+        ll_->deleteLayer(new_layer_id_);
     }
 
     // TODO: Freelist is not updated. Feelist is bs! For now
@@ -40,7 +42,7 @@ void LayerFromLabels::undo(){
 void LayerFromLabels::redo(){
     boost::shared_ptr<Layer> layer = ll_->addLayer();
     layer->setName(layer_name_);
-    new_layer_ = layer;
+    new_layer_id_ = layer->getId();
 
     if(subtractive_){
         // Subtractive remove labels from layers

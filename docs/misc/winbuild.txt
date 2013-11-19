@@ -84,7 +84,7 @@ environment:
     set PATH=%PATH%;C:\qt\qtbase\bin
 
 	set GLEWROOT=C:\PCL\dependencies\glew-1.9.0 # can be set via paths
-	set CONFIG_ROOT=C:\Users\rickert\Downloads\libconfig
+	#set CONFIG_ROOT=C:\Users\rickert\Downloads\libconfig
 	#set EIGEN_ROOT="C:\Program Files\Eigen"
 	#set BOOST_ROOT="C:\boost"
 	#set FLANN_ROOT="C:\Program Files\Flann"

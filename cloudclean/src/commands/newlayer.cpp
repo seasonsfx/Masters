@@ -1,5 +1,7 @@
 #include "newlayer.h"
 
+#include <QDebug>
+
 #include <model/layerlist.h>
 #include <model/pointcloud.h>
 #include <model/layer.h>
@@ -11,6 +13,7 @@ NewLayer::NewLayer(boost::shared_ptr<PointCloud> pc,
     idxs_ = idxs;
     ll_ = ll;
     applied_once_ = false;
+    new_layer_id_ = -1;
 }
 
 QString NewLayer::actionText(){
@@ -23,12 +26,18 @@ void NewLayer::undo(){
         pc_->labels_[idx] = new_to_old[pc_->labels_[idx]];
     }
 
-    // Delete layer
-    if(!new_layer_.expired()){
-        auto layer = new_layer_.lock();
-        layer_color_ = layer->getColor();
-        ll_->deleteLayer(layer);
+    boost::shared_ptr<Layer> new_layer_sptr = ll_->getLayer(new_layer_id_);
+
+    if(new_layer_sptr == nullptr){
+        qDebug() << "Could not uncreate layer " << new_layer_id_;
+        return;
     }
+
+    // Delete layer
+    layer_color_ = new_layer_sptr->getColor();
+    ll_->deleteLayer(new_layer_id_);
+    qDebug() << "Un created layer: " << new_layer_id_;
+
 }
 
 uint16_t NewLayer::getNewLabel(uint16_t old, boost::shared_ptr<Layer> layer) {
@@ -65,7 +74,8 @@ void NewLayer::redo(){
     // also, disregarding deletions for merges
 
     boost::shared_ptr<Layer> layer = ll_->addLayer();
-    new_layer_ = layer;
+    new_layer_id_ = layer->getId();
+    //new_layer_ = layer;
     if(new_to_old.size() != 0)
         layer->setColor(layer_color_);
 
@@ -89,6 +99,7 @@ void NewLayer::redo(){
     pc_->flagsUpdated();
 
     // TODO(Rickert) : Update color lookup buffer
+    qDebug() << "Created layer: " << new_layer_id_;
 }
 
 bool NewLayer::mergeWith(const QUndoCommand *other){

@@ -93,8 +93,7 @@ boost::shared_ptr<Layer> LayerList::addLayer(boost::shared_ptr<Layer> layer){
 }
 
 boost::shared_ptr<Layer> LayerList::addLayerWithId(uint id) {
-    boost::shared_ptr<Layer> layer(new Layer(layer_lookup_table_));
-    layer->id_ = id;
+    boost::shared_ptr<Layer> layer(new Layer(layer_lookup_table_, id));
     return addLayer(layer);
 }
 

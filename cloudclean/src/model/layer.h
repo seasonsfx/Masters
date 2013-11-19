@@ -15,7 +15,7 @@ typedef std::set<Layer *> LayerSet;
 class MODEL_API Layer : public QObject {
     Q_OBJECT
  private:
-    Layer(std::map<uint16_t, LayerSet> & layer_lookup_table);
+    Layer(std::map<uint16_t, LayerSet> & layer_lookup_table, uint id = last_id_++);
 
  public:
     ~Layer();

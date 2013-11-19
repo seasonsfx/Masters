@@ -1,5 +1,5 @@
 #include "layerdelete.h"
-
+#include <QDebug>
 #include <model/layerlist.h>
 #include <model/layer.h>
 
@@ -25,6 +25,8 @@ void LayerDelete::undo(){
         layer->addLabel(label);
     }
     layer_ = layer;
+
+    qDebug() << "Undeleted layer: " << layer->getId() << " that had label" << id_;
 }
 
 void LayerDelete::redo(){
@@ -32,6 +34,8 @@ void LayerDelete::redo(){
     boost::shared_ptr<Layer> layer = layer_.lock();
     id_ = layer->getId();
     ll_->deleteLayer(layer);
+
+    qDebug() << "Deleted layer: " << id_;
 }
 
 bool LayerDelete::mergeWith(const QUndoCommand *other){

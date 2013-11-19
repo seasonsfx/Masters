@@ -166,8 +166,9 @@ void LayerList::deleteLayer(boost::shared_ptr<Layer> layer) {
     }
 }
 
+// the idx here is the position in the list
 void LayerList::deleteLayer(int idx){
-    disconnect(layers_[idx].get(), SIGNAL(colorChanged()),
+    disconnect(layers_.at(idx).get(), SIGNAL(colorChanged()),
                this, SIGNAL(lookupTableUpdate()));
     beginRemoveRows(QModelIndex(), idx, idx);
 

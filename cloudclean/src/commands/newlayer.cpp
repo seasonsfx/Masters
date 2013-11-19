@@ -26,16 +26,16 @@ void NewLayer::undo(){
         pc_->labels_[idx] = new_to_old[pc_->labels_[idx]];
     }
 
-    boost::shared_ptr<Layer> new_layer_sptr = ll_->getLayer(new_layer_id_);
+    boost::shared_ptr<Layer> new_layer = ll_->getLayer(new_layer_id_);
 
-    if(new_layer_sptr == nullptr){
+    if(new_layer == nullptr){
         qDebug() << "Could not uncreate layer " << new_layer_id_;
         return;
     }
 
     // Delete layer
-    layer_color_ = new_layer_sptr->getColor();
-    ll_->deleteLayer(new_layer_id_);
+    layer_color_ = new_layer->getColor();
+    ll_->deleteLayer(new_layer);
     qDebug() << "Un created layer: " << new_layer_id_;
 
 }
@@ -73,7 +73,12 @@ void NewLayer::redo(){
     // lables can be freed when the command is deleted, assuming the stack is infinite
     // also, disregarding deletions for merges
 
-    boost::shared_ptr<Layer> layer = ll_->addLayer();
+    boost::shared_ptr<Layer> layer;
+    if(applied_once_)
+        layer = ll_->addLayerWithId(new_layer_id_);
+    else
+        layer = ll_->addLayer();
+
     new_layer_id_ = layer->getId();
     //new_layer_ = layer;
     if(new_to_old.size() != 0)

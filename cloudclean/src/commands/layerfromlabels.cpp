@@ -10,6 +10,8 @@ LayerFromLabels::LayerFromLabels(boost::shared_ptr<std::vector<uint16_t> > label
     labels_ = labels;
     ll_ = ll;
     layer_name_ = layer_name;
+    new_layer_id_ = -1;
+    applied_once_ = false;
 }
 
 QString LayerFromLabels::actionText(){
@@ -23,10 +25,10 @@ void LayerFromLabels::undo(){
     if(new_layer == nullptr){
         qDebug() << "Layer went missing, can't undo new layer";
     } else {
-        ll_->deleteLayer(new_layer_id_);
+        ll_->deleteLayer(new_layer);
     }
 
-    // TODO: Freelist is not updated. Feelist is bs! For now
+    // TODO: Freelist is not updated. Feelist is bs! For now..
 
     // Undo subtractive
     if(subtractive_) {
@@ -40,7 +42,13 @@ void LayerFromLabels::undo(){
 }
 
 void LayerFromLabels::redo(){
-    boost::shared_ptr<Layer> layer = ll_->addLayer();
+    boost::shared_ptr<Layer> layer;
+
+    if(!applied_once_)
+        layer = ll_->addLayer();
+    else
+        layer = ll_->addLayerWithId(new_layer_id_);
+
     layer->setName(layer_name_);
     new_layer_id_ = layer->getId();
 
@@ -62,6 +70,7 @@ void LayerFromLabels::redo(){
         layer->addLabel(label);
     }
 
+    applied_once_ = true;
 }
 
 bool LayerFromLabels::mergeWith(const QUndoCommand *other){

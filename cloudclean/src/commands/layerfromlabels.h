@@ -33,6 +33,7 @@ class COMMAND_API LayerFromLabels : public QUndoCommand
     uint new_layer_id_;
     std::map<uint, std::vector<uint16_t> > removed_from_;
     QString layer_name_;
+    bool applied_once_;
 };
 
 #endif // LayerFromLabels_H

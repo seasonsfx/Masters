@@ -244,7 +244,10 @@ void LayerListView::setColor() {
     Layer & l = *ll_->getLayers()[id];
     if(random)
         l.setRandomColor();
-    else
-        l.setColor(QColorDialog::getColor(l.color_));
+    else {
+        QColor new_col = QColorDialog::getColor(l.color_);
+        if(new_col.isValid())
+            l.setColor(new_col);
+    }
     emit update();
 }

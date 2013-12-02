@@ -22,7 +22,8 @@ class JsonExport : public IPlugin {
     ~JsonExport();
 
  private slots:
-    void myFunc();
+    void save();
+    void load();
 
  private:
     Core * core_;
@@ -32,7 +33,8 @@ class JsonExport : public IPlugin {
     FlatView * flatview_;
     MainWindow * mw_;
 
-    QAction * myaction;
+    QAction * save_action_;
+    QAction * load_action_;
 };
 
 #endif  // JSONEXPORT_H

@@ -6,6 +6,7 @@
 #include <future>
 #include <thread>
 #include <QObject>
+#include <QString>
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
 #include <pcl/search/octree.h>
@@ -35,8 +36,8 @@ class MODEL_API PointCloud : public QObject, public pcl::PointCloud<pcl::PointXY
     explicit PointCloud();
     ~PointCloud();
     bool point_matches_label(int idx, std::vector<uint16_t> & labels);
-    bool save_ptx(const char* filename, std::vector<uint16_t> labels);
-    bool load_ptx(const char* filename, int decimation_factor = 1);
+    bool save_ptx(const char* filepath, std::vector<uint16_t> labels);
+    bool load_ptx(const char* filepath, int decimation_factor = 1);
 
     void translate(const Eigen::Vector3f& pos);
     void translate(float x, float y, float z)  {
@@ -60,6 +61,8 @@ class MODEL_API PointCloud : public QObject, public pcl::PointCloud<pcl::PointXY
 
     std::vector<boost::shared_ptr<std::vector<int> > > getSelections();
 
+    QString filepath() { return filepath_; }
+
  signals:
     void transformed();
     void progress(int percentage);
@@ -76,6 +79,7 @@ class MODEL_API PointCloud : public QObject, public pcl::PointCloud<pcl::PointXY
     mutable boost::shared_ptr<std::vector<int>> grid_to_cloud_map_;
     std::vector<int> cloud_to_grid_map_;
     boost::shared_ptr<std::mutex> pc_mutex;
+    QString filepath_;
 
  public:
     int scan_width_;

@@ -311,6 +311,9 @@ bool PointCloud::load_ptx(const char* filename, int decimation_factor) {
     });
 
     fclose(pfile);
+
+    filepath_ = QString(filename);
+
     return this;
 }
 

@@ -31,9 +31,9 @@ SET(APPLICATION_ID "${APPLICATION_VENDOR_ID}.${PROJECT_NAME}")
 SET(CMAKE_VERBOSE_MAKEFILE 1) # Use 1 for debugging, 0 for release
 
 if(NOT MSVC)
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -g -Wno-attributes -Wno-enum-compare -fPIC")
-    SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fPIC")
-    SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2 -fPIC")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O2 -g -gdwarf-3 -Wno-attributes -Wno-enum-compare -fPIC")
+    SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
+    #SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fPIC")
 endif()
 
 add_definitions(-DBOOST_ALL_NO_LIB)
@@ -139,15 +139,15 @@ IF(MSVC)
 #    endforeach(flag_var)
 
 ELSE()
-    SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -Wall -gdwarf-3")
+    SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -Wall")
     SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -std=c++0x")
     SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -fopenmp")
     SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations")
     SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -Wno-unknown-pragmas")
     SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -fstack-protector-all")
     SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -fPIC")
-    SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -pipe") # makes things faster
-    # Make GCC like MSVC, SO FOR LIBS YTOU DO DLL_EXPORT TYPE THINGS
+    SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -pipe") # makes things faster?
+    # Make GCC like MSVC, SO FOR LIBS TO DO DLL_EXPORT TYPE THINGS
     SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -fvisibility=hidden")
     SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -fvisibility-inlines-hidden")
 ENDIF()

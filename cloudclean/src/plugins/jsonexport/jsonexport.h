@@ -1,5 +1,5 @@
-#ifndef ${upper_name}_H
-#define ${upper_name}_H
+#ifndef JSONEXPORT_H
+#define JSONEXPORT_H
 
 #include "pluginsystem/iplugin.h"
 class QAction;
@@ -11,15 +11,15 @@ class FlatView;
 class GLWidget;
 class MainWindow;
 
-class ${camel_name} : public IPlugin {
+class JsonExport : public IPlugin {
     Q_INTERFACES(IPlugin)
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "za.co.circlingthesun.cloudclean.${lower_name}" FILE "${lower_name}.json")
+    Q_PLUGIN_METADATA(IID "za.co.circlingthesun.cloudclean.jsonexport" FILE "jsonexport.json")
  public:
     QString getName();
     void initialize(Core * core);
     void cleanup();
-    ~${camel_name}();
+    ~JsonExport();
 
  private slots:
     void myFunc();
@@ -35,4 +35,4 @@ class ${camel_name} : public IPlugin {
     QAction * myaction;
 };
 
-#endif  // ${upper_name}_H
+#endif  // JSONEXPORT_H

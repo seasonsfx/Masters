@@ -1,12 +1,8 @@
 #include "plugins/jsonexport/jsonexport.h"
 #include <QDebug>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QJsonArray>
-#include <QJsonValue>
 #include <QAction>
 #include <QToolBar>
-#include <QFile>
+#include <fstream>
 #include "model/layerlist.h"
 #include "model/cloudlist.h"
 #include "gui/glwidget.h"
@@ -52,70 +48,61 @@ JsonExport::~JsonExport(){
 void JsonExport::myFunc(){
     qDebug() << "Myfunc";
 
-// Example
-//    {
-//        "filenames": ["one.ptx", "two.ptx"],
-//        "labels": {
-//            "one.ptx": [1, 2, 3, 4, 5],
-//            "two.ptx": [1, 2, 3, 4, 5],
-//        },
-//        "layers": [
-//            {
-//                "name": "Layer1",
-//                "visible": true,
-//                "labels": [1, 3, 5],
-//            }
-//        ]
-//    }
 
-
-
-    QJsonObject root;
-    QJsonArray filenames;
-    QJsonObject labels;
-
-    for(boost::shared_ptr<PointCloud> cloud :cl_->clouds_){
-        filenames.push_back(QJsonValue(cloud->filepath()));
-
-        QJsonArray pointlabels;
-
-        for(int label : cloud->labels_){
-            pointlabels.push_back(QJsonValue(label));
-        }
-
-        labels.insert(cloud->filepath(), QJsonValue(pointlabels));
-    }
-
-    root.insert("filenames", QJsonValue(filenames));
-    root.insert("labels", QJsonValue(labels));
-
-    QJsonArray layers;
-
-    for(const boost::shared_ptr<Layer> layer : ll_->getLayers()) {
-        QJsonObject alayer;
-        alayer.insert("name", QJsonValue(layer->getName()));
-        alayer.insert("visible", QJsonValue(layer->isVisible()));
-        QJsonArray labels;
-        for(int label : layer->getLabelSet()) {
-            labels.push_back(QJsonValue(label));
-        }
-        alayer.insert("labels", QJsonValue(labels));
-        layers.push_back(alayer);
-    }
-
-    root.insert("layers", QJsonValue(layers));
-
-    QJsonDocument doc(root);
-
-    QFile file;
-    file.setFileName("test.ccf");
-    file.open(QIODevice::WriteOnly);
-    file.write(doc.toJson());
-    file.close();
+//    filecount;
+//    filename1;
+//    filename2;
+//    file1 label count;
+//    1 2 3 4 5 5 6 6 9 9
+//    file2 label count;
+//    667 2 26237 4724 27
+//    layer count;
+//    layer1 name;
+//    layer1 visibility;
+//    layer1 label count;
+//    3 324 242 423 42 34234
+//    EOF
 
 
     // Bring up file save dialog here
 
+    std::ofstream file("test.ccf");
+    if (!file.is_open()){
+        qDebug() << "File open fail";
+        return;
+    }
+
+    file << cl_->clouds_.size() << "\n";
+
+    for(boost::shared_ptr<PointCloud> cloud :cl_->clouds_)
+        file << cloud->filepath().data()->toLatin1() << "\n";
+
+    for(boost::shared_ptr<PointCloud> cloud :cl_->clouds_){
+        file << cloud->labels_.size() << "\n";
+        int idx = 0;
+        for(; idx < cloud->labels_.size()-1; idx++){
+            file << cloud->labels_[idx] << " ";
+        }
+        file << cloud->labels_[++idx] << "\n";
+    }
+
+    file << ll_->getLayers().size() << "\n";
+
+    for(const boost::shared_ptr<Layer> layer : ll_->getLayers()) {
+
+        file << layer->getName().data()->toLatin1() << "\n";
+        file << layer->isVisible() << "\n";
+        file << layer->getLabelSet().size() << "\n";
+
+        const std::set<uint16_t> & ls = layer->getLabelSet();
+        auto it = ls.begin();
+        for(; it != --ls.end(); it++) {
+            file << *it << " ";
+        }
+        file << *it << "\n";
+    }
+
+    file.close();
 }
 
 Q_PLUGIN_METADATA(IID "za.co.circlingthesun.cloudclean.jsonexport")

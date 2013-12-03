@@ -1,0 +1,78 @@
+CloudClean feature requests and bugs:
+	https://github.com/circlingthesun/masters/issues
+
+Navigation:
+	To move around the cloud use the arrow keys or WASD
+
+	To look around the cloud drag in the view window.
+
+	To move the camera back to the start press ctrl + r.
+
+	To get a birds eyey view of teh cloud press ctrl + b
+
+	The default camera mode is first person. If you want to rotate the cloud, hold control while dragging the cloud.
+
+	The first person camera corrects for camera roll so it might not work as expected if you have rotated the cloud. To reset the cloud orientientation right click on the cloud and select "Reset orientation"
+
+	If the cloud that you are loading does not have an origin in the center it may not be in view. 
+	Right click on the cloud and select "Fly to cloud" to navigate to it.
+
+	To move the cloud hold coltrol while using the arrow keys (buggy, will be fixed soon.)
+
+	If the 2D view has the wrong orientation, right click on it and select "rotate"
+
+Selections:
+	There are 4 selection tools on the toolbar.
+
+	The blue floodfill icon will attempt to select a plane when you click on a point in the view window.
+
+	The yellow floodfil tool will attempt to select all planes in the cloud.
+
+	The green selection tool lets you select points in the 2D view. Use the radius slider on the bottom the right to control the selection radius.
+
+	The blue 3D selection tool lets you select points in the 3D view. It also has a radius slider.
+
+	The 2d and 3d selection tools lets you control the selection colour by pressing numbers 1-8 on the keyboard. You will need this for the random forest tool.
+
+	The 2d and 3d selection tools allow you to deselect points by holding the ctrl key while using them.
+
+Layers:
+	Layers are subsets of points in one or more clouds.
+
+	One point can be in multiple layers.
+
+	When a layer is selected, the points in that layer will be coloured.
+
+	A colour of a layer can be changed by right clicking on the layer and either selecting "Random Color" or "Change Color"
+
+	Selections can be turned into layers and layers into selections. Right click on the viewport and select "Layer from selection" to create one or more layers out of the current selection(s). Right click on a layer in the layer view and select "Select points" to select the points in the layer.
+
+	Layers can be merged by selecting two or more, right clicking and selecting "Merge".
+
+	A new layer can be created out of the intersection of two or more layers by selecting then, right clicking and then selecting "Intersect".
+
+	Layers can be hidden by clicking on the eye in the cloud list.
+
+
+Clouds:
+	You can load multiple clouds. Selections only work on the active cloud highlighted in the cloud list. Layers and selections can be created accross muluple clouds.
+
+	Clouds can be hidden by clicking on the eye in the cloud list.
+
+Undo:
+	All selection and layer operations are undo and redoable.
+
+Load & Save:
+	PTX files can be loaded via File->Load PTX.
+
+	The points corresponding to a layer or multiple layers in the current active cloud can be saved as a PTX file my right clicking on the layer(s) and selecting "Save Layer(s)".
+
+	All current layers can be saved to file and loaded via File->Save Project and File->Load Project
+
+Random forest tool:
+	The random forest tool classifies a cloud by example. Selection tools need to be used to colour different classes of points. Click the red and green forest tool icon to classify the cloud once selections have been made. Selections can be eddited once the classification is complete. Remember to convert selections to layers if you want to save it as part of a project.
+
+Other tools:
+	2d Lasso
+	3d Lasso
+	

@@ -257,7 +257,7 @@ void Camera::rotate3D(float _yaw, float _pitch, float _roll) {
 void Camera::adjustFov(int val) {
     // Mouse seems to move in increments of 120
     val = -val/60.0f;
-    if (fov_future_ + val < 170.0f && fov_future_ + val > 2.0f)
+    if (fov_future_ + val < 100.0f && fov_future_ + val > 2.0f)
         setFoV(fov_future_ + val);
 
 }

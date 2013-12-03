@@ -42,7 +42,7 @@ QVariant CloudList::data(const QModelIndex & index, int role) const {
             case Qt::DisplayRole:
             {
                 QString re;
-                QTextStream(&re) << "Cloud " << row;
+                QTextStream(&re) << clouds_[row]->filepath();
                 return re;
             }
         }

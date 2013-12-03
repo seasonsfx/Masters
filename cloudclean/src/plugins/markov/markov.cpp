@@ -44,16 +44,16 @@ void Markov::initialize2(PluginManager * pm) {
         return;
     }
 
-    enable_ = new QAction(QIcon(":/markov.png"), "markov action", 0);
-    enable_->setCheckable(true);
+    //enable_ = new QAction(QIcon(":/markov.png"), "markov action", 0);
+    //enable_->setCheckable(true);
 
-    connect(enable_,&QAction::triggered, [this] (bool on) {
-        graphcut();
-    });
+    //connect(enable_,&QAction::triggered, [this] (bool on) {
+    //    graphcut();
+    //});
 
-    mw_->toolbar_->addAction(enable_);
-    std::function<void(int)> func = std::bind(&Markov::graphcut, this, std::placeholders::_1);
-    picker_ = new Picker(glwidget_, cl_, func);
+    //mw_->toolbar_->addAction(enable_);
+    //std::function<void(int)> func = std::bind(&Markov::graphcut, this, std::placeholders::_1);
+    //picker_ = new Picker(glwidget_, cl_, func);
 
     forrest_action_ = new QAction(QIcon(":/randomforest.png"), "forrest action", 0);
     connect(forrest_action_, &QAction::triggered, [this] (bool on) {
@@ -68,9 +68,9 @@ void Markov::initialize2(PluginManager * pm) {
 }
 
 void Markov::cleanup(){
-    mw_->toolbar_->removeAction(enable_);
+    //mw_->toolbar_->removeAction(enable_);
     mw_->toolbar_->removeAction(forrest_action_);
-    delete enable_;
+    //delete enable_;
     delete picker_;
     delete forrest_action_;
 }

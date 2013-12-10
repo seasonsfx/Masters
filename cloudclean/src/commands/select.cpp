@@ -71,7 +71,8 @@ void Select::undo(){
         update->push_back(idx);
     }
 
-    pc->flagsUpdated(update);
+    emit pc->flagUpdate(update);
+    //pc->flagsUpdated(update);
 
 }
 
@@ -102,7 +103,8 @@ void Select::redo(){
         update->push_back(idx);
     }
 
-    pc->flagsUpdated(update);
+
+    emit pc->flagUpdate(update);
 
 }
 

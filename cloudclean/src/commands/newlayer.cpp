@@ -100,8 +100,8 @@ void NewLayer::redo(){
     }
     applied_once_ = true;
 
-    pc_->labelsUpdated();
-    pc_->flagsUpdated();
+    emit pc_->labelUpdate();
+    emit pc_->flagUpdate();
 
     // TODO(Rickert) : Update color lookup buffer
     qDebug() << "Created layer: " << new_layer_id_;

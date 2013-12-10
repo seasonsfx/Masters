@@ -393,14 +393,6 @@ void PointCloud::resetOrientation() {
     emit transformed();
 }
 
-void PointCloud::flagsUpdated(boost::shared_ptr<std::vector<int> > idxs) {
-    emit flagUpdate(idxs);
-}
-
-void PointCloud::labelsUpdated(boost::shared_ptr<std::vector<int> > idxs) {
-    emit labelUpdate(idxs);
-}
-
 std::vector<boost::shared_ptr<std::vector<int> > > PointCloud::getSelections() {
     std::vector<boost::shared_ptr<std::vector<int> > > selections(8);
 

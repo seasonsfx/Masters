@@ -89,6 +89,7 @@ class GUI_API Camera : public QObject {
 
  public slots:
     void birds_eye();
+    void toggleRollCorrection();
 
  signals:
     void updated();
@@ -118,6 +119,7 @@ class GUI_API Camera : public QObject {
     float translation_speed_;
 
     //std::mutex * mtx_;
+    bool roll_correction_;
 
     friend class GLWidget;
 };

@@ -156,8 +156,8 @@ void Brush3D::paint(const Eigen::Affine3f& proj, const Eigen::Affine3f& mv){
     qDebug() << "Hello from paint plugin";
 }
 
-void Brush3D::select(QMouseEvent * event){
-    int idx = pick(event->x(), event->y(), glwidget_->width(),
+void Brush3D::select(float x, float y){
+    int idx = pick(x, y, glwidget_->width(),
                    glwidget_->height(), 1e-04,
                    glwidget_->camera_.projectionMatrix(),
                    glwidget_->camera_.modelviewMatrix(),
@@ -186,6 +186,10 @@ bool Brush3D::mouseClickEvent(QMouseEvent * event){
 }
 
 bool Brush3D::mouseMoveEvent(QMouseEvent * event) {
+    // How is the mouse moving?
+    Eigen::Vector2d pos(event->x(), event->y());
+    Eigen::Vector2d last_pos = last_mouse_pos_;
+
     last_mouse_pos_ << event->x(), event->y();
     if(event->buttons() != Qt::LeftButton && !event->modifiers())
         return false;
@@ -194,8 +198,22 @@ bool Brush3D::mouseMoveEvent(QMouseEvent * event) {
     if(cl_->clouds_.size() == 0)
         return false;
 
-    if(event->buttons())
-        select(event);
+    // Todo: find distance traveled in real space
+    // this doesnt scale up close
+    if(event->buttons()){
+        Eigen::Vector2d diff(pos - last_pos);
+        float len = diff.norm();
+        if(len > 10) {
+            float dist = 0;
+            Eigen::Vector2d dir = diff.normalized();
+            while(dist <= len){
+                Eigen::Vector2d p = last_pos + dist*dir;
+                dist+=5;
+                select(p.x(), p.y());
+            }
+        }
+        select(event->x(), event->y());
+    }
 
     return true;
 }
@@ -206,7 +224,7 @@ bool Brush3D::mousePressEvent(QMouseEvent * event) {
     if(cl_->clouds_.size() == 0)
         return false;
     core_->us_->beginMacro("3d Select");
-    select(event);
+    select(event->x(), event->y());
     last_mouse_pos_ << event->x(), event->y();
     mouse_down_pos_ = last_mouse_pos_;
     return true;

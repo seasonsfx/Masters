@@ -89,8 +89,8 @@ boost::shared_ptr<PointCloud> CloudList::addCloud(boost::shared_ptr<PointCloud> 
     endInsertRows();
     mtx_->unlock();
 
-    connect(pc.get(), SIGNAL(flagUpdate()), this, SIGNAL(updated()));
-    connect(pc.get(), SIGNAL(labelUpdate()), this, SIGNAL(updated()));
+    //connect(pc.get(), SIGNAL(flagUpdate()), this, SIGNAL(updated()));
+    //connect(pc.get(), SIGNAL(labelUpdate()), this, SIGNAL(updated()));
     connect(pc.get(), SIGNAL(transformed()), this, SIGNAL(updated()));
 
     emit cloudUpdate(pc);
@@ -110,8 +110,8 @@ void CloudList::removeCloud(int idx){
     pc->deleting_ = true;
     emit deletingCloud(pc);
 
-    disconnect(pc.get(), SIGNAL(flagUpdate()), this, SIGNAL(updated()));
-    disconnect(pc.get(), SIGNAL(labelUpdate()), this, SIGNAL(updated()));
+    //disconnect(pc.get(), SIGNAL(flagUpdate()), this, SIGNAL(updated()));
+    //disconnect(pc.get(), SIGNAL(labelUpdate()), this, SIGNAL(updated()));
     disconnect(pc.get(), SIGNAL(transformed()), this, SIGNAL(updated()));
 
 

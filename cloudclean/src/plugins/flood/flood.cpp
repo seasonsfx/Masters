@@ -63,7 +63,7 @@ void Flood::initialize2(PluginManager * pm) {
         return;
     }
 
-    enable_ = new QAction(QIcon(":/images/flood.jpg"), "Floodfill", 0);
+    enable_ = new QAction(QIcon(":/images/flood.png"), "Floodfill", 0);
     enable_->setCheckable(true);
     enable_->setChecked(false);
     is_enabled_ = false;
@@ -76,11 +76,11 @@ void Flood::initialize2(PluginManager * pm) {
 
     mw_->toolbar_->addAction(enable_);
 
-    //global_flood_ = new QAction(QIcon(":/images/flood2.jpg"), "Global floodfill", 0);
+    //global_flood_ = new QAction(QIcon(":/images/flood2.png"), "Global floodfill", 0);
     //connect(global_flood_, &QAction::triggered, this, &Flood::global_flood);
     //mw_->toolbar_->addAction(global_flood_);
 
-    global_flood2_ = new QAction(QIcon(":/images/flood2.jpg"), "Global floodfill 2", 0);
+    global_flood2_ = new QAction(QIcon(":/images/flood2.png"), "Global floodfill 2", 0);
     connect(global_flood2_, &QAction::triggered, this, &Flood::global_flood2);
     mw_->toolbar_->addAction(global_flood2_);
 

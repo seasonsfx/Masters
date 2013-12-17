@@ -48,7 +48,7 @@ class GUI_API MainWindow : public QMainWindow {
 
  public slots:
     void loadFile();
-    void saveFile();
+    void saveLayer();
 
     void startBgAction(QString name, bool deterministic = false);
     void stopBgAction(QString name);

@@ -319,6 +319,7 @@ bool PointCloud::load_ptx(const char* filename, int decimation_factor) {
 
 void PointCloud::translate(const Eigen::Vector3f& pos) {
     sensor_origin_ += Vector4f(pos.x(), pos.y(), pos.z(), 0);
+    emit transformed();
 }
 
 void PointCloud::rotate2D(float x, float y) {

@@ -28,6 +28,7 @@ class Markov : public IPlugin {
  private:
     void graphcut(int idx = 0);
     void randomforest();
+    void svm();
 
  signals:
     void enabling();
@@ -50,6 +51,7 @@ class Markov : public IPlugin {
 
     QAction * enable_;
     QAction * forrest_action_;
+    QAction * svm_action_;
     bool enabled_;
 
     int fg_idx_;

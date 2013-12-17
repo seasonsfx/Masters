@@ -5,6 +5,7 @@ include_directories(
 )
 
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/thirdparty/omclboost/src)
+INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/thirdparty/EigenLibSVM/include)
 
 QT5_ADD_RESOURCES(markov_RESOURCES_RCC markov.qrc)
 FILE (GLOB plugin_SOURCE *.cpp *.cxx *.cc *.C *.c *.h *.hpp)
@@ -19,6 +20,7 @@ target_link_libraries(
     cloudclean_gui
     normalestimator
     omclboost
+    svmlib
     ${PCL_LIBRARIES}
 )
 

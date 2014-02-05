@@ -1,4 +1,5 @@
 #include "cloudgldata.h"
+#include <boost/make_shared.hpp>
 #include <QDebug>
 
 CloudGLData::CloudGLData(boost::shared_ptr<PointCloud> pc) {
@@ -177,6 +178,7 @@ void CloudGLData::copyGrid(){
 
 void CloudGLData::syncCloud() {
     dirty_points_ = true;
+    emit updated();
 }
 
 void CloudGLData::syncLabels(boost::shared_ptr<std::vector<int> > idxs) {
@@ -187,21 +189,32 @@ void CloudGLData::syncLabels(boost::shared_ptr<std::vector<int> > idxs) {
         dirty_label_list_ = idxs;
     }
     dirty_labels_ = true;
+    emit updated();
 }
 
 void CloudGLData::syncFlags(boost::shared_ptr<std::vector<int> > idxs) {
-    if(idxs == nullptr) {
-        qDebug() << "Attempted to sync a nullptr!";
-        return;
-    }
 
-    if(dirty_flags_ && dirty_flag_list_.get() != nullptr && dirty_flag_list_->size() !=0){
+    if(idxs == nullptr) {
+        qDebug() << "Slow syncining all flags!";
+
+        if(dirty_flag_list_.get() == nullptr)
+            dirty_flag_list_ = boost::make_shared<std::vector<int> >();
+
+        for(int i = 0; i < pc_->flags_.size(); i++)
+            dirty_flag_list_->push_back(i);
+    }
+    else if(dirty_flags_ && dirty_flag_list_.get() != nullptr && dirty_flag_list_->size() !=0){
         dirty_flag_list_->insert(dirty_flag_list_->end(), idxs->begin(), idxs->end());
     }
-    else {
+    else if(idxs != nullptr) {
         dirty_flag_list_ = idxs;
     }
+    else {
+        qDebug() << "yeah... how did you get here?";
+        return;
+    }
     dirty_flags_ = true;
+    emit updated();
 }
 
 void CloudGLData::draw(GLint vao){

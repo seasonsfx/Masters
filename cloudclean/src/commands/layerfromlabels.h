@@ -30,9 +30,10 @@ class COMMAND_API LayerFromLabels : public QUndoCommand
     bool subtractive_;
     boost::shared_ptr<std::vector<uint16_t> > labels_;
     LayerList * ll_;
-    boost::weak_ptr<Layer> new_layer_;
+    uint new_layer_id_;
     std::map<uint, std::vector<uint16_t> > removed_from_;
     QString layer_name_;
+    bool applied_once_;
 };
 
 #endif // LayerFromLabels_H

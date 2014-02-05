@@ -23,6 +23,10 @@
 #include "online_rf.h"
 #include "experimenter.h"
 
+
+#include <eigenlibsvm/svm_utils.h>
+#include <eigenlibsvm/eigen_extensions.h>
+
 QString Markov::getName(){
     return "markov";
 }
@@ -44,16 +48,16 @@ void Markov::initialize2(PluginManager * pm) {
         return;
     }
 
-    enable_ = new QAction(QIcon(":/markov.png"), "markov action", 0);
-    enable_->setCheckable(true);
+    //enable_ = new QAction(QIcon(":/markov.png"), "markov action", 0);
+    //enable_->setCheckable(true);
 
-    connect(enable_,&QAction::triggered, [this] (bool on) {
-        graphcut();
-    });
+    //connect(enable_,&QAction::triggered, [this] (bool on) {
+    //    graphcut();
+    //});
 
-    mw_->toolbar_->addAction(enable_);
-    std::function<void(int)> func = std::bind(&Markov::graphcut, this, std::placeholders::_1);
-    picker_ = new Picker(glwidget_, cl_, func);
+    //mw_->toolbar_->addAction(enable_);
+    //std::function<void(int)> func = std::bind(&Markov::graphcut, this, std::placeholders::_1);
+    //picker_ = new Picker(glwidget_, cl_, func);
 
     forrest_action_ = new QAction(QIcon(":/randomforest.png"), "forrest action", 0);
     connect(forrest_action_, &QAction::triggered, [this] (bool on) {
@@ -63,16 +67,24 @@ void Markov::initialize2(PluginManager * pm) {
     mw_->toolbar_->addAction(forrest_action_);
 
 
+    svm_action_ = new QAction(QIcon(":/randomforest.png"), "svm action", 0);
+    connect(svm_action_, &QAction::triggered, [this] (bool on) {
+        svm();
+    });
+
+    mw_->toolbar_->addAction(svm_action_);
+
     enabled_ = false;
     fg_idx_ = -1;
 }
 
 void Markov::cleanup(){
-    mw_->toolbar_->removeAction(enable_);
+    //mw_->toolbar_->removeAction(enable_);
     mw_->toolbar_->removeAction(forrest_action_);
-    delete enable_;
-    delete picker_;
+    //delete enable_;
+    //delete picker_;
     delete forrest_action_;
+    delete svm_action_;
 }
 
 Markov::~Markov(){
@@ -358,12 +370,32 @@ void Markov::randomforest(){
     std::set<int> labels;
     std::set<int> seen;
 
+    int sample_size = 0;
+    for(uint s : selection_sources) {
+        sample_size += selections[s]->size();
+    }
+
+    int max_samples = 1000000;
+    int nth = 1;
+    if(sample_size > max_samples) {
+        nth = sample_size / max_samples;
+        qDebug() << "Points: " << sample_size << ", Max: " << max_samples;
+        qDebug() << "Too many points, using every " << nth << "'th point";
+    }
+
+
     int count = 0;
+    int count2 = 0;
     for(uint y : selection_sources){
         for(int big_idx : *selections[y]) {
             int idx = big_to_small[big_idx];
 
             if(!seen.insert(idx).second)
+                continue;
+
+            count++;
+
+            if(count % nth != 0)
                 continue;
 
             Sample sample;
@@ -390,10 +422,11 @@ void Markov::randomforest(){
             //std::cout << "sample:" << sample.x << endl;
 
 
-            if((count++%2==0))
+            if((count2++%2==0))
                 dataset_train.m_samples.push_back(sample);
             else
                 dataset_test.m_samples.push_back(sample);
+
         }
 
     }
@@ -405,9 +438,9 @@ void Markov::randomforest(){
     }
 
 
-    dataset_test.m_numClasses = labels.size();
+    dataset_test.m_numClasses = 8;
     dataset_test.m_numSamples = dataset_test.m_samples.size();
-    dataset_train.m_numClasses = labels.size();
+    dataset_train.m_numClasses = 8;
     dataset_train.m_numSamples = dataset_train.m_samples.size();
 
 
@@ -429,13 +462,16 @@ void Markov::randomforest(){
 
     OnlineRF model(hp, dataset_train.m_numClasses, dataset_train.m_numFeatures, dataset_train.m_minFeatRange, dataset_train.m_maxFeatRange);
 
+    /*
     for(int i = 0; i < dataset_train.m_numFeatures; i++){
         qDebug() << "Min" << dataset_train.m_minFeatRange[i] << "Max" << dataset_train.m_maxFeatRange[i];
     }
+    */
 
 
     timeIt(1);
-    trainAndTest(&model, dataset_train, dataset_test, hp);
+    train(&model, dataset_train, hp);
+    //trainAndTest(&model, dataset_train, dataset_test, hp);
     cout << "Training/Test time: " << timeIt(0) << endl;
 
     // fill in datasets
@@ -443,7 +479,7 @@ void Markov::randomforest(){
     // Inference here!
     // for all the other points
 
-    Result invalid;
+    Result invalid(8);
     //invalid.confidence.at(0) = 0;
     invalid.prediction = -1;
 
@@ -603,6 +639,219 @@ void Markov::randomforest(){
     fg_idx_ = -1;
     disable();
     */
+}
+
+
+void Markov::svm(){
+    qDebug() << "SVM";
+
+    boost::shared_ptr<PointCloud> cloud = core_->cl_->active_;
+    if(cloud == nullptr)
+        return;
+
+
+    // get normals
+    pcl::PointCloud<pcl::Normal>::Ptr normals = ne_->getNormals(cl_->active_);
+
+    // zip and downsample
+    pcl::PointCloud<pcl::PointXYZINormal>::Ptr smallcloud = zipNormals(cl_->active_, normals);
+    std::vector<int> big_to_small;
+    smallcloud = octreeDownsample(smallcloud.get(), 0.05, big_to_small);
+
+    /// Setup features
+
+    // PCA
+    boost::shared_ptr<std::vector<Eigen::Vector3f> > pca = getPCA(smallcloud.get(), 0.2f, 0);
+
+    /// SVM
+
+
+    // Load selection
+    std::vector<boost::shared_ptr<std::vector<int>>> selections = cloud->getSelections();
+
+    std::vector<int> selection_sources;
+
+    for(uint i = 0; i < selections.size(); i++) {
+        if(selections[i]->size() > 30)
+            selection_sources.push_back(i);
+    }
+
+    if(selection_sources.size() < 2) {
+        qDebug() << "Not enough data";
+        return;
+    }
+
+    // Creating the train data
+    DataSet dataset_train, dataset_test;
+
+    dataset_train.m_numFeatures = 10;
+    dataset_test.m_numFeatures = 10;
+
+
+    std::set<int> labels;
+    std::set<int> seen;
+
+    int sample_size = 0;
+    for(uint s : selection_sources) {
+        sample_size += selections[s]->size();
+    }
+
+    int max_samples = 1000000;
+    int nth = 1;
+    if(sample_size > max_samples) {
+        nth = sample_size / max_samples;
+        qDebug() << "Points: " << sample_size << ", Max: " << max_samples;
+        qDebug() << "Too many points, using every " << nth << "'th point";
+    }
+
+    selection_sources.resize(2); // binary case;
+    std::map<int, int> source_to_label;
+    source_to_label[selection_sources[0]] = 1;
+    source_to_label[selection_sources[1]] = -1;
+
+    int count = 0;
+    int count2 = 0;
+    for(uint y : selection_sources){
+        for(int big_idx : *selections[y]) {
+            int idx = big_to_small[big_idx];
+
+            if(!seen.insert(idx).second)
+                continue;
+
+            count++;
+
+            if(count % nth != 0)
+                continue;
+
+            Sample sample;
+            sample.x = Eigen::VectorXd(dataset_train.m_numFeatures);
+            sample.id = idx;
+            sample.w = 1.0;
+            sample.y = y;
+
+            labels.insert(y);
+
+            //set samples
+            sample.x(0) = smallcloud->at(idx).x;
+            sample.x(1) = smallcloud->at(idx).y;
+            sample.x(2) = smallcloud->at(idx).z;
+            sample.x(3) = smallcloud->at(idx).intensity;
+            sample.x(4) = smallcloud->at(idx).normal_x;
+            sample.x(5) = smallcloud->at(idx).normal_y;
+            sample.x(6) = smallcloud->at(idx).normal_z;
+            sample.x(7) = (*pca)[idx][0];
+            sample.x(8) = (*pca)[idx][1];
+            sample.x(9) = (*pca)[idx][2];
+
+
+            //std::cout << "sample:" << sample.x << endl;
+
+
+            if((count2++%2==0))
+                dataset_train.m_samples.push_back(sample);
+            else
+                dataset_test.m_samples.push_back(sample);
+
+        }
+
+    }
+
+
+
+    dataset_test.m_numClasses = 8;
+    dataset_test.m_numSamples = dataset_test.m_samples.size();
+    dataset_train.m_numClasses = 8;
+    dataset_train.m_numSamples = dataset_train.m_samples.size();
+
+
+    qDebug() << "Size tr:" << dataset_train.m_numSamples;
+    qDebug() << "Size ts:" << dataset_test.m_numSamples;
+
+    if(dataset_train.m_numSamples < 10 || dataset_test.m_numSamples < 10){
+        qDebug() << "Not enough samples";
+        return;
+    }
+
+
+    dataset_train.findFeatRange();
+    dataset_test.findFeatRange();
+
+    //OnlineRF model(hp, dataset_train.m_numClasses, dataset_train.m_numFeatures, dataset_train.m_minFeatRange, dataset_train.m_maxFeatRange);
+
+
+    /////// SVM ///////////////////
+
+
+    Eigen::MatrixXf X(dataset_train.m_numSamples, dataset_train.m_numFeatures); // features
+    std::vector<int> y(dataset_train.m_numSamples);
+
+    for(int n = 0; n < dataset_train.m_numFeatures; ++n){
+        Eigen::VectorXf fy(10);
+        for(int i = 0; i < 10; i++){
+            fy(i) = dataset_test.m_samples[n].x(i);
+        }
+
+        X.row(n) = fy;
+        y[n] = source_to_label[dataset_test.m_samples[n].y];
+    }
+
+
+    esvm::SVMClassifier svm;
+    svm.train(X, y);
+
+
+    //// Extrapolate
+
+    vector<int> yhat;
+
+    Eigen::MatrixXf X2(smallcloud->points.size(), dataset_train.m_numFeatures);
+
+    for(size_t idx = 0; idx < smallcloud->points.size(); ++idx) {
+
+        X2.row(idx) = Eigen::VectorXf(dataset_train.m_numFeatures);
+
+        //set samples
+        X2(idx, 0) = smallcloud->at(idx).x;
+        X2(idx, 1) = smallcloud->at(idx).y;
+        X2(idx, 2) = smallcloud->at(idx).z;
+        X2(idx, 3) = smallcloud->at(idx).intensity;
+        X2(idx, 4) = smallcloud->at(idx).normal_x;
+        X2(idx, 5) = smallcloud->at(idx).normal_y;
+        X2(idx, 6) = smallcloud->at(idx).normal_z;
+        X2(idx, 7) = (*pca)[idx][0];
+        X2(idx, 8) = (*pca)[idx][1];
+        X2(idx, 9) = (*pca)[idx][2];
+
+    }
+
+    svm.test(X2, yhat);
+
+
+    ///// OUTPUT //////////
+
+    // Select fg and bg
+    std::vector<boost::shared_ptr<std::vector<int>>> seg_selections(2);
+    for(int i = 0; i < 2; i++){
+        seg_selections[i] = boost::make_shared<std::vector<int>>();
+    }
+
+    for(size_t idx = 0; idx < cloud->points.size(); ++idx) {
+        int idx_small = big_to_small[idx];
+        int label = yhat[idx_small] < 0 ? 0 :1;
+        seg_selections[label]->push_back(idx);
+    }
+
+
+    core_->us_->beginMacro("SVM");
+
+    for(int i = 0; i < 2; i++){
+        if(seg_selections[i]->size() > 0) {
+            core_->us_->push(new Select(cl_->active_, seg_selections[i], false, 1 << i));
+        }
+    }
+
+    core_->us_->endMacro();
+
 }
 
 Q_PLUGIN_METADATA(IID "za.co.circlingthesun.cloudclean.iplugin")

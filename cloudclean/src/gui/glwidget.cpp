@@ -291,6 +291,9 @@ void GLWidget::keyPressEvent(QKeyEvent * event) {
         else if (event->modifiers() != Qt::ControlModifier)
             camera_.translate(-translate_unit_ * Vector3f::UnitY());
         return;
+   case Qt::Key_C:
+        camera_.toggleRollCorrection();
+        return;
 
     //
     // Reset

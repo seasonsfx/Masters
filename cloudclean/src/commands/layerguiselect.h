@@ -15,10 +15,10 @@ class LayerList;
 class PointCloud;
 class Layer;
 
-class COMMAND_API LayerGuiSelect : public QUndoCommand
+class COMMAND_API LayerFromSelection : public QUndoCommand
 {
  public:
-    LayerGuiSelect(boost::shared_ptr<std::vector<uint16_t> > labels,
+    LayerFromSelection(boost::shared_ptr<std::vector<uint16_t> > labels,
                     LayerList * ll, bool subtractive = true);
     QString actionText();
     virtual void undo();
@@ -30,8 +30,9 @@ class COMMAND_API LayerGuiSelect : public QUndoCommand
     bool subtractive_;
     boost::shared_ptr<std::vector<uint16_t> > labels_;
     LayerList * ll_;
-    boost::weak_ptr<Layer> new_layer_;
+    uint new_layer_id_;
     std::map<Layer *, std::vector<uint16_t> > removed_from_;
+    bool applied_once_;
 };
 
 #endif // LayerGuiSelect_H

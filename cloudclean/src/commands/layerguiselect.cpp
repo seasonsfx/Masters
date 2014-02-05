@@ -1,27 +1,33 @@
 #include "layerguiselect.h"
-
+#include <QDebug>
 #include <model/layerlist.h>
 #include <model/pointcloud.h>
 #include <model/layer.h>
 
-LayerGuiSelect::LayerGuiSelect(boost::shared_ptr<std::vector<uint16_t> > labels,
+LayerFromSelection::LayerFromSelection(boost::shared_ptr<std::vector<uint16_t> > labels,
                                  LayerList * ll, bool subtractive) {
     subtractive_ = subtractive;
     labels_ = labels;
     ll_ = ll;
+    new_layer_id_ = -1;
+    applied_once_ = false;
 }
 
-QString LayerGuiSelect::actionText(){
+QString LayerFromSelection::actionText(){
     return "New Layer";
 }
 
-void LayerGuiSelect::undo(){
+void LayerFromSelection::undo(){
+
+    boost::shared_ptr<Layer> layer = ll_->getLayer(new_layer_id_);
 
     // Delete layer
-    if(!new_layer_.expired()){
-        auto layer = new_layer_.lock();
-        ll_->deleteLayer(layer);
+    if(layer == nullptr){
+        qDebug() << "This should not happen";
+        return;
     }
+
+    ll_->deleteLayer(layer);
 
     // TODO: Freelist is not updated
 
@@ -35,9 +41,14 @@ void LayerGuiSelect::undo(){
 
 }
 
-void LayerGuiSelect::redo(){
-    boost::shared_ptr<Layer> layer = ll_->addLayer();
-    new_layer_ = layer;
+void LayerFromSelection::redo(){
+    boost::shared_ptr<Layer> layer;
+    if(applied_once_)
+        layer = ll_->addLayerWithId(new_layer_id_);
+    else
+        layer = ll_->addLayer();
+
+    new_layer_id_ = layer->getId();
 
     if(subtractive_){
         // Subtractive remove labels from layers
@@ -57,12 +68,13 @@ void LayerGuiSelect::redo(){
         layer->addLabel(label);
     }
 
+    applied_once_ = true;
 }
 
-bool LayerGuiSelect::mergeWith(const QUndoCommand *other){
+bool LayerFromSelection::mergeWith(const QUndoCommand *other){
     return false;
 }
 
-int LayerGuiSelect::id() const{
+int LayerFromSelection::id() const{
     return 3;
 }

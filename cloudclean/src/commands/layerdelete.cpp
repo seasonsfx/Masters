@@ -1,5 +1,5 @@
 #include "layerdelete.h"
-
+#include <QDebug>
 #include <model/layerlist.h>
 #include <model/layer.h>
 
@@ -9,7 +9,7 @@ LayerDelete::LayerDelete(boost::shared_ptr<Layer> layer, LayerList * ll) {
     col_ = layer->getColor();
     name_ = layer->getName();
     ll_ = ll;
-    layer_ = layer;
+    id_ = layer->getId();
 }
 
 QString LayerDelete::actionText(){
@@ -24,14 +24,16 @@ void LayerDelete::undo(){
     for(uint16_t label : labels_){
         layer->addLabel(label);
     }
-    layer_ = layer;
+
+    qDebug() << "Undeleted layer: " << layer->getId() << " that had label" << id_;
 }
 
 void LayerDelete::redo(){
     // Delete layer
-    boost::shared_ptr<Layer> layer = layer_.lock();
-    id_ = layer->getId();
+    boost::shared_ptr<Layer> layer = ll_->getLayer(id_);
     ll_->deleteLayer(layer);
+
+    qDebug() << "Deleted layer: " << id_;
 }
 
 bool LayerDelete::mergeWith(const QUndoCommand *other){

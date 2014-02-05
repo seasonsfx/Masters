@@ -56,6 +56,8 @@ Camera::Camera() {
     depth_near_ = 1.0f;
     depth_far_ = 1000.f;
 
+    roll_correction_ = true;
+
     rotation_current_ = AngleAxis<float>(-M_PI/2.0, Vector3f(1.0f, 0.0f, 0.0f));
     rotation_future_ = AngleAxis<float>(-M_PI/2.0, Vector3f(1.0f, 0.0f, 0.0f));
 
@@ -86,6 +88,7 @@ Camera::Camera() {
         else {
             translation_speed_ = 1;
         }
+
     });
 
     timer_->start(1000/60);
@@ -198,6 +201,9 @@ void Camera::rotate2D(float x, float y) {
     if(angle < 0)
         correction_factor = 0;
 
+    if(!roll_correction_)
+        correction_factor = 0;
+
     AngleAxis<float> roll_correction(correction_factor*-roll, Vector3f::UnitZ());
     rotation_future_ = roll_correction * rotation_future_;
     rotation_future_.normalize();
@@ -257,7 +263,7 @@ void Camera::rotate3D(float _yaw, float _pitch, float _roll) {
 void Camera::adjustFov(int val) {
     // Mouse seems to move in increments of 120
     val = -val/60.0f;
-    if (fov_future_ + val < 170.0f && fov_future_ + val > 2.0f)
+    if (fov_future_ + val < 100.0f && fov_future_ + val > 2.0f)
         setFoV(fov_future_ + val);
 
 }
@@ -265,4 +271,8 @@ void Camera::adjustFov(int val) {
 void Camera::birds_eye() {
     rotation_future_ = AngleAxis<float>(0, Vector3f(1, 0, 0));
     translation_future_ = 20 * -Vector3f::UnitZ();
+}
+
+void Camera::toggleRollCorrection(){
+    roll_correction_ = !roll_correction_;
 }

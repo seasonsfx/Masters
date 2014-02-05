@@ -47,7 +47,7 @@ class Brush3D : public IPlugin {
     void paint(const Eigen::Affine3f& proj, const Eigen::Affine3f& mv);
 
  private:
-    void select(QMouseEvent * event);
+    void select(float x, float y);
     bool mouseClickEvent(QMouseEvent * event);
     bool mouseMoveEvent(QMouseEvent * event);
     bool mousePressEvent(QMouseEvent * event);

@@ -93,8 +93,7 @@ boost::shared_ptr<Layer> LayerList::addLayer(boost::shared_ptr<Layer> layer){
 }
 
 boost::shared_ptr<Layer> LayerList::addLayerWithId(uint id) {
-    boost::shared_ptr<Layer> layer(new Layer(layer_lookup_table_));
-    layer->id_ = id;
+    boost::shared_ptr<Layer> layer(new Layer(layer_lookup_table_, id));
     return addLayer(layer);
 }
 
@@ -167,8 +166,9 @@ void LayerList::deleteLayer(boost::shared_ptr<Layer> layer) {
     }
 }
 
+// the idx here is the position in the list
 void LayerList::deleteLayer(int idx){
-    disconnect(layers_[idx].get(), SIGNAL(colorChanged()),
+    disconnect(layers_.at(idx).get(), SIGNAL(colorChanged()),
                this, SIGNAL(lookupTableUpdate()));
     beginRemoveRows(QModelIndex(), idx, idx);
 

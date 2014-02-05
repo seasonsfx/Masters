@@ -38,7 +38,7 @@ class COMMAND_API NewLayer : public QUndoCommand
     boost::shared_ptr<std::vector<int> > idxs_;
     LayerList * ll_;
 
-    boost::weak_ptr<Layer> new_layer_;
+    uint new_layer_id_;
     QColor layer_color_;
 
     bool applied_once_;

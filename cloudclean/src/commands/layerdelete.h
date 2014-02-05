@@ -31,7 +31,6 @@ class COMMAND_API LayerDelete : public QUndoCommand {
     QString name_;
     LayerList * ll_;
     uint id_;
-    boost::weak_ptr<Layer> layer_;
 };
 
 #endif // LayerFromLabels_H

@@ -120,17 +120,17 @@ MainWindow::MainWindow(QUndoStack *us, CloudList * cl, LayerList * ll, QWidget *
     menus_.insert(tr("View"), view_menu_);
     menus_.insert(tr("Window"), window_menu_);
 
-    QAction * load = new QAction(tr("Load"), this);
+    QAction * load = new QAction(tr("Load PTX"), this);
     load->setIcon(style->standardIcon(QStyle::SP_DirIcon));
-    QAction * save = new QAction(tr("Save"), this);
-    save->setIcon(style->standardIcon(QStyle::SP_DialogSaveButton));
+    //QAction * save = new QAction(tr("Save"), this);
+    //save->setIcon(style->standardIcon(QStyle::SP_DialogSaveButton));
     connect(load, SIGNAL(triggered()), this, SLOT(loadFile()));
-    connect(save, SIGNAL(triggered()), this, SLOT(saveFile()));
+    //connect(save, SIGNAL(triggered()), this, SLOT(saveLayer()));
 
-    toolbar_->addAction(load);
-    toolbar_->addAction(save);
+    //toolbar_->addAction(load);
+    //toolbar_->addAction(save);
     file_menu_->addAction(load);
-    file_menu_->addAction(save);
+    //file_menu_->addAction(save);
 
     QAction * exitAct = new QAction(tr("E&xit"), this);
     exitAct->setShortcuts(QKeySequence::Quit);
@@ -229,16 +229,16 @@ void MainWindow::removeMenu(QAction * action, QString menu_name){
 
 void MainWindow::loadFile(){
     QString filename = QFileDialog::getOpenFileName(
-                 this, tr("Open Scan"), "~", tr("PTX Files (*.ptx)"));
+                 nullptr, tr("Open Scan"), QDir::home().absolutePath(), tr("PTX Files (*.ptx)"));
     if (filename.length() == 0)
         return;
 
     std::thread(&CloudList::loadFile, cl_, filename).detach();
 }
 
-void MainWindow::saveFile(){
+void MainWindow::saveLayer(){
     QString filename = QFileDialog::getSaveFileName(
-                 this, tr("Save Scan"), "~", tr("PTX Files (*.ptx)"));
+                nullptr, tr("Save layer as PTX"), QDir::home().absolutePath(), tr("PTX Files (*.ptx)"));
     if (filename.length() == 0)
         return;
 

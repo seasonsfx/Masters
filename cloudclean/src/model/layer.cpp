@@ -2,12 +2,12 @@
 #include <cstdlib>
 #include <QDebug>
 
-Layer::Layer(std::map<uint16_t, LayerSet> & layer_lookup_table)
+Layer::Layer(std::map<uint16_t, LayerSet> & layer_lookup_table, uint id)
     : layer_lookup_table_(layer_lookup_table) {
     name_ = QString("New Layer ") + QString::number(last_id_);
     color_.setHsl(rand()%359, rand()%55 + 200, 127);
     visible_ = true;
-    id_ = last_id_++;
+    id_ = id;
 }
 
 Layer::~Layer(){

@@ -1,5 +1,5 @@
 #include "layerfromlabels.h"
-
+#include <QDebug>
 #include <model/layerlist.h>
 #include <model/pointcloud.h>
 #include <model/layer.h>
@@ -10,6 +10,8 @@ LayerFromLabels::LayerFromLabels(boost::shared_ptr<std::vector<uint16_t> > label
     labels_ = labels;
     ll_ = ll;
     layer_name_ = layer_name;
+    new_layer_id_ = -1;
+    applied_once_ = false;
 }
 
 QString LayerFromLabels::actionText(){
@@ -19,12 +21,14 @@ QString LayerFromLabels::actionText(){
 void LayerFromLabels::undo(){
 
     // Delete layer
-    if(!new_layer_.expired()){
-        auto layer = new_layer_.lock();
-        ll_->deleteLayer(layer);
+    boost::shared_ptr<Layer> new_layer = ll_->getLayer(new_layer_id_);
+    if(new_layer == nullptr){
+        qDebug() << "Layer went missing, can't undo new layer";
+    } else {
+        ll_->deleteLayer(new_layer);
     }
 
-    // TODO: Freelist is not updated. Feelist is bs! For now
+    // TODO: Freelist is not updated. Feelist is bs! For now..
 
     // Undo subtractive
     if(subtractive_) {
@@ -38,9 +42,15 @@ void LayerFromLabels::undo(){
 }
 
 void LayerFromLabels::redo(){
-    boost::shared_ptr<Layer> layer = ll_->addLayer();
+    boost::shared_ptr<Layer> layer;
+
+    if(!applied_once_)
+        layer = ll_->addLayer();
+    else
+        layer = ll_->addLayerWithId(new_layer_id_);
+
     layer->setName(layer_name_);
-    new_layer_ = layer;
+    new_layer_id_ = layer->getId();
 
     if(subtractive_){
         // Subtractive remove labels from layers
@@ -60,6 +70,7 @@ void LayerFromLabels::redo(){
         layer->addLabel(label);
     }
 
+    applied_once_ = true;
 }
 
 bool LayerFromLabels::mergeWith(const QUndoCommand *other){

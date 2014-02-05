@@ -311,11 +311,15 @@ bool PointCloud::load_ptx(const char* filename, int decimation_factor) {
     });
 
     fclose(pfile);
+
+    filepath_ = QString(filename);
+
     return this;
 }
 
 void PointCloud::translate(const Eigen::Vector3f& pos) {
     sensor_origin_ += Vector4f(pos.x(), pos.y(), pos.z(), 0);
+    emit transformed();
 }
 
 void PointCloud::rotate2D(float x, float y) {
@@ -388,14 +392,6 @@ void PointCloud::resetOrientation() {
     qDebug() << "reset";
     sensor_orientation_ = sensor_orientation_.setIdentity();
     emit transformed();
-}
-
-void PointCloud::flagsUpdated(boost::shared_ptr<std::vector<int> > idxs) {
-    emit flagUpdate(idxs);
-}
-
-void PointCloud::labelsUpdated(boost::shared_ptr<std::vector<int> > idxs) {
-    emit labelUpdate(idxs);
 }
 
 std::vector<boost::shared_ptr<std::vector<int> > > PointCloud::getSelections() {

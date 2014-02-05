@@ -3,6 +3,8 @@
 #include <QDebug>
 #include <QColorDialog>
 #include <QMenu>
+#include <QFileDialog>
+#include <QDir>
 #include <boost/make_shared.hpp>
 
 #include "commands/newlayer.h"
@@ -234,6 +236,32 @@ void LayerListView::contextMenu(const QPoint &pos) {
         });
         menu.addAction(&select_layer);
 
+        QAction save_layer("Save Layer(s)", 0);
+
+        connect(&save_layer, &QAction::triggered, [&] () {
+                QString filename = QFileDialog::getSaveFileName(
+                            nullptr, tr("Save layer as PTX"), QDir::home().absolutePath(), tr("PTX Files (*.ptx)"));
+                if (filename.length() == 0)
+                    return;
+
+                std::set<uint16_t> slabels;
+                for(boost::weak_ptr<Layer> wl : ll_->getSelection()) {
+                    boost::shared_ptr<Layer> l = wl.lock();
+                    for(uint16_t label : l->getLabelSet()){
+                        slabels.insert(label);
+                    }
+                }
+
+                std::vector<uint16_t> labels;
+                for(uint16_t label : slabels){
+                    labels.push_back(label);
+                }
+
+                std::thread(&CloudList::saveFile, cl_, filename, labels).detach();
+        });
+
+        menu.addAction(&save_layer);
+
         menu.exec(ui_->tableView->mapToGlobal(pos));
     }
 }
@@ -244,7 +272,10 @@ void LayerListView::setColor() {
     Layer & l = *ll_->getLayers()[id];
     if(random)
         l.setRandomColor();
-    else
-        l.setColor(QColorDialog::getColor(l.color_));
+    else {
+        QColor new_col = QColorDialog::getColor(l.color_);
+        if(new_col.isValid())
+            l.setColor(new_col);
+    }
     emit update();
 }

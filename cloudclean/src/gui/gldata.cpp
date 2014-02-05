@@ -31,10 +31,12 @@ GLData::GLData(QGLContext * glcontext, CloudList *cl, LayerList *ll, QObject *pa
 void GLData::reloadCloud(boost::shared_ptr<PointCloud> cloud){
     glcontext_->makeCurrent();
     cloudgldata_[cloud].reset(new CloudGLData(cloud));
+    connect(cloudgldata_[cloud].get(), &CloudGLData::updated, this, &GLData::update);
     emit update();
 }
 
 void GLData::deleteCloud(boost::shared_ptr<PointCloud> cloud){
+    disconnect(cloudgldata_[cloud].get(), &CloudGLData::updated, this, &GLData::update);
     cloudgldata_.erase(cloudgldata_.find(cloud));
 }
 

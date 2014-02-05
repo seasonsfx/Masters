@@ -48,4 +48,4 @@ void ${camel_name}::myFunc(){
     qDebug() << "Myfunc";
 }
 
-Q_PLUGIN_METADATA(IID "za.co.circlingthesun.cloudclean.iplugin")
+Q_PLUGIN_METADATA(IID "za.co.circlingthesun.cloudclean.${lower_name}")

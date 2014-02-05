@@ -23,6 +23,9 @@ class GUI_API CloudGLData : public QObject{
     void copyGrid();
     // TOD0: enableGrid()
 
+ signals:
+    void updated();
+
  public slots:
     void syncCloud();
     void syncLabels(boost::shared_ptr<std::vector<int> > idxs = nullptr);

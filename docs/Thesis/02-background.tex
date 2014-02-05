@@ -1,87 +1,87 @@
 %!TEX root = thesis.tex
 \chapter{Background} \label{ch2}
 
-\section{Cultural heritage preservation}
-	What is it and why is it important?
-	\subsection{Zamani project}
-	\subsection{CyArk Project}
+In order to expedited the segmentation of laser range scans its important to both understand the problem domain as well as constrain the problem. We start this chapter by examining laser range scanning technology and how it is employed in the context cultural heritage domain.
 
-\section{Laser scanning}
-	\subsection{Processing pipeline}
-		\subsubsection{Data aquisition}
-			\begin{itemize}
-			\item Time of flight scanners
-			\item Triangulation scanners
-			\item Structure from motion
-			\item Scanner resolution increasing over time
-			\item Data
-			\begin{itemize}
-				\item Point coordinates
-				\item Non uniform density
-				\item Reflectance
-				\item RGB
-				\item Scanner position
-			\end{itemize}
-			\end{itemize}
+\section{Range scanners}
+	
+There is an enormous variety of range scanners. Time of flight scanners are generally used in the cultural heritage domain because of their long range (up to kilometers). Time of flight scanners work by sending out a laser pulses that reflect of objects and is then recorded by a sensor at the source. The time it takes to the pulse to return, along with the angle at which the pulse was fired, is used to determine the position of a point on a surface. There is more measurement error (millimeters) along the direction of the laser than the other two axis. This is due to measurement inaccuracies when timing the laser's travel time. Triangulation scanners are more accurate along the direction of the beam (tens of micrometers), but they have a shorter range compared to time of flight scanners. This makes them less popular when people try minimize the number of scans required to capture a site. (Other types of range scanners include structure from motion and structured light.)
+
+Time of flight scanners can be set to sample at different resolutions. Low resolution scans (10 000 points) may take seconds while higher resolution scans (millions of points) may take minutes depending on the model. All scanners return the X,Y and Z coordinates per sample. Most also return an intensity value of the reflected light. More expensive scanners are also mounted with a camera that associates RGB values with every sample. This makes it easier to texture (texture) the final model. Measuring the orientation and GPS position of the scanner is another optional feature that can ease registration process (discussed later).
+
+(Mention Averaged pixel on edges for time of flight)
+(Mention multiple sample pulse scanners)
+(Mention non uniform point density somewhere? too obvious?)
+(Mention scanner resolution increasing over time?)
+
+\section{3D reconstruction pipeline}
+Some processing is required in order to create a 3d model from a collection of laser range scans. Unwanted objects need to be removed or cleaned. Holes created by removals and occlusions need to be filled. The scans need to registered. Registration is the process of aligning all the scans on a common coordinate system (mention Iterative closest points?).Then the registered point sets have to turned into a surface model. This is also called meshing. Finally the model has to be textured. RGB data from the scanner can be used if it available. Alternatively photos from the site has to be mapped to the model. The second approach is somewhat more time consuming.
+
+The cleaning step can be omitted but the quality of the model will be affected. Objects such as trees or grass do not always mesh nicely, and floating bits of people as they walk around may not be aesthetically pleasing. Hole filling is also not strictly necessary. It can even be argued that it compromises the integrity of the historical record as the filled area would be fabricated.
+
+The first 3 step also do not have to happen in order. It is often the case that hole filling, cleaning and registration tasks are interspersed. Cleaning may be detrimental to the reregistration process as useful correspondences may be removed. Cleaning scans after registration can however be problematic. If the scans have been merged into a single point cloud, loading the scan into main memory may not be an option on some programs. One also loses the 2d grid structure of the scan after merging. The scan's grid allows one to interpret the scan as a 2d image which may be easier to clean.
 
 
-		\subsubsection{Registration}
-			\begin{itemize}
-			\item 2.5D to full 3D
-			\item Iterative closest points
-			\end{itemize}
-		
-		\subsubsection{Cleaning}
-			\begin{itemize}
-			\item Time consuming
-			\item Classification task
-			\item Types of noise
-				\begin{itemize}
-				\item Averaged pixel on edges
-				\item Static noise
-				\item Moving noise
-				\end{itemize}
-			\item No points are modified
-			\item Focus on interactivity and accuracy
-			\item Manual vs automated tools
-			\item Tradeoffs between cleaning before and after registration
-			\end{itemize}
+\section{Point cloud cleaning}
+	Focused specifically on the task of point cloud cleaning in heritage scenes
 
-		\subsubsection{Final steps}
-			\begin{itemize}
-			\item Surface reconstruction (Mention)
-			\item Hole filling (Mention)
-			\item Texturing (Mention)
-			\end{itemize}
+	\subsection{Problem}
+	Characterize heritage scenes
+	\begin{itemize}
+		\item Large scans
+		\item many scans
+		\item Non uniform density
+		\item Large point sets
+		\item Hard to distinguish trees from walls
+	\end{itemize}
 
-
-\section{Pointcloud Cleaning}
 	\subsection{Existing systems}
 		\begin{itemize}
-		\item Z\&Y
-		\item Cyclone
-		\item Pointools
-		\item Meshlab
-		\item VR Mesh Studio
-		\item Carlson Pointcloud
-		\item 3D Reshaper
-		\item Terrascan
+			\item Z\&Y
+			\item Cyclone
+			\item Pointools
+			\item Meshlab
+			\item VR Mesh Studio
+			\item Carlson Pointcloud
+			\item 3D Reshaper
+			\item Terrascan
 		\end{itemize}
 
 	\subsection{Evaluation of existing systems}
-		\begin{itemize}
-		\item None of the automated methods work well for trees
-		\item Proprietary with the exception of Meshlab
-		\end{itemize}		
+	We should look at existing systems in terms of a testing framework
+	Evaluate their tools
+	Evaluate user interface
+	\begin{itemize}
+		\item navigation: camera vs object move
+		\item tool set (what tools are available)
+		\item license
+		\item 2d/3d editing
+		\item extensibility (why did I not use it)
+	\end{itemize}
 
-\section{Image segmentation}
+
+\section{Previous work}
+Point cloud cleaning is a interactive segmentation problem. Segmentation is by no means a new problem.
+
+\subsection{Taxonomy}
+\begin{itemize}
+	\item Interactive/Automated
+	\item Information: 2D/2.5D/3D/nD, color, multi-sample, intensity
+	\item Resolution: High, Medium, Low
+	\item Features: Texture, FPFH, Normals, ...
+	\item Target: trees, ground, walls, people, generic
+	\item Parameters: Low, Medium, High
+\end{itemize}
+
+
+\subsection{Image segmentation}
 	Scans are simply a depth maps so 2D image techniques should be investigated
 	\subsection{Image gradients}
 	\subsection{Edge detection}
 	\subsection{Blob extraction}
-	\subsection{Controur extraction}
+	\subsection{Contour extraction}
 
-\section{Laser scan segmentation}
+\subsection{Laser scan segmentation}
 	\subsection{Point features}
 		\subsubsection{Normals}
 			Basic building block for other features
@@ -112,20 +112,20 @@
 
 	\subsection{Region growing}
 		\begin{itemize}
-		\item Grow neighbourhood from seedpoint
-		\item Add neighbour if it satisfies some similatrity criteria
+		\item Grow neighbourhood from seed point
+		\item Add neighbour if it satisfies some similarity criteria
 		\item Point feature can be used to determine similarity
 		\end{itemize}
 
 	\subsection{K-means clustering}
-		Problems with non uniform denisty
+		Problems with non uniform density
 
 	\subsection{Graph cuts}
 		\begin{itemize}
 		\item Binary classification
-		\item Encode point similatity edges
+		\item Encode point similarity edges
 		\item Shown to work well with arbitrary objects
-		\item Results are parameter dependend
+		\item Results are parameter depended
 		\end{itemize}
 
 	\subsection{Machine learning}
@@ -137,27 +137,27 @@
 		\item Requires training
 		\end{itemize}
 		
-	\subsection{Evaluation of literature}
-		\begin{itemize}
-		\item FPFH seems to discriminate well for primitive geometry. Might be a useful featature to use in tree classification.
-		\item Machine learning has been used to classify vegitation. It however requires training and classified datasets are rare. Possibility to train a classifier on the on scans in the application. Unpredictable accuracy.
-		\item Graph cuts have been shown be effective for automated object classification. Augmented with more edge information accuracty may be improved with minimal user interaction.
-		\end{itemize}
+	% \subsection{Evaluation of literature}
+	% 	\begin{itemize}
+	% 	\item FPFH seems to discriminate well for primitive geometry. Might be a useful feature to use in tree classification.
+	% 	\item Machine learning has been used to classify vegetation. It however requires training and classified datasets are rare. Possibility to train a classifier on the on scans in the application. Unpredictable accuracy.
+	% 	\item Graph cuts have been shown be effective for automated object classification. Augmented with more edge information accuracy may be improved with minimal user interaction.
+	% 	\end{itemize}
 
 \section{Evaluation techniques}
 \begin{itemize}
 	\item What was used in previous work and would it be suitable in this instance?
 \end{itemize}
 	
-\section{User interaction}
-	\begin{itemize}
-		\item Level of interactvity expected?
-		\item Characteristics of interfaces?
-		\item Basic expected functionality?
-		\item Suitable evaluation techniques
-	\end{itemize}
+% \section{User interaction}
+% 	\begin{itemize}
+% 		\item Level of interactivity expected?
+% 		\item Characteristics of interfaces?
+% 		\item Basic expected functionality?
+% 		\item Suitable evaluation techniques
+% 	\end{itemize}
 		
 
-\section{Conclusion?}
-What do I conclude from all this and lead into the next chapter.		
+\section{Conclusion}
+%What do I conclude from all this and lead into the next chapter.		
 

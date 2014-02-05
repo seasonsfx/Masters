@@ -399,6 +399,11 @@ void Markov::randomforest(){
     }
 
 
+    for(int i = 0; i < 10 /*dataset_train.m_samples.size()*/; i++){
+        std::cout << "train:\t\t\t\t" << dataset_train.m_samples[i].y << std::endl << dataset_train.m_samples[i].x << std::endl;
+        std::cout << "test:\t\t\t\t" << dataset_test.m_samples[i].y << std::endl << dataset_test.m_samples[i].x << std::endl;
+    }
+
 
     dataset_test.m_numClasses = labels.size();
     dataset_test.m_numSamples = dataset_test.m_samples.size();

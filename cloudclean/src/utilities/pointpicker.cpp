@@ -106,6 +106,10 @@ int pick(int win_x, int win_y, int win_width, int win_height, float max_dist,
     const Octree::Ptr octree_ptr = pc->octree();
     octree_ptr->getIntersectedVoxelIndices(origin, direction, intercept_indices);
 
+    // get ray point on far plane
+    Eigen::Vector3f far_point = proj * cam_mv * p2;
+    far_point[2] = 0.0f;
+
     // Find point
     for (int i : intercept_indices) {
 
@@ -124,21 +128,13 @@ int pick(int win_x, int win_y, int win_width, int win_height, float max_dist,
 
         pcl::PointXYZI & p = pc->points[i];
 
+        Eigen::Vector3f query_point = proj * mv * p.getVector3fMap();
+        query_point[2] = 0.0f;
 
-        //Eigen::Vector3f point(p.x(), p.y(), p.z());
-
-        // Skip points to far from the line
-        // Totod make parameter
-        float dist_to_line = pointToLineDist(p.getVector3fMap(), p1, p2);
-        if(dist_to_line > max_dist)
-            continue;
-
-        // Point distance to camera
-        float dist_to_cam = (p.getVector3fMap()-p1).norm();
-
-        if (dist_to_cam < min_val) {
+        float dist = (query_point - far_point).norm();
+        if (dist < min_val) {
             min_index = i;
-            min_val = dist_to_cam;
+            min_val = dist;
         }
     }
 

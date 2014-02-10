@@ -34,7 +34,7 @@ MainWindow::MainWindow(QUndoStack *us, CloudList * cl, LayerList * ll, QWidget *
     ll_ = ll;
     cl_ = cl;
 
-    progressbar_ = new QProgressBar();
+    progressbar_ = new QProgressBar(this);
     statusbar_ = statusBar();
     tabs_ = new QTabWidget(this);
 
@@ -105,10 +105,10 @@ MainWindow::MainWindow(QUndoStack *us, CloudList * cl, LayerList * ll, QWidget *
 
     mb_ = menuBar();
 
-    file_menu_ = new QMenu(tr("File"));
-    edit_menu_ = new QMenu(tr("Edit"));
-    view_menu_ = new QMenu(tr("View"));
-    window_menu_ = new QMenu(tr("Window"));
+    file_menu_ = new QMenu(tr("File"), this);
+    edit_menu_ = new QMenu(tr("Edit"), this);
+    view_menu_ = new QMenu(tr("View"), this);
+    window_menu_ = new QMenu(tr("Window"), this);
 
     mb_->addMenu(file_menu_);
     mb_->addMenu(edit_menu_);
@@ -228,17 +228,22 @@ void MainWindow::removeMenu(QAction * action, QString menu_name){
 }
 
 void MainWindow::loadFile(){
+    QSettings settings;
+
+    QString path = settings.value("load/lastlocation", QDir::home().absolutePath()).toString();
     QString filename = QFileDialog::getOpenFileName(
-                 nullptr, tr("Open Scan"), QDir::home().absolutePath(), tr("PTX Files (*.ptx)"));
+                 this, tr("Open Scan"), path , tr("PTX Files (*.ptx)"));
     if (filename.length() == 0)
         return;
 
+    settings.setValue("load/lastlocation", QFileInfo(filename).absolutePath());
+    settings.sync();
     std::thread(&CloudList::loadFile, cl_, filename).detach();
 }
 
 void MainWindow::saveLayer(){
     QString filename = QFileDialog::getSaveFileName(
-                nullptr, tr("Save layer as PTX"), QDir::home().absolutePath(), tr("PTX Files (*.ptx)"));
+                this, tr("Save layer as PTX"), QDir::home().absolutePath(), tr("PTX Files (*.ptx)"));
     if (filename.length() == 0)
         return;
 

@@ -9,12 +9,15 @@
 #include <QApplication>
 #include <QToolBar>
 #include <QVBoxLayout>
+#include <QHBoxLayout>
 #include <QDoubleSpinBox>
 #include <QLabel>
 #include <QSpacerItem>
 #include <QStackedWidget>
 #include <QSlider>
+#include <QButtonGroup>
 #include <QDockWidget>
+#include <QPushButton>
 #include "model/layerlist.h"
 #include "model/cloudlist.h"
 #include "gui/glwidget.h"
@@ -58,11 +61,9 @@ void Brush3D::initialize(Core *core){
 
     mw_->tooloptions_->addWidget(settings_);
 
-    QHBoxLayout * hb = new QHBoxLayout(settings_);
-    layout->addItem(hb);
+    QHBoxLayout * sliderbox = new QHBoxLayout(settings_);
+    layout->addItem(sliderbox);
     layout->addItem(new QSpacerItem(0, 0, QSizePolicy::Maximum, QSizePolicy::Maximum));
-
-
     QSlider * slider = new QSlider(settings_);
     slider->setOrientation(Qt::Horizontal);
     slider->setRange(1, 300);
@@ -70,11 +71,29 @@ void Brush3D::initialize(Core *core){
     slider->setToolTip("Radius in cm");
     slider->setValue(radius_*100);
     slider->setTickPosition(QSlider::TicksBelow);
-
     QLabel * label = new QLabel("Radius", settings_);
+    sliderbox->addWidget(label);
+    sliderbox->addWidget(slider);
 
-    hb->addWidget(label);
-    hb->addWidget(slider);
+    QColor colors[] = {
+        QColor(255, 0, 0, 255), // Red
+        QColor(0, 255, 0, 255), // Green
+        QColor(0, 0, 255, 255), // Blue
+        QColor(255, 255, 0, 255), // Yellow
+        QColor(0, 255, 255, 255), // Cyan
+        QColor(255, 0, 255, 255), // Magenta
+        QColor(255, 128, 0, 255), // Orange
+        QColor(128, 0, 255, 255) // Purple
+    };
+
+    QButtonGroup * colorbox = new QButtonGroup(settings_);
+    for(int i = 0; i < 8; i++){
+        QPushButton * btn = new QPushButton();
+        QString qss = QString("background-color: %1").arg(colors[i].name());
+        btn->setStyleSheet(qss);
+        colorbox->addButton(btn);
+    }
+
 
     connect(slider, SIGNAL(valueChanged(int)), this, SLOT(setRad(int)));
 }

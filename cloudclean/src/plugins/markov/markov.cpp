@@ -72,7 +72,7 @@ void Markov::initialize2(PluginManager * pm) {
         svm();
     });
 
-    mw_->toolbar_->addAction(svm_action_);
+    //mw_->toolbar_->addAction(svm_action_);
 
     enabled_ = false;
     fg_idx_ = -1;
@@ -84,7 +84,7 @@ void Markov::cleanup(){
     //delete enable_;
     //delete picker_;
     delete forrest_action_;
-    delete svm_action_;
+    //delete svm_action_;
 }
 
 Markov::~Markov(){

@@ -46,7 +46,7 @@ void Brush2D::initialize(Core *core){
     radius_ = 20;
 
     settings_ = new QWidget();
-    settings_->setLayout(new QHBoxLayout(settings_));
+    settings_->setLayout(new SliderLayout(settings_));
 
     QSlider * slider = new QSlider(settings_);
     slider->setOrientation(Qt::Horizontal);

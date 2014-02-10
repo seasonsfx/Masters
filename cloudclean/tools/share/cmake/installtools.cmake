@@ -1,46 +1,61 @@
-function(find_dlls lib_files dll_dir dll_files)
+#
+#   Windows helper function to resolve dll's for .lib files
+#
+FUNCTION(FIND_DLLS LIB_LIST DLL_PATH DLL_LIST_OUT)
 
-    list( REMOVE_ITEM lib_files debug optimized)
+    LIST(REMOVE_ITEM LIB_LIST debug optimized)
 
-    foreach( library ${lib_files} )
-        get_filename_component( library_name ${library} NAME_WE )
-        get_filename_component( library_path ${library} PATH )
+    FOREACH(LIB ${LIB_LIST})
+        get_filename_component(LIB_NAME ${LIB} NAME_WE)
+        get_filename_component(LIB_PATH ${LIB} PATH)
 
-        string( REGEX REPLACE "^lib(.*)" "\\1" library_name ${library_name} )
-        
-        set(file_name ${library_name}.dll)
-        list(APPEND search_paths ${library_path} ${dll_dir})
-        
-        find_file(
-            ${library_name}
-            ${file_name}
+        STRING(REGEX REPLACE "^lib(.*)" "\\1" LIB_NAME ${LIB_NAME})
+
+        SET(DLL_FILE_NAME ${LIB_NAME}.dll)
+        SET(DLL_FILE_NAME2 lib${LIB_NAME}.dll)
+        #SET(SEARCH_PATHS "${SEARCH_PATHS} ${LIB_PATH} ${DLL_PATH}")
+        LIST(APPEND SEARCH_PATHS ${LIB_PATH} ${DLL_PATH})
+
+        FIND_FILE(
+            ${LIB_NAME}
+            ${DLL_FILE_NAME}
+            ${DLL_FILE_NAME2}
             HINTS
-            ${search_paths}
+            ${SEARCH_PATHS}
             $ENV{LIBPATH}
             $ENV{PATH}
             $ENV{SYSTEMROOT}/system32
             $ENV{VCINSTALLDIR}/bin
-        )
+            NO_DEFAULT_PATH
+       )
 
-        if( ${library_name} )
-            list( APPEND dll_file_list ${${library_name}} )
-            message("Found : " ${library_name})
-        else()
-            message("not found: " ${library_name})
-        endif()
+        IF(${LIB_NAME})
+            LIST(APPEND DLL_FILE_NAME_LIST ${${LIB_NAME}})
+            MESSAGE("Found : " ${LIB_NAME})
+        ELSE()
+            MESSAGE("not found: " ${LIB_NAME})
+            MESSAGE("SEARCHRED: ${SEARCH_PATHS}")
+        ENDIF()
 
-    endforeach()
-    if(NOT "${dll_file_list}" STREQUAL "")
-        list( REMOVE_DUPLICATES dll_file_list )
-    endif()
-    set(${dll_files} ${dll_file_list} PARENT_SCOPE)
-endfunction()
+    ENDFOREACH()
+    IF(NOT "${DLL_FILE_NAME_LIST}" STREQUAL "")
+        LIST(REMOVE_DUPLICATES DLL_FILE_NAME_LIST)
+    ENDIF()
+    SET(${DLL_LIST_OUT} ${DLL_FILE_NAME_LIST} PARENT_SCOPE)
+    MESSAGE("FOUND: ${DLL_FILE_NAME_LIST}")
+ENDFUNCTION()
 
-function(followsym _files real_files)
-    set (_resolvedFiles "")
-    foreach (_file ${_files})
+#
+#   Helper function to resolve symlinks
+#
+FUNCTION(RESOLVE_SYMLINKS _files real_files)
+    SET(_resolvedFiles "")
+    FOREACH(_file ${_files})
         get_filename_component(_resolvedFile "${_file}" REALPATH)
-        list (APPEND _resolvedFiles "${_resolvedFile}")
-    endforeach()
-    set(${real_files} ${_resolvedFiles} PARENT_SCOPE)
-endfunction()
+        LIST(APPEND _resolvedFiles "${_resolvedFile}")
+    ENDFOREACH()
+    SET(${real_files} ${_resolvedFiles} PARENT_SCOPE)
+ENDFUNCTION()
+
+get_target_property(QT_LIB_PATH Qt5::Core LOCATION)
+get_filename_component(QT_LIB_PATH ${QT_LIB_PATH} PATH)

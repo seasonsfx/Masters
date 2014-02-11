@@ -230,10 +230,13 @@ void Brush3D::select(float x, float y){
 
     int r = radius_ * 50;
 
+    screenToWorld(x-r, y-r, x+r, y+r, glwidget_->width(), glwidget_->height(), mv2, glwidget_->camera_.projectionMatrix(), p1, p2, 0);
+    float screen_rad = (p2-p1).norm()/2.0f;
     screenToWorld(x-r, y-r, x+r, y+r, glwidget_->width(), glwidget_->height(), mv2, glwidget_->camera_.projectionMatrix(), p1, p2, z);
-    float rad = (p2-p1).norm()/2.0f;
+    float world_rad = (p2-p1).norm()/2.0f;
 
-    rad = 1/rad;
+    float scale = screen_rad/world_rad;
+    float rad = r*scale;
 
     qDebug() << "rad: " << rad;
 

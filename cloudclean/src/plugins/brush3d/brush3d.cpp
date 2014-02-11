@@ -210,6 +210,34 @@ void Brush3D::select(float x, float y){
     if(idx == -1)
         return;
 
+    // need to determine the scaled radius
+    Eigen::Affine3f mv = glwidget_->camera_.projectionMatrix() * glwidget_->camera_.modelviewMatrix();
+    Eigen::Vector3f q = cl_->active_->modelview() * cl_->active_->points.at(idx).getVector3fMap();
+
+    Eigen::Vector3f proj_point = mv*q;
+    float z = proj_point.z();
+
+    float n = glwidget_->camera_.getNear();
+    float f = glwidget_->camera_.getFar();
+
+    z = (z - n)/(f - n);
+
+    qDebug() << "z: " << z;
+
+    // Find how big the radius on screen is in the world
+    Eigen::Vector3f p1, p2;
+    Eigen::Affine3f mv2 = glwidget_->camera_.modelviewMatrix() * cl_->active_->modelview();
+
+    int r = radius_ * 50;
+
+    screenToWorld(x-r, y-r, x+r, y+r, glwidget_->width(), glwidget_->height(), mv2, glwidget_->camera_.projectionMatrix(), p1, p2, z);
+    float rad = (p2-p1).norm()/2.0f;
+
+    rad = 1/rad;
+
+    qDebug() << "rad: " << rad;
+
+
     boost::shared_ptr<std::vector<int> > indices;
     indices.reset(new std::vector<int>());
 
@@ -217,7 +245,7 @@ void Brush3D::select(float x, float y){
     empty.reset(new std::vector<int>());
 
     std::vector<float> distsq;
-    cl_->active_->octree()->radiusSearch(idx, radius_, *indices, distsq);
+    cl_->active_->octree()->radiusSearch(idx, rad, *indices, distsq);
 
     bool negative_select = QApplication::keyboardModifiers() == Qt::ControlModifier;
 

@@ -50,7 +50,16 @@ class Layer;
 UTIL_API void screenToRay(int x, int y, int win_width, int win_height, const Eigen::Affine3f& mv,
                               const Eigen::Affine3f& projPointToLine,
                               Eigen::Vector3f& p1,
-                              Eigen::Vector3f& p2);
+                              Eigen::Vector3f& p2,
+                              float near = 0.0f,
+                              float far = 1.0f);
+
+UTIL_API void screenToWorld(int x1, int y1, int x2, int y2, int win_width, int win_height,
+                              const Eigen::Affine3f& mv,
+                              const Eigen::Affine3f& proj,
+                              Eigen::Vector3f& p1,
+                              Eigen::Vector3f& p2,
+                              float z);
 
 UTIL_API int pick(int win_x, int win_y, int win_width, int win_height, float max_dist,
         const Eigen::Affine3f& proj, const Eigen::Affine3f& cam_mv,

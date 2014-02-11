@@ -299,7 +299,7 @@ bool PointCloud::load_ptx(const char* filename, int decimation_factor) {
 
     // Start loading octree
     fut_octree_ = std::async(std::launch::async, [&, this](){
-        double resolution = 0.2;
+        double resolution = 0.02;
         qDebug() << "Start octree";
         Octree::Ptr octree = Octree::Ptr(new Octree(resolution));
         pcl::PointCloud<pcl::PointXYZI>::ConstPtr cptr(this, boost::serialization::null_deleter());

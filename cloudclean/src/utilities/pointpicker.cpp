@@ -55,7 +55,9 @@ void screenToRay(int x, int y, int win_width, int win_height,
                               const Eigen::Affine3f& mv,
                               const Eigen::Affine3f& proj,
                               Eigen::Vector3f& p1,
-                              Eigen::Vector3f& p2) {
+                              Eigen::Vector3f& p2,
+                              float near,
+                              float far) {
     double dX, dY, dZ;
 
     // Convert to double matrices
@@ -73,10 +75,42 @@ void screenToRay(int x, int y, int win_width, int win_height,
     y = win_height - y;
 
     // Unproject
-    gluUnProject(x, y, 0.0f, mvmatrix, projmatrix, viewport, &dX, &dY, &dZ);
+    gluUnProject(x, y, near, mvmatrix, projmatrix, viewport, &dX, &dY, &dZ);
     p1 = Eigen::Vector3f(static_cast<float>(dX), static_cast<float>(dY),
                          static_cast<float>(dZ));
-    gluUnProject(x, y, 1.0f, mvmatrix, projmatrix, viewport, &dX, &dY, &dZ);
+    gluUnProject(x, y, far, mvmatrix, projmatrix, viewport, &dX, &dY, &dZ);
+    p2 = Eigen::Vector3f(static_cast<float>(dX), static_cast<float>(dY),
+                         static_cast<float>(dZ));
+}
+
+void screenToWorld(int x1, int y1, int x2, int y2, int win_width, int win_height,
+                              const Eigen::Affine3f& mv,
+                              const Eigen::Affine3f& proj,
+                              Eigen::Vector3f& p1,
+                              Eigen::Vector3f& p2,
+                              float z) {
+    double dX, dY, dZ;
+
+    // Convert to double matrices
+    double mvmatrix[16];
+    double projmatrix[16];
+    for (int i = 0; i < 16; ++i) {
+        projmatrix[i] = proj.data()[i];
+        mvmatrix[i] = mv.data()[i];
+    }
+
+    // Fetch current viewport
+    int viewport[4] = {0, 0, win_width, win_height};
+
+    // Invert y axis
+    y1 = win_height - y1;
+    y2 = win_height - y2;
+
+    // Unproject
+    gluUnProject(x1, y1, z, mvmatrix, projmatrix, viewport, &dX, &dY, &dZ);
+    p1 = Eigen::Vector3f(static_cast<float>(dX), static_cast<float>(dY),
+                         static_cast<float>(dZ));
+    gluUnProject(x2, y2, z, mvmatrix, projmatrix, viewport, &dX, &dY, &dZ);
     p2 = Eigen::Vector3f(static_cast<float>(dX), static_cast<float>(dY),
                          static_cast<float>(dZ));
 }

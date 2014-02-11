@@ -65,6 +65,14 @@ class GUI_API Camera : public QObject {
 
     void setDepthRange(float near, float far);
 
+    inline float getNear(){
+        return depth_near_;
+    }
+
+    inline float getFar(){
+        return depth_far_;
+    }
+
     void setPosition(const Eigen::Vector3f& pos);
     void setPosition(float x, float y, float z)  {
         setPosition(Eigen::Vector3f(x, y, z));

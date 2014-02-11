@@ -107,8 +107,8 @@ int pick(int win_x, int win_y, int win_width, int win_height, float max_dist,
     octree_ptr->getIntersectedVoxelIndices(origin, direction, intercept_indices);
 
     // get ray point on far plane
-    Eigen::Vector3f far_point = proj * cam_mv * p2;
-    far_point[2] = 0.0f;
+    Eigen::Vector3f ray_point = proj * cam_mv * (p1+p2)/2;
+    ray_point[2] = 0.0f;
 
     // Find point
     for (int i : intercept_indices) {
@@ -131,7 +131,7 @@ int pick(int win_x, int win_y, int win_width, int win_height, float max_dist,
         Eigen::Vector3f query_point = proj * mv * p.getVector3fMap();
         query_point[2] = 0.0f;
 
-        float dist = (query_point - far_point).norm();
+        float dist = (query_point - ray_point).norm();
         if (dist < min_val) {
             min_index = i;
             min_val = dist;

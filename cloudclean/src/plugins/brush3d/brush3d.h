@@ -21,6 +21,8 @@ class GLWidget;
 class MainWindow;
 class QSpinbox;
 class QLabel;
+class QPushButton;
+class QButtonGroup;
 
 class Brush3D : public IPlugin {
     Q_INTERFACES(IPlugin)
@@ -52,6 +54,7 @@ class Brush3D : public IPlugin {
     bool mouseMoveEvent(QMouseEvent * event);
     bool mousePressEvent(QMouseEvent * event);
     bool mouseReleaseEvent(QMouseEvent * event);
+    void setSelectMask(uint8_t mask);
 
  private:
     Core * core_;
@@ -76,6 +79,8 @@ class Brush3D : public IPlugin {
 
     uint8_t select_mask_;
 
+    std::vector<QPushButton *> buttons_;
+    QButtonGroup * button_group_;
     QWidget * settings_;
 };
 

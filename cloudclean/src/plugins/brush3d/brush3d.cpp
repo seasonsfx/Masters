@@ -18,6 +18,7 @@
 #include <QButtonGroup>
 #include <QDockWidget>
 #include <QPushButton>
+#include <QGridLayout>
 #include "model/layerlist.h"
 #include "model/cloudlist.h"
 #include "gui/glwidget.h"
@@ -61,9 +62,7 @@ void Brush3D::initialize(Core *core){
 
     mw_->tooloptions_->addWidget(settings_);
 
-    QHBoxLayout * sliderbox = new QHBoxLayout(settings_);
-    layout->addItem(sliderbox);
-    layout->addItem(new QSpacerItem(0, 0, QSizePolicy::Maximum, QSizePolicy::Maximum));
+    //layout->addItem(new QSpacerItem(0, 0, QSizePolicy::Maximum, QSizePolicy::Maximum));
     QSlider * slider = new QSlider(settings_);
     slider->setOrientation(Qt::Horizontal);
     slider->setRange(1, 300);
@@ -71,9 +70,9 @@ void Brush3D::initialize(Core *core){
     slider->setToolTip("Radius in cm");
     slider->setValue(radius_*100);
     slider->setTickPosition(QSlider::TicksBelow);
-    QLabel * label = new QLabel("Radius", settings_);
-    sliderbox->addWidget(label);
-    sliderbox->addWidget(slider);
+
+    layout->addWidget(new QLabel("Radius:", settings_));
+    layout->addWidget(slider);
 
     QColor colors[] = {
         QColor(255, 0, 0, 255), // Red
@@ -86,13 +85,39 @@ void Brush3D::initialize(Core *core){
         QColor(128, 0, 255, 255) // Purple
     };
 
-    QButtonGroup * colorbox = new QButtonGroup(settings_);
+    button_group_ = new QButtonGroup(settings_);
+    button_group_->setExclusive(true);
+    QGridLayout * buttons = new QGridLayout(settings_);
+
+    buttons->setSizeConstraint(layout->SetMaximumSize);
+    buttons->setColumnStretch(0, 1);
+    buttons->setColumnStretch(1, 1);
+    buttons->setColumnStretch(2, 1);
+    buttons->setColumnStretch(3, 1);
+    buttons->setRowStretch(0, 1);
+    buttons->setRowStretch(1, 1);
+    buttons->setRowStretch(2, 1);
+    buttons->setRowStretch(3, 1);
+
     for(int i = 0; i < 8; i++){
         QPushButton * btn = new QPushButton();
-        QString qss = QString("background-color: %1").arg(colors[i].name());
+        QColor inverted(255-colors[i].red(), 255-colors[i].green(), 255-colors[i].blue());
+        QString qss = QString("QPushButton {background-color: %1; color: %2; padding: 0.25em;} QPushButton:checked {background-color: %3}").arg(colors[i].name()).arg(inverted.name()).arg(colors[i].name());
         btn->setStyleSheet(qss);
-        colorbox->addButton(btn);
+        btn->setCheckable(true);
+        button_group_->addButton(btn);
+        buttons_.push_back(btn);
+
+        buttons->addWidget(btn, i/4, i%4);
+        btn->setText(QString("%1").arg(i+1));
+        btn->connect(btn, &QPushButton::pressed, [this, i] (){
+            setSelectMask(1 << i);
+        });
     }
+
+    layout->setSizeConstraint(layout->SetMaximumSize);
+    layout->addWidget(new QLabel("Selection color:", settings_));
+    layout->addLayout(buttons);
 
 
     connect(slider, SIGNAL(valueChanged(int)), this, SLOT(setRad(int)));
@@ -290,6 +315,16 @@ void Brush3D::disable() {
     is_enabled_ = false;
 }
 
+void Brush3D::setSelectMask(uint8_t mask){
+    int pos = 0;
+    for(; pos < 8; ++pos){
+        if(1<<pos == mask)
+            break;
+    }
+    buttons_[pos]->setChecked(true);
+    select_mask_ = mask;
+}
+
 bool Brush3D::eventFilter(QObject *object, QEvent *event){
 
     // Bypass plugin via shift
@@ -309,28 +344,28 @@ bool Brush3D::eventFilter(QObject *object, QEvent *event){
 
         switch(static_cast<QKeyEvent*>(event)->key()){
         case Qt::Key_1:
-            select_mask_ = 1;
+            setSelectMask(1);
             return true;
         case Qt::Key_2:
-            select_mask_ = 2;
+            setSelectMask(2);
             return true;
         case Qt::Key_3:
-            select_mask_ = 4;
+            setSelectMask(4);
             return true;
         case Qt::Key_4:
-            select_mask_ = 8;
+            setSelectMask(8);
             return true;
         case Qt::Key_5:
-            select_mask_ = 16;
+            setSelectMask(16);
             return true;
         case Qt::Key_6:
-            select_mask_ = 32;
+            setSelectMask(32);
             return true;
         case Qt::Key_7:
-            select_mask_ = 64;
+            setSelectMask(64);
             return true;
         case Qt::Key_8:
-            select_mask_ = 128;
+            setSelectMask(128);
             return true;
         }
 

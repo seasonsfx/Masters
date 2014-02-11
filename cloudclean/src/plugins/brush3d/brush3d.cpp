@@ -238,7 +238,7 @@ void Brush3D::select(float x, float y){
     float scale = screen_rad/world_rad;
     float rad = screen_rad*scale;
 
-    qDebug() << "rad: " << screen_rad << world_rad;
+    qDebug() << "rad: " << screen_rad << world_rad << scale;
 
 
     boost::shared_ptr<std::vector<int> > indices;

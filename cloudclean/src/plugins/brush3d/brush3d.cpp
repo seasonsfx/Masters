@@ -289,9 +289,23 @@ bool Brush3D::mouseMoveEvent(QMouseEvent * event) {
                         int viewport[4] = {0, 0, glwidget_->x(), glwidget_->y()};
                         double wx, wy, wz;
 
+                        double mv [16];
+                        double proj [16];
+
+                        Eigen::Affine3f t = (glwidget_->camera_.modelviewMatrix() * cl_->active_->modelview());
+                        Eigen::Affine3f t2 = glwidget_->camera_.projectionMatrix();
+
+                        const float * mvt = t.data();
+                        const float * projt = t2.data();
+
+                        for(int i = 0; i < 16; i++){
+                            mv[i] = mvt[i];
+                            proj[i] = projt[i];
+                        }
+
                         gluProject(p.x(), p.y(), p.z(),
-                           (glwidget_->camera_.modelviewMatrix() * cl_->active_->modelview()).data(),
-                            glwidget_->camera_.projectionMatrix().data(),
+                            mv,
+                            proj,
                             viewport,
                             &wx, &wy, &wz);
 

@@ -19,6 +19,7 @@
 #include <QDockWidget>
 #include <QPushButton>
 #include <QGridLayout>
+#include <QCheckBox>
 #include "model/layerlist.h"
 #include "model/cloudlist.h"
 #include "gui/glwidget.h"
@@ -29,7 +30,7 @@
 #include "pluginsystem/core.h"
 
 QString Brush3D::getName(){
-    return "3D Brush Tool";
+    return "Brush Tool";
 }
 
 void Brush3D::initialize(Core *core){
@@ -41,12 +42,12 @@ void Brush3D::initialize(Core *core){
     mw_ = core_->mw_;
     initialized_gl = false;
 
-    select_mask_ = 1;
-
-    enable_ = new QAction(QIcon(":/images/brush3d.png"), "3d Brush Tool", 0);
+    enable_ = new QAction(QIcon(":/images/brush.png"), "Brush Tool", 0);
     enable_->setCheckable(true);
     enable_->setChecked(false);
 
+    last_picked_point_ = -1;
+    last_rad_ = 0;
     is_enabled_ = false;
     radius_ = 0.5f;
 
@@ -62,7 +63,6 @@ void Brush3D::initialize(Core *core){
 
     mw_->tooloptions_->addWidget(settings_);
 
-    //layout->addItem(new QSpacerItem(0, 0, QSizePolicy::Maximum, QSizePolicy::Maximum));
     QSlider * slider = new QSlider(settings_);
     slider->setOrientation(Qt::Horizontal);
     slider->setRange(1, 300);
@@ -74,51 +74,16 @@ void Brush3D::initialize(Core *core){
     layout->addWidget(new QLabel("Radius:", settings_));
     layout->addWidget(slider);
 
-    QColor colors[] = {
-        QColor(255, 0, 0, 255), // Red
-        QColor(0, 255, 0, 255), // Green
-        QColor(0, 0, 255, 255), // Blue
-        QColor(255, 255, 0, 255), // Yellow
-        QColor(0, 255, 255, 255), // Cyan
-        QColor(255, 0, 255, 255), // Magenta
-        QColor(255, 128, 0, 255), // Orange
-        QColor(128, 0, 255, 255) // Purple
-    };
+    layout->addWidget(new QLabel("Depth correct:", settings_));
+    QCheckBox * cb = new QCheckBox(settings_);
+    depth_adjust_ = true;
+    cb->setChecked(depth_adjust_);
+    layout->addWidget(cb);
+    cb->connect(cb, &QCheckBox::toggled, [this] (bool on) {
+        depth_adjust_ = on;
+    });
 
-    button_group_ = new QButtonGroup(settings_);
-    button_group_->setExclusive(true);
-    QGridLayout * buttons = new QGridLayout(settings_);
-
-    buttons->setSizeConstraint(layout->SetMaximumSize);
-    buttons->setColumnStretch(0, 1);
-    buttons->setColumnStretch(1, 1);
-    buttons->setColumnStretch(2, 1);
-    buttons->setColumnStretch(3, 1);
-    buttons->setRowStretch(0, 1);
-    buttons->setRowStretch(1, 1);
-    buttons->setRowStretch(2, 1);
-    buttons->setRowStretch(3, 1);
-
-    for(int i = 0; i < 8; i++){
-        QPushButton * btn = new QPushButton();
-        QColor inverted(255-colors[i].red(), 255-colors[i].green(), 255-colors[i].blue());
-        QString qss = QString("QPushButton {background-color: %1; color: %2; padding: 0.25em;} QPushButton:checked {background-color: %3}").arg(colors[i].name()).arg(inverted.name()).arg(colors[i].name());
-        btn->setStyleSheet(qss);
-        btn->setCheckable(true);
-        button_group_->addButton(btn);
-        buttons_.push_back(btn);
-
-        buttons->addWidget(btn, i/4, i%4);
-        btn->setText(QString("%1").arg(i+1));
-        btn->connect(btn, &QPushButton::pressed, [this, i] (){
-            setSelectMask(1 << i);
-        });
-    }
-
-    layout->setSizeConstraint(layout->SetMaximumSize);
-    layout->addWidget(new QLabel("Selection color:", settings_));
-    layout->addLayout(buttons);
-
+    layout->addItem(new QSpacerItem(0, 0, QSizePolicy::Maximum, QSizePolicy::Maximum));
 
     connect(slider, SIGNAL(valueChanged(int)), this, SLOT(setRad(int)));
 }
@@ -133,7 +98,6 @@ void Brush3D::cleanup(){
     delete line_;
     delete program_;
 }
-
 void Brush3D::initializeGL() {
     program_ = new QGLShaderProgram();
     bool succ = program_->addShaderFromSourceFile(
@@ -200,7 +164,44 @@ void Brush3D::paint(const Eigen::Affine3f& proj, const Eigen::Affine3f& mv){
     qDebug() << "Hello from paint plugin";
 }
 
-void Brush3D::select(float x, float y){
+void Brush3D::select2D(int x, int y){
+    boost::shared_ptr<PointCloud> pc = cl_->active_;
+
+    Eigen::Vector3f coord;
+    coord << 2.0f* (x/float(flatview_->width()) - 0.5),
+        -2.0f* (y/float(flatview_->height()) - 0.5), 1;
+    coord = flatview_->getCamera().inverse() * coord;
+
+    coord[1] = cl_->active_->scan_height()-coord[1];
+
+    boost::shared_ptr<std::vector<int> > indices;
+    indices.reset(new std::vector<int>());
+
+    int rad = radius_ * 1000;
+
+    for(int x = -rad/2; x < rad/2; x++){
+        for(int y = -rad/2; y < rad/2; y++){
+            if(x*x + y*y > (rad/2.0f)*(rad/2.0f) )
+                continue;
+
+            int idx = flatview_->imageToCloudIdx(int(coord.x() + x + 0.5),
+                                      int(coord.y() + y + 0.5), pc);
+            if (idx < 0) {
+                if(idx < -1)
+                    qDebug() << "Bug! Idx < -1 : idx = " << idx;
+                continue;
+            }
+
+            indices->push_back(idx);
+        }
+    }
+
+    bool negative_select = QApplication::keyboardModifiers() == Qt::ControlModifier;
+    core_->us_->push(new Select(pc, indices, core_->mw_->deselect_ || negative_select, core_->mw_->select_mask_));
+
+}
+
+int Brush3D::select3D(float x, float y){
     int idx = pick(x, y, glwidget_->width(),
                    glwidget_->height(), 1e-04,
                    glwidget_->camera_.projectionMatrix(),
@@ -208,52 +209,39 @@ void Brush3D::select(float x, float y){
                    cl_->active_);
 
     if(idx == -1)
-        return;
+        return -1;
 
-    // need to determine the scaled radius
-    Eigen::Affine3f mv = glwidget_->camera_.projectionMatrix() * glwidget_->camera_.modelviewMatrix();
-    Eigen::Vector3f q = cl_->active_->modelview() * cl_->active_->points.at(idx).getVector3fMap();
-
-    Eigen::Vector3f proj_point = mv*q;
-    float z = proj_point.z();
-
-    float n = glwidget_->camera_.getNear();
-    float f = glwidget_->camera_.getFar();
-
-    z = (z - n)/(f - n);
-
-    qDebug() << "z: " << z;
-
-    // Find how big the radius on screen is in the world
     Eigen::Vector3f p1, p2;
-    Eigen::Affine3f mv2 = glwidget_->camera_.modelviewMatrix() * cl_->active_->modelview();
+    int r = radius_ * 100;
 
-    int r = radius_ * 50;
+    float rad;
 
-    screenToWorld(x-r, y-r, x+r, y+r, glwidget_->width(), glwidget_->height(), mv2, glwidget_->camera_.projectionMatrix(), p1, p2, 0);
-    float screen_rad = (p2-p1).norm()/2.0f;
-    screenToWorld(x-r, y-r, x+r, y+r, glwidget_->width(), glwidget_->height(), mv2, glwidget_->camera_.projectionMatrix(), p1, p2, z);
-    float world_rad = (p2-p1).norm()/2.0f;
+    if(depth_adjust_){
+        GLfloat wz;
+        glReadPixels(x, glwidget_->height() - y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &wz);
+        // picked radius
+        screenToWorld(x-r, y-r, x+r, y+r, glwidget_->width(), glwidget_->height(), Eigen::Affine3f::Identity(), glwidget_->camera_.projectionMatrix(), p1, p2, wz);
+        rad = (p2-p1).norm()/2.0f;
+    } else {
+        // near radius
+        screenToWorld(x-r, y-r, x+r, y+r, glwidget_->width(), glwidget_->height(), Eigen::Affine3f::Identity(), glwidget_->camera_.projectionMatrix(), p1, p2, 0);
+        rad = (p2-p1).norm()/2.0f;
+        rad = rad * 10;
+    }
 
-    float scale = screen_rad/world_rad;
-    float rad = screen_rad*scale;
-
-    qDebug() << "rad: " << screen_rad << world_rad << scale;
-
+    last_rad_ = rad;
 
     boost::shared_ptr<std::vector<int> > indices;
     indices.reset(new std::vector<int>());
-
-    boost::shared_ptr<std::vector<int> > empty;
-    empty.reset(new std::vector<int>());
 
     std::vector<float> distsq;
     cl_->active_->octree()->radiusSearch(idx, rad, *indices, distsq);
 
     bool negative_select = QApplication::keyboardModifiers() == Qt::ControlModifier;
 
-    core_->us_->push(new Select(cl_->active_, indices, negative_select, select_mask_));
+    core_->us_->push(new Select(cl_->active_, indices, core_->mw_->deselect_ || negative_select, core_->mw_->select_mask_));
 
+    return idx;
 }
 
 bool Brush3D::mouseClickEvent(QMouseEvent * event){
@@ -273,21 +261,79 @@ bool Brush3D::mouseMoveEvent(QMouseEvent * event) {
     if(cl_->clouds_.size() == 0)
         return false;
 
-    // Todo: find distance traveled in real space
-    // this doesnt scale up close
-    if(event->buttons()){
-        Eigen::Vector2d diff(pos - last_pos);
-        float len = diff.norm();
-        if(len > 10) {
-            float dist = 0;
-            Eigen::Vector2d dir = diff.normalized();
-            while(dist <= len){
-                Eigen::Vector2d p = last_pos + dist*dir;
-                dist+=5;
-                select(p.x(), p.y());
+    if(is3d()){
+        if(event->buttons()){
+            if(last_picked_point_ != -1){
+
+                Eigen::Vector3f p1 = cl_->active_->at(last_picked_point_).getArray3fMap();
+                last_picked_point_ = select3D(event->x(), event->y());
+                Eigen::Vector3f p2 = cl_->active_->at(last_picked_point_).getArray3fMap();
+
+                Eigen::Vector3f diff = p2-p1;
+                float len = diff.norm();
+                qDebug() << "len" << len << "< " << (radius_*100)/4;
+                if(len > last_rad_/4) {
+                    float dist = 0;
+                    Eigen::Vector3f dir = diff.normalized();
+                    // Interpolate
+                    while(dist < len){
+                        qDebug() << "dist" << dist;
+                        Eigen::Vector3f p = p1 + dist*dir;
+                        dist+=last_rad_/4;
+
+                        pcl::PointXYZI q;
+                        q.getArray3fMap() = p;
+
+                        // calculate radius
+
+                        int viewport[4] = {0, 0, glwidget_->x(), glwidget_->y()};
+                        double wx, wy, wz;
+
+                        gluProject(p.x(), p.y(), p.z(),
+                           (glwidget_->camera_.modelviewMatrix() * cl_->active_->modelview()).data(),
+                            glwidget_->camera_.projectionMatrix().data(),
+                            viewport,
+                            &wx, &wy, &wz);
+
+
+
+
+//                        boost::shared_ptr<std::vector<int> > indices;
+//                        indices.reset(new std::vector<int>());
+
+//                        std::vector<float> distsq;
+//                        cl_->active_->octree()->radiusSearch(q, last_rad_, *indices, distsq);
+
+//                        bool negative_select = QApplication::keyboardModifiers() == Qt::ControlModifier;
+//                        core_->us_->push(new Select(cl_->active_, indices, core_->mw_->deselect_ || negative_select, core_->mw_->select_mask_));
+
+
+
+                        last_picked_point_ = select3D(wx, wy);
+                    }
+                }
+
+            } else {
+                last_picked_point_ = select3D(event->x(), event->y());
             }
         }
-        select(event->x(), event->y());
+    } else {
+
+        if(event->buttons()){
+            Eigen::Vector2d diff(pos - last_pos);
+            float len = diff.norm();
+            if(len > (radius_*1000)/4) {
+                float dist = 0;
+                Eigen::Vector2d dir = diff.normalized();
+                // Interpolate
+                while(dist <= len){
+                    Eigen::Vector2d p = last_pos + dist*dir;
+                    dist+=5;
+                    select2D(p.x(), p.y());
+                }
+            }
+            select2D(event->x(), event->y());
+        }
     }
 
     return true;
@@ -299,7 +345,11 @@ bool Brush3D::mousePressEvent(QMouseEvent * event) {
     if(cl_->clouds_.size() == 0)
         return false;
     core_->us_->beginMacro("3d Select");
-    select(event->x(), event->y());
+    if(is3d()){
+        last_picked_point_ = select3D(event->x(), event->y());
+    } else {
+        select2D(event->x(), event->y());
+    }
     last_mouse_pos_ << event->x(), event->y();
     mouse_down_pos_ = last_mouse_pos_;
     return true;
@@ -309,6 +359,7 @@ bool Brush3D::mouseReleaseEvent(QMouseEvent * event){
     core_->us_->endMacro();
     last_mouse_pos_ << event->x(), event->y();
     float dist = (last_mouse_pos_ - mouse_down_pos_).norm();
+    last_picked_point_ = -1;
     if(dist < 2){
         return mouseClickEvent(event);
     }
@@ -321,9 +372,9 @@ void Brush3D::enable() {
         disable();
         return;
     }
-    QTabWidget * tabs = qobject_cast<QTabWidget *>(glwidget_->parent()->parent());
-    tabs->setCurrentWidget(glwidget_);
-    enable_->setChecked(true);
+//    QTabWidget * tabs = qobject_cast<QTabWidget *>(glwidget_->parent()->parent());
+//    tabs->setCurrentWidget(glwidget_);
+//    enable_->setChecked(true);
 
     mw_->options_dock_->show();
     mw_->tooloptions_->setCurrentWidget(settings_);
@@ -333,6 +384,7 @@ void Brush3D::enable() {
     //        this, SLOT(paint(Eigen::Affine3f, Eigen::Affine3f)),
     //        Qt::DirectConnection);
     glwidget_->installEventFilter(this);
+    flatview_->installEventFilter(this);
     connect(core_, SIGNAL(endEdit()), this, SLOT(disable()));
     is_enabled_ = true;
 }
@@ -343,23 +395,23 @@ void Brush3D::disable() {
     //disconnect(glwidget_, SIGNAL(pluginPaint(Eigen::Affine3f, Eigen::Affine3f)),
     //        this, SLOT(paint(Eigen::Affine3f, Eigen::Affine3f)));
     glwidget_->removeEventFilter(this);
+    flatview_->removeEventFilter(this);
     is_enabled_ = false;
 }
 
 void Brush3D::setSelectMask(uint8_t mask){
-    int pos = 0;
-    for(; pos < 8; ++pos){
-        if(1<<pos == mask)
-            break;
-    }
-    buttons_[pos]->setChecked(true);
-    select_mask_ = mask;
+    core_->mw_->setSelectMask(mask);
+}
+
+bool Brush3D::is3d(){
+    QTabWidget * tabs = qobject_cast<QTabWidget *>(glwidget_->parent()->parent());
+    return tabs->currentIndex() == tabs->indexOf(glwidget_);
 }
 
 bool Brush3D::eventFilter(QObject *object, QEvent *event){
 
     // Bypass plugin via shift
-    if(QApplication::keyboardModifiers() == Qt::SHIFT)
+    if(QApplication::keyboardModifiers() == Qt::SHIFT || !core_->mw_->edit_mode_)
         return false;
 
     switch(event->type()){

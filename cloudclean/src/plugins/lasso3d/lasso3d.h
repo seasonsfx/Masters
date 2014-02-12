@@ -44,12 +44,14 @@ class Lasso3D : public IPlugin {
  public slots:
     void enable();
     void disable();
+    void paint2d();
     void paint(const Eigen::Affine3f& proj, const Eigen::Affine3f& mv);
 
  private:
     void select(QMouseEvent * event);
+    bool is3d();
     bool mouseClickEvent(QMouseEvent * event);
-    bool mouseDblClickEvent(QMouseEvent * event);
+    bool mouseDblClickEvent(QMouseEvent *);
     bool mouseMoveEvent(QMouseEvent * event);
     bool mousePressEvent(QMouseEvent * event);
     bool mouseReleaseEvent(QMouseEvent * event);

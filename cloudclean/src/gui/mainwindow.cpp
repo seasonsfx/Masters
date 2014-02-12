@@ -16,6 +16,12 @@
 #include <QGridLayout>
 #include <QBoxLayout>
 #include <QSettings>
+#include <QShortcut>
+#include <QButtonGroup>
+#include <QLabel>
+#include <QGridLayout>
+#include <QPushButton>
+#include <QVBoxLayout>
 
 #include "gui/glwidget.h"
 #include "gui/flatview.h"
@@ -29,6 +35,9 @@ MainWindow::MainWindow(QUndoStack *us, CloudList * cl, LayerList * ll, QWidget *
     : QMainWindow(parent) {
 
     this->setObjectName("mainwindow");
+
+    select_mask_ = 1;
+    deselect_ = false;
 
     us_ = us;
     ll_ = ll;
@@ -185,6 +194,79 @@ MainWindow::MainWindow(QUndoStack *us, CloudList * cl, LayerList * ll, QWidget *
     connect(flatview_, SIGNAL(customContextMenuRequested(const QPoint&)),
             this, SLOT(contextMenu(const QPoint &)));
 
+    // setup selection color picker
+    QColor colors[] = {
+        QColor(255, 0, 0, 255), // Red
+        QColor(0, 255, 0, 255), // Green
+        QColor(0, 0, 255, 255), // Blue
+        QColor(255, 255, 0, 255), // Yellow
+        QColor(0, 255, 255, 255), // Cyan
+        QColor(255, 0, 255, 255), // Magenta
+        QColor(255, 128, 0, 255), // Orange
+        QColor(128, 0, 255, 255) // Purple
+    };
+
+    selection_dock_ = new QDockWidget(this);
+    selection_dock_->setObjectName("options_dock");
+    selection_dock_->setWindowTitle(tr("Selection options"));
+    QWidget * selection_options_widget = new QWidget(this);
+    selection_dock_->setWidget(selection_options_widget);
+
+    button_group_ = new QButtonGroup(selection_options_widget);
+    button_group_->setExclusive(true);
+
+    QVBoxLayout * selection_options_layout = new QVBoxLayout(selection_options_widget);
+    selection_options_widget->setLayout(selection_options_layout);
+
+
+    QGridLayout * color_layout = new QGridLayout();
+    color_layout->setColumnStretch(0, 1);
+    color_layout->setColumnStretch(1, 1);
+    color_layout->setColumnStretch(2, 1);
+    color_layout->setColumnStretch(3, 1);
+    color_layout->setColumnStretch(4, 1);
+    color_layout->setColumnStretch(5, 1);
+    color_layout->setColumnStretch(6, 1);
+    color_layout->setColumnStretch(7, 1);
+
+    selection_options_layout->addLayout(color_layout, 1);
+
+    for(int i = 0; i < 8; i++){
+        QPushButton * btn = new QPushButton();
+        QColor inverted(255-colors[i].red(), 255-colors[i].green(), 255-colors[i].blue());
+        QString qss = QString("QPushButton {background-color: %1; color: %2; padding: 0.25em;} QPushButton:checked {background-color: %3}").arg(colors[i].name()).arg(inverted.name()).arg(colors[i].name());
+        btn->setStyleSheet(qss);
+        btn->setCheckable(true);
+        button_group_->addButton(btn);
+        buttons_.push_back(btn);
+        color_layout->addWidget(btn, 0, i);
+        btn->setText(QString("%1").arg(i));
+        btn->connect(btn, &QPushButton::pressed, [this, i] (){
+            setSelectMask(1 << i);
+        });
+    }
+
+    QPushButton * deselect_button = new QPushButton("Deselect mode", selection_options_widget);
+    deselect_button->setCheckable(true);
+    connect(deselect_button, &QPushButton::toggled, [this] (bool on){
+        deselect_ = on;
+    });
+    selection_options_layout->addWidget(deselect_button, 1);
+
+    setSelectMask(select_mask_);
+
+    addDockWidget(Qt::RightDockWidgetArea, selection_dock_);
+
+    edit_mode_ = true;
+
+    // setup keyboard shortcuts
+
+    QShortcut * toggle_edit = new QShortcut(QKeySequence(Qt::Key_E), this);
+    toggle_edit->connect(toggle_edit, &QShortcut::activated, [this] (){
+        edit_mode_ = !edit_mode_;
+        toolbar_->setDisabled(!edit_mode_);
+    });
+
     // Restore state
     QSettings settings;
     if(!restoreGeometry(settings.value("mainwindow/geometry").toByteArray())){
@@ -203,6 +285,17 @@ MainWindow::MainWindow(QUndoStack *us, CloudList * cl, LayerList * ll, QWidget *
 
 MainWindow::~MainWindow() {
     delete gld_;
+}
+
+
+void MainWindow::setSelectMask(uint8_t mask){
+    int pos = 0;
+    for(; pos < 8; ++pos){
+        if(1<<pos == mask)
+            break;
+    }
+    buttons_[pos]->setChecked(true);
+    select_mask_ = mask;
 }
 
 void MainWindow::addMenu(QAction * action, QString menu_name){

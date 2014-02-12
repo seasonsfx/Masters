@@ -2,6 +2,6 @@
     <qresource prefix="/">
         <file>basic.frag</file>
         <file>basic.vert</file>
-        <file>images/lasso_3d.png</file>
+        <file>images/lasso.png</file>
     </qresource>
 </RCC>

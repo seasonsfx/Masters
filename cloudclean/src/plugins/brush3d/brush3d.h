@@ -49,12 +49,14 @@ class Brush3D : public IPlugin {
     void paint(const Eigen::Affine3f& proj, const Eigen::Affine3f& mv);
 
  private:
-    void select(float x, float y);
+    void select2D(int x, int y);
+    int select3D(float x, float y);
     bool mouseClickEvent(QMouseEvent * event);
     bool mouseMoveEvent(QMouseEvent * event);
     bool mousePressEvent(QMouseEvent * event);
     bool mouseReleaseEvent(QMouseEvent * event);
     void setSelectMask(uint8_t mask);
+    bool is3d();
 
  private:
     Core * core_;
@@ -77,11 +79,12 @@ class Brush3D : public IPlugin {
     bool is_enabled_;
     float radius_;
 
-    uint8_t select_mask_;
-
+    bool depth_adjust_;
     std::vector<QPushButton *> buttons_;
     QButtonGroup * button_group_;
     QWidget * settings_;
+    int last_picked_point_;
+    float last_rad_;
 };
 
 #endif  // BRUSH_3D_H

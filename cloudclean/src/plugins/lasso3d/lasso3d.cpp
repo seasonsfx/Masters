@@ -26,7 +26,7 @@
 #include "pluginsystem/core.h"
 
 QString Lasso3D::getName(){
-    return "3D Lasso Tool";
+    return "Lasso Tool";
 }
 
 void Lasso3D::initialize(Core *core){
@@ -37,7 +37,7 @@ void Lasso3D::initialize(Core *core){
     flatview_ = core_->mw_->flatview_;
     mw_ = core_->mw_;
 
-    enable_ = new QAction(QIcon(":/images/lasso_3d.png"), "3d polygon lasso tool", 0);
+    enable_ = new QAction(QIcon(":/images/lasso.png"), "Ppolygon lasso tool", 0);
     enable_->setCheckable(true);
     enable_->setChecked(false);
 
@@ -64,17 +64,26 @@ void Lasso3D::cleanup(){
     delete lasso_;
 }
 
+void Lasso3D::paint2d(){
+    lasso_->drawLasso(last_mouse_pos_.x(), last_mouse_pos_.y(), flatview_);
+}
+
 void Lasso3D::paint(const Eigen::Affine3f& proj, const Eigen::Affine3f& mv){
     lasso_->drawLasso(last_mouse_pos_.x(), last_mouse_pos_.y(), glwidget_);
 }
 
+
+bool Lasso3D::is3d(){
+    QTabWidget * tabs = qobject_cast<QTabWidget *>(glwidget_->parent()->parent());
+    return tabs->currentIndex() == tabs->indexOf(glwidget_);
+}
 
 bool Lasso3D::mouseClickEvent(QMouseEvent * event){
     lasso_->addScreenPoint(event->x(), event->y(), core_->mw_->glwidget_->width(), core_->mw_->glwidget_->height());
     return true;
 }
 
-bool Lasso3D::mouseDblClickEvent(QMouseEvent * event){
+bool Lasso3D::mouseDblClickEvent(QMouseEvent *){
     if(cl_->clouds_.size() == 0){
         disable();
         return false;
@@ -85,14 +94,20 @@ bool Lasso3D::mouseDblClickEvent(QMouseEvent * event){
 
     Eigen::Matrix4f ndc = (cam.projectionMatrix() *  cam.modelviewMatrix() * cloud->modelview()).matrix();
 
-    boost::shared_ptr<std::vector<int> > empty = boost::make_shared<std::vector<int>>();
     boost::shared_ptr<std::vector<int>> selected_indices = boost::make_shared<std::vector<int>>();
     boost::shared_ptr<std::vector<int>> removed_indices= boost::make_shared<std::vector<int>>();
 
-    lasso_->getIndices(ndc, cloud.get(), selected_indices, removed_indices);
+    if(is3d()){
+        lasso_->getIndices(ndc, cloud.get(), selected_indices, removed_indices);
+    } else {
+        lasso_->getIndices2D(cloud->scan_height(), flatview_->getCamera(),
+                             cloud->cloudToGridMap(), selected_indices,
+                             removed_indices);
+    }
 
     core_->us_->beginMacro("3d lasso tool");
-    core_->us_->push(new Select(cl_->active_, selected_indices));
+    bool negative_select = QApplication::keyboardModifiers() == Qt::ControlModifier;
+    core_->us_->push(new Select(cl_->active_, selected_indices, core_->mw_->deselect_ || negative_select, core_->mw_->select_mask_));
     core_->us_->endMacro();
 
     disable();
@@ -106,8 +121,14 @@ bool Lasso3D::mouseMoveEvent(QMouseEvent * event) {
         disable();
         return false;
     }
-    lasso_->moveLastScreenPoint(event->x(), event->y(), core_->mw_->glwidget_);
-    glwidget_->update();
+
+    if(is3d()){
+        lasso_->moveLastScreenPoint(event->x(), event->y(), core_->mw_->glwidget_);
+        glwidget_->update();
+    } else {
+        lasso_->moveLastScreenPoint(event->x(), event->y(), core_->mw_->flatview_);
+        flatview_->update();
+    }
 
     if(event->buttons() != Qt::LeftButton)
         return false;
@@ -144,8 +165,8 @@ void Lasso3D::enable() {
         disable();
         return;
     }
-    QTabWidget * tabs = qobject_cast<QTabWidget *>(glwidget_->parent()->parent());
-    tabs->setCurrentWidget(glwidget_);
+//    QTabWidget * tabs = qobject_cast<QTabWidget *>(glwidget_->parent()->parent());
+//    tabs->setCurrentWidget(glwidget_);
     enable_->setChecked(true);
 
     mw_->options_dock_->show();
@@ -157,7 +178,13 @@ void Lasso3D::enable() {
     connect(glwidget_, SIGNAL(pluginPaint(Eigen::Affine3f, Eigen::Affine3f)),
             this, SLOT(paint(Eigen::Affine3f, Eigen::Affine3f)),
             Qt::DirectConnection);
+
+    connect(flatview_, SIGNAL(pluginPaint()),
+            this, SLOT(paint2d()),
+            Qt::DirectConnection);
+
     glwidget_->installEventFilter(this);
+    flatview_->installEventFilter(this);
     connect(core_, SIGNAL(endEdit()), this, SLOT(disable()));
     is_enabled_ = true;
 }
@@ -167,6 +194,9 @@ void Lasso3D::disable() {
     disconnect(core_, SIGNAL(endEdit()), this, SLOT(disable()));
     disconnect(glwidget_, SIGNAL(pluginPaint(Eigen::Affine3f, Eigen::Affine3f)),
             this, SLOT(paint(Eigen::Affine3f, Eigen::Affine3f)));
+    disconnect(flatview_, SIGNAL(pluginPaint()),
+            this, SLOT(paint2d()));
+    glwidget_->removeEventFilter(this);
     glwidget_->removeEventFilter(this);
     is_enabled_ = false;
 }
@@ -174,7 +204,7 @@ void Lasso3D::disable() {
 bool Lasso3D::eventFilter(QObject *object, QEvent *event){
 
     // Bypass plugin via shift
-    if(QApplication::keyboardModifiers() == Qt::SHIFT)
+    if(QApplication::keyboardModifiers() == Qt::SHIFT || !core_->mw_->edit_mode_)
         return false;
 
     switch(event->type()){

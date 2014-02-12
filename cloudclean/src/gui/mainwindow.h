@@ -20,6 +20,8 @@ class QUndoStack;
 class QMenuBar;
 class QStackedWidget;
 class QToolBox;
+class QButtonGroup;
+class QPushButton;
 
 #ifdef LEAP_SUPPORT
     #include "gui/leaplistener.h"
@@ -35,6 +37,8 @@ class GUI_API MainWindow : public QMainWindow {
  public:
     explicit MainWindow(QUndoStack * us, CloudList *cl, LayerList *ll, QWidget *parent = 0);
     ~MainWindow();
+
+    void setSelectMask(uint8_t mask);
 
     void addMenu(QAction * action, QString menu_name);
     void removeMenu(QAction * action, QString menu_name);
@@ -70,7 +74,11 @@ class GUI_API MainWindow : public QMainWindow {
    QMenu * window_menu_;
 
    QDockWidget * options_dock_;
+   QDockWidget * selection_dock_;
 
+   uint8_t select_mask_;
+   bool deselect_;
+   bool edit_mode_;
  protected:
    void closeEvent(QCloseEvent *event);
 
@@ -88,6 +96,9 @@ class GUI_API MainWindow : public QMainWindow {
 
     QMenuBar * mb_;
     QHash<QString, QMenu *> menus_;
+
+    std::vector<QPushButton *> buttons_;
+    QButtonGroup * button_group_;
 
 #ifdef LEAP_SUPPORT
     LeapListener * listener;

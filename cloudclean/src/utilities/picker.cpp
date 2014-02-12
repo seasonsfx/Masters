@@ -46,15 +46,16 @@
 #include "model/cloudlist.h"
 
 
-Picker::Picker(GLWidget *glwidget, CloudList * cl, std::function<void (int)> callback) {
+Picker::Picker(GLWidget *glwidget, CloudList * cl, std::function<void (int)> callback, bool * enabled) {
     callback_ = callback;
     glwidget_ = glwidget;
     cl_ = cl;
+    enabled_ = enabled;
 }
 
 
 bool Picker::eventFilter(QObject *object, QEvent *event){
-    if(QApplication::keyboardModifiers() == Qt::SHIFT)
+    if(QApplication::keyboardModifiers() == Qt::SHIFT || !*enabled_)
         return false;
 
     switch(event->type()){

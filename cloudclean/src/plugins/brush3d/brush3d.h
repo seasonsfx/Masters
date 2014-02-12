@@ -40,9 +40,6 @@ class Brush3D : public IPlugin {
  signals:
     void enabling();
 
- private slots:
-    void setRad(int val);
-
  public slots:
     void enable();
     void disable();

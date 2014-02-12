@@ -261,10 +261,33 @@ MainWindow::MainWindow(QUndoStack *us, CloudList * cl, LayerList * ll, QWidget *
 
     // setup keyboard shortcuts
 
-    QShortcut * toggle_edit = new QShortcut(QKeySequence(Qt::Key_E), this);
-    toggle_edit->connect(toggle_edit, &QShortcut::activated, [this] (){
+    connect(new QShortcut(QKeySequence(Qt::Key_Z), this), &QShortcut::activated, [this] (){
         edit_mode_ = !edit_mode_;
         toolbar_->setDisabled(!edit_mode_);
+    });
+    connect(new QShortcut(QKeySequence(Qt::Key_1), this), &QShortcut::activated, [this] (){
+        setSelectMask(1);
+    });
+    connect(new QShortcut(QKeySequence(Qt::Key_2), this), &QShortcut::activated, [this] (){
+        setSelectMask(2);
+    });
+    connect(new QShortcut(QKeySequence(Qt::Key_3), this), &QShortcut::activated, [this] (){
+        setSelectMask(4);
+    });
+    connect(new QShortcut(QKeySequence(Qt::Key_4), this), &QShortcut::activated, [this] (){
+        setSelectMask(8);
+    });
+    connect(new QShortcut(QKeySequence(Qt::Key_5), this), &QShortcut::activated, [this] (){
+        setSelectMask(16);
+    });
+    connect(new QShortcut(QKeySequence(Qt::Key_6), this), &QShortcut::activated, [this] (){
+        setSelectMask(32);
+    });
+    connect(new QShortcut(QKeySequence(Qt::Key_7), this), &QShortcut::activated, [this] (){
+        setSelectMask(64);
+    });
+    connect(new QShortcut(QKeySequence(Qt::Key_8), this), &QShortcut::activated, [this] (){
+        setSelectMask(128);
     });
 
     // Restore state

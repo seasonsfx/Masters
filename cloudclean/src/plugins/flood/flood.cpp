@@ -11,6 +11,12 @@
 #include <QEvent>
 #include <QMouseEvent>
 #include <QTime>
+#include <QComboBox>
+#include <QVBoxLayout>
+#include <QLabel>
+#include <QStackedWidget>
+#include <QDockWidget>
+#include <QSlider>
 
 #include <boost/serialization/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
@@ -52,8 +58,8 @@ void Flood::initialize(Core *core){
     mw_ = core_->mw_;
 
     std::function<void(int)> func = std::bind(&Flood::flood, this, std::placeholders::_1);
-    picker_ = new Picker(glwidget_, cl_, func);
-
+    picker_ = new Picker(glwidget_, cl_, func, &(core->mw_->edit_mode_));
+    error_percent_ = 50;
 }
 
 void Flood::initialize2(PluginManager * pm) {
@@ -76,31 +82,74 @@ void Flood::initialize2(PluginManager * pm) {
 
     mw_->toolbar_->addAction(enable_);
 
+    settings_ = new QWidget();
+    QVBoxLayout * layout = new QVBoxLayout(settings_);
+    settings_->setLayout(layout);
+    mw_->tooloptions_->addWidget(settings_);
+
+    layout->addWidget(new QLabel("Feature"));
+    QComboBox * cb = new QComboBox();
+    cb->addItem("Normal", "normal");
+    cb->addItem("Intensity", "intensity");
+    layout->addWidget(cb);
+
+    connect(cb, &QComboBox::currentTextChanged, [this, cb] (QString text){
+        qDebug() <<text;
+    });
+
+
+    layout->addWidget(new QLabel("Termination condition"));
+    cb = new QComboBox();
+    cb->addItem("Deviation from source feature", "normal");
+    cb->addItem("Deviation from neighbouring feature", "intensity");
+    layout->addWidget(cb);
+
+    connect(cb, &QComboBox::currentTextChanged, [this, cb] (QString text){
+        qDebug() <<text;
+    });
+
+    layout->addWidget(new QLabel("Error threshold"));
+
+    QSlider * slider = new QSlider();
+    slider->setOrientation(Qt::Horizontal);
+    slider->setRange(1, 100);
+    slider->setSingleStep(1);
+    slider->setToolTip("Percentage");
+    slider->setValue(error_percent_);
+    slider->setTickPosition(QSlider::TicksBelow);
+    connect(slider, &QSlider::valueChanged, [this] (int val){
+        error_percent_ = val;
+    });
+    layout->addWidget(slider);
+
+
+    layout->addStretch();
     //global_flood_ = new QAction(QIcon(":/images/flood2.png"), "Global floodfill", 0);
     //connect(global_flood_, &QAction::triggered, this, &Flood::global_flood);
     //mw_->toolbar_->addAction(global_flood_);
 
-    global_flood2_ = new QAction(QIcon(":/images/flood2.png"), "Global floodfill 2", 0);
-    connect(global_flood2_, &QAction::triggered, this, &Flood::global_flood2);
-    mw_->toolbar_->addAction(global_flood2_);
+    //global_flood2_ = new QAction(QIcon(":/images/flood2.png"), "Global floodfill 2", 0);
+    //connect(global_flood2_, &QAction::triggered, this, &Flood::global_flood2);
+    //mw_->toolbar_->addAction(global_flood2_);
 
 }
 
 void Flood::cleanup(){
+    mw_->tooloptions_->removeWidget(settings_);
     mw_->toolbar_->removeAction(enable_);
     mw_->removeMenu(enable_, "Edit");
     delete enable_;
     //mw_->toolbar_->removeAction(global_flood_);
     //delete global_flood_;
-    mw_->toolbar_->removeAction(global_flood2_);
-    delete global_flood2_;
+    //mw_->toolbar_->removeAction(global_flood2_);
+    //delete global_flood2_;
 }
 
 Flood::~Flood(){
 }
 
 void Flood::enable() {
-    qDebug() << "enablebling";
+    qDebug() << "enabling";
 
     if(is_enabled_){
         disable();
@@ -110,12 +159,14 @@ void Flood::enable() {
     QTabWidget * tabs = qobject_cast<QTabWidget *>(glwidget_->parent()->parent());
     tabs->setCurrentWidget(glwidget_);
 
+    mw_->options_dock_->show();
+    mw_->tooloptions_->setCurrentWidget(settings_);
+
     is_enabled_ = true;
     enable_->setChecked(true);
 
     emit enabling();
 
-    //glwidget_->installEventFilter(this);
     glwidget_->installEventFilter(picker_);
 
     connect(core_, SIGNAL(endEdit()), this, SLOT(disable()));
@@ -175,7 +226,7 @@ boost::shared_ptr<std::vector<int> > Flood::getLayerIndices() {
 
 void Flood::flood(int source_idx){
 
-    float max_dist = 1.0f;
+    float max_dist = error_percent_/50;
     int max_nn = 8;
     float radius = 0.10f;
 

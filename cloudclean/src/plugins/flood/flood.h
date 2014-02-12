@@ -57,6 +57,10 @@ class Flood : public IPlugin {
     bool is_enabled_;
     NormalEstimator * ne_;
     Picker * picker_;
+
+    float error_percent_;
+    bool only_unselected_;
+    bool neighbour_error_;
 };
 
 #endif  // GRAPH_CUT_H

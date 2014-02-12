@@ -47,10 +47,12 @@ class QMouseEvent;
 class GLWidget;
 class CloudList;
 
+static bool yes = true;
+
 class UTIL_API Picker : public QObject{
     Q_OBJECT
  public:
-    Picker(GLWidget *glwidget, CloudList * cl, std::function<void (int)> callback);
+    Picker(GLWidget *glwidget, CloudList * cl, std::function<void (int)> callback, bool *enabled = &yes);
     bool eventFilter(QObject *object, QEvent *event);
 
  private:
@@ -61,7 +63,7 @@ class UTIL_API Picker : public QObject{
     CloudList * cl_;
     int idx_;
     std::function<void(int)> callback_;
-
+    bool * enabled_;
 };
 
 #endif  // CLOUDCLEAN_SRC_CLOUDCLEAN_PICKER_H_

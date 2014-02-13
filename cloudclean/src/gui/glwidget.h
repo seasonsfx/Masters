@@ -29,7 +29,13 @@ public:
     QSize sizeHint() const;
 
     void resetRotationMatrix();
-    GLData *getGLData();
+    GLData *gld();
+
+    float pointRenderSize(){
+        return point_render_size_;
+    }
+
+
 
 protected:
     void initializeGL();

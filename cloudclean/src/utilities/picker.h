@@ -38,8 +38,10 @@
 #ifndef CLOUDCLEAN_SRC_CLOUDCLEAN_PICKER_H_
 #define CLOUDCLEAN_SRC_CLOUDCLEAN_PICKER_H_
 
+#include "glheaders.h"
 #include <functional>
 #include <QObject>
+#include <QGLShaderProgram>
 #include "utilities/export.h"
 
 class QEvent;
@@ -53,17 +55,31 @@ class UTIL_API Picker : public QObject{
     Q_OBJECT
  public:
     Picker(GLWidget *glwidget, CloudList * cl, std::function<void (int)> callback, bool *enabled = &yes);
+    ~Picker();
+    uint Picker::renderPick(int x, int y);
     bool eventFilter(QObject *object, QEvent *event);
+
 
  private:
     bool mouseReleaseEvent(QMouseEvent * event);
 
  private:
+    QGLShaderProgram program_;
     GLWidget * glwidget_;
     CloudList * cl_;
     int idx_;
     std::function<void(int)> callback_;
     bool * enabled_;
+
+    // gl stuff
+    GLuint texture_id_;
+    GLuint picking_texture_id_;
+    GLuint depth_texture_id_;
+    GLuint vao_;
+    GLuint fbo_;
+    int uni_sampler_;
+    int uni_projection_;
+    int uni_modelview_;
 };
 
 #endif  // CLOUDCLEAN_SRC_CLOUDCLEAN_PICKER_H_

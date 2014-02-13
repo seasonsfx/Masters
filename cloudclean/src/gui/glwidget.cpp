@@ -347,6 +347,6 @@ void GLWidget::contextMenu(const QPoint &pos) {
 
 }
 
-GLData * GLWidget::getGLData(){
+GLData * GLWidget::gld(){
     return gld_;
 }

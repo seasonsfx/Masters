@@ -20,7 +20,7 @@ target_link_libraries(
     cloudclean_gui
 )
 
-QT5_ADD_RESOURCES(cloudclean_util resources/resources.qrc)
+#QT5_ADD_RESOURCES(cloudclean_util util_resources.qrc)
 QT5_USE_MODULES(cloudclean_util Core Gui OpenGL)
 
 INSTALL(TARGETS cloudclean_util DESTINATION ${LIB_INSTALL} COMPONENT CloudClean)

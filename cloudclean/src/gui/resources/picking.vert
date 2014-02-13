@@ -15,7 +15,7 @@ void main( void ) {
 
     // Adjust the colour intensity
     int layer_id = color_index;
-    bool is_selected = flags;
+    bool is_selected = bool(flags);
 
 
     // Selections will make this fail

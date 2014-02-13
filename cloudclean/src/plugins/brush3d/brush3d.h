@@ -23,6 +23,7 @@ class QSpinbox;
 class QLabel;
 class QPushButton;
 class QButtonGroup;
+class Picker;
 
 class Brush3D : public IPlugin {
     Q_INTERFACES(IPlugin)
@@ -75,6 +76,8 @@ class Brush3D : public IPlugin {
 
     bool is_enabled_;
     float radius_;
+
+    Picker * picker_;
 
     bool depth_adjust_;
     std::vector<QPushButton *> buttons_;

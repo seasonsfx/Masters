@@ -52,7 +52,6 @@ Picker::Picker(GLWidget *glwidget, CloudList * cl, std::function<void (int)> cal
     cl_ = cl;
     enabled_ = enabled;
 
-
     //
     // Load shader program
     //
@@ -200,6 +199,8 @@ uint Picker::renderPick(int x, int y){
     glBindTexture(GL_TEXTURE_2D, 0);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+    qDebug() << "render pick" << data[0];
+
     return data[0];
 }
 
@@ -217,13 +218,15 @@ bool Picker::eventFilter(QObject *object, QEvent *event){
 
 bool Picker::mouseReleaseEvent(QMouseEvent * event){
 
-//    int idx = pick(event->x(), event->y(), glwidget_->width(),
-//                   glwidget_->height(), 0.02,
-//                   glwidget_->camera_.projectionMatrix(),
-//                   glwidget_->camera_.modelviewMatrix(),
-//                   cl_->active_);
+    int idx = pick(event->x(), event->y(), glwidget_->width(),
+                   glwidget_->height(), 0.02,
+                   glwidget_->camera_.projectionMatrix(),
+                   glwidget_->camera_.modelviewMatrix(),
+                   cl_->active_);
 
-    uint idx = renderPick(event->x(), event->y());
+    //uint idx = renderPick(event->x(), event->y());
+
+    qDebug() << idx << "picked";
 
     if(idx != -1)
         callback_(idx);

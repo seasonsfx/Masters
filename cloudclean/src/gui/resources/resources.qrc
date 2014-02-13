@@ -9,5 +9,7 @@
         <file>basic.vert</file>
         <file>eye_closed.png</file>
         <file>eye_open.png</file>
+        <file>picking.frag</file>
+        <file>picking.vert</file>
     </qresource>
 </RCC>

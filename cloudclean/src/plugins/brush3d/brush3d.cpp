@@ -26,6 +26,7 @@
 #include "gui/glwidget.h"
 #include "gui/flatview.h"
 #include "gui/mainwindow.h"
+#include "utilities/picker.h"
 #include "utilities/pointpicker.h"
 #include "commands/select.h"
 #include "pluginsystem/core.h"

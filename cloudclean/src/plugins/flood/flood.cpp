@@ -312,7 +312,8 @@ void Flood::flood(int source_idx){
     }
 
     core_->us_->beginMacro("Normal fill");
-    core_->us_->push(new Select(cl_->active_, selected));
+    bool negative_select = QApplication::keyboardModifiers() == Qt::ControlModifier;
+    core_->us_->push(new Select(cl_->active_, selected, core_->mw_->deselect_ || negative_select, core_->mw_->select_mask_));
     core_->us_->endMacro();
 
     qDebug("Time to fill : %d ms", t.elapsed());

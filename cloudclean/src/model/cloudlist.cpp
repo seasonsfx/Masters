@@ -119,6 +119,8 @@ void CloudList::removeCloud(int idx){
     clouds_.erase(clouds_.begin()+idx);
     endRemoveRows();
     active_.reset();
+    if(idx > 0)
+        active_ = clouds_.at(idx-1);
     emit updated();
 }
 

@@ -52,6 +52,17 @@ Picker::Picker(GLWidget *glwidget, CloudList * cl, std::function<void (int)> cal
     cl_ = cl;
     enabled_ = enabled;
 
+//    QFile file(":/picking.frag");
+//    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)){
+//        qDebug() << "---------= cant read frag -----------------";
+//    } else {
+//        while (!file.atEnd()) {
+//            QString line = file.readLine();
+//            qDebug() << line;
+//        }
+//    }
+
+
     //
     // Load shader program
     //
@@ -97,13 +108,6 @@ Picker::~Picker(){
 }
 
 uint Picker::renderPick(int x, int y){
-    glClearColor(1.0, 1.0, 1.0, 1.0);CE();
-    glEnable(GL_DEPTH_TEST);CE();
-    glEnable(GL_MULTISAMPLE);CE();
-    glEnable(GL_POINT_SMOOTH);CE();
-    glPointSize(glwidget_->pointRenderSize());CE();
-    glClear(GL_DEPTH_BUFFER_BIT);CE();
-    glEnable(GL_DEPTH_TEST);CE();
 
     glBindFramebuffer(GL_FRAMEBUFFER, fbo_);CE();
     // Create the texture object for the primitive information buffer
@@ -132,13 +136,16 @@ uint Picker::renderPick(int x, int y){
     }
 
 
+    glClearColor(1.0, 1.0, 1.0, 1.0);CE();
+    glEnable(GL_DEPTH_TEST);CE();
+    glEnable(GL_MULTISAMPLE);CE();
+    glEnable(GL_POINT_SMOOTH);CE();
+    glPointSize(glwidget_->pointRenderSize());CE();
+    glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT); CE();
+
 
     program_.bind(); CE();
 
-    glUniformMatrix4fv(uni_modelview_, 1, GL_FALSE,
-                       glwidget_->camera_.modelviewMatrix().data());CE();
-    glUniformMatrix4fv(uni_projection_, 1, GL_FALSE,
-                       glwidget_->camera_.projectionMatrix().data());CE();
 
     glUniform1i(uni_sampler_, 0); CE();
     glBindTexture(GL_TEXTURE_BUFFER, texture_id_); CE();
@@ -175,6 +182,9 @@ uint Picker::renderPick(int x, int y){
     glVertexAttribIPointer(3, 1, GL_BYTE, 0, 0); CE();
     cd->flag_buffer_->release(); CE();
 
+    glUniformMatrix4fv(uni_projection_, 1, GL_FALSE,
+                       glwidget_->camera_.projectionMatrix().data());CE();
+
     glUniformMatrix4fv(uni_modelview_, 1, GL_FALSE,
                        (glwidget_->camera_.modelviewMatrix()*pc->modelview())
                        .data());CE();
@@ -189,7 +199,7 @@ uint Picker::renderPick(int x, int y){
     glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo_);
     glReadBuffer(GL_COLOR_ATTACHMENT0);CE();
     uint data[3];
-    glReadPixels(x, y, 1, 1, GL_RGB_INTEGER, GL_UNSIGNED_INT, &data);CE();
+    glReadPixels(x, glwidget_->height() - y, 1, 1, GL_RGB_INTEGER, GL_UNSIGNED_INT, &data);CE();
     glReadBuffer(GL_NONE);CE();
     glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);CE();
 
@@ -226,7 +236,7 @@ bool Picker::mouseReleaseEvent(QMouseEvent * event){
 
     qDebug() << idx << "picked";
 
-    if(idx != -1)
+    if(idx != -1 && callback_!=nullptr)
         callback_(idx);
 
     return true;

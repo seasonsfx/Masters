@@ -44,6 +44,8 @@ void Brush3D::initialize(Core *core){
     mw_ = core_->mw_;
     initialized_gl = false;
 
+    picker_ = new Picker(glwidget_, cl_);
+
     enable_ = new QAction(QIcon(":/images/brush.png"), "Brush Tool", 0);
     enable_->setCheckable(true);
     enable_->setChecked(false);
@@ -245,11 +247,13 @@ void Brush3D::select2D(int x, int y){
 }
 
 int Brush3D::select3D(float x, float y){
-    int idx = pick(x, y, glwidget_->width(),
-                   glwidget_->height(), 1e-04,
-                   glwidget_->camera_.projectionMatrix(),
-                   glwidget_->camera_.modelviewMatrix(),
-                   cl_->active_);
+//    int idx = pick(x, y, glwidget_->width(),
+//                   glwidget_->height(), 1e-04,
+//                   glwidget_->camera_.projectionMatrix(),
+//                   glwidget_->camera_.modelviewMatrix(),
+//                   cl_->active_);
+
+    int idx = picker_->renderPick(x, y);
 
     if(idx == -1)
         return -1;

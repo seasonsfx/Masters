@@ -54,7 +54,7 @@ static bool yes = true;
 class UTIL_API Picker : public QObject{
     Q_OBJECT
  public:
-    Picker(GLWidget *glwidget, CloudList * cl, std::function<void (int)> callback, bool *enabled = &yes);
+    Picker(GLWidget *glwidget, CloudList * cl, std::function<void (int)> callback = nullptr, bool *enabled = &yes);
     ~Picker();
     uint renderPick(int x, int y);
     bool eventFilter(QObject *object, QEvent *event);

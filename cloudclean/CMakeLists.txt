@@ -39,10 +39,21 @@ endif()
 add_definitions(-DBOOST_ALL_NO_LIB)
 
 if(MSVC)
-  # Boost system wont link without this
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
-  # Compiler needs moar memories!
-  #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zm2000")
+    # Boost system wont link without this
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
+    SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /Z7 /O2")
+    # Compiler needs moar memories!
+    #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zm2000")
+
+    if(CMAKE_CXX_FLAGS_DEBUG MATCHES "/RTC1")
+      string(REPLACE "/RTC1" ""
+        CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
+      message(STATUS "info: replaced '/RTC1' in CMAKE_CXX_FLAGS_DEBUG with ''
+            Value of CMAKE_CXX_FLAGS_DEBUG seen in cmake-gui is being
+    overridden with:
+            CMAKE_CXX_FLAGS_DEBUG='${CMAKE_CXX_FLAGS_DEBUG}'")
+    endif()
+
 endif()
 
 #

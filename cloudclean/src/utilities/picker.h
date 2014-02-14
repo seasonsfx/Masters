@@ -56,7 +56,7 @@ class UTIL_API Picker : public QObject{
  public:
     Picker(GLWidget *glwidget, CloudList * cl, std::function<void (int)> callback, bool *enabled = &yes);
     ~Picker();
-    uint Picker::renderPick(int x, int y);
+    uint renderPick(int x, int y);
     bool eventFilter(QObject *object, QEvent *event);
 
 

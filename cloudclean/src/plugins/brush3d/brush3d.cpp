@@ -78,16 +78,13 @@ void Brush3D::initialize(Core *core){
 
 
     QLabel * l = new QLabel("Radius:", settings_);
-    //l->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
     layout->addWidget(l);
     layout->addWidget(slider);
 
     l = new QLabel("Depth correct:", settings_);
-    //l->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
     layout->addWidget(l);
 
     QCheckBox * cb = new QCheckBox(settings_);
-    //cb->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
     depth_adjust_ = true;
     cb->setChecked(depth_adjust_);
     layout->addWidget(cb);

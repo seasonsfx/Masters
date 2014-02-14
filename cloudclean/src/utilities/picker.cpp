@@ -55,15 +55,15 @@ Picker::Picker(GLWidget *glwidget, CloudList * cl, std::function<void (int)> cal
     //
     // Load shader program
     //
-    bool succ = program_.addShaderFromSourceFile(
+    bool succ = program_3d_.addShaderFromSourceFile(
                 QGLShader::Vertex, ":/picking.vert"); CE();
-    if (!succ) qWarning() << "Shader compile log:" << program_.log();
-    succ = program_.addShaderFromSourceFile(
+    if (!succ) qWarning() << "Shader compile log:" << program_3d_.log();
+    succ = program_3d_.addShaderFromSourceFile(
                 QGLShader::Fragment, ":/picking.frag"); CE();
-    if (!succ) qWarning() << "Shader compile log:" << program_.log();
-    succ = program_.link(); CE();
+    if (!succ) qWarning() << "Shader compile log:" << program_3d_.log();
+    succ = program_3d_.link(); CE();
     if (!succ) {
-        qWarning() << "Could not link shader program_:" << program_.log();
+        qWarning() << "Could not link shader program_:" << program_3d_.log();
         qWarning() << "Exiting...";
         abort();
     }
@@ -72,11 +72,11 @@ Picker::Picker(GLWidget *glwidget, CloudList * cl, std::function<void (int)> cal
     //
     // Resolve uniforms
     //
-    program_.bind(); CE();
-    uni_sampler_ = program_.uniformLocation("sampler"); RC(uni_sampler_);
-    uni_projection_ = program_.uniformLocation("projection"); RC(uni_projection_);
-    uni_modelview_ = program_.uniformLocation("modelview"); RC(uni_modelview_);
-    program_.release(); CE();
+    program_3d_.bind(); CE();
+    uni_sampler_ = program_3d_.uniformLocation("sampler"); RC(uni_sampler_);
+    uni_projection_ = program_3d_.uniformLocation("projection"); RC(uni_projection_);
+    uni_modelview_ = program_3d_.uniformLocation("modelview"); RC(uni_modelview_);
+    program_3d_.release(); CE();
 
     //
     // Set up textures & vao
@@ -133,7 +133,7 @@ uint Picker::renderPick(int x, int y){
 
 
 
-    program_.bind(); CE();
+    program_3d_.bind(); CE();
 
     glUniformMatrix4fv(uni_modelview_, 1, GL_FALSE,
                        glwidget_->camera_.modelviewMatrix().data());CE();
@@ -183,7 +183,7 @@ uint Picker::renderPick(int x, int y){
 
     /////////
     glBindVertexArray(0);CE();
-    program_.release(); CE();
+    program_3d_.release(); CE();
 
     // read point
     glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo_);

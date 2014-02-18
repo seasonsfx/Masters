@@ -209,6 +209,9 @@ uint Picker::renderPick(int x, int y){
 
     qDebug() << "render pick" << data[0];
 
+    if(data[0] == 1065353216)
+        return -1;
+
     return data[0];
 }
 

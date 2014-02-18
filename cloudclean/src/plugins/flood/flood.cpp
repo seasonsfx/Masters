@@ -59,7 +59,7 @@ void Flood::initialize(Core *core){
 
     std::function<void(int)> func = std::bind(&Flood::flood, this, std::placeholders::_1);
     picker_ = new Picker(glwidget_, cl_, func, &(core->mw_->edit_mode_));
-    error_percent_ = 50;
+    threshold_ = 50;
 }
 
 void Flood::initialize2(PluginManager * pm) {
@@ -89,35 +89,42 @@ void Flood::initialize2(PluginManager * pm) {
 
     layout->addWidget(new QLabel("Feature"));
     QComboBox * cb = new QComboBox();
-    cb->addItem("Normal", "normal");
-    cb->addItem("Intensity", "intensity");
+    cb->addItem("Normal", uint(Feature::Normal));
+    cb->addItem("Intensity", uint(Feature::Intensity));
+    cb->addItem("Connectivity", uint(Feature::Connectivity));
     layout->addWidget(cb);
-
-    connect(cb, &QComboBox::currentTextChanged, [this, cb] (QString text){
-        qDebug() <<text;
-    });
 
 
     layout->addWidget(new QLabel("Termination condition"));
-    cb = new QComboBox();
-    cb->addItem("Deviation from source feature", "normal");
-    cb->addItem("Deviation from neighbouring feature", "intensity");
-    layout->addWidget(cb);
+    QComboBox * cb2 = new QComboBox();
+    cb2->addItem("Deviation from source feature", uint(TerminationCond::SourceDeviation));
+    cb2->addItem("Deviation from neighbouring feature", uint(TerminationCond::NeighbourDeviation));
+    layout->addWidget(cb2);
 
-    connect(cb, &QComboBox::currentTextChanged, [this, cb] (QString text){
-        qDebug() <<text;
+    connect(cb, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [this, cb, cb2] (int idx){
+        feature_ = Feature(cb->itemData(idx).toInt());
+        cb2->setDisabled(feature_ == Feature::Connectivity);
     });
 
-    layout->addWidget(new QLabel("Threshold"));
+    connect(cb2, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [this, cb2] (int idx){
+        term_cond_ = TerminationCond(cb2->itemData(idx).toInt());
+    });
+
+    QLabel * l = new QLabel(QString("Threshold %1 \%").arg(threshold_));
+    layout->addWidget(l);
 
     QSlider * slider = new QSlider();
     slider->setOrientation(Qt::Horizontal);
     slider->setRange(1, 100);
     slider->setSingleStep(1);
-    slider->setValue(error_percent_);
+    slider->setValue(threshold_);
     slider->setTickPosition(QSlider::TicksBelow);
-    connect(slider, &QSlider::valueChanged, [this] (int val){
-        error_percent_ = val;
+    connect(slider, &QSlider::valueChanged, [this, l] (int val){
+        threshold_ = val;
+        if(feature_ != Feature::Connectivity)
+            l->setText(QString("Threshold %1 \%").arg(threshold_));
+        else
+            l->setText(QString("Distance %1 cm").arg(threshold_));
     });
     layout->addWidget(slider);
 
@@ -225,9 +232,9 @@ boost::shared_ptr<std::vector<int> > Flood::getLayerIndices() {
 
 void Flood::flood(int source_idx){
 
-    float max_dist = error_percent_/50;
+    float max_dist = threshold_/50;
     int max_nn = 8;
-    float radius = 0.10f;
+    float radius = 0.20f;
 
     QTime t;
     t.start();
@@ -238,7 +245,7 @@ void Flood::flood(int source_idx){
     // zip and downsample
     pcl::PointCloud<pcl::PointXYZINormal>::Ptr smallcloud = zipNormals(cl_->active_, normals);
     std::vector<int> big_to_small;
-    smallcloud = octreeDownsample(smallcloud.get(), 0.05, big_to_small);
+    smallcloud = octreeDownsample(smallcloud.get(), 0.01, big_to_small);
 
 /*
     // write normals back so we can see
@@ -279,7 +286,8 @@ void Flood::flood(int source_idx){
 
         std::vector<int> idxs;
         std::vector<float> dists;
-        search.radiusSearch(current_idx, radius, idxs, dists, max_nn);
+        //search.radiusSearch(current_idx, radius, idxs, dists, max_nn);
+        search.nearestKSearch(current_idx, max_nn, idxs, dists);
 
         for (int idx : idxs) {
             pcl::PointXYZINormal & n = (*smallcloud)[idx];

@@ -17,6 +17,17 @@ class QMouseEvent;
 class NormalEstimator;
 class Picker;
 
+enum class Feature: uint {
+    Normal,
+    Intensity,
+    Connectivity
+};
+
+enum class TerminationCond: uint {
+    SourceDeviation,
+    NeighbourDeviation
+};
+
 class Flood : public IPlugin {
     Q_INTERFACES(IPlugin)
     Q_OBJECT
@@ -58,9 +69,9 @@ class Flood : public IPlugin {
     NormalEstimator * ne_;
     Picker * picker_;
 
-    float error_percent_;
-    bool only_unselected_;
-    bool neighbour_error_;
+    float threshold_;
+    TerminationCond term_cond_;
+    Feature feature_;
 };
 
 #endif  // GRAPH_CUT_H

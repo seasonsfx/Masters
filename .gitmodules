@@ -1,6 +1,6 @@
 [submodule "OMCLBoost"]
-      path = cloudclean/thirdparty/omclboost
-      url = https://github.com/circlingthesun/omclboost
+	path = cloudclean/thirdparty/omclboost
+	url = https://github.com/circlingthesun/omclboost
 [submodule "cloudclean/thirdparty/EigenLibSVM"]
 	path = cloudclean/thirdparty/EigenLibSVM
-	url = git@github.com:circlingthesun/EigenLibSVM.git
+	url = https://github.com/circlingthesun/EigenLibSVM

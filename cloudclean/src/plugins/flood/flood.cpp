@@ -103,7 +103,7 @@ void Flood::initialize2(PluginManager * pm) {
 
     QLabel * l = new QLabel(QString("Threshold %1 \%").arg(threshold_));
 
-    connect(cb, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [this, cb, cb2, 1] (int idx){
+    connect(cb, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [this, cb, cb2, l] (int idx){
         feature_ = Feature(cb->itemData(idx).toInt());
         cb2->setDisabled(feature_ == Feature::Connectivity);
         if(feature_ != Feature::Connectivity)

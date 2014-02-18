@@ -64,7 +64,7 @@ class UTIL_API Picker : public QObject{
     bool mouseReleaseEvent(QMouseEvent * event);
 
  private:
-    QGLShaderProgram program_;
+    QGLShaderProgram program_3d_;
     GLWidget * glwidget_;
     CloudList * cl_;
     int idx_;

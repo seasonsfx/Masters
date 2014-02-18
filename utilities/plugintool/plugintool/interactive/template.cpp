@@ -1,10 +1,8 @@
-#include "plugins/brush3d/brush3d.h"
+#include "plugins/${lower_name}/${lower_name}.h"
 #include <QDebug>
 #include <QEvent>
 #include <QKeyEvent>
 #include <QAction>
-#include <QGLShaderProgram>
-#include <QGLBuffer>
 #include <QTabWidget>
 #include <QApplication>
 #include <QToolBar>
@@ -31,22 +29,21 @@
 #include "commands/select.h"
 #include "pluginsystem/core.h"
 
-QString Brush3D::getName(){
-    return "Brush Tool";
+QString ${camel_name}::getName(){
+    return "${name} Tool";
 }
 
-void Brush3D::initialize(Core *core){
+void ${camel_name}::initialize(Core *core){
     core_= core;
     cl_ = core_->cl_;
     ll_ = core_->ll_;
     glwidget_ = core_->mw_->glwidget_;
     flatview_ = core_->mw_->flatview_;
     mw_ = core_->mw_;
-    initialized_gl = false;
 
     picker_ = new Picker(glwidget_, cl_);
 
-    enable_ = new QAction(QIcon(":/images/brush.png"), "Brush Tool", 0);
+    enable_ = new QAction(QIcon(":/${icon}"), "Enable ${name}", 0);
     enable_->setCheckable(true);
     enable_->setChecked(false);
 
@@ -100,41 +97,13 @@ void Brush3D::initialize(Core *core){
 
 }
 
-void Brush3D::cleanup(){
+void ${camel_name}::cleanup(){
     disable();
     mw_->removeMenu(enable_, "Edit");
     mw_->toolbar_->removeAction(enable_);
     mw_->tooloptions_->removeWidget(settings_);
     disconnect(this, SIGNAL(enabling()), core_, SIGNAL(endEdit()));
     disconnect(enable_, SIGNAL(triggered()), this, SLOT(enable()));
-    delete line_;
-    delete program_;
-}
-
-void Brush3D::initializeGL() {
-    program_ = new QGLShaderProgram();
-    bool succ = program_->addShaderFromSourceFile(
-                QGLShader::Vertex, ":/basic.vert"); CE();
-    qWarning() << program_->log();
-    if (!succ) qWarning() << "Shader compile log:" << program_->log();
-    succ = program_->addShaderFromSourceFile(
-                QGLShader::Fragment, ":/basic.frag"); CE();
-    if (!succ) qWarning() << "Shader compile log:" << program_->log();
-    succ = program_->link(); CE();
-    if (!succ) {
-        qWarning() << "Could not link shader program_:" << program_->log();
-        qWarning() << "Exiting...";
-        abort();
-    }
-
-    line_ = new QGLBuffer();
-    line_->create(); CE();
-    line_->bind(); CE();
-    size_t point_size = 3*sizeof(float);
-    line_->allocate(2*point_size); CE();
-    line_->release();
-
-    initialized_gl = true;
 }
 
 float getZ(Eigen::Vector3f p, Eigen::Affine3f mv, Eigen::Affine3f proj, int w, int h){
@@ -159,54 +128,11 @@ float getZ(Eigen::Vector3f p, Eigen::Affine3f mv, Eigen::Affine3f proj, int w, i
         viewport,
         &wx, &wy, &wz);
 
-//                                Eigen::Vector4f e = (t2*t).matrix() * q.getVector4fMap();
-//                                e[3] = 1;
-//                                wz = e.z()/e.w();
-
     return wz;
 }
 
-void Brush3D::paint(const Eigen::Affine3f& proj, const Eigen::Affine3f& mv){
-    if(!initialized_gl) {
-        initializeGL();
-    }
 
-    program_->bind();
-
-    line_->bind(); CE();
-    float * layerbuff =
-            static_cast<float *>(glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY)); CE();
-
-    layerbuff[0] = p1.x();
-    layerbuff[1] = p1.y();
-    layerbuff[2] = p1.z();
-    layerbuff[3] = p2.x();
-    layerbuff[4] = p2.y();
-    layerbuff[5] = p2.z();
-
-    glUnmapBuffer(GL_ARRAY_BUFFER);
-
-    glUniformMatrix4fv(program_->uniformLocation("mv"), 1, GL_FALSE,
-                       glwidget_->camera_.modelviewMatrix().data());CE();
-    glUniformMatrix4fv(program_->uniformLocation("proj"), 1, GL_FALSE,
-                       glwidget_->camera_.projectionMatrix().data()); CE();
-    float col[3] = {0, 1, 0};
-    glUniform3fv(program_->uniformLocation("colour"), 1, col); CE();
-
-    glEnableVertexAttribArray(0); CE();
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0); CE();
-
-    glLineWidth(2);
-    glDrawArrays(GL_LINES, 0, 2); CE();
-
-    line_->release(); CE();
-
-    program_->release();
-
-    qDebug() << "Hello from paint plugin";
-}
-
-void Brush3D::select2D(int x, int y){
+void ${camel_name}::select2D(int x, int y){
     boost::shared_ptr<PointCloud> pc = cl_->active_;
 
     Eigen::Vector3f coord;
@@ -243,12 +169,7 @@ void Brush3D::select2D(int x, int y){
 
 }
 
-int Brush3D::select3D(float x, float y){
-//    int idx = pick(x, y, glwidget_->width(),
-//                   glwidget_->height(), 1e-04,
-//                   glwidget_->camera_.projectionMatrix(),
-//                   glwidget_->camera_.modelviewMatrix(),
-//                   cl_->active_);
+int ${camel_name}::select3D(float x, float y){
 
     int idx = picker_->renderPick(x, y);
 
@@ -269,8 +190,6 @@ int Brush3D::select3D(float x, float y){
                     glwidget_->width(), glwidget_->height()
                     );
 
-        //glReadPixels(x, glwidget_->height() - y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &wz);
-        // picked radius
         screenToWorld(x-r, y-r, x+r, y+r, glwidget_->width(), glwidget_->height(), Eigen::Affine3f::Identity(), glwidget_->camera_.projectionMatrix(), p1, p2, wz);
         rad = (p2-p1).norm()/2.0f;
     } else {
@@ -294,11 +213,11 @@ int Brush3D::select3D(float x, float y){
     return idx;
 }
 
-bool Brush3D::mouseClickEvent(QMouseEvent * event){
+bool ${camel_name}::mouseClickEvent(QMouseEvent * event){
     return true;
 }
 
-bool Brush3D::mouseMoveEvent(QMouseEvent * event) {
+bool ${camel_name}::mouseMoveEvent(QMouseEvent * event) {
     // How is the mouse moving?
     Eigen::Vector2d pos(event->x(), event->y());
     Eigen::Vector2d last_pos = last_mouse_pos_;
@@ -388,12 +307,12 @@ bool Brush3D::mouseMoveEvent(QMouseEvent * event) {
     return true;
 }
 
-bool Brush3D::mousePressEvent(QMouseEvent * event) {
+bool ${camel_name}::mousePressEvent(QMouseEvent * event) {
     if(event->buttons() != Qt::LeftButton)
         return false;
     if(cl_->clouds_.size() == 0)
         return false;
-    core_->us_->beginMacro("3d Select");
+    core_->us_->beginMacro("${name}");
     if(is3d()){
         last_picked_point_ = select3D(event->x(), event->y());
     } else {
@@ -404,7 +323,7 @@ bool Brush3D::mousePressEvent(QMouseEvent * event) {
     return true;
 }
 
-bool Brush3D::mouseReleaseEvent(QMouseEvent * event){
+bool ${camel_name}::mouseReleaseEvent(QMouseEvent * event){
     core_->us_->endMacro();
     last_mouse_pos_ << event->x(), event->y();
     float dist = (last_mouse_pos_ - mouse_down_pos_).norm();
@@ -416,48 +335,40 @@ bool Brush3D::mouseReleaseEvent(QMouseEvent * event){
     return true;
 }
 
-void Brush3D::enable() {
+void ${camel_name}::enable() {
     if(is_enabled_){
         disable();
         return;
     }
-//    QTabWidget * tabs = qobject_cast<QTabWidget *>(glwidget_->parent()->parent());
-//    tabs->setCurrentWidget(glwidget_);
-//    enable_->setChecked(true);
 
     mw_->options_dock_->show();
     mw_->tooloptions_->setCurrentWidget(settings_);
 
     emit enabling();
-    //connect(glwidget_, SIGNAL(pluginPaint(Eigen::Affine3f, Eigen::Affine3f)),
-    //        this, SLOT(paint(Eigen::Affine3f, Eigen::Affine3f)),
-    //        Qt::DirectConnection);
     glwidget_->installEventFilter(this);
     flatview_->installEventFilter(this);
     connect(core_, SIGNAL(endEdit()), this, SLOT(disable()));
     is_enabled_ = true;
 }
 
-void Brush3D::disable() {
+void ${camel_name}::disable() {
     enable_->setChecked(false);
     disconnect(core_, SIGNAL(endEdit()), this, SLOT(disable()));
-    //disconnect(glwidget_, SIGNAL(pluginPaint(Eigen::Affine3f, Eigen::Affine3f)),
-    //        this, SLOT(paint(Eigen::Affine3f, Eigen::Affine3f)));
     glwidget_->removeEventFilter(this);
     flatview_->removeEventFilter(this);
     is_enabled_ = false;
 }
 
-void Brush3D::setSelectMask(uint8_t mask){
+void ${camel_name}::setSelectMask(uint8_t mask){
     core_->mw_->setSelectMask(mask);
 }
 
-bool Brush3D::is3d(){
+bool ${camel_name}::is3d(){
     QTabWidget * tabs = qobject_cast<QTabWidget *>(glwidget_->parent()->parent());
     return tabs->currentIndex() == tabs->indexOf(glwidget_);
 }
 
-bool Brush3D::eventFilter(QObject *object, QEvent *event){
+bool ${camel_name}::eventFilter(QObject *object, QEvent *event){
 
     // Bypass plugin via shift
     if(QApplication::keyboardModifiers() == Qt::SHIFT || !core_->mw_->edit_mode_)
@@ -479,4 +390,4 @@ bool Brush3D::eventFilter(QObject *object, QEvent *event){
     }
 }
 
-Q_PLUGIN_METADATA(IID "za.co.circlingthesun.cloudclean.iplugin")
+Q_PLUGIN_METADATA(IID "za.co.circlingthesun.cloudclean.${lower_name}")

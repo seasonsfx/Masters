@@ -108,13 +108,12 @@ void Flood::initialize2(PluginManager * pm) {
         qDebug() <<text;
     });
 
-    layout->addWidget(new QLabel("Error threshold"));
+    layout->addWidget(new QLabel("Threshold"));
 
     QSlider * slider = new QSlider();
     slider->setOrientation(Qt::Horizontal);
     slider->setRange(1, 100);
     slider->setSingleStep(1);
-    slider->setToolTip("Percentage");
     slider->setValue(error_percent_);
     slider->setTickPosition(QSlider::TicksBelow);
     connect(slider, &QSlider::valueChanged, [this] (int val){

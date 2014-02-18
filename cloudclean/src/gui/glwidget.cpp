@@ -225,7 +225,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent * event) {
     if(event->buttons() == Qt::LeftButton && event->modifiers() != Qt::ControlModifier){
         camera_.rotate2D(rot.x(), rot.y());
     }
-    else if(event->buttons() /* ==  Qt::RightButton */ ||   event->modifiers() == Qt::ControlModifier){
+    else if(event->buttons() && event->modifiers() == Qt::ControlModifier){
         boost::shared_ptr<PointCloud> pc = cl_->active_;
         pc->rotate2D(rot.x(), -rot.y());
     }

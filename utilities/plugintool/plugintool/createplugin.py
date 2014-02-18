@@ -9,21 +9,26 @@ here = os.path.dirname(os.path.abspath(__file__))
 
 def usage(argv):
     cmd = os.path.basename(argv[0])
-    print('usage: %s <PluginName>\n'
+    print('usage: %s <PluginName> [template]\n'
           '(example: "%s MyPlugin")' % (cmd, cmd))
     sys.exit(1)
 
 
 def main(argv=sys.argv):
-    if len(argv) != 2:
+    if len(argv) < 2:
         usage(argv)
     
+    if len(argv) == 3:
+        tn = argv[2]
+    else:
+        tn = "template"
+
     templates = [
-        {"in": "template/template.cpp", "out": "${lower_name}/${lower_name}.cpp"},
-        {"in": "template/template.h", "out": "${lower_name}/${lower_name}.h"},
-        {"in": "template/template.qrc", "out": "${lower_name}/${lower_name}.qrc"},
-        {"in": "template/template.json", "out": "${lower_name}/${lower_name}.json"},
-        {"in": "template/CMakeLists.txt", "out": "${lower_name}/CMakeLists.txt"},
+        {"in": "%s/template.cpp" % tn, "out": "${lower_name}/${lower_name}.cpp"},
+        {"in": "%s/template.h" % tn, "out": "${lower_name}/${lower_name}.h"},
+        {"in": "%s/template.qrc" % tn, "out": "${lower_name}/${lower_name}.qrc"},
+        {"in": "%s/template.json" % tn, "out": "${lower_name}/${lower_name}.json"},
+        {"in": "%s/CMakeLists.txt" % tn, "out": "${lower_name}/CMakeLists.txt"},
     ]
 
     name = argv[1].strip("'\"")

@@ -101,16 +101,22 @@ void Flood::initialize2(PluginManager * pm) {
     cb2->addItem("Deviation from neighbouring feature", uint(TerminationCond::NeighbourDeviation));
     layout->addWidget(cb2);
 
-    connect(cb, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [this, cb, cb2] (int idx){
+    QLabel * l = new QLabel(QString("Threshold %1 \%").arg(threshold_));
+
+    connect(cb, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [this, cb, cb2, 1] (int idx){
         feature_ = Feature(cb->itemData(idx).toInt());
         cb2->setDisabled(feature_ == Feature::Connectivity);
+        if(feature_ != Feature::Connectivity)
+            l->setText(QString("Threshold %1 \%").arg(threshold_));
+        else
+            l->setText(QString("Distance %1 cm").arg(threshold_));
     });
 
     connect(cb2, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [this, cb2] (int idx){
         term_cond_ = TerminationCond(cb2->itemData(idx).toInt());
     });
 
-    QLabel * l = new QLabel(QString("Threshold %1 \%").arg(threshold_));
+
     layout->addWidget(l);
 
     QSlider * slider = new QSlider();

@@ -180,8 +180,6 @@ void LayerList::deleteLayer(boost::shared_ptr<Layer> layer) {
 
 // the idx here is the position in the list
 void LayerList::deleteLayer(int idx){
-    disconnect(layers_.at(idx).get(), SIGNAL(colorChanged()),
-               this, SIGNAL(lookupTableUpdate()));
     beginRemoveRows(QModelIndex(), idx, idx);
 
     auto toDel = [&idx, this] (boost::weak_ptr<Layer> l) {
@@ -217,6 +215,8 @@ void LayerList::deleteLayer(int idx){
 
     endRemoveRows();
     emit lookupTableUpdate();
+    disconnect(layers_.at(idx).get(), SIGNAL(colorChanged()),
+               this, SIGNAL(lookupTableUpdate()));
 }
 
 int16_t LayerList::createLabelId() {

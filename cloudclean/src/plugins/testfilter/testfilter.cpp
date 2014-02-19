@@ -165,7 +165,7 @@ void Testfilter::select2D(int x, int y){
     }
 
     bool negative_select = QApplication::keyboardModifiers() == Qt::ControlModifier;
-    core_->us_->push(new Select(pc, indices, core_->mw_->deselect_ || negative_select, core_->mw_->select_mask_));
+    core_->us_->push(new Select(pc, indices, core_->mw_->deselect_ || negative_select, core_->mw_->select_mask_, true, ll_->getHiddenLabels()));
 
 }
 
@@ -208,7 +208,7 @@ int Testfilter::select3D(float x, float y){
 
     bool negative_select = QApplication::keyboardModifiers() == Qt::ControlModifier;
 
-    core_->us_->push(new Select(cl_->active_, indices, core_->mw_->deselect_ || negative_select, core_->mw_->select_mask_));
+    core_->us_->push(new Select(cl_->active_, indices, core_->mw_->deselect_ || negative_select, core_->mw_->select_mask_, true, ll_->getHiddenLabels()));
 
     return idx;
 }
@@ -276,7 +276,7 @@ bool Testfilter::mouseMoveEvent(QMouseEvent * event) {
                         cl_->active_->octree()->radiusSearch(q, last_rad_, *indices, distsq);
 
                         bool negative_select = QApplication::keyboardModifiers() == Qt::ControlModifier;
-                        core_->us_->push(new Select(cl_->active_, indices, core_->mw_->deselect_ || negative_select, core_->mw_->select_mask_));
+                        core_->us_->push(new Select(cl_->active_, indices, core_->mw_->deselect_ || negative_select, core_->mw_->select_mask_, true, ll_->getHiddenLabels()));
 
                     }
                 }

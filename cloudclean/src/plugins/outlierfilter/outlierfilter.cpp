@@ -4,6 +4,7 @@
 #include <QToolBar>
 #include <QSlider>
 #include <QLabel>
+#include <QCheckBox>
 #include <QVBoxLayout>
 #include <QStackedWidget>
 #include <QPushButton>
@@ -42,8 +43,10 @@ void OutlierFilter::initialize(Core *core){
 
     mw_->toolbar_->addAction(enable_);
 
-    radius_ = 3;
-    min_neigbours_ = 3;
+    radius_ = 100;
+    min_neigbours_ = 10;
+    bool non_uniform_ = false;
+
     is_enabled_ = false;
 
     ////////////////////////
@@ -67,8 +70,6 @@ void OutlierFilter::initialize(Core *core){
         radius_ = val;
         l->setText(QString("Radius: %1 cm").arg(radius_));
     });
-
-
     layout->addWidget(l);
     layout->addWidget(slider);
 
@@ -85,9 +86,20 @@ void OutlierFilter::initialize(Core *core){
     });
     layout->addWidget(spinbox);
 
+    QLabel * l3 = new QLabel("Normalise:", settings_);
+    layout->addWidget(l3);
+
+    QCheckBox * cb = new QCheckBox(settings_);
+    cb->setChecked(non_uniform_);
+    layout->addWidget(cb);
+
+    connect(cb, &QCheckBox::toggled, [=] (bool on){
+        this->non_uniform_ = on;
+    });
+
+
     QPushButton * start = new QPushButton("Filter", settings_);
     layout->addWidget(start);
-
     connect(start, SIGNAL(clicked()), this, SLOT(filter()));
 
     layout->addItem(new QSpacerItem(0, 0, QSizePolicy::Maximum, QSizePolicy::Maximum));
@@ -141,10 +153,19 @@ void OutlierFilter::filter() {
     qDebug() << "min_neigbours_:" << min_neigbours_;
     qDebug() << "Candidates: " << candidates.size();
 
+
     for(uint idx : candidates){
         std::vector<int> foundindices;
         std::vector<float> distsq;
         //search.radiusSearch(idx, radius_/100, foundindices, distsq);
+
+        float dist = cl_->active_->at(idx).getVector3fMap().norm();
+
+        int min_neighbours = min_neigbours_;
+
+        if(non_uniform_)
+            min_neighbours = sqrt((min_neigbours_/(radius_/100))*dist);
+
         cloud->octree()->radiusSearch(idx, radius_/100, foundindices, distsq);
         if(foundindices.size() < min_neigbours_){
             indices->push_back(idx);
@@ -153,7 +174,7 @@ void OutlierFilter::filter() {
 
     qDebug() << "Points selected: " << indices->size();
 
-    core_->us_->push(new Select(cl_->active_, indices, core_->mw_->deselect_, core_->mw_->select_mask_));
+    core_->us_->push(new Select(cl_->active_, indices, core_->mw_->deselect_, core_->mw_->select_mask_, true, ll_->getHiddenLabels()));
 
 }
 

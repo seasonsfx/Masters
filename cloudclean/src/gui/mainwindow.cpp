@@ -177,6 +177,10 @@ MainWindow::MainWindow(QUndoStack *us, CloudList * cl, LayerList * ll, QWidget *
     connect(select, SIGNAL(triggered()), clv_, SLOT(selectAllPoints()));
     edit_menu_->addAction(select);
 
+    QAction * invert = new QAction(tr("Invert Selection"), this);
+    connect(invert, SIGNAL(triggered()), clv_, SLOT(invertSelection()));
+    edit_menu_->addAction(invert);
+
     undo->setShortcut(QKeySequence::Undo);
     redo->setShortcut(QKeySequence::Redo);
     undo->setShortcutContext(Qt::ApplicationShortcut);
@@ -405,6 +409,8 @@ void MainWindow::contextMenu(const QPoint &pos) {
 
     menu.addAction("Deselect all", clv_, SLOT(deselectAllPoints()));
     menu.addAction("Select all", clv_, SLOT(selectAllPoints()));
+    menu.addAction("Invert selection", clv_, SLOT(invertSelection()));
+
 
     if(flatview_->isVisible())
         menu.addAction("Rotate", flatview_, SLOT(rotate90()));

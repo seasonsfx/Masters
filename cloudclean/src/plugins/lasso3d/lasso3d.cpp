@@ -107,7 +107,7 @@ bool Lasso3D::mouseDblClickEvent(QMouseEvent *){
 
     core_->us_->beginMacro("Lasso tool");
     bool negative_select = QApplication::keyboardModifiers() == Qt::ControlModifier;
-    core_->us_->push(new Select(cl_->active_, selected_indices, core_->mw_->deselect_ || negative_select, core_->mw_->select_mask_));
+    core_->us_->push(new Select(cl_->active_, selected_indices, core_->mw_->deselect_ || negative_select, core_->mw_->select_mask_, true, ll_->getHiddenLabels()));
     core_->us_->endMacro();
 
     disable();

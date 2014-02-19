@@ -43,6 +43,9 @@ class OutlierFilter : public IPlugin {
     float radius_;
     uint min_neigbours_;
     bool is_enabled_;
+
+    bool non_uniform_;
+    float cam_distance_;
 };
 
 #endif  // OUTLIERFILTER_H

@@ -5,6 +5,8 @@
 #include <QToolBar>
 #include <QStyle>
 #include <QApplication>
+#include <QSettings>
+#include <QString>
 #include <fstream>
 #include "model/layerlist.h"
 #include "model/cloudlist.h"
@@ -127,10 +129,20 @@ void JsonExport::save(){
 }
 
 void JsonExport::load(){
+    QSettings settings;
+
+    QString path = settings.value("load/lastlocation", QDir::home().absolutePath()).toString();
+
     QString filename = QFileDialog::getOpenFileName(
-                 nullptr, tr("Open project"), QDir::home().absolutePath(), tr("Cloud clean project files (*.ccp)"));
+                 nullptr, tr("Open project"), path, tr("Cloud clean project files (*.ccp)"));
     if (filename.length() == 0)
         return;
+
+    // look up root of where the ccp file is
+    QString ccppath = QFileInfo(filename).absolutePath();
+
+    settings.setValue("load/lastlocation", ccppath);
+    settings.sync();
 
     std::ifstream file(filename.toLocal8Bit().data());
     if (!file.is_open()){
@@ -154,10 +166,46 @@ void JsonExport::load(){
 
     std::map<uint16_t, uint16_t> old_to_new_label;
 
+    auto resolveFile = [] (QString filepath, QString hint) {
+        filepath = filepath.trimmed();
+        bool exists = QFile(filepath).exists();
+        QFileInfo fi(filepath);
+        if(exists)
+            return filepath;
+
+        QChar sep = QDir::separator();
+        QString name = fi.fileName();
+        QStringList l = hint.split(sep);
+
+        qDebug() << l;
+
+        for(int i = l.size(); i > 0; i--){
+            QStringList c;
+            for(int j = 0; j < i; j++){
+                c << l[j];
+            }
+            c << name;
+            QString candidate_path = c.join(sep).trimmed();
+            QFileInfo fi(candidate_path);
+
+            qDebug() << "candidate: |" << candidate_path.toLocal8Bit().data() << '|' <<exists;
+
+            if(fi.exists())
+                return candidate_path;
+        }
+
+        return QString("");
+    };
+
+
     for(QString path : filepaths) {
-        boost::shared_ptr<PointCloud> cloud = cl_->loadFile(path);
+        QString f = resolveFile(path, ccppath);
+        qDebug() << "loading: " << f;
+        if(f == "")
+            return;
+        boost::shared_ptr<PointCloud> cloud = cl_->loadFile(f);
         if(cloud == nullptr) {
-            qDebug() << "could not load cloud";
+            qDebug() << "could not load cloud: " << f;
             return;
         }
         std::vector<int16_t> & labels = cloud->labels_;

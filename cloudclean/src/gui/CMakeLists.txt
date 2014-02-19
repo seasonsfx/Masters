@@ -25,6 +25,7 @@ if(NOT Leap_FOUND)
     endforeach()
     MESSAGE("NO LEAP SUPPORT!")
 else()
+    add_definitions("-DLEAP_SUPPORT")
     MESSAGE("YAY FOR LEAP SUPPORT!")
 endif()
 

@@ -66,7 +66,7 @@ void LayerListView::selectionToLayer(){
                 continue;
 
             us_->push(new NewLayer(pc, selection, ll_));
-            us_->push(new Select(pc,selection, true, 1 << sel_idx));
+            us_->push(new Select(pc,selection, true, 1 << sel_idx, true, ll_->getHiddenLabels()));
         }
     }
 
@@ -229,7 +229,7 @@ void LayerListView::contextMenu(const QPoint &pos) {
                     }
                 }
 
-                us_->push(new Select(pc, points));
+                us_->push(new Select(pc, points, false, 1, true, ll_->getHiddenLabels()));
 
             }
             us_->endMacro();

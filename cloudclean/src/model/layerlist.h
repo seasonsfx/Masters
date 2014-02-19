@@ -40,6 +40,7 @@ class MODEL_API LayerList : public QAbstractListModel {
     boost::shared_ptr<Layer> getDefaultLayer() const;
     const std::vector<boost::shared_ptr<Layer>> & getLayers();
 
+    boost::shared_ptr<std::vector<uint16_t> > getHiddenLabels();
 
 
  signals:

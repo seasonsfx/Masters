@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QFileDialog>
 #include <QUndoStack>
+#include <boost/make_shared.hpp>
 #include <thread>
 #include <functional>
 #include "commands/select.h"
@@ -104,7 +105,7 @@ void CloudListView::deselectAllPoints(){
 
         for(size_t sel_idx = 0; sel_idx < selections.size(); sel_idx++){
             boost::shared_ptr<std::vector<int> > selection = selections[sel_idx];
-            us_->push(new Select(cloud, selection, true, 1 << sel_idx));
+            us_->push(new Select(cloud, selection, true, 1 << sel_idx, true, ll_->getHiddenLabels()));
         }
     }
     us_->endMacro();
@@ -116,16 +117,33 @@ void CloudListView::selectAllPoints(){
         boost::shared_ptr<std::vector<int> > indices;
         indices.reset(new std::vector<int>());
 
-        boost::shared_ptr<std::vector<int> > empty;
-        empty.reset(new std::vector<int>());
-
         for(uint idx = 0; idx < cloud->flags_.size(); idx++){
             PointFlags & flag =  cloud->flags_[idx];
             if(!(uint8_t(PointFlags::selected) & uint8_t(flag)))
                 indices->push_back(idx);
         }
 
-        us_->push(new Select(cloud, indices));
+        us_->push(new Select(cloud, indices, false, 1, true, ll_->getHiddenLabels()));
+    }
+    us_->endMacro();
+}
+
+void CloudListView::invertSelection(){
+    us_->beginMacro("Invert selection");
+    for(boost::shared_ptr<PointCloud> cloud : cl_->clouds_){
+        boost::shared_ptr<std::vector<int> > select = boost::make_shared<std::vector<int> >();
+        boost::shared_ptr<std::vector<int> > deselect = boost::make_shared<std::vector<int> >();
+
+        for(uint idx = 0; idx < cloud->flags_.size(); idx++){
+            PointFlags & flag = cloud->flags_[idx];
+            if(uint8_t(flag) == 0)
+                select->push_back(idx);
+            else
+                deselect->push_back(idx);
+        }
+
+        us_->push(new Select(cloud, select, false, 1, true, ll_->getHiddenLabels()));
+        us_->push(new Select(cloud, deselect, true, 1, true, ll_->getHiddenLabels()));
     }
     us_->endMacro();
 }

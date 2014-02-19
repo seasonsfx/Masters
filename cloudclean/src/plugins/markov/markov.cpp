@@ -233,7 +233,7 @@ void Markov::graphcut(int idx){
 
     //std::copy(clusters[1].indices.begin(), clusters[1].indices.end(), select->begin());
 
-    Select * selectCmd = new Select(cl_->active_, select);
+    Select * selectCmd = new Select(cl_->active_, select, false, 1, true, ll_->getHiddenLabels());
 
 
 
@@ -530,7 +530,7 @@ void Markov::randomforest(){
 
     for(int i = 0; i < 8; i++){
         if(seg_selections[i]->size() > 0) {
-            core_->us_->push(new Select(cl_->active_, seg_selections[i], false, 1 << i));
+            core_->us_->push(new Select(cl_->active_, seg_selections[i], false, 1 << i, true, ll_->getHiddenLabels()));
         }
     }
 
@@ -846,7 +846,7 @@ void Markov::svm(){
 
     for(int i = 0; i < 2; i++){
         if(seg_selections[i]->size() > 0) {
-            core_->us_->push(new Select(cl_->active_, seg_selections[i], false, 1 << i));
+            core_->us_->push(new Select(cl_->active_, seg_selections[i], false, 1 << i, true, ll_->getHiddenLabels()));
         }
     }
 

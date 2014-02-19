@@ -2,8 +2,12 @@
 #define GRAPH_CUT_H
 
 #include "pluginsystem/iplugin.h"
+#include <pcl/point_types.h>
+#include <pcl/point_cloud.h>
 #include <memory>
+#include <map>
 #include <boost/shared_ptr.hpp>
+
 class QAction;
 class QWidget;
 class Core;
@@ -16,6 +20,7 @@ class Event;
 class QMouseEvent;
 class NormalEstimator;
 class Picker;
+class PointCloud;
 
 enum class Feature: uint {
     Normal,
@@ -72,6 +77,12 @@ class Flood : public IPlugin {
     float threshold_;
     TerminationCond term_cond_;
     Feature feature_;
+
+    int k_;
+
+    std::map<boost::shared_ptr<PointCloud>, pcl::PointCloud<pcl::PointXYZINormal>::Ptr> cache_;
+    std::map<boost::shared_ptr<PointCloud>, std::vector<int>> cache2_;
+    std::map<boost::shared_ptr<PointCloud>, std::vector<std::vector<int>>> cache3_;
 };
 
 #endif  // GRAPH_CUT_H

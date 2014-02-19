@@ -29,6 +29,7 @@ class CloudListView : public QDockWidget
  public slots:
    void deselectAllPoints();
    void selectAllPoints();
+   void invertSelection();
 
  private:
     LayerList * ll_;

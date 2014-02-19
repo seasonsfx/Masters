@@ -1,4 +1,5 @@
 #include "layerlist.h"
+#include <boost/make_shared.hpp>
 #include <QTextStream>
 #include <QDebug>
 
@@ -152,6 +153,17 @@ const std::vector<boost::shared_ptr<Layer> > & LayerList::getLayers() {
     return layers_;
 }
 
+boost::shared_ptr<std::vector<uint16_t> > LayerList::getHiddenLabels(){
+    boost::shared_ptr<std::vector<uint16_t> > hidden = boost::make_shared<std::vector<uint16_t> >();
+    for(boost::shared_ptr<Layer> l :layers_){
+        if(!l->isVisible()){
+            for(uint16_t label: l->getLabelSet()){
+                hidden->push_back(label);
+            }
+        }
+    }
+    return hidden;
+}
 
 void LayerList::deleteLayer(){
     int id = sender()->property("layer_id").toInt();

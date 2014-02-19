@@ -24,6 +24,7 @@
 #include <pcl/search/kdtree.h>
 #include <pcl/kdtree/kdtree_flann.h>
 #include <pcl/features/principal_curvatures.h>
+#include <pcl/common/pca.h>
 
 //#define PCL_NO_PRECOMPILE
 //#include <pcl/segmentation/region_growing.h>
@@ -59,7 +60,8 @@ void Flood::initialize(Core *core){
 
     std::function<void(int)> func = std::bind(&Flood::flood, this, std::placeholders::_1);
     picker_ = new Picker(glwidget_, cl_, func, &(core->mw_->edit_mode_));
-    threshold_ = 50;
+    threshold_ = 30;
+    k_ = 8;
 }
 
 void Flood::initialize2(PluginManager * pm) {
@@ -90,7 +92,7 @@ void Flood::initialize2(PluginManager * pm) {
     layout->addWidget(new QLabel("Feature"));
     QComboBox * cb = new QComboBox();
     cb->addItem("Normal", uint(Feature::Normal));
-    cb->addItem("Intensity", uint(Feature::Intensity));
+    //cb->addItem("Intensity", uint(Feature::Intensity));
     cb->addItem("Connectivity", uint(Feature::Connectivity));
     layout->addWidget(cb);
 
@@ -140,9 +142,9 @@ void Flood::initialize2(PluginManager * pm) {
     //connect(global_flood_, &QAction::triggered, this, &Flood::global_flood);
     //mw_->toolbar_->addAction(global_flood_);
 
-    //global_flood2_ = new QAction(QIcon(":/images/flood2.png"), "Global floodfill 2", 0);
-    //connect(global_flood2_, &QAction::triggered, this, &Flood::global_flood2);
-    //mw_->toolbar_->addAction(global_flood2_);
+    global_flood2_ = new QAction(QIcon(":/images/flood2.png"), "Global floodfill 2", 0);
+    connect(global_flood2_, &QAction::triggered, this, &Flood::global_flood2);
+    mw_->toolbar_->addAction(global_flood2_);
 
 }
 
@@ -153,8 +155,8 @@ void Flood::cleanup(){
     delete enable_;
     //mw_->toolbar_->removeAction(global_flood_);
     //delete global_flood_;
-    //mw_->toolbar_->removeAction(global_flood2_);
-    //delete global_flood2_;
+    mw_->toolbar_->removeAction(global_flood2_);
+    delete global_flood2_;
 }
 
 Flood::~Flood(){
@@ -167,6 +169,8 @@ void Flood::enable() {
         disable();
         return;
     }
+
+    // enable the cache
 
     QTabWidget * tabs = qobject_cast<QTabWidget *>(glwidget_->parent()->parent());
     tabs->setCurrentWidget(glwidget_);
@@ -188,6 +192,11 @@ void Flood::enable() {
 }
 
 void Flood::disable() {
+    // clear the cache
+    cache_.clear();
+    cache2_.clear();
+    cache3_.clear();
+
     is_enabled_ = false;
     enable_->setChecked(false);
     disconnect(core_, SIGNAL(endEdit()), this, SLOT(disable()));
@@ -245,13 +254,29 @@ void Flood::flood(int source_idx){
     QTime t;
     t.start();
 
-    // get normals
-    pcl::PointCloud<pcl::Normal>::Ptr normals = ne_->getNormals(cl_->active_);
+    auto it = cache_.find(cl_->active_);
+    if(it == cache_.end()) {
+        // cache miss
+        // get normals
+        pcl::PointCloud<pcl::Normal>::Ptr normals = ne_->getNormals(cl_->active_);
 
-    // zip and downsample
-    pcl::PointCloud<pcl::PointXYZINormal>::Ptr smallcloud = zipNormals(cl_->active_, normals);
-    std::vector<int> big_to_small;
-    smallcloud = octreeDownsample(smallcloud.get(), 0.01, big_to_small);
+        // zip and downsample
+        pcl::PointCloud<pcl::PointXYZINormal>::Ptr smallcloud = zipNormals(cl_->active_, normals);
+        std::vector<int> & big_to_small = cache2_[cl_->active_];
+        cache_[cl_->active_] = octreeDownsample(smallcloud.get(), 0.01, big_to_small);
+
+        cache3_[cl_->active_] = std::vector<std::vector<int>>(smallcloud->size());
+
+        std::vector<std::vector<int>> & small_to_big = cache3_[cl_->active_];
+        for(size_t big_idx = 0; big_idx < big_to_small.size(); big_idx++) {
+            int small_idx = big_to_small[big_idx];
+            small_to_big[small_idx].push_back(big_idx);
+        }
+    }
+
+    pcl::PointCloud<pcl::PointXYZINormal>::Ptr smallcloud = cache_[cl_->active_];
+    std::vector<int> & big_to_small = cache2_[cl_->active_];
+    std::vector<std::vector<int>> & small_to_big = cache3_[cl_->active_];
 
 /*
     // write normals back so we can see
@@ -280,7 +305,7 @@ void Flood::flood(int source_idx){
 
     std::set<int> visited;
 
-    int dist_count = 0;
+    boost::shared_ptr<std::vector<uint16_t>> hidden_labels = ll_->getHiddenLabels();
 
     while (!flood_queue.empty()){
         current_idx = flood_queue.front(); flood_queue.pop();
@@ -292,8 +317,11 @@ void Flood::flood(int source_idx){
 
         std::vector<int> idxs;
         std::vector<float> dists;
-        //search.radiusSearch(current_idx, radius, idxs, dists, max_nn);
-        search.nearestKSearch(current_idx, max_nn, idxs, dists);
+
+        if(feature_ == Feature::Connectivity)
+            search.radiusSearch(current_idx, threshold_, idxs, dists, max_nn);
+        else
+            search.nearestKSearch(current_idx, k_, idxs, dists);
 
         for (int idx : idxs) {
             pcl::PointXYZINormal & n = (*smallcloud)[idx];
@@ -301,12 +329,24 @@ void Flood::flood(int source_idx){
 
             float dist = (normal-source_normal).norm();
 
-            if(dist > max_dist) {
-                if(dist_count++ < 10){
-                    qDebug() << "too big:" << dist;
-                }
+            if(feature_ == Feature::Normal && dist > threshold_/50) {
                 continue;
             }
+
+            bool is_hidden = false;
+
+            for(int big_idx : small_to_big[idx]){
+                for(uint16_t hlabel : *hidden_labels){
+                    if(hlabel == cl_->active_->labels_[big_idx]){
+                        is_hidden = true;
+                        break;
+                    }
+                }
+                if(is_hidden)
+                    break;
+            }
+            if(is_hidden)
+                continue;
 
             flood_queue.push(idx);
         }
@@ -326,7 +366,7 @@ void Flood::flood(int source_idx){
 
     core_->us_->beginMacro("Normal fill");
     bool negative_select = QApplication::keyboardModifiers() == Qt::ControlModifier;
-    core_->us_->push(new Select(cl_->active_, selected, core_->mw_->deselect_ || negative_select, core_->mw_->select_mask_));
+    core_->us_->push(new Select(cl_->active_, selected, core_->mw_->deselect_ || negative_select, core_->mw_->select_mask_, true, ll_->getHiddenLabels()));
     core_->us_->endMacro();
 
     qDebug("Time to fill : %d ms", t.elapsed());
@@ -389,7 +429,6 @@ void Flood::global_flood(){
 */
 
 void Flood::global_flood2(){
-    float max_dist = 1.0f;
     int max_nn = 8;
     float radius = 0.10f;
     size_t min_region = 100;
@@ -478,26 +517,19 @@ void Flood::global_flood2(){
     pcl::KdTreeFLANN<pcl::PointXYZINormal> search;
     search.setInputCloud(smallcloud);
 
-    // debugging variable
-    int debug_dist_count = 0;
-
     auto fill = [&] (int source_idx) {
 
         std::vector<int> region;
 
         std::vector<int> idxs;
         std::vector<float> dists;
-        search.radiusSearch(source_idx, radius, idxs, dists, max_nn);
-
+        //search.radiusSearch(source_idx, radius, idxs, dists, max_nn);
+        search.nearestKSearch(source_idx, 4, idxs, dists);
         Eigen::Vector3f source_normal(0, 0, 0);
-
         for(int idx : idxs) {
             source_normal += (*smallcloud)[idx].getNormalVector3fMap();
         }
-
         source_normal /= idxs.size();
-
-        //Eigen::Map<Eigen::Vector3f> source_normal = (*smallcloud)[source_idx].getNormalVector3fMap();
 
         std::queue<int> flood_queue;
         flood_queue.push(source_idx);
@@ -517,25 +549,16 @@ void Flood::global_flood2(){
 
             std::vector<int> idxs;
             std::vector<float> dists;
-            search.radiusSearch(current_idx, radius, idxs, dists, max_nn);
+            //search.radiusSearch(current_idx, radius, idxs, dists, max_nn);
+            search.nearestKSearch(current_idx, k_, idxs, dists);
 
             for (int idx : idxs) {
                 Eigen::Map<Eigen::Vector3f> normal = (*smallcloud)[idx].getNormalVector3fMap();
 
                 float dist = (normal-source_normal).norm();
 
-                if(debug_dist_count++ < 10){
-                    qDebug() << "dist:" << dist;
-                }
-
-                if(dist != dist) {
-                    qDebug() << "source normal map" << source_normal[0] << source_normal[1] << source_normal[2];
-                    qDebug() << "normal map" << normal[0] << normal[1] << normal[2];
-                    qDebug() << "normal.." << (*smallcloud)[idx].normal_x << (*smallcloud)[idx].normal_y << (*smallcloud)[idx].normal_z;
-                }
-
                 // skip points out of range
-                if(dist > max_dist || dist != dist) {
+                if(dist > threshold_/50 || dist != dist) {
                     continue;
                 }
 
@@ -562,13 +585,26 @@ void Flood::global_flood2(){
                 seen.erase(seen.find(re_idx));
             }
             qDebug() << "Deleted region of size" << region.size();
-
             continue;
         }
 
+        // Remove the regoin if it doesnt look planar
+
+
+        pcl::PCA<pcl::PointXYZINormal> pcEstimator(true);
+        pcEstimator.setInputCloud(smallcloud);
+
+        pcEstimator.setIndices(boost::shared_ptr<std::vector<int>>(&region, boost::serialization::null_deleter()));
+        Eigen::Vector3f eig = pcEstimator.getEigenValues();
+
+        if(eig[2]/( (eig[0] + eig[1])/2 ) > 0.2 ){
+            continue;
+            qDebug() << "Not a plane";
+        }
+
+
         qDebug() << "Curvature" << smallcloud->points[seed_idx].curvature;
         qDebug() << "Region: " << region.size();
-
         qDebug() << "Big enough";
 
         // Create a big layer
@@ -578,8 +614,10 @@ void Flood::global_flood2(){
                 big_idxs->push_back(big_idx);
             }
         }
-        NewLayer * nl = new NewLayer(cl_->active_, big_idxs, ll_);
-        core_->us_->push(nl);
+        //NewLayer * nl = new NewLayer(cl_->active_, big_idxs, ll_);
+        //core_->us_->push(nl);
+        core_->us_->push(new Select(cl_->active_, big_idxs, false, core_->mw_->select_mask_, true, ll_->getHiddenLabels()));
+
 
     }
 

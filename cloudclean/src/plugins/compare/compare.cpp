@@ -44,7 +44,7 @@ void Compare::initialize(Core *core){
 
     mw_->tooloptions_->addWidget(settings_);
 
-    layout->addWidget(new QLabel("Layer set 1:", settings_));
+    layout->addWidget(new QLabel("Truth:", settings_));
     QListWidget * l1 = new QListWidget(settings_);
     layout->addWidget(l1);
     QHBoxLayout * split1 = new QHBoxLayout(settings_);
@@ -54,7 +54,7 @@ void Compare::initialize(Core *core){
     QPushButton * clear1 = new QPushButton("Clear", settings_);
     split1->addWidget(clear1);
 
-    layout->addWidget(new QLabel("Layer set 2:", settings_));
+    layout->addWidget(new QLabel("Result:", settings_));
     QListWidget * l2 = new QListWidget(settings_);
     layout->addWidget(l2);
     QHBoxLayout * split2 = new QHBoxLayout(settings_);
@@ -123,11 +123,45 @@ void Compare::initialize(Core *core){
         layers2_.clear();
     });
 
+    connect(compare, SIGNAL(clicked()), this, SLOT(compare()));
+
     layout->addStretch();
 }
 
-void Compare::filter() {
-    qDebug() << "hello, this is where the action happens";
+void Compare::compare() {
+    auto is_label_in_set = [=] (uint16_t label, std::vector<boost::weak_ptr<Layer> > & layers){
+        const LayerSet & ls = ll_->getLayersForLabel(label);
+
+        for(Layer * x : ls){
+            for(boost::weak_ptr<Layer> y: layers){
+                if(y.lock().get() == x)
+                    return true;
+            }
+        }
+
+        return false;
+    };
+
+    int count = 0;
+    int count1 = 0;
+    int count2 = 0;
+
+    for(uint16_t label : cl_->active_->labels_){
+        bool in1 = is_label_in_set(label, layers1_);
+        bool in2 = is_label_in_set(label, layers2_);
+
+        if(in1)
+            count1++;
+        if(in2)
+            count2++;
+        if(in1 && in2)
+            count++;
+    }
+
+    // http://en.wikipedia.org/wiki/Precision_and_recall
+    qDebug() << "overlap: " << count << "truth: " << count1 << "result: " << count2;
+    qDebug() << "Recall: " << float(count)/count1;
+    qDebug() << "Precision: " << float(count)/count2;
 }
 
 void Compare::cleanup(){

@@ -30,7 +30,7 @@ class Compare : public IPlugin {
  private slots:
     void enable();
     void disable();
-    void filter();
+    void compare();
 
  private:
     Core * core_;

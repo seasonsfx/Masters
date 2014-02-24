@@ -21,11 +21,22 @@ LayerListView::LayerListView(QUndoStack * us, LayerList * ll,
     ui_->setupUi(this);
     ui_->tableView->setModel(ll_);
 
-    connect(ui_->tableView->selectionModel(),
-            SIGNAL(selectionChanged(const QItemSelection &,
-                                 const QItemSelection &)), ll_,
-            SLOT(selectionChanged(const QItemSelection &,
-                                    const QItemSelection &)));
+//    connect(ui_->tableView->selectionModel(),
+//            SIGNAL(selectionChanged(const QItemSelection &,
+//                                 const QItemSelection &)), ll_,
+//            SLOT(selectionChanged(const QItemSelection &,
+//                                    const QItemSelection &)));
+
+    connect(ui_->tableView->selectionModel(), &QItemSelectionModel::selectionChanged, [=] (const QItemSelection & sel, const QItemSelection & dsel) {
+        std::vector<int> selection;
+        for(QModelIndex index : ui_->tableView->selectionModel()->selectedIndexes()){
+            if(index.column() != 0)
+                continue;
+            int idx = index.row();
+            selection.push_back(idx);
+            ll_->selectionChanged(selection);
+        }
+    });
 
     ui_->tableView->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui_->tableView, SIGNAL(customContextMenuRequested(const QPoint&)),

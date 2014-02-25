@@ -16,8 +16,8 @@ class LayerListView : public QDockWidget
     Q_OBJECT
     
  public:
-    explicit LayerListView(QUndoStack *us, LayerList * ll,
-                           CloudList * cl, QWidget *parent = 0);
+    LayerListView(QUndoStack *us, LayerList * ll,
+                           CloudList * cl, uint8_t & selection_mask, QWidget *parent = 0);
     ~LayerListView();
 
  public slots:
@@ -35,6 +35,7 @@ class LayerListView : public QDockWidget
     CloudList * cl_;
     QUndoStack * us_;
     Ui::LayerListView *ui_;
+    uint8_t & selection_mask_;
 };
 
 #endif // LAYERLISTVIEW_H

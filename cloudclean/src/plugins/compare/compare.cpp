@@ -10,6 +10,7 @@
 #include <QListWidget>
 #include <QVBoxLayout>
 #include <QStackedWidget>
+#include <QLineEdit>
 #include "model/layerlist.h"
 #include "model/cloudlist.h"
 #include "gui/glwidget.h"
@@ -54,7 +55,7 @@ void Compare::initialize(Core *core){
     QPushButton * clear1 = new QPushButton("Clear", settings_);
     split1->addWidget(clear1);
 
-    layout->addWidget(new QLabel("Result:", settings_));
+    layout->addWidget(new QLabel("Segementation:", settings_));
     QListWidget * l2 = new QListWidget(settings_);
     layout->addWidget(l2);
     QHBoxLayout * split2 = new QHBoxLayout(settings_);
@@ -66,6 +67,18 @@ void Compare::initialize(Core *core){
 
     QPushButton * compare = new QPushButton("Compare", settings_);
     layout->addWidget(compare);
+
+    precision_ = new QLineEdit(settings_);
+    precision_->setReadOnly(true);
+    recall_ = new QLineEdit(settings_);
+    recall_->setReadOnly(true);
+
+    QHBoxLayout * split = new QHBoxLayout(settings_);
+    layout->addLayout(split);
+    split->addWidget(new QLabel("Recall", settings_));
+    split->addWidget(recall_);
+    split->addWidget(new QLabel("Precision", settings_));
+    split->addWidget(precision_);
 
     // connect
 
@@ -162,6 +175,9 @@ void Compare::compare() {
     qDebug() << "overlap: " << count << "truth: " << count1 << "result: " << count2;
     qDebug() << "Recall: " << float(count)/count1;
     qDebug() << "Precision: " << float(count)/count2;
+
+    recall_->setText(QString("%1").arg(float(count)/count1));
+    precision_->setText(QString("%1").arg(float(count)/count2));
 }
 
 void Compare::cleanup(){

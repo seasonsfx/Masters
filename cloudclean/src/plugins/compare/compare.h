@@ -13,6 +13,7 @@ class FlatView;
 class GLWidget;
 class MainWindow;
 class Layer;
+class QLineEdit;
 
 class Compare : public IPlugin {
     Q_INTERFACES(IPlugin)
@@ -43,6 +44,9 @@ class Compare : public IPlugin {
     QAction * enable_;
     QWidget * settings_;
     bool is_enabled_;
+
+    QLineEdit * precision_;
+    QLineEdit * recall_;
 
     float radius_;
     std::vector<boost::weak_ptr<Layer> >  layers1_;

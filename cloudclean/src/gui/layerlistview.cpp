@@ -13,13 +13,14 @@
 #include "commands/layerdelete.h"
 
 LayerListView::LayerListView(QUndoStack * us, LayerList * ll,
-                             CloudList * cl, QWidget *parent) :
-        QDockWidget(parent), ui_(new Ui::LayerListView) {
+                             CloudList * cl, uint8_t & selection_mask, QWidget *parent) :
+    QDockWidget(parent), ui_(new Ui::LayerListView), selection_mask_(selection_mask) {
     ll_ = ll;
     cl_ = cl;
     us_ = us;
     ui_->setupUi(this);
     ui_->tableView->setModel(ll_);
+
 
 //    connect(ui_->tableView->selectionModel(),
 //            SIGNAL(selectionChanged(const QItemSelection &,
@@ -34,8 +35,8 @@ LayerListView::LayerListView(QUndoStack * us, LayerList * ll,
                 continue;
             int idx = index.row();
             selection.push_back(idx);
-            ll_->selectionChanged(selection);
         }
+        ll_->selectionChanged(selection);
     });
 
     ui_->tableView->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -240,7 +241,7 @@ void LayerListView::contextMenu(const QPoint &pos) {
                     }
                 }
 
-                us_->push(new Select(pc, points, false, 1, true, ll_->getHiddenLabels()));
+                us_->push(new Select(pc, points, false, selection_mask_, true, ll_->getHiddenLabels()));
 
             }
             us_->endMacro();

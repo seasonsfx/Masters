@@ -25,6 +25,7 @@ FlatView::FlatView(QGLFormat & fmt, CloudList * cl,
 
 void FlatView::setGLD(GLData * gld){
     gld_ = gld;
+    rotate(M_PI/2 *3);
 }
 
 
@@ -149,6 +150,8 @@ void FlatView::setCloud(boost::shared_ptr<PointCloud> new_pc) {
 
     connect(pc.get(), SIGNAL(flagUpdate()), this, SLOT(update()));
     connect(pc.get(), SIGNAL(labelUpdate()), this, SLOT(update()));
+
+
     if(gl_init_)
         resizeGL(width(), height());
     if(this->isVisible())

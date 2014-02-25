@@ -74,7 +74,7 @@ MainWindow::MainWindow(QUndoStack *us, CloudList * cl, LayerList * ll, QWidget *
     flatview_->setGLD(gld_);
 
     clv_ = new CloudListView(us, ll, cl, glwidget_, this);
-    llv_ = new LayerListView(us, ll, cl, this);
+    llv_ = new LayerListView(us, ll, cl, select_mask_, this);
 
     progressbar_->setTextVisible( false );
     progressbar_->setRange( 0, 100 );

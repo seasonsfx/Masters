@@ -253,6 +253,10 @@ void LayerList::copyLayerSet(uint8_t source_label, uint8_t dest_label){
 
 void LayerList::selectionChanged(const std::vector<int> &selection) {
 
+//    for(boost::shared_ptr<Layer> l : *layers_){
+//        l->
+//    }
+
     selection_.clear();
     for (int idx : selection) {
         selection_.push_back(layers_[idx]);

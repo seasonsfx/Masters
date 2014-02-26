@@ -5,6 +5,7 @@
 #include <QWindow>
 #include <cmath>
 #include <cstdlib>
+#include <boost/make_shared.hpp>
 #include "utilities/pointpicker.h"
 
 using namespace Eigen;
@@ -162,8 +163,17 @@ void GLWidget::paintEvent(QPaintEvent *event) {
         boost::shared_ptr<PointCloud> pc = pair.first;
         boost::shared_ptr<CloudGLData> cd = pair.second;
 
-        if(!pc->isVisible())
+        if(!pc->isVisible() && cd != nullptr){
+            qDebug() << "Should be deleted now";
+            gld_->cloudgldata_[pc].reset();
             continue;
+        }
+
+        if(cd == nullptr){
+            qDebug() << "Should be recreated now";
+            gld_->cloudgldata_[pc].reset(new CloudGLData(pc));
+            cd = gld_->cloudgldata_[pc];
+        }
 
         glBindVertexArray(vao_);
 

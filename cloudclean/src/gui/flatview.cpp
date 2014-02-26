@@ -5,6 +5,7 @@
 #include <QApplication>
 #include <QLabel>
 #include <QMessageBox>
+#include <boost/make_shared.hpp>
 #include "commands/select.h"
 
 FlatView::FlatView(QGLFormat & fmt, CloudList * cl,
@@ -276,18 +277,30 @@ void FlatView::paintEvent(QPaintEvent *event) {
         initializeGL();
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-    QPainter p(this);
-    p.beginNativePainting();
-
-    glEnable(GL_DEPTH_TEST);
+    boost::shared_ptr<PointCloud> pc = pc_.lock();
+    boost::shared_ptr<CloudGLData> & cd = gld_->cloudgldata_[pc];
 
     if(pc_.expired()){
         qDebug() << "Nothing to paint on flatview";
         return;
     }
 
-    boost::shared_ptr<PointCloud> pc = pc_.lock();
-    boost::shared_ptr<CloudGLData> cd = gld_->cloudgldata_[pc];
+    if(!pc->isVisible() && cd != nullptr){
+        qDebug() << "Should be deleted now";
+        gld_->cloudgldata_[pc].reset();
+        return;
+    }
+
+    if(cd == nullptr){
+        gld_->cloudgldata_[pc].reset(new CloudGLData(pc));
+        cd = gld_->cloudgldata_[pc];
+    }
+
+    QPainter p(this);
+    p.beginNativePainting();
+
+    glEnable(GL_DEPTH_TEST);
+
 
     program_.bind(); CE();
     glUniformMatrix3fv(uni_camera_, 1, GL_FALSE, getCamera().data()); CE();

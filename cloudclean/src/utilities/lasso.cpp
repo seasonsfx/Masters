@@ -192,7 +192,7 @@ void Lasso::getIndices(Eigen::Affine3f & proj,
     copyd(proj.data(), proj1);
     copyd(mv.data(), mv1);
 
-    int view [4] = {-1000, -1000, 1000, 1000};
+    int view [4] = {-1000, -1000, 2000, 2000};
 
     auto inside_lasso = [&] (pcl::PointXYZI & p) {
         /// project point

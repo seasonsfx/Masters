@@ -3,6 +3,7 @@
 #include <QUndoStack>
 #include <QItemSelection>
 #include <QApplication>
+#include <QFileInfo>
 #include <commands/select.h>
 
 CloudList::CloudList(QObject *parent)
@@ -138,6 +139,9 @@ void CloudList::selectionChanged(const QItemSelection &sel,
 }
 
 boost::shared_ptr<PointCloud> CloudList::loadFile(QString filename){
+    if(!QFileInfo(filename).exists())
+        return nullptr;
+
     boost::shared_ptr<PointCloud> pc;
     pc.reset(new PointCloud());
     pc->moveToThread(QApplication::instance()->thread());

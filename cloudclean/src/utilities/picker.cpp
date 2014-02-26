@@ -40,27 +40,20 @@
 #include <QApplication>
 #include <QEvent>
 #include <QMouseEvent>
+#include <QTabWidget>
 
 #include "utilities/pointpicker.h"
 #include "gui/glwidget.h"
+#include "gui/flatview.h"
 #include "model/cloudlist.h"
 
 
-Picker::Picker(GLWidget *glwidget, CloudList * cl, std::function<void (int)> callback, bool * enabled) {
+Picker::Picker(GLWidget *glwidget, FlatView *flatview, CloudList * cl, std::function<void (int)> callback, bool * enabled) {
     callback_ = callback;
     glwidget_ = glwidget;
+    flatview_ = flatview;
     cl_ = cl;
     enabled_ = enabled;
-
-//    QFile file(":/picking.frag");
-//    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)){
-//        qDebug() << "---------= cant read frag -----------------";
-//    } else {
-//        while (!file.atEnd()) {
-//            QString line = file.readLine();
-//            qDebug() << line;
-//        }
-//    }
 
 
     //
@@ -107,8 +100,7 @@ Picker::~Picker(){
     glDeleteFramebuffers(1, &fbo_);CE();
 }
 
-uint Picker::renderPick(int x, int y){
-
+uint Picker::renderPick3d(int x, int y){
     glBindFramebuffer(GL_FRAMEBUFFER, fbo_);CE();
     // Create the texture object for the primitive information buffer
     glBindTexture(GL_TEXTURE_2D, picking_texture_id_);CE();
@@ -227,6 +219,12 @@ bool Picker::eventFilter(QObject *object, QEvent *event){
     }
 }
 
+bool Picker::is3d(){
+    QTabWidget * tabs = qobject_cast<QTabWidget *>(glwidget_->parent()->parent());
+    return tabs->currentIndex() == tabs->indexOf(glwidget_);
+}
+
+
 bool Picker::mouseReleaseEvent(QMouseEvent * event){
 
 //    int idx = pick(event->x(), event->y(), glwidget_->width(),
@@ -235,7 +233,24 @@ bool Picker::mouseReleaseEvent(QMouseEvent * event){
 //                   glwidget_->camera_.modelviewMatrix(),
 //                   cl_->active_);
 
-    uint idx = renderPick(event->x(), event->y());
+    uint idx = -1;
+    if(is3d()) {
+        idx = renderPick3d(event->x(), event->y());
+    }
+    else {
+        boost::shared_ptr<PointCloud> pc = cl_->active_;
+        Eigen::Vector3f coord;
+        coord << 2.0f* (event->x()/float(flatview_->width()) - 0.5),
+            -2.0f* (event->y()/float(flatview_->height()) - 0.5), 1;
+        coord = flatview_->getCamera().inverse() * coord;
+
+        coord[1] = cl_->active_->scan_height()-coord[1];
+
+        idx = flatview_->imageToCloudIdx(int(coord.x() + 0.5),
+                                  int(coord.y() + 0.5), pc);
+
+    }
+
 
     qDebug() << idx << "picked";
 

@@ -59,6 +59,8 @@ void Lasso3D::initialize(Core *core){
 }
 
 void Lasso3D::cleanup(){
+    mw_->removeMenu(enable_, "Edit");
+    mw_->toolbar_->removeAction(enable_);
     disconnect(this, SIGNAL(enabling()), core_, SIGNAL(endEdit()));
     disconnect(enable_, SIGNAL(triggered()), this, SLOT(enable()));
     delete lasso_;
@@ -89,20 +91,19 @@ bool Lasso3D::mouseDblClickEvent(QMouseEvent *){
         return false;
     }
 
-    auto & cam = core_->mw_->glwidget_->camera_;
+
     auto cloud = cl_->active_;
 
-    Eigen::Matrix4f ndc = (cam.projectionMatrix() *  cam.modelviewMatrix() * cloud->modelview()).matrix();
-
     boost::shared_ptr<std::vector<int>> selected_indices = boost::make_shared<std::vector<int>>();
-    boost::shared_ptr<std::vector<int>> removed_indices= boost::make_shared<std::vector<int>>();
 
     if(is3d()){
-        lasso_->getIndices(ndc, cloud.get(), selected_indices, removed_indices);
+        auto & cam = core_->mw_->glwidget_->camera_;
+        Eigen::Affine3f mv =  cam.modelviewMatrix() * cloud->modelview();
+        Eigen::Affine3f proj = cam.projectionMatrix();
+        lasso_->getIndices(proj, mv, cloud.get(), selected_indices);
     } else {
         lasso_->getIndices2D(cloud->scan_height(), flatview_->getCamera(),
-                             cloud->cloudToGridMap(), selected_indices,
-                             removed_indices);
+                             cloud->cloudToGridMap(), selected_indices);
     }
 
     core_->us_->beginMacro("Lasso tool");

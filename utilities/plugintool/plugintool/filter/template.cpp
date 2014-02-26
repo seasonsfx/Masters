@@ -32,6 +32,8 @@ void ${camel_name}::initialize(Core *core){
     is_enabled_ = false;
     connect(this, SIGNAL(enabling()), core_, SIGNAL(endEdit()));
     enable_ = new QAction(QIcon(":/${icon}"), "Enable ${name}", 0);
+    enable_->setCheckable(true);
+    connect(enable_, SIGNAL(triggered()), this, SLOT(enable()));
 
     mw_->toolbar_->addAction(enable_);
 
@@ -57,6 +59,7 @@ void ${camel_name}::initialize(Core *core){
 
     layout->addWidget(l);
     layout->addWidget(slider);
+    layout->addStretch();
 }
 
 void ${camel_name}::filter() {

@@ -47,6 +47,7 @@
 class QEvent;
 class QMouseEvent;
 class GLWidget;
+class FlatView;
 class CloudList;
 
 static bool yes = true;
@@ -54,11 +55,11 @@ static bool yes = true;
 class UTIL_API Picker : public QObject{
     Q_OBJECT
  public:
-    Picker(GLWidget *glwidget, CloudList * cl, std::function<void (int)> callback = nullptr, bool *enabled = &yes);
+    Picker(GLWidget *glwidget, FlatView *flatview, CloudList * cl, std::function<void (int)> callback = nullptr, bool *enabled = &yes);
     ~Picker();
-    uint renderPick(int x, int y);
+    uint renderPick3d(int x, int y);
     bool eventFilter(QObject *object, QEvent *event);
-
+    bool is3d();
 
  private:
     bool mouseReleaseEvent(QMouseEvent * event);
@@ -66,6 +67,7 @@ class UTIL_API Picker : public QObject{
  private:
     QGLShaderProgram program_3d_;
     GLWidget * glwidget_;
+    FlatView * flatview_;
     CloudList * cl_;
     int idx_;
     std::function<void(int)> callback_;

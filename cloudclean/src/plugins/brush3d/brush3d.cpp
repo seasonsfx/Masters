@@ -44,7 +44,7 @@ void Brush3D::initialize(Core *core){
     mw_ = core_->mw_;
     initialized_gl = false;
 
-    picker_ = new Picker(glwidget_, cl_);
+    picker_ = new Picker(glwidget_, flatview_, cl_);
 
     enable_ = new QAction(QIcon(":/images/brush.png"), "Brush Tool", 0);
     enable_->setCheckable(true);
@@ -83,8 +83,7 @@ void Brush3D::initialize(Core *core){
     layout->addWidget(l);
     layout->addWidget(slider);
 
-    l = new QLabel("Depth correct:", settings_);
-    layout->addWidget(l);
+    layout->addWidget(new QLabel("Depth correct:", settings_));
 
     QCheckBox * cb = new QCheckBox(settings_);
     depth_adjust_ = true;
@@ -92,6 +91,17 @@ void Brush3D::initialize(Core *core){
     layout->addWidget(cb);
     cb->connect(cb, &QCheckBox::toggled, [this] (bool on) {
         depth_adjust_ = on;
+    });
+
+
+    layout->addWidget(new QLabel("Spacially aware:", settings_));
+
+    QCheckBox * sa = new QCheckBox(settings_);
+    spacially_aware_ = true;
+    sa->setChecked(spacially_aware_);
+    layout->addWidget(sa);
+    sa->connect(sa, &QCheckBox::toggled, [this] (bool on) {
+        spacially_aware_ = on;
     });
 
     layout->addItem(new QSpacerItem(0, 0, QSizePolicy::Maximum, QSizePolicy::Maximum));
@@ -216,45 +226,40 @@ void Brush3D::select2D(int x, int y){
 
     coord[1] = cl_->active_->scan_height()-coord[1];
 
-    boost::shared_ptr<std::vector<int> > indices;
-    indices.reset(new std::vector<int>());
+    boost::shared_ptr<std::vector<int> > indices = boost::make_shared<std::vector<int>>();
 
-    int rad = radius_ * 500;
+    if(!spacially_aware_) {
+        int rad = radius_ * 500;
 
-    for(int x = -rad; x < rad; x++){
-        for(int y = -rad; y < rad; y++){
-            if(x*x + y*y > (rad)*(rad) )
-                continue;
+        for(int x = -rad; x < rad; x++){
+            for(int y = -rad; y < rad; y++){
+                if(x*x + y*y > (rad)*(rad) )
+                    continue;
 
-            int idx = flatview_->imageToCloudIdx(int(coord.x() + x + 0.5),
-                                      int(coord.y() + y + 0.5), pc);
-            if (idx < 0) {
-                if(idx < -1)
-                    qDebug() << "Bug! Idx < -1 : idx = " << idx;
-                continue;
+                int idx = flatview_->imageToCloudIdx(int(coord.x() + x + 0.5),
+                                          int(coord.y() + y + 0.5), pc);
+                if (idx < 0) {
+                    if(idx < -1)
+                        qDebug() << "Bug! Idx < -1 : idx = " << idx;
+                    continue;
+                }
+
+                indices->push_back(idx);
             }
-
-            indices->push_back(idx);
         }
+    } else {
+        int idx = flatview_->imageToCloudIdx(int(coord.x() + 0.5),
+                                  int(coord.y() + 0.5), pc);
+        select(idx, x, y);
     }
+
 
     bool negative_select = QApplication::keyboardModifiers() == Qt::ControlModifier;
     core_->us_->push(new Select(pc, indices, core_->mw_->deselect_ || negative_select, core_->mw_->select_mask_, true, ll_->getHiddenLabels()));
 
 }
 
-int Brush3D::select3D(float x, float y){
-//    int idx = pick(x, y, glwidget_->width(),
-//                   glwidget_->height(), 1e-04,
-//                   glwidget_->camera_.projectionMatrix(),
-//                   glwidget_->camera_.modelviewMatrix(),
-//                   cl_->active_);
-
-    int idx = picker_->renderPick(x, y);
-
-    if(idx == -1)
-        return -1;
-
+int Brush3D::select(int idx, int x, int y){
     Eigen::Vector3f p1, p2;
     int r = radius_ * 100;
 
@@ -269,7 +274,6 @@ int Brush3D::select3D(float x, float y){
                     glwidget_->width(), glwidget_->height()
                     );
 
-        //glReadPixels(x, glwidget_->height() - y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &wz);
         // picked radius
         screenToWorld(x-r, y-r, x+r, y+r, glwidget_->width(), glwidget_->height(), Eigen::Affine3f::Identity(), glwidget_->camera_.projectionMatrix(), p1, p2, wz);
         rad = (p2-p1).norm()/2.0f;
@@ -292,6 +296,21 @@ int Brush3D::select3D(float x, float y){
     core_->us_->push(new Select(cl_->active_, indices, core_->mw_->deselect_ || negative_select, core_->mw_->select_mask_, true, ll_->getHiddenLabels()));
 
     return idx;
+}
+
+int Brush3D::select3D(float x, float y){
+//    int idx = pick(x, y, glwidget_->width(),
+//                   glwidget_->height(), 1e-04,
+//                   glwidget_->camera_.projectionMatrix(),
+//                   glwidget_->camera_.modelviewMatrix(),
+//                   cl_->active_);
+
+    int idx = picker_->renderPick3d(x, y);
+
+    if(idx == -1)
+        return -1;
+
+    return select(idx, x, y);
 }
 
 bool Brush3D::mouseClickEvent(QMouseEvent * event){

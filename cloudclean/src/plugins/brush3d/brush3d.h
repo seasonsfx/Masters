@@ -49,6 +49,7 @@ class Brush3D : public IPlugin {
  private:
     void select2D(int x, int y);
     int select3D(float x, float y);
+    int select(int idx, int x, int y);
     bool mouseClickEvent(QMouseEvent * event);
     bool mouseMoveEvent(QMouseEvent * event);
     bool mousePressEvent(QMouseEvent * event);
@@ -80,6 +81,7 @@ class Brush3D : public IPlugin {
     Picker * picker_;
 
     bool depth_adjust_;
+    bool spacially_aware_;
     std::vector<QPushButton *> buttons_;
     QButtonGroup * button_group_;
     QWidget * settings_;

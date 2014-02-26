@@ -81,11 +81,17 @@ void JsonExport::save(){
 //    3 324 242 423 42 34234
 //    EOF
 
+    QSettings settings;
+    QString path = settings.value("load/lastlocation", QDir::home().absolutePath()).toString();
 
     QString filename = QFileDialog::getSaveFileName(
-                 nullptr, tr("Save project"), QDir::home().absolutePath(), tr("Cloud clean project files (*.ccp)"));
+                 nullptr, tr("Save project"), path, tr("Cloud clean project files (*.ccp)"));
     if (filename.length() == 0)
         return;
+
+    QString ccppath = QFileInfo(filename).absolutePath();
+    settings.setValue("load/lastlocation", ccppath);
+    settings.sync();
 
     std::ofstream file(filename.toLocal8Bit().data());
     if (!file.is_open()){

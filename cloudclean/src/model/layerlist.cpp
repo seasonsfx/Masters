@@ -251,25 +251,15 @@ void LayerList::copyLayerSet(uint8_t source_label, uint8_t dest_label){
     emit lookupTableUpdate(); // TODO(Rickert): Might be inefficient with many calls to this slot
 }
 
-void LayerList::selectionChanged(const QItemSelection &sel,
-                                     const QItemSelection &des) {
+void LayerList::selectionChanged(const std::vector<int> &selection) {
 
-    // Labda to remove selection
-    auto toDel = [&des, this] (boost::weak_ptr<Layer> l) {
-        for(QModelIndex d : des.indexes()){
-            if(l.expired())
-                return true; // this should not happen, just in case take care of it
-            if(l.lock() == layers_[d.row()])
-                return true;
-        }
-        return false;
-    };
+//    for(boost::shared_ptr<Layer> l : *layers_){
+//        l->
+//    }
 
-    selection_.erase( remove_if(selection_.begin(), selection_.end(), toDel),
-                      selection_.end() );
-
-    for (QModelIndex s : sel.indexes()) {
-        selection_.push_back(layers_[s.row()]);
+    selection_.clear();
+    for (int idx : selection) {
+        selection_.push_back(layers_[idx]);
     }
 
     emit changedSelection(selection_);

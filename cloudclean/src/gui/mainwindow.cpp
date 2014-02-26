@@ -74,7 +74,7 @@ MainWindow::MainWindow(QUndoStack *us, CloudList * cl, LayerList * ll, QWidget *
     flatview_->setGLD(gld_);
 
     clv_ = new CloudListView(us, ll, cl, glwidget_, this);
-    llv_ = new LayerListView(us, ll, cl, this);
+    llv_ = new LayerListView(us, ll, cl, select_mask_, this);
 
     progressbar_->setTextVisible( false );
     progressbar_->setRange( 0, 100 );
@@ -215,6 +215,8 @@ MainWindow::MainWindow(QUndoStack *us, CloudList * cl, LayerList * ll, QWidget *
     selection_dock_->setWindowTitle(tr("Selection options"));
     QWidget * selection_options_widget = new QWidget(this);
     selection_dock_->setWidget(selection_options_widget);
+
+    window_menu_->addAction(selection_dock_->toggleViewAction());
 
     button_group_ = new QButtonGroup(selection_options_widget);
     button_group_->setExclusive(true);

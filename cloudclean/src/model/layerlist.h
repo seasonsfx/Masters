@@ -49,7 +49,7 @@ class MODEL_API LayerList : public QAbstractListModel {
     void changedSelection(std::vector<boost::weak_ptr<Layer> > selection);
 
  public slots:
-    void selectionChanged(const QItemSelection &sel, const QItemSelection &des);
+    void selectionChanged(const std::vector<int> & selection);
     void deleteLayer(boost::shared_ptr<Layer> layer);
     void deleteLayer();
     void deleteLayer(int idx);

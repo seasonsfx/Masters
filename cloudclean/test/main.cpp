@@ -15,9 +15,7 @@ class PerfTest : public ::testing::Test {
     QTime t;
     int ms;
 
-    PerfTest() {
-        ms = 0;
-    }
+    PerfTest() : ms(0) {}
 
     virtual ~PerfTest() {}
 

@@ -28,7 +28,7 @@ public:
     std::vector<Eigen::Vector2f> getPoints();
 
     std::vector<Eigen::Vector2f> getPolygon();
-    void getIndices(Eigen::Affine3f &ndc_mat,
+    void getIndices(Eigen::Affine3f &proj, Eigen::Affine3f &mv,
                     pcl::PointCloud<pcl::PointXYZI> *cloud,
                     boost::shared_ptr<std::vector<int> > source_indices);
     void getIndices2D(int height, const Eigen::Affine2f & cam,

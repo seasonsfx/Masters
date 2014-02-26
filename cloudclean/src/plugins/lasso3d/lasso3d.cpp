@@ -98,8 +98,9 @@ bool Lasso3D::mouseDblClickEvent(QMouseEvent *){
 
     if(is3d()){
         auto & cam = core_->mw_->glwidget_->camera_;
-        Eigen::Affine3f ndc = cam.projectionMatrix() *  cam.modelviewMatrix() * cloud->modelview();
-        lasso_->getIndices(ndc, cloud.get(), selected_indices);
+        Eigen::Affine3f mv =  cam.modelviewMatrix() * cloud->modelview();
+        Eigen::Affine3f proj = cam.projectionMatrix();
+        lasso_->getIndices(proj, mv, cloud.get(), selected_indices);
     } else {
         lasso_->getIndices2D(cloud->scan_height(), flatview_->getCamera(),
                              cloud->cloudToGridMap(), selected_indices);

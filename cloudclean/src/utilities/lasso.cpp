@@ -1,5 +1,6 @@
 #include "lasso.h"
 
+#include <GL/glu.h>
 #include <math.h>
 
 #include <QPolygonF>
@@ -79,8 +80,7 @@ Eigen::Vector2f randomLineSegment(Eigen::Vector2f & origin){
 bool pointInsidePolygon(std::vector<Eigen::Vector2f> polygon,
                         Eigen::Vector2f point){
 
-    while(true)
-    {
+    while(true) {
         Eigen::Vector2f endPoint = randomLineSegment(point);
 
         for(uint i = 0; i < polygon.size(); ++i)
@@ -149,7 +149,6 @@ void Lasso::drawLasso(Eigen::Vector2f mouseLoc, QPaintDevice * device){
     painter.setPen(Qt::green);
     painter.drawPolygon(polygon); CE();
 
-    //const_cast<QPen>(painter.pen()).setWidth(3);
     QPen pen(Qt::red);
     pen.setCapStyle(Qt::RoundCap);
     pen.setWidth(6);
@@ -173,18 +172,16 @@ std::vector<Eigen::Vector2f> Lasso::getPoints() {
     return points_;
 }
 
-void Lasso::getIndices(Eigen::Matrix4f & ndc_mat,
+void Lasso::getIndices(Eigen::Affine3f & ndc_mat,
                 pcl::PointCloud<pcl::PointXYZI> * cloud,
-                boost::shared_ptr<std::vector<int> > source_indices,
-                boost::shared_ptr<std::vector<int> > removed_indices){
+                boost::shared_ptr<std::vector<int> > source_indices){
 
-    float * matdata = ndc_mat.data();
+    int count = 10;
 
-    auto inside_lasso = [&, matdata] (pcl::PointXYZI & p) {
+    auto inside_lasso = [&] (pcl::PointXYZI & p) {
         /// project point
-        Eigen::Vector4f p_4;
-        p_4 << p.x, p.y, p.z, 1;
-        p_4 = ndc_mat * p_4;
+        Eigen::Vector4f p_4 = p.getVector4fMap();
+        p_4 = ndc_mat.matrix() * p_4;
 
         // Limit to front of camera
         if(p_4.z() < 0.0f)
@@ -193,7 +190,16 @@ void Lasso::getIndices(Eigen::Matrix4f & ndc_mat,
         // Perspective divide
         Eigen::Vector2f p_2;
         p_2 << p_4.x(), p_4.y();
-        p_2 /= p_4.z();
+
+        if(count-- > 0) {
+            qDebug() << p_4.w();
+            std::cout << ndc_mat.matrix() << std::endl;
+        }
+
+        p_2 /= p_4.w();
+
+
+
 
         /// do lasso test
         return  pointInsidePolygon(points_, p_2);
@@ -205,20 +211,13 @@ void Lasso::getIndices(Eigen::Matrix4f & ndc_mat,
                 source_indices->push_back(idx);
             }
         }
-    } else {
-        for(int idx : *source_indices){
-            if(!inside_lasso(cloud->points[idx])) {
-                removed_indices->push_back(idx);
-            }
-        }
     }
 
 }
 
 void Lasso::getIndices2D(int height, const Eigen::Affine2f & cam,
                 const std::vector<int> & cloud_to_grid_map,
-                boost::shared_ptr<std::vector<int> > source_indices,
-                boost::shared_ptr<std::vector<int> > removed_indices) {
+                boost::shared_ptr<std::vector<int> > source_indices) {
 
     auto inside_lasso = [&] (int idx) {
         /// do lasso test
@@ -233,12 +232,6 @@ void Lasso::getIndices2D(int height, const Eigen::Affine2f & cam,
         for (uint idx = 0; idx < cloud_to_grid_map.size(); idx++) {
             if(inside_lasso(idx)) {
                 source_indices->push_back(idx);
-            }
-        }
-    } else {
-        for(int idx : *source_indices){
-            if(!inside_lasso(idx)) {
-                removed_indices->push_back(idx);
             }
         }
     }

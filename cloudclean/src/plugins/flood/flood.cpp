@@ -59,7 +59,7 @@ void Flood::initialize(Core *core){
     mw_ = core_->mw_;
 
     std::function<void(int)> func = std::bind(&Flood::flood, this, std::placeholders::_1);
-    picker_ = new Picker(glwidget_, cl_, func, &(core->mw_->edit_mode_));
+    picker_ = new Picker(glwidget_, flatview_, cl_, func, &(core->mw_->edit_mode_));
     threshold_ = 30;
     k_ = 8;
 }
@@ -75,6 +75,7 @@ void Flood::initialize2(PluginManager * pm) {
     enable_->setCheckable(true);
     enable_->setChecked(false);
     is_enabled_ = false;
+    feature_ = Feature::Normal;
 
     mw_->addMenu(enable_, "Edit");
     mw_->toolbar_->addAction(enable_);
@@ -91,7 +92,7 @@ void Flood::initialize2(PluginManager * pm) {
 
     layout->addWidget(new QLabel("Feature"));
     QComboBox * cb = new QComboBox();
-    cb->addItem("Normal", uint(Feature::Normal));
+    cb->addItem("Normal", uint(feature_));
     //cb->addItem("Intensity", uint(Feature::Intensity));
     cb->addItem("Connectivity", uint(Feature::Connectivity));
     layout->addWidget(cb);
@@ -172,8 +173,8 @@ void Flood::enable() {
 
     // enable the cache
 
-    QTabWidget * tabs = qobject_cast<QTabWidget *>(glwidget_->parent()->parent());
-    tabs->setCurrentWidget(glwidget_);
+    //QTabWidget * tabs = qobject_cast<QTabWidget *>(glwidget_->parent()->parent());
+    //tabs->setCurrentWidget(glwidget_);
 
     mw_->options_dock_->show();
     mw_->tooloptions_->setCurrentWidget(settings_);
@@ -184,6 +185,7 @@ void Flood::enable() {
     emit enabling();
 
     glwidget_->installEventFilter(picker_);
+    flatview_->installEventFilter(picker_);
 
     connect(core_, SIGNAL(endEdit()), this, SLOT(disable()));
 
@@ -201,6 +203,7 @@ void Flood::disable() {
     enable_->setChecked(false);
     disconnect(core_, SIGNAL(endEdit()), this, SLOT(disable()));
     glwidget_->removeEventFilter(picker_);
+    flatview_->removeEventFilter(picker_);
 }
 
 boost::shared_ptr<std::vector<int> > Flood::getLayerIndices() {

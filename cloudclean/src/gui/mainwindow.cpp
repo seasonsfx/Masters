@@ -216,6 +216,8 @@ MainWindow::MainWindow(QUndoStack *us, CloudList * cl, LayerList * ll, QWidget *
     QWidget * selection_options_widget = new QWidget(this);
     selection_dock_->setWidget(selection_options_widget);
 
+    window_menu_->addAction(selection_dock_->toggleViewAction());
+
     button_group_ = new QButtonGroup(selection_options_widget);
     button_group_->setExclusive(true);
 

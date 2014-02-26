@@ -60,6 +60,13 @@ class MODEL_API PointCloud : public QObject, public pcl::PointCloud<pcl::PointXY
 
     QString filepath() { return filepath_; }
 
+    bool isMoving() {
+        Eigen::Vector4f diff = sensor_origin_ - sensor_origin_future_;
+        diff[3] = 0;
+        if(diff.norm() > 1e-4)
+            return true;
+    }
+
  signals:
     void transformed();
     void progress(int percentage);
@@ -77,6 +84,9 @@ class MODEL_API PointCloud : public QObject, public pcl::PointCloud<pcl::PointXY
     std::vector<int> cloud_to_grid_map_;
     boost::shared_ptr<std::mutex> pc_mutex;
     QString filepath_;
+
+    float translation_speed_;
+    Eigen::Vector4f sensor_origin_future_;
 
  public:
     int scan_width_;

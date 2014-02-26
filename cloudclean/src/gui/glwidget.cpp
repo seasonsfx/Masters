@@ -158,10 +158,15 @@ void GLWidget::paintEvent(QPaintEvent *event) {
 	auto id = buff->bufferId();
     glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, id); CE();
 
+    bool clouds_moving = false;
+
     // Draw all clouds
     for(std::pair<boost::shared_ptr<PointCloud>, boost::shared_ptr<CloudGLData> > pair: gld_->cloudgldata_) {
         boost::shared_ptr<PointCloud> pc = pair.first;
         boost::shared_ptr<CloudGLData> cd = pair.second;
+
+        if(pc->isMoving())
+            clouds_moving = true;
 
         if(!pc->isVisible() && cd != nullptr){
             qDebug() << "Should be deleted now";
@@ -206,6 +211,8 @@ void GLWidget::paintEvent(QPaintEvent *event) {
         cd->draw(vao_);
         glBindVertexArray(0);
     }
+
+    camera_.alwaysUpdate(clouds_moving);
 
     glBindTexture(GL_TEXTURE_BUFFER, 0); CE();
 
@@ -256,6 +263,7 @@ void GLWidget::wheelEvent(QWheelEvent * event) {
 }
 
 void GLWidget::keyPressEvent(QKeyEvent * event) {
+    float push_factor = 0.1;
     switch (event->key()) {
 
     //
@@ -264,40 +272,40 @@ void GLWidget::keyPressEvent(QKeyEvent * event) {
     case Qt::Key_D:
     case Qt::Key_Right:
         if (event->modifiers() == Qt::ControlModifier && cl_->active_ != nullptr)
-            cl_->active_->translate(translate_unit_ * camera_.rotation_current_.matrix().inverse() * Vector3f::UnitX());
+            cl_->active_->translate(translate_unit_*push_factor * camera_.rotation_current_.matrix().inverse() * Vector3f::UnitX());
         else if(event->modifiers() != Qt::ControlModifier)
             camera_.translate(-translate_unit_ * Vector3f::UnitX());
         return;
     case Qt::Key_A:
     case Qt::Key_Left:
         if (event->modifiers() == Qt::ControlModifier && cl_->active_ != nullptr)
-            cl_->active_->translate(-translate_unit_ * camera_.rotation_current_.matrix().inverse() * Vector3f::UnitX());
+            cl_->active_->translate(-translate_unit_*push_factor * camera_.rotation_current_.matrix().inverse() * Vector3f::UnitX());
         else if (event->modifiers() != Qt::ControlModifier)
             camera_.translate(translate_unit_ * Vector3f::UnitX());
         return;
     case Qt::Key_W:
     case Qt::Key_Up:
         if (event->modifiers() == Qt::ControlModifier && cl_->active_ != nullptr)
-            cl_->active_->translate(-translate_unit_ * camera_.rotation_current_.matrix().inverse() * Vector3f::UnitZ());
+            cl_->active_->translate(-translate_unit_*push_factor * camera_.rotation_current_.matrix().inverse() * Vector3f::UnitZ());
         else if (event->modifiers() != Qt::ControlModifier)
             camera_.translate(translate_unit_ * Vector3f::UnitZ());
         return;
     case Qt::Key_S:
     case Qt::Key_Down:
         if (event->modifiers() == Qt::ControlModifier && cl_->active_ != nullptr)
-            cl_->active_->translate(translate_unit_ * camera_.rotation_current_.matrix().inverse() * Vector3f::UnitZ());
+            cl_->active_->translate(translate_unit_*push_factor * camera_.rotation_current_.matrix().inverse() * Vector3f::UnitZ());
         else if (event->modifiers() != Qt::ControlModifier)
             camera_.translate(-translate_unit_ * Vector3f::UnitZ());
         return;
     case Qt::Key_Q:
         if (event->modifiers() == Qt::ControlModifier && cl_->active_ != nullptr)
-            cl_->active_->translate(-translate_unit_ * camera_.rotation_current_.matrix().inverse() * Vector3f::UnitY());
+            cl_->active_->translate(-translate_unit_*push_factor * camera_.rotation_current_.matrix().inverse() * Vector3f::UnitY());
         else if (event->modifiers() != Qt::ControlModifier)
             camera_.translate(translate_unit_ * Vector3f::UnitY());
         return;
     case Qt::Key_E:
         if (event->modifiers() == Qt::ControlModifier && cl_->active_ != nullptr)
-            cl_->active_->translate(translate_unit_ * camera_.rotation_current_.matrix().inverse() * Vector3f::UnitY());
+            cl_->active_->translate(translate_unit_*push_factor * camera_.rotation_current_.matrix().inverse() * Vector3f::UnitY());
         else if (event->modifiers() != Qt::ControlModifier)
             camera_.translate(-translate_unit_ * Vector3f::UnitY());
         return;

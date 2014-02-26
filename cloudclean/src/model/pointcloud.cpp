@@ -38,6 +38,7 @@ PointCloud::PointCloud()
     max_bounding_box_ = Eigen::Vector3f(-INFINITY, -INFINITY, -INFINITY);
     deleting_ = false;
     visible_ = true;
+    translation_speed_ = 1;
 }
 
 PointCloud::~PointCloud() {
@@ -154,6 +155,7 @@ bool PointCloud::load_ptx(const char* filename, int decimation_factor) {
             &this->sensor_origin_[1], &this->sensor_origin_[2]);
 
     this->sensor_origin_[3] = 0.0f;
+    sensor_origin_future_ = sensor_origin_;
 
     Eigen::Matrix3f orientation_mat;
     for(int row = 0; row < 3; row++ )
@@ -318,7 +320,12 @@ bool PointCloud::load_ptx(const char* filename, int decimation_factor) {
 }
 
 void PointCloud::translate(const Eigen::Vector3f& pos) {
-    sensor_origin_ += Vector4f(pos.x(), pos.y(), pos.z(), 0);
+    sensor_origin_future_ += Eigen::Vector4f(pos.x(), pos.y(), pos.z(), 0) * translation_speed_;
+
+    if(translation_speed_ < 10)
+        translation_speed_ *= 1.1f; // If succesive tranlations are performed, speed things up
+
+    //sensor_origin_ += Eigen::Vector4f(pos.x(), pos.y(), pos.z(), 0);
     emit transformed();
 }
 
@@ -330,6 +337,11 @@ void PointCloud::rotate2D(float x, float y) {
 }
 
 Eigen::Affine3f PointCloud::modelview() {
+    if(isMoving())
+        sensor_origin_ = sensor_origin_ * 0.5 + sensor_origin_future_ * 0.5;
+    else
+        translation_speed_ = 1.0f;
+
     Translation3f tr(sensor_origin_.x(), sensor_origin_.y(), sensor_origin_.z());
 
     AngleAxis<float> rotation(0, Vector3f(1, 0, 0));

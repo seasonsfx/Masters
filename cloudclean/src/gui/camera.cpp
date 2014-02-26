@@ -57,6 +57,7 @@ Camera::Camera() {
     depth_far_ = 1000.f;
 
     roll_correction_ = true;
+    always_update_ = false;
 
     rotation_current_ = AngleAxis<float>(-M_PI/2.0, Vector3f(1.0f, 0.0f, 0.0f));
     rotation_future_ = AngleAxis<float>(-M_PI/2.0, Vector3f(1.0f, 0.0f, 0.0f));
@@ -75,7 +76,7 @@ Camera::Camera() {
         float fov_diff = fov_future_ - fov_current_;
 
         if(trans_diff.norm() > 1e-4 || !good_enough_rotation || fabs(fov_diff) > 1e-10) {
-            //update_pending_ = false;
+
             translation_current_ = translation_current_ + trans_diff * 0.5;
             rotation_current_ = rotation_current_.slerp(0.5, rotation_future_);
             fov_current_ = fov_future_ * 0.5 + fov_current_ * 0.5;
@@ -86,8 +87,11 @@ Camera::Camera() {
             emit updated();
         }
         else {
+            if(always_update_)
+                emit updated();
             translation_speed_ = 1;
         }
+
 
     });
 

@@ -95,6 +95,10 @@ class GUI_API Camera : public QObject {
     void rotate3D(float _yaw, float _pitch, float _roll);
     void adjustFov(int val);
 
+    void alwaysUpdate(bool on){
+        always_update_ = on;
+    }
+
  public slots:
     void birds_eye();
     void toggleRollCorrection();
@@ -128,7 +132,7 @@ class GUI_API Camera : public QObject {
 
     //std::mutex * mtx_;
     bool roll_correction_;
-
+    bool always_update_;
     friend class GLWidget;
 };
 

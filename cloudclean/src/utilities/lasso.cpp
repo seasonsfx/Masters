@@ -192,7 +192,7 @@ void Lasso::getIndices(Eigen::Affine3f & proj,
     copyd(proj.data(), proj1);
     copyd(mv.data(), mv1);
 
-    int view [4] = {-1000, -1000, 2000, 2000};
+    int view [4] = {0, 0, 1000, 1000};
 
     auto inside_lasso = [&] (pcl::PointXYZI & p) {
         /// project point
@@ -210,9 +210,9 @@ void Lasso::getIndices(Eigen::Affine3f & proj,
 
         double wx, wy, wz;
         gluProject(p.x, p.y, p.z, mv1, proj1, view, &wx, &wy, &wz);
-        float wxf = wx/2000.0f, wyf = wy/2000.0f, wzf = wz/2000.0f;
+        wx = (wx/500.0f)-1.0f, wy = (wy/500.0f)-1.0f;
 
-        Eigen::Vector2f p_2(wxf, wyf);
+        Eigen::Vector2f p_2(wx, wy);
 
         if(count-- > 0) {
             qDebug() << p_4.w();

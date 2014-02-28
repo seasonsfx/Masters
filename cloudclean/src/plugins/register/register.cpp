@@ -9,6 +9,8 @@
 #include <QLabel>
 #include <QVBoxLayout>
 #include <QStackedWidget>
+#include <QComboBox>
+#include <QFileInfo>
 #include "model/layerlist.h"
 #include "model/cloudlist.h"
 #include "gui/glwidget.h"
@@ -16,6 +18,7 @@
 #include "gui/mainwindow.h"
 #include "commands/select.h"
 #include "pluginsystem/core.h"
+#include <pcl/registration/icp.h>
 
 QString Register::getName(){
     return "Register";
@@ -28,6 +31,9 @@ void Register::initialize(Core *core){
     glwidget_ = core_->mw_->glwidget_;
     flatview_ = core_->mw_->flatview_;
     mw_ = core_->mw_;
+
+    stationary_idx_ = -1;
+    moving_idx_ = -1;
 
     is_enabled_ = false;
     connect(this, SIGNAL(enabling()), core_, SIGNAL(endEdit()));
@@ -43,30 +49,97 @@ void Register::initialize(Core *core){
 
     mw_->tooloptions_->addWidget(settings_);
 
-    QLabel * l = new QLabel(QString("Radius: %1 cm").arg(radius_), settings_);
+//    QLabel * l = new QLabel(QString("Radius: %1 cm").arg(radius_), settings_);
 
-    QSlider * slider = new QSlider(settings_);
-    slider->setOrientation(Qt::Horizontal);
-    slider->setRange(1, 300);
-    slider->setSingleStep(1);
-    slider->setToolTip("Radius in cm");
-    slider->setValue(radius_);
-    slider->setTickPosition(QSlider::TicksBelow);
-    connect(slider, &QSlider::valueChanged, [this, l] (int val){
-        radius_ = val;
-        l->setText(QString("Radius: %1 cm").arg(radius_));
+//    QSlider * slider = new QSlider(settings_);
+//    slider->setOrientation(Qt::Horizontal);
+//    slider->setRange(1, 300);
+//    slider->setSingleStep(1);
+//    slider->setToolTip("Radius in cm");
+//    slider->setValue(radius_);
+//    slider->setTickPosition(QSlider::TicksBelow);
+//    connect(slider, &QSlider::valueChanged, [this, l] (int val){
+//        radius_ = val;
+//        l->setText(QString("Radius: %1 cm").arg(radius_));
+//    });
+//    layout->addWidget(slider);
+
+    layout->addWidget(new QLabel("Stationary cloud"));
+    stationary_cb_ = new QComboBox(settings_);
+    layout->addWidget(stationary_cb_);
+
+    layout->addWidget(new QLabel("Moving cloud"));
+    moving_cb_ = new QComboBox(settings_);
+    layout->addWidget(moving_cb_);
+
+    connect(cl_, SIGNAL(listModified()), this, SLOT(clModified()));
+    connect(cl_, SIGNAL(listModified()), this, SLOT(clModified()));
+
+    connect(stationary_cb_, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [this] (int idx){
+        stationary_idx_ = stationary_cb_->itemData(idx).toInt();
+        if(stationary_idx_ != -1 && stationary_idx_ == moving_idx_){
+            stationary_idx_ = -1;
+            stationary_cb_->setCurrentIndex(0);
+        }
     });
 
-    layout->addWidget(l);
-    layout->addWidget(slider);
+    connect(moving_cb_, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [this] (int idx){
+        moving_idx_ = moving_cb_->itemData(idx).toInt();
+        if(moving_idx_ != -1 && stationary_idx_ == moving_idx_){
+            moving_idx_ = -1;
+            moving_cb_->setCurrentIndex(0);
+        }
+    });
+
+    clModified();
+
+    QPushButton * run = new QPushButton("Run");
+    connect(run, SIGNAL(clicked()), this, SLOT(align()));
+    layout->addWidget(run);
+
     layout->addStretch();
 }
 
-void Register::filter() {
-    qDebug() << "hello, this is where the action happens";
+void Register::clModified(){
+    stationary_cb_->clear();
+    moving_cb_->clear();
+
+    stationary_cb_->addItem("Select", -1);
+    moving_cb_->addItem("Select", -1);
+
+    stationary_idx_ = -1;
+    moving_idx_ = -1;
+
+    for(int idx = 0; idx < cl_->clouds_.size(); idx++) {
+        boost::shared_ptr<PointCloud> cloud = cl_->clouds_[idx];
+        QFileInfo fi(cloud->filepath());
+        stationary_cb_->addItem(fi.fileName(), idx);
+        moving_cb_->addItem(fi.fileName(), idx);
+    }
+}
+
+void Register::align() {
+    if(stationary_idx_ == -1 || moving_idx_== -1)
+        return;
+
+    boost::shared_ptr<PointCloud> stationary = cl_->clouds_[stationary_idx_];
+    boost::shared_ptr<PointCloud> moving = cl_->clouds_[moving_idx_];
+
+    pcl::IterativeClosestPoint<pcl::PointXYZI, pcl::PointXYZI> icp;
+    icp.setTransformationEpsilon(1e-6);
+    icp.setMaxCorrespondenceDistance (0.1);
+    icp.setInputCloud(moving);
+    icp.setInputTarget(stationary);
+    icp.setMaximumIterations (2);
+    icp.align(*moving);
+
+    std::cout << "has converged:" << icp.hasConverged() << " score: " <<
+      icp.getFitnessScore() << std::endl;
 }
 
 void Register::cleanup(){
+    disconnect(cl_, SIGNAL(rowsInserted(QModelIndex,int,int,QPrivateSignal)), this, SLOT(clModified()));
+    disconnect(cl_, SIGNAL(rowsRemoved(QModelIndex,int,int,QPrivateSignal)), this, SLOT(clModified()));
     mw_->toolbar_->removeAction(enable_);
     mw_->tooloptions_->removeWidget(settings_);
     delete enable_;

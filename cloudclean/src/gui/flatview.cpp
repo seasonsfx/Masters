@@ -278,7 +278,7 @@ void FlatView::paintEvent(QPaintEvent *event) {
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
     boost::shared_ptr<PointCloud> pc = pc_.lock();
-    boost::shared_ptr<CloudGLData> & cd = gld_->cloudgldata_[pc];
+    boost::shared_ptr<CloudGLData> cd = gld_->cloudgldata_[pc];
 
     if(pc_.expired()){
         qDebug() << "Nothing to paint on flatview";
@@ -291,7 +291,7 @@ void FlatView::paintEvent(QPaintEvent *event) {
         return;
     }
 
-    if(cd == nullptr){
+    if(pc->isVisible() && cd == nullptr){
         gld_->cloudgldata_[pc].reset(new CloudGLData(pc));
         cd = gld_->cloudgldata_[pc];
     }

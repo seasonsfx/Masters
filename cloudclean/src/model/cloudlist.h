@@ -36,6 +36,7 @@ class MODEL_API CloudList : public QAbstractListModel {
     void progressUpdate(int percentage);
     void startNonDetJob();
     void endNonDetJob();
+    void listModified();
 
  public slots:
     void removeCloud();

@@ -43,7 +43,8 @@ QVariant CloudList::data(const QModelIndex & index, int role) const {
             case Qt::DisplayRole:
             {
                 QString re;
-                QTextStream(&re) << clouds_[row]->filepath();
+                QFileInfo fi(clouds_[row]->filepath());
+                QTextStream(&re) << fi.fileName();
                 return re;
             }
         }
@@ -122,6 +123,7 @@ void CloudList::removeCloud(int idx){
     active_.reset();
     if(clouds_.size() > 0)
         active_ = clouds_.at(0);
+    emit listModified();
     emit updated();
 }
 
@@ -154,7 +156,7 @@ boost::shared_ptr<PointCloud> CloudList::loadFile(QString filename){
     emit startNonDetJob();
     addCloud(pc);
     emit endNonDetJob();
-
+    emit listModified();
     return pc;
 }
 

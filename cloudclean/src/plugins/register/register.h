@@ -4,6 +4,7 @@
 #include "pluginsystem/iplugin.h"
 class QAction;
 class QWidget;
+class QComboBox;
 class Core;
 class CloudList;
 class LayerList;
@@ -27,7 +28,8 @@ class Register : public IPlugin {
  private slots:
     void enable();
     void disable();
-    void filter();
+    void clModified();
+    void align();
 
  private:
     Core * core_;
@@ -42,6 +44,12 @@ class Register : public IPlugin {
     bool is_enabled_;
 
     float radius_;
+
+    QComboBox * stationary_cb_;
+    QComboBox * moving_cb_;
+
+    int stationary_idx_;
+    int moving_idx_;
 };
 
 #endif  // REGISTER_H

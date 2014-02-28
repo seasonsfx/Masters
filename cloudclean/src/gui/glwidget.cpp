@@ -168,13 +168,15 @@ void GLWidget::paintEvent(QPaintEvent *event) {
         if(pc->isMoving())
             clouds_moving = true;
 
-        if(!pc->isVisible() && cd != nullptr){
+        if(!pc->isVisible() && cd.get() != nullptr){
             qDebug() << "Should be deleted now";
             gld_->cloudgldata_[pc].reset();
-            continue;
         }
 
-        if(cd == nullptr){
+        if(!pc->isVisible())
+            continue;
+
+        if(pc->isVisible() && cd.get() == nullptr){
             qDebug() << "Should be recreated now";
             gld_->cloudgldata_[pc].reset(new CloudGLData(pc));
             cd = gld_->cloudgldata_[pc];

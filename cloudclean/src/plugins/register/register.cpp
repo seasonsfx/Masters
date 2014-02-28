@@ -18,6 +18,7 @@
 #include "gui/mainwindow.h"
 #include "commands/select.h"
 #include "pluginsystem/core.h"
+#include "utilities/utils.h"
 #include <pcl/registration/icp.h>
 
 QString Register::getName(){
@@ -125,13 +126,20 @@ void Register::align() {
     boost::shared_ptr<PointCloud> stationary = cl_->clouds_[stationary_idx_];
     boost::shared_ptr<PointCloud> moving = cl_->clouds_[moving_idx_];
 
+    std::vector<int> big_to_small;;
+    pcl::PointCloud<pcl::PointXYZI>::Ptr s = octreeDownsample(stationary.get(), 0.01, big_to_small);
+    pcl::PointCloud<pcl::PointXYZI>::Ptr m = octreeDownsample(moving.get(), 0.01, big_to_small);
+
     pcl::IterativeClosestPoint<pcl::PointXYZI, pcl::PointXYZI> icp;
     icp.setTransformationEpsilon(1e-6);
     icp.setMaxCorrespondenceDistance (0.1);
-    icp.setInputCloud(moving);
-    icp.setInputTarget(stationary);
+    icp.setInputCloud(m);
+    icp.setInputTarget(s);
     icp.setMaximumIterations (2);
-    icp.align(*moving);
+    icp.align(*m);
+
+    moving->sensor_origin_ = m->sensor_origin_;
+    moving->sensor_orientation_ = m->sensor_orientation_;
 
     std::cout << "has converged:" << icp.hasConverged() << " score: " <<
       icp.getFitnessScore() << std::endl;

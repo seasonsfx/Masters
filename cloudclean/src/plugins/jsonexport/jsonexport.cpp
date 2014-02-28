@@ -8,6 +8,8 @@
 #include <QSettings>
 #include <QString>
 #include <fstream>
+#include <cstdlib>
+
 #include "model/layerlist.h"
 #include "model/cloudlist.h"
 #include "gui/glwidget.h"
@@ -66,18 +68,27 @@ JsonExport::~JsonExport(){
 void JsonExport::save(){
     qDebug() << "Myfunc";
 
+//    cloudcleanproject
+//    1 // version
+//    1 // hasselections
 
 //    filecount;
 //    filename1;
 //    filename2;
-//    file1 label count;
-//    1 2 3 4 5 5 6 6 9 9
-//    file2 label count;
-//    667 2 26237 4724 27
+
+//    file1_label_count;
+//    1 2 3 4 5 5 6 6 9 9 // label for each point
+//    1 2 4 8 8 8 9 9 9 9 // selection masks
+
+//    file2_label_count;
+//    667 2 26237 4724 27 // label for each point
+//    1 2 4 8 8 8 9 9 9 9 // selection masks
+
 //    layer count;
 //    layer1 name;
 //    layer1 visibility;
-//    layer1 label count;
+//    layer1 color;
+//    layer1_label_count;
 //    3 324 242 423 42 34234
 //    EOF
 
@@ -99,6 +110,9 @@ void JsonExport::save(){
         return;
     }
 
+    file << "cloudcleanproject\n1\n";
+    file << "1\n";
+
     file << cl_->clouds_.size() << "\n";
 
     for(boost::shared_ptr<PointCloud> cloud :cl_->clouds_) {
@@ -107,12 +121,21 @@ void JsonExport::save(){
     }
 
     for(boost::shared_ptr<PointCloud> cloud :cl_->clouds_){
+        // save labels
         file << cloud->labels_.size() << "\n";
         int idx = 0;
         for(; idx < cloud->labels_.size()-1; idx++){
             file << cloud->labels_[idx] << " ";
         }
         file << cloud->labels_[++idx] << "\n";
+
+        // save selections
+        idx = 0;
+        for(; idx < cloud->labels_.size()-1; idx++){
+            file << uint8_t(cloud->flags_[idx]) << " ";
+        }
+        file << uint8_t(cloud->flags_[++idx]) << "\n";
+
     }
 
     file << ll_->getLayers().size() << "\n";
@@ -121,6 +144,7 @@ void JsonExport::save(){
 
         file << layer->getName().toLocal8Bit().data() << "\n";
         file << layer->isVisible() << "\n";
+        file << layer->getColor().name().toLocal8Bit().data() << "\n";
         file << layer->getLabelSet().size() << "\n";
 
         const std::set<uint16_t> & ls = layer->getLabelSet();
@@ -156,10 +180,23 @@ void JsonExport::load(){
         return;
     }
 
-
+    std::string firstline;
     int num_clouds;
-    file >> num_clouds >> std::ws;
+    int version = 0;
+    int has_selections = false;
+
+    file >> firstline >> std::ws;
+
+    if(firstline == "cloudcleanproject"){
+        file >> version >> std::ws;
+        file >> has_selections >> std::ws;
+        file >> num_clouds >> std::ws;
+    } else {
+        num_clouds = atoi(firstline.c_str());
+    }
+
     qDebug() << "Number of clouds" << num_clouds;
+
     std::vector<QString> filepaths(num_clouds);
 
     char buff[1024];
@@ -226,6 +263,15 @@ void JsonExport::load(){
             labels[i] = old_to_new_label[label];
         }
 
+        if(version == 0)
+            continue;
+
+        // save selections
+        uint8_t flags;
+        for(int i = 0; i < labelcount; i++) {
+            file >> flags;
+            cloud->flags_[i] = PointFlags(flags);
+        }
 
     }
 
@@ -242,6 +288,12 @@ void JsonExport::load(){
         file >> visible;
         if(!visible)
             layer->toggleVisible();
+
+        if(version > 0){
+            std::string color_str;
+            file >> color_str;
+            layer->setColor(QColor(QString(color_str.c_str())));
+        }
 
 
         int label_count;

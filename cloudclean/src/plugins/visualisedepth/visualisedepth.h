@@ -2,6 +2,7 @@
 #define VDEPTH_CUT_H
 
 #include <memory>
+#include <functional>
 #include <Eigen/Dense>
 #include "glheaders.h"
 #include "pluginsystem/iplugin.h"
@@ -19,6 +20,7 @@ class GLWidget;
 class MainWindow;
 class QLabel;
 class NormalEstimator;
+class QComboBox;
 
 class VDepth : public IPlugin {
     Q_INTERFACES(IPlugin)
@@ -42,7 +44,14 @@ class VDepth : public IPlugin {
 
     pcl::PointCloud<pcl::PointXYZINormal>::Ptr gridDownsample(boost::shared_ptr<PointCloud> input, float resolution, std::vector<int>& sub_idxs);
 
+signals:
+  void enabling();
+
  private slots:
+    void layersModified();
+    void enable();
+    void disable();
+
     void don_vis();
     void hist_vis();
     void fpfh_vis();
@@ -66,8 +75,10 @@ class VDepth : public IPlugin {
     FlatView * flatview_;
     MainWindow * mw_;
 
-    QAction * myaction_;
+    QAction * enable_;
     QWidget * settings_;
+    bool is_enabled_;
+
     QWidget * depth_widget_;
     int tab_idx_;
 
@@ -77,6 +88,12 @@ class VDepth : public IPlugin {
     NormalEstimator * ne_;
     float time;
 
+    QComboBox * feature_cb_;
+    QComboBox * layer_cb_;
+    int function_idx_;
+    int layer_idx_;
+
+    std::vector<std::function<void()>> functions_;
 };
 
 #endif  // VDEPTH_CUT_H

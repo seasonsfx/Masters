@@ -45,26 +45,6 @@ void VDepth::initialize(Core *core){
     glwidget_ = core_->mw_->glwidget_;
     flatview_ = core_->mw_->flatview_;
     mw_ = core_->mw_;
-    myaction_ = new QAction(QIcon(":/images/visualisedepth.png"), "Visualisedepth", 0);
-
-    depth_widget_ = new QWidget(0);
-    tab_idx_ = core_->mw_->addTab(depth_widget_, "Depth map");
-
-    QVBoxLayout * layout = new QVBoxLayout(depth_widget_);
-    QScrollArea * scrollarea = new QScrollArea();
-    scrollarea->setBackgroundRole(QPalette::Dark);
-    layout->addWidget(scrollarea);
-    image_container_ = new QLabel();
-    scrollarea->setWidget(image_container_);
-
-    // Nonsense
-    connect(myaction_,&QAction::triggered, [this] (bool on) {
-        qDebug() << "Click!";
-    });
-    connect(myaction_, SIGNAL(triggered()), this, SLOT(curve_vis()));
-    mw_->toolbar_->addAction(myaction_);
-	time = 0;
-
 }
 
 void VDepth::initialize2(PluginManager * pm) {
@@ -73,12 +53,96 @@ void VDepth::initialize2(PluginManager * pm) {
         qDebug() << "Normal estimator plugin needed for normal viz";
         return;
     }
+
+    function_idx_ = -1;
+    layer_idx_ = -1;
+
+    // Set up viz tab
+    depth_widget_ = new QWidget(0);
+    tab_idx_ = core_->mw_->addTab(depth_widget_, "Feature visualisation");
+
+    QVBoxLayout * tablayout = new QVBoxLayout(depth_widget_);
+    QScrollArea * scrollarea = new QScrollArea();
+    scrollarea->setBackgroundRole(QPalette::Dark);
+    tablayout->addWidget(scrollarea);
+    image_container_ = new QLabel();
+    scrollarea->setWidget(image_container_);
+
+
+    // set up settings
+    is_enabled_ = false;
+    enable_ = new QAction(QIcon(":/images/visualisedepth.png"), "Correlate and visualise", 0);
+    enable_->setCheckable(true);
+
+    connect(enable_, SIGNAL(triggered()), this, SLOT(enable()));
+    mw_->toolbar_->addAction(enable_);
+    time = 0;
+    settings_ = new QWidget();
+    QVBoxLayout * layout = new QVBoxLayout(settings_);
+    settings_->setLayout(layout);
+    mw_->tooloptions_->addWidget(settings_);
+
+    // settings widgets
+    layout->addWidget(new QLabel("Feature"));
+    feature_cb_ = new QComboBox(settings_);
+    layout->addWidget(feature_cb_);
+
+    feature_cb_->addItem("Difference of normals", 0);
+    feature_cb_->addItem("Fast point feature histograms", 1);
+    feature_cb_->addItem("Curvature", 2);
+    feature_cb_->addItem("Normal standard deviation", 3);
+    feature_cb_->addItem("Eigen ratio", 4);
+//    feature_cb_->addItem("Difference of normals", 5);
+//    feature_cb_->addItem("Difference of normals", 6);
+//    feature_cb_->addItem("Difference of normals", 7);
+
+    connect(feature_cb_, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [this] (int idx){
+        function_idx_ = feature_cb_->itemData(idx).toInt();
+        qDebug() << "changed";
+    });
+
+    // round up functions
+    functions_.push_back(std::bind(&VDepth::don_vis, this));
+    functions_.push_back(std::bind(&VDepth::fpfh_vis, this));
+    functions_.push_back(std::bind(&VDepth::curve_vis, this));
+    functions_.push_back(std::bind(&VDepth::normalnoise, this));
+    functions_.push_back(std::bind(&VDepth::eigen_ratio, this));
+
+    layout->addWidget(new QLabel("Correlate with layer:"));
+    layer_cb_ = new QComboBox(settings_);
+    layout->addWidget(layer_cb_);
+
+    QPushButton * run = new QPushButton("Correlate & visualise");
+    connect(run, &QPushButton::clicked, [=] (){
+        if(function_idx_ != -1){
+            qDebug() << "call!";
+            functions_[function_idx_]();
+        }
+
+    });
+    layout->addWidget(run);
+
+    layout->addStretch();
+
+    connect(ll_, SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(layersModified()));
+}
+
+void VDepth::layersModified(){
+    layer_cb_->clear();
+    layer_cb_->addItem("Select", -1);
+
+    layer_idx_ = -1;
+
+    for(int idx = 0; idx < ll_->getLayers().size(); idx++) {
+        boost::shared_ptr<Layer> layer = ll_->getLayers()[idx];
+        layer_cb_->addItem(layer->getName(), layer->getId());
+    }
 }
 
 void VDepth::cleanup(){
-    mw_->toolbar_->removeAction(myaction_);
+    mw_->toolbar_->removeAction(enable_);
     mw_->removeTab(tab_idx_);
-    delete myaction_;
+    delete enable_;
     delete depth_widget_;
 }
 
@@ -86,6 +150,26 @@ VDepth::~VDepth(){
     if(image_ != nullptr)
         delete image_;
 }
+
+void VDepth::enable() {
+    if(is_enabled_){
+        disable();
+        return;
+    }
+
+    mw_->options_dock_->show();
+    mw_->tooloptions_->setCurrentWidget(settings_);
+    emit enabling();
+    connect(core_, SIGNAL(endEdit()), this, SLOT(disable()));
+    is_enabled_ = true;
+}
+
+void VDepth::disable(){
+    enable_->setChecked(false);
+    disconnect(core_, SIGNAL(endEdit()), this, SLOT(disable()));
+    is_enabled_ = false;
+}
+
 
 int gridToCloudIdx(int x, int y, boost::shared_ptr<PointCloud> pc, int * lookup){
     if(x < 0 || x > pc->scan_width())

@@ -81,7 +81,41 @@ void GLWidget::initializeGL() {
         abort();
     }
 
-    //emit pluginPaint(camera_.projectionMatrix(), camera_.modelviewMatrix());
+
+    //
+    // Load bg shader program
+    //
+    succ = program_bg_.addShaderFromSourceFile(
+                QGLShader::Vertex, ":/bg.vs.glsl"); CE();
+    if (!succ) qWarning() << "Shader compile log:" << program_bg_.log();
+    succ = program_bg_.addShaderFromSourceFile(
+                QGLShader::Fragment, ":/bg.fs.glsl"); CE();
+    if (!succ) qWarning() << "Shader compile log:" << program_bg_.log();
+    succ = program_bg_.link(); CE();
+    if (!succ) {
+        qWarning() << "Could not link shader program_:" << program_bg_.log();
+        qWarning() << "Exiting...";
+        abort();
+    }
+
+    program_bg_.bind();
+    uni_resolution_ = program_bg_.uniformLocation("resolution"); RC(uni_resolution_);
+    program_bg_.release();
+
+    glGenVertexArrays(1, &vao_bg_);
+
+    bg_buff_.create(); CE();
+    bg_buff_.bind(); CE();
+    size_t bsize = 4*sizeof(float)*2;
+    bg_buff_.allocate(bsize); CE();
+    float data[] = { -1, -1,
+                     -1,  1,
+                      1,  -1,
+                      1,  1};
+
+    bg_buff_.write(0, data, bsize);
+    bg_buff_.release();
+
 
     //
     // Resolve uniforms
@@ -130,6 +164,20 @@ void GLWidget::paintEvent(QPaintEvent *event) {
     // Make sure the labels are updates
     // Make sure nothing has changed
 
+      program_bg_.bind();
+
+      glUniform2f(uni_resolution_, width(), height());
+
+      glBindVertexArray(vao_bg_);
+      bg_buff_.bind();
+      glEnableVertexAttribArray(0); CE();
+      glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0); CE();
+
+      glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+      bg_buff_.release();
+      glBindVertexArray(0);
+      program_bg_.release();
+
 //    QPainter p(this);
 
 //    QRadialGradient gradient;
@@ -138,7 +186,7 @@ void GLWidget::paintEvent(QPaintEvent *event) {
 //    gradient.setFocalPoint(0.40, 0.45);
 //    gradient.setColorAt(0.0, QColor(105, 146, 182));
 //    gradient.setColorAt(0.4, QColor(81, 113, 150));
-//    gradient.setColorAt(0.8, QColor(16, 56, 121));
+//    gradient.setColorAt(0.8, QColor(16, 56, 121)); 0.062745098, 0.219607843, 0.474509804
 
 //    p.setRenderHint(QPainter::Antialiasing);
 //    p.setPen(Qt::NoPen);
@@ -148,8 +196,8 @@ void GLWidget::paintEvent(QPaintEvent *event) {
 
 //    p.beginNativePainting();
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    //glClear(GL_DEPTH_BUFFER_BIT);
+    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
 
     program_.bind(); CE();
@@ -162,7 +210,7 @@ void GLWidget::paintEvent(QPaintEvent *event) {
 
     glUniform1i(uni_sampler_, 0); CE();
     glBindTexture(GL_TEXTURE_BUFFER, texture_id_); CE();
-	auto buff = gld_->color_lookup_buffer_;
+    auto buff = gld_->color_lookup_buffer_;
 	auto id = buff->bufferId();
     glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, id); CE();
 

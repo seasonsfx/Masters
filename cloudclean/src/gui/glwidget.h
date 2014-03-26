@@ -66,17 +66,21 @@ protected:
     GLData * gld_;
 
     QGLShaderProgram program_;
+    QGLShaderProgram program_bg_;
+
+    QGLBuffer bg_buff_;
 
     int uni_sampler_;
     int uni_projection_;
     int uni_modelview_;
+    int uni_resolution_;
 
     float translate_unit_;
     QVector2D mouse_drag_start_;
     float point_render_size_;
 
     GLuint texture_id_;
-    GLuint vao_;
+    GLuint vao_, vao_bg_;
 
     bool gl_init_;
     Eigen::Vector2d last_mouse_pos_;

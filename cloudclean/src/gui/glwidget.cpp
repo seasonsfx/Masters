@@ -108,6 +108,11 @@ void GLWidget::initializeGL() {
     // Generate vao
     glGenVertexArrays(1, &vao_);
     gl_init_ = true;
+
+    // fix incorrect initial viewport
+    connect(gld_, &GLData::update, [=] (){
+        resizeGL(width(), height());
+    });
 }
 
 
@@ -116,36 +121,39 @@ void GLWidget::paintEvent(QPaintEvent *event) {
         return;
 
     makeCurrent();
-    if(!gl_init_)
+
+    if(!gl_init_){
         initializeGL();
+    }
 
     //makeCurrent();
     // Make sure the labels are updates
     // Make sure nothing has changed
 
-    QPainter p(this);
+//    QPainter p(this);
 
-    QRadialGradient gradient;
-    gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
-    gradient.setCenter(0.45, 0.50);
-    gradient.setFocalPoint(0.40, 0.45);
-    gradient.setColorAt(0.0, QColor(105, 146, 182));
-    gradient.setColorAt(0.4, QColor(81, 113, 150));
-    gradient.setColorAt(0.8, QColor(16, 56, 121));
+//    QRadialGradient gradient;
+//    gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
+//    gradient.setCenter(0.45, 0.50);
+//    gradient.setFocalPoint(0.40, 0.45);
+//    gradient.setColorAt(0.0, QColor(105, 146, 182));
+//    gradient.setColorAt(0.4, QColor(81, 113, 150));
+//    gradient.setColorAt(0.8, QColor(16, 56, 121));
 
-    p.setRenderHint(QPainter::Antialiasing);
-    p.setPen(Qt::NoPen);
-    p.setPen(Qt::NoPen);
-    p.setBrush(gradient);
-    p.drawRect(0, 0, size().width(), size().height());
+//    p.setRenderHint(QPainter::Antialiasing);
+//    p.setPen(Qt::NoPen);
+//    p.setPen(Qt::NoPen);
+//    p.setBrush(gradient);
+//    p.drawRect(0, 0, size().width(), size().height());
 
-    p.beginNativePainting();
+//    p.beginNativePainting();
 
-    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glClear(GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    //glClear(GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
 
     program_.bind(); CE();
+
 
     glUniformMatrix4fv(uni_modelview_, 1, GL_FALSE,
                        camera_.modelviewMatrix().data());CE();
@@ -218,8 +226,8 @@ void GLWidget::paintEvent(QPaintEvent *event) {
 
     glBindTexture(GL_TEXTURE_BUFFER, 0); CE();
 
-    p.endNativePainting();
-    p.end();
+//    p.endNativePainting();
+//    p.end();
 
     emit pluginPaint(camera_.projectionMatrix(), camera_.modelviewMatrix());
     glFinish();

@@ -49,9 +49,9 @@ MainWindow::MainWindow(QUndoStack *us, CloudList * cl, LayerList * ll, QWidget *
 
     QGLFormat base_format;
     // Core profile breaks qpainter
-    base_format.setProfile(QGLFormat::CompatibilityProfile);
+    base_format.setProfile(QGLFormat::CoreProfile);
     // This can be set to 3.3 but setting the version gets us core profile on amd
-    //base_format.setVersion(4, 3);
+    base_format.setVersion(3, 3);
 #ifdef _WIN32
     base_format.setVersion(3, 3);
 #endif

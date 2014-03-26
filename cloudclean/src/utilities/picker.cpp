@@ -77,7 +77,6 @@ Picker::Picker(GLWidget *glwidget, FlatView *flatview, CloudList * cl, std::func
     // Resolve uniforms
     //
     program_3d_.bind(); CE();
-    uni_sampler_ = program_3d_.uniformLocation("sampler"); RC(uni_sampler_);
     uni_projection_ = program_3d_.uniformLocation("projection"); RC(uni_projection_);
     uni_modelview_ = program_3d_.uniformLocation("modelview"); RC(uni_modelview_);
     program_3d_.release(); CE();
@@ -137,13 +136,6 @@ uint Picker::renderPick3d(int x, int y){
 
 
     program_3d_.bind(); CE();
-
-
-    glUniform1i(uni_sampler_, 0); CE();
-    glBindTexture(GL_TEXTURE_BUFFER, texture_id_); CE();
-    auto buff = glwidget_->gld()->color_lookup_buffer_;CE();
-    auto id = buff->bufferId();CE();
-    glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, id); CE();
 
     glBindVertexArray(vao_);CE();
 

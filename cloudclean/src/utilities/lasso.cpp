@@ -3,17 +3,17 @@
 #include <GL/glu.h>
 #include <math.h>
 
-#include <QPolygonF>
-#include <QPainter>
 #include <QDebug>
 #include <QPen>
+#include <QGLShaderProgram>
+#include <QGLBuffer>
 
 #include <time.h>
 #include <cstdlib>
 
 Lasso::Lasso()
 {
-
+    initgl_ = false;
 }
 
 Eigen::Vector2i Lasso::getScreenPoint(Eigen::Vector2f & p, int w, int h) {
@@ -132,36 +132,83 @@ void Lasso::drawLasso(int x, int y, QPaintDevice *device) {
 }
 
 void Lasso::drawLasso(Eigen::Vector2f mouseLoc, QPaintDevice * device){
-    QPolygonF polygon;
-
-    // Conversion is a bit of a hack
-    for(auto p: points_){
-        polygon << screenPoint(p, device->width(),
-                               device->height());
+    if(!initgl_){
+        initGL();
+        initgl_ = true;
     }
 
-    polygon << screenPoint(mouseLoc, device->width(),
-                           device->height());
+    if(points_.size() == 1)
+        return;
+
+    // create buffer
+    QGLBuffer buff(QGLBuffer::VertexBuffer); CE();
+    buff.create(); CE();
+    buff.bind(); CE();
+    size_t b_size = 3*sizeof(float)*(points_.size()+1);
+    buff.allocate(b_size); CE();
+
+    int third_component = 0;
+
+    buff.write(0, mouseLoc.data(), 2*sizeof(float));
+    buff.write(2*sizeof(float), &third_component, sizeof(float));
+
+    for(uint i = 0; i < points_.size(); i++){
+        buff.write((i+1)*3*sizeof(float), points_[i].data(), 2*sizeof(float));
+        buff.write((i+1)*3*sizeof(float) + 2*sizeof(float), &third_component, sizeof(float));
+    }
 
 
-    QPainter painter(device);
-    painter.endNativePainting();
-    painter.setPen(Qt::green);
-    painter.drawPolygon(polygon); CE();
 
-    QPen pen(Qt::red);
-    pen.setCapStyle(Qt::RoundCap);
-    pen.setWidth(6);
+    // bind buffer
+    program_->bind();
+    glBindVertexArray(vao_);
 
-    painter.setPen(pen);
-    painter.drawPoints(polygon);
 
-    painter.beginNativePainting();
+    glEnableVertexAttribArray(0); CE();
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0); CE();
 
+    int uni_projection = program_->uniformLocation("proj"); RC(uni_projection);
+    int uni_modelview = program_->uniformLocation("mv"); RC(uni_modelview);
+    int uni_color = program_->uniformLocation("colour"); RC(uni_color);
+
+    Eigen::Matrix4f identity = Eigen::Matrix4f::Identity();
+
+    glUniformMatrix4fv(uni_modelview, 1, GL_FALSE,
+                       identity.data());CE();
+    glUniformMatrix4fv(uni_projection, 1, GL_FALSE,
+                       identity.data());CE();
+
+    float color[] = {0.0f, 1.0f, 0.0f};
+    glUniform3fv(uni_color, 1, color);
+
+    glDrawArrays(GL_LINE_STRIP, 0, points_.size()+1); CE();
+
+    buff.release(); CE();
+    glBindVertexArray(0);
+    program_->release();
 }
 
 void Lasso::clear(){
     points_.clear();
+}
+
+bool Lasso::initGL(){
+    program_ = new QGLShaderProgram();
+    bool succ = program_->addShaderFromSourceFile(
+                QGLShader::Vertex, ":/basic.vert"); CE();
+    if (!succ) qWarning() << "Shader compile log:" << program_->log();
+    succ = program_->addShaderFromSourceFile(
+                QGLShader::Fragment, ":/basic.frag"); CE();
+    if (!succ) qWarning() << "Shader compile log:" << program_->log();
+    succ = program_->link(); CE();
+    if (!succ) {
+        qWarning() << "Could not link shader program_:" << program_->log();
+        qWarning() << "Exiting...";
+        abort();
+    }
+
+    glGenVertexArrays(1, &vao_);
+    return succ;
 }
 
 std::vector<Eigen::Vector2f> Lasso::getPolygon(){
@@ -178,8 +225,6 @@ void Lasso::getIndices(Eigen::Affine3f & proj,
                 boost::shared_ptr<std::vector<int> > source_indices){
 
     Eigen::Affine3f ndc_mat = proj * mv;
-
-    int count = 10;
 
     auto copyd = [] (float * i, double * o) {
         for(int idx = 0; idx < 16; idx++){
@@ -203,22 +248,11 @@ void Lasso::getIndices(Eigen::Affine3f & proj,
         if(p_4.z() < 0.0f)
             return false;
 
-        // Perspective divide
-        //Eigen::Vector2f p_2;
-        //p_2 << p_4.x(), p_4.y();
-        //p_2 /= p_4.w();
-
         double wx, wy, wz;
         gluProject(p.x, p.y, p.z, mv1, proj1, view, &wx, &wy, &wz);
         wx = (wx/500.0f)-1.0f, wy = (wy/500.0f)-1.0f;
 
         Eigen::Vector2f p_2(wx, wy);
-
-        if(count-- > 0) {
-            qDebug() << p_4.w();
-            std::cout << ndc_mat.matrix() << std::endl;
-        }
-
 
         /// do lasso test
         return  pointInsidePolygon(points_, p_2);

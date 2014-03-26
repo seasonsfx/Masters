@@ -9,6 +9,7 @@
 #include "utilities/export.h"
 
 class QPaintDevice;
+class QGLShaderProgram;
 
 class UTIL_API Lasso
 {
@@ -25,6 +26,7 @@ public:
     void drawLasso(int x, int y, QPaintDevice *device);
     void drawLasso(Eigen::Vector2f mouseLoc, QPaintDevice *device);
     void clear();
+    bool initGL();
     std::vector<Eigen::Vector2f> getPoints();
 
     std::vector<Eigen::Vector2f> getPolygon();
@@ -39,6 +41,9 @@ public:
 private:
     // Points normalised
     std::vector<Eigen::Vector2f>    points_;
+    QGLShaderProgram * program_;
+    bool initgl_;
+    GLuint vao_;
 };
 
 #endif // LASSO_H

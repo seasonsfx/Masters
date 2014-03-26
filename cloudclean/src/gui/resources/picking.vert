@@ -5,7 +5,6 @@ layout(location = 1) in float intensity;
 layout(location = 2) in int color_index;
 layout(location = 3) in int flags;
 
-uniform samplerBuffer sampler;
 uniform mat4 projection;
 uniform mat4 modelview;
 

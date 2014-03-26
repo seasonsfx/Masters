@@ -149,12 +149,12 @@ void Lasso::drawLasso(Eigen::Vector2f mouseLoc, QPaintDevice * device){
 
     int third_component = 0;
 
-    buff.write(0, mouseLoc.data(), 2*sizeof(float));
-    buff.write(2*sizeof(float), &third_component, sizeof(float));
+//    buff.write(0, mouseLoc.data(), 2*sizeof(float));
+//    buff.write(2*sizeof(float), &third_component, sizeof(float));
 
     for(uint i = 0; i < points_.size(); i++){
-        buff.write((i+1)*3*sizeof(float), points_[i].data(), 2*sizeof(float));
-        buff.write((i+1)*3*sizeof(float) + 2*sizeof(float), &third_component, sizeof(float));
+        buff.write((i+0)*3*sizeof(float), points_[i].data(), 2*sizeof(float));
+        buff.write((i+0)*3*sizeof(float) + 2*sizeof(float), &third_component, sizeof(float));
     }
 
 
@@ -181,7 +181,8 @@ void Lasso::drawLasso(Eigen::Vector2f mouseLoc, QPaintDevice * device){
     float color[] = {0.0f, 1.0f, 0.0f};
     glUniform3fv(uni_color, 1, color);
 
-    glDrawArrays(GL_LINE_STRIP, 0, points_.size()+1); CE();
+    glLineWidth(2.0f);
+    glDrawArrays(GL_LINE_LOOP, 0, points_.size()); CE();
 
     buff.release(); CE();
     glBindVertexArray(0);

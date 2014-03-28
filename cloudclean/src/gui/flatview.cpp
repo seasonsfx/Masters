@@ -224,9 +224,9 @@ void FlatView::initializeGL() {
         }
     #endif
 
-    glClearColor(0.0, 0.0, 0.0, 1.0);
+    glClearColor(0.0, 0.0, 0.0, 1.0); CE();
     //glEnable(GL_CULL_FACE);
-    glEnable(GL_MULTISAMPLE);
+    glEnable(GL_MULTISAMPLE); CE();
 
     //
     // Load shader program

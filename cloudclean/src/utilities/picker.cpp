@@ -87,8 +87,8 @@ Picker::Picker(GLWidget *glwidget, FlatView *flatview, CloudList * cl, std::func
     glGenTextures(1, &texture_id_); CE();
     glGenTextures(1, &picking_texture_id_); CE();
     glGenTextures(1, &depth_texture_id_); CE();
-    glGenVertexArrays(1, &vao_);
-    glGenFramebuffers(1, &fbo_);
+    glGenVertexArrays(1, &vao_); CE();
+    glGenFramebuffers(1, &fbo_); CE();
 }
 
 Picker::~Picker(){
@@ -130,7 +130,7 @@ uint Picker::renderPick3d(int x, int y){
     glClearColor(1.0, 1.0, 1.0, 1.0);CE();
     glEnable(GL_DEPTH_TEST);CE();
     glEnable(GL_MULTISAMPLE);CE();
-    glEnable(GL_POINT_SMOOTH);CE();
+    //glEnable(GL_POINT_SMOOTH);CE();
     glPointSize(glwidget_->pointRenderSize());CE();
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT); CE();
 
@@ -180,7 +180,7 @@ uint Picker::renderPick3d(int x, int y){
     program_3d_.release(); CE();
 
     // read point
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo_);
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo_); CE();
     glReadBuffer(GL_COLOR_ATTACHMENT0);CE();
     uint data[3];
     glReadPixels(x, glwidget_->height() - y, 1, 1, GL_RGB_INTEGER, GL_UNSIGNED_INT, &data);CE();
@@ -188,8 +188,8 @@ uint Picker::renderPick3d(int x, int y){
     glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);CE();
 
     // Restore the default framebuffer
-    glBindTexture(GL_TEXTURE_2D, 0);CE();
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);CE();
+    glBindTexture(GL_TEXTURE_2D, 0); CE();
+    glBindFramebuffer(GL_FRAMEBUFFER, 0); CE();
 
     qDebug() << "render pick" << data[0];
 

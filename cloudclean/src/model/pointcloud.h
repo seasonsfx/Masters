@@ -92,7 +92,7 @@ class MODEL_API PointCloud : public QObject, public pcl::PointCloud<pcl::PointXY
     int scan_width_;
     int scan_height_;
 
-    std::vector<int16_t> labels_;
+    std::vector<uint16_t> labels_;
     std::vector<PointFlags> flags_;
     CoordinateFrame frame_;
 

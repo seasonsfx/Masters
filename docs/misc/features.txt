@@ -1,0 +1,74 @@
+How normals are calulated:
+    We use the grid
+    Interpolate missing valies
+
+How is downsampling done?
+    Grid vis octree
+    Grid is inefficient at small resolutions or over large distances
+    Average the points in a cell as well as normals
+
+TODO:
+    Figure out when 16bit labels will run out
+
+Features
+-----------
+
+Histograms of intensity values, paper showing how intensity values differ
+    Kulbach lieber distance vs Euclidian
+
+Principal curvatures
+    Resolution
+    Input normals
+
+Ratio of principal curvatures
+    Resolution
+
+Distance between principal curvatures
+    Kulbach lieber distance vs Euclidian
+    for each point calcuate the feature distance to neighbourhood around it
+    This was probably not a good idea
+
+Standard deviation of distance to point
+    Has problem with spherical base*
+    Radius
+    2d or 3d
+    maximum points if 3d
+
+Standard deveiation of normals
+    Trees are noisey
+    Radius of the search
+    Maximum neighbours
+
+Difference of normals
+    Resolution 1
+    Resolution 2
+
+
+Subtract low frequency noise:
+    Blur and the subtract the noise
+    Radius of the convolution
+    In 2d or 3d
+    Number of convolutions
+
+Principal components/ eigen valies
+    In which directions do things vary
+    Radius of the computation
+
+Fast point feature histogram:
+    
+
+Eigen ratio
+    Planes, edges, and corners
+    Ration helps determine that
+    Radius for feature
+    Maximum points
+
+Intensity:
+    Basic
+
+X, Y, Z values
+    Perhaps normalize these?
+
+
+
+Notes: when learning its not only useful to know what is a tree but also what is not

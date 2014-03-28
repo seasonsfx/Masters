@@ -1,7 +1,6 @@
 #version 330
  
 layout(location = 0) in vec2 vertex;
-uniform vec3 colour;
 
 void main( void )
 {

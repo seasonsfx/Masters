@@ -251,7 +251,7 @@ void JsonExport::load(){
             qDebug() << "could not load cloud: " << f;
             return;
         }
-        std::vector<int16_t> & labels = cloud->labels_;
+        std::vector<uint16_t> & labels = cloud->labels_;
         int labelcount;
         int label;
         file >> labelcount >> std::ws;

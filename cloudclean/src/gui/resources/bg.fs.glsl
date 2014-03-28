@@ -2,13 +2,12 @@
  
 layout(location = 0) out vec3 fragColor;
 
-uniform vec3 colour;
+
 
 const vec2 mouse = vec2(0, 0);
 const float time = 1.0;
 uniform vec2 resolution;
 
-//const vec3 color0 = vec3(1., 1., 1.);
 const vec3 color1 = vec3(0.41, 0.57, 0.71); // 0
 const vec3 color2 = vec3(0.31, 0.44, 0.58); // 0.4
 const vec3 color3 = vec3(0.06, 0.22, 0.47); // 0.8

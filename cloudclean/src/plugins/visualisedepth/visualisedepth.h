@@ -34,6 +34,7 @@ class VDepth : public IPlugin {
     ~VDepth();
 
  private:
+    void computeCorrelation(float * data, int vector_size, int size, std::vector<int> & big_to_small);
     void drawFloats(boost::shared_ptr<const std::vector<float> > out_img, boost::shared_ptr<PointCloud> cloud);
     void drawVector3f(boost::shared_ptr<const std::vector<Eigen::Vector3f> > out_img, boost::shared_ptr<PointCloud> cloud);
 
@@ -92,6 +93,8 @@ signals:
     QComboBox * layer_cb_;
     int function_idx_;
     int layer_idx_;
+
+    double resolution_;
 
     std::vector<std::function<void()>> functions_;
 };

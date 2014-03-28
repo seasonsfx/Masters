@@ -16,6 +16,7 @@ CloudGLData::CloudGLData(boost::shared_ptr<PointCloud> pc) {
     // Point buffer setup
     //
     point_buffer_.reset(new QGLBuffer(QGLBuffer::VertexBuffer)); CE();
+    point_buffer_->setUsagePattern(QGLBuffer::StreamDraw);
     point_buffer_->create(); CE();
     point_buffer_->bind(); CE();
     size_t vb_size = sizeof(pcl::PointXYZI)*pc->size();
@@ -119,6 +120,12 @@ void CloudGLData::copyCloud(){
     }
 
     glUnmapBuffer(GL_ARRAY_BUFFER);
+
+//    for(uint i = 0; i < pc_->size(); i++) {
+//        point_buffer_->write(i*sizeof(float)*4, (*pc_)[i].data, sizeof(float)*3);
+//        point_buffer_->write(i*sizeof(float)*4, &((*pc_)[i].intensity), sizeof(float));
+//    }
+
     point_buffer_->release(); CE();
 }
 

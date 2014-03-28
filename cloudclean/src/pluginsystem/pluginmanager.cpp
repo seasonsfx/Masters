@@ -134,7 +134,7 @@ bool PluginResource::load(QString path) {
 
     if(found && export_symbols.value().toBool()){
         loader_->setLoadHints(QLibrary::ExportExternalSymbolsHint);
-        qDebug() << "Exporting";
+        //qDebug() << "Exporting";
     }
 
     bool loaded = loader_->load();
@@ -253,7 +253,7 @@ IPlugin * PluginManager::loadPlugin(PluginMetaData & meta, std::map<QString, Plu
         if(loadPlugin(dep_meta, dep_graph) != nullptr)
             continue;
 
-        qDebug() << "Loaded: " << dep << " (dependency of " << meta.name_ << ")";
+        //qDebug() << "Loaded: " << dep << " (dependency of " << meta.name_ << ")";
     }
 
     PluginResource * pr = new PluginResource(meta.path_, core_, this);
@@ -306,8 +306,8 @@ void PluginManager::updateDepGraph() {
         QString absfilepath = plugins_dir_->absoluteFilePath(fileName);
         PluginMetaData meta(absfilepath);
 
-        qDebug() << "Found: " << absfilepath;
-        qDebug() << "Name: " << meta.name_;
+        // qDebug() << "Found: " << absfilepath;
+        // qDebug() << "Name: " << meta.name_;
 
         // If meta data does not exists
         if(dep_graph_.find(meta.name_) == dep_graph_.end())
@@ -382,12 +382,12 @@ void PluginManager::loadPlugins() {
 
 void PluginManager::initializePlugins() {
     for(PluginResource * pr : plugins_){
-        qDebug() << "init1: " << pr->instance_->getName();
+        // qDebug() << "init1: " << pr->instance_->getName();
         pr->instance_->initialize(core_);
     }
 
     for(PluginResource * pr : plugins_){
-        qDebug() << "init2: " << pr->instance_->getName();
+        // qDebug() << "init2: " << pr->instance_->getName();
         pr->instance_->initialize2(this);
     }
 }

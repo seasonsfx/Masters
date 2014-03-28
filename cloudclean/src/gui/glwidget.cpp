@@ -164,19 +164,19 @@ void GLWidget::paintEvent(QPaintEvent *event) {
     // Make sure the labels are updates
     // Make sure nothing has changed
 
-      program_bg_.bind();
+      program_bg_.bind(); CE();
 
-      glUniform2f(uni_resolution_, width(), height());
+      glUniform2f(uni_resolution_, width(), height()); CE();
 
-      glBindVertexArray(vao_bg_);
-      bg_buff_.bind();
+      glBindVertexArray(vao_bg_); CE();
+      bg_buff_.bind(); CE();
       glEnableVertexAttribArray(0); CE();
       glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0); CE();
 
-      glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-      bg_buff_.release();
-      glBindVertexArray(0);
-      program_bg_.release();
+      glDrawArrays(GL_TRIANGLE_STRIP, 0, 4); CE();
+      bg_buff_.release(); CE();
+      glBindVertexArray(0); CE();
+      program_bg_.release(); CE();
 
 //    QPainter p(this);
 
@@ -197,8 +197,8 @@ void GLWidget::paintEvent(QPaintEvent *event) {
 //    p.beginNativePainting();
 
     //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glClear(GL_DEPTH_BUFFER_BIT);
-    glEnable(GL_DEPTH_TEST);
+    glClear(GL_DEPTH_BUFFER_BIT); CE();
+    glEnable(GL_DEPTH_TEST); CE();
 
     program_.bind(); CE();
 

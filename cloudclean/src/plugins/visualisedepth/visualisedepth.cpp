@@ -5,6 +5,7 @@
 #include <QToolBar>
 #include <QtWidgets>
 #include <QScrollArea>
+#include <QDoubleSpinBox>
 
 #include <pcl/point_types.h>
 #include <pcl/features/fpfh.h>
@@ -54,8 +55,9 @@ void VDepth::initialize2(PluginManager * pm) {
         return;
     }
 
-    function_idx_ = -1;
+    function_idx_ = 0;
     layer_idx_ = -1;
+    resolution_ = 0.5;
 
     // Set up viz tab
     depth_widget_ = new QWidget(0);
@@ -108,11 +110,27 @@ void VDepth::initialize2(PluginManager * pm) {
     functions_.push_back(std::bind(&VDepth::normalnoise, this));
     functions_.push_back(std::bind(&VDepth::eigen_ratio, this));
 
-    layout->addWidget(new QLabel("Correlate with layer:"));
-    layer_cb_ = new QComboBox(settings_);
-    layout->addWidget(layer_cb_);
+//    layout->addWidget(new QLabel("Correlate with layer:"));
+//    layer_cb_ = new QComboBox(settings_);
+//    layout->addWidget(layer_cb_);
 
-    QPushButton * run = new QPushButton("Correlate & visualise");
+
+    // Downsample settings
+    QDoubleSpinBox * downsample_sb = new QDoubleSpinBox();
+    downsample_sb->setAccelerated(true);
+    downsample_sb->setMinimum(0.001);
+    downsample_sb->setMaximum(1);
+    downsample_sb->setValue(resolution_);
+    connect(downsample_sb, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), [=] (double value){
+        resolution_ = value;
+    });
+
+    layout->addWidget(new QLabel("Downsample resolution (meters)"));
+    layout->addWidget(downsample_sb);
+
+
+    // Run button
+    QPushButton * run = new QPushButton("Correlate and visualise");
     connect(run, &QPushButton::clicked, [=] (){
         if(function_idx_ != -1){
             qDebug() << "call!";
@@ -133,13 +151,14 @@ void VDepth::layersModified(){
 
     layer_idx_ = -1;
 
-    for(int idx = 0; idx < ll_->getLayers().size(); idx++) {
+    for(uint idx = 0; idx < ll_->getLayers().size(); idx++) {
         boost::shared_ptr<Layer> layer = ll_->getLayers()[idx];
         layer_cb_->addItem(layer->getName(), layer->getId());
     }
 }
 
 void VDepth::cleanup(){
+    mw_->tooloptions_->removeWidget(settings_);
     mw_->toolbar_->removeAction(enable_);
     mw_->removeTab(tab_idx_);
     delete enable_;
@@ -170,6 +189,95 @@ void VDepth::disable(){
     is_enabled_ = false;
 }
 
+// to correlate, we need an x and y
+
+//float mean(float * data, int vector_size, int index, int size){
+//    float sum = 0;
+//    for(int i = 0; i < size; i++){
+//        sum += data[i*vector_size + index];
+//    }
+//    return sum/float(size);
+//}
+
+void sum_calc(float * data, int vector_size, int size, float * sum, float * sum_of_squares){
+    for(int j = 0; j < vector_size; j++){
+        sum[j] = 0.0f;
+        sum_of_squares[j] = 0.0f;
+    }
+
+    for(int i = 0; i < size; i++){
+        for(int j = 0; j < vector_size; j++){
+            sum[j] += data[i*vector_size + j];
+            sum_of_squares[j] += pow(data[i*vector_size + j], 2);
+        }
+    }
+}
+
+float sum_product_calc(float * y_data, float * x_data, int x_vector_size, int size, float * sum_product){
+
+    for(int j = 0; j < x_vector_size; j++){
+        sum_product[j] = 0.0f;
+    }
+
+    for(int i = 0; i < size; i++){
+        for(int j = 0; j < x_vector_size; j++){
+            sum_product[j] += y_data[i] * x_data[i*x_vector_size + j];
+        }
+    }
+}
+
+inline float correlate(float sx, float sxx, float sy, float syy, float sxy, float n){
+    return (n*sxy-sx*sy)/sqrt((n*sxx-sx*sx) * (n*syy-sy*sy));
+}
+
+// blend the large segmentation to small!!!
+
+// correlate binaryish with vector
+std::vector<float> correlate_with_vector(std::vector<float> & segment, float * data, int x_vector_size, int size){
+    std::vector<float> sum_x(x_vector_size);
+    std::vector<float> sum_of_squares_x(x_vector_size);
+    sum_calc(data, x_vector_size, size, sum_x.data(), sum_of_squares_x.data());
+
+    float sum_y;
+    float sum_of_squares_y;
+    sum_calc(segment.data(), 1, size, &sum_y, &sum_of_squares_y);
+
+    std::vector<float> sum_xy(x_vector_size);
+    sum_product_calc(segment.data(), data, x_vector_size, size, sum_xy.data());
+
+    std::vector<float> correlation(x_vector_size);
+
+    for(int j = 0; j < x_vector_size; j++){
+        correlation[j] = correlate(sum_x[j], sum_of_squares_x[j], sum_y, sum_of_squares_y, sum_xy[j], size);
+        correlation[x_vector_size] = correlation[j]*correlation[j];
+    }
+
+    return correlation;
+}
+
+std::vector<float> get_scaled_layer_mask(
+        std::vector<uint16_t> labels_,
+        std::set<uint16_t> segment_labels,
+        std::vector<int> & big_to_small,
+        int small_size){
+
+    std::vector<float> mask(small_size, 0.0f);
+    std::vector<int> mask_count(small_size, 0);
+
+    for(int big_idx = 0; big_idx < big_to_small.size(); big_idx++){
+        int small_idx = big_to_small[big_idx];
+        mask_count[small_idx]++;
+        uint16_t label = labels_[big_idx];
+        if(segment_labels.find(label) != segment_labels.end())
+            mask[small_idx]++;
+    }
+
+    for(int i = 0; i < small_size; i++){
+        mask[i] = mask_count[i] == 0 ? 0.0f : mask[i]/mask_count[i];
+    }
+
+    return mask;
+}
 
 int gridToCloudIdx(int x, int y, boost::shared_ptr<PointCloud> pc, int * lookup){
     if(x < 0 || x > pc->scan_width())
@@ -178,6 +286,33 @@ int gridToCloudIdx(int x, int y, boost::shared_ptr<PointCloud> pc, int * lookup)
         return -1;
     return lookup[x + y*pc->scan_width()];
 }
+
+
+void VDepth::computeCorrelation(float * data, int vector_size, int size, std::vector<int> & big_to_small){
+
+    if(ll_->getSelection().size() == 0)
+        return;
+
+    std::set<uint16_t> labels;
+    for(boost::weak_ptr<Layer> wlayer: ll_->getSelection()){
+        for(uint16_t label : wlayer.lock()->getLabelSet())
+            labels.insert(label);
+    }
+
+    std::vector<float> layer = get_scaled_layer_mask(cl_->active_->labels_,
+                          labels,
+                          big_to_small,
+                          size);
+
+    //MatrixXf a(10,15);
+    //VectorXf b(30);
+    std::vector<float> correlation = correlate_with_vector(layer, data, vector_size, size);
+
+    for(int i = 0; i < correlation.size(); i++){
+        qDebug() << "Correlate " << i << ": " << correlation[i];
+    }
+}
+
 
 void VDepth::drawFloats(boost::shared_ptr<const std::vector<float> > out_img, boost::shared_ptr<PointCloud> cloud){
     qDebug() << "DRAW!";
@@ -411,7 +546,7 @@ pcl::PointCloud<pcl::PointXYZINormal>::Ptr VDepth::downsample(
     // Zipper up normals and xyzi
     pcl::PointCloud<pcl::PointXYZINormal>::Ptr cloud = zipNormals(*input, *normals);
 
-    pcl::PointCloud<pcl::PointXYZINormal>::Ptr output = octreeDownsample(cloud.get(), resolution, sub_idxs);
+    pcl::PointCloud<pcl::PointXYZINormal>::Ptr output = octreeDownsample(cloud.get(), resolution_, sub_idxs);
 
     return output;
 
@@ -477,8 +612,8 @@ void VDepth::don_vis(){
 
     pcl::PointCloud<pcl::Normal>::Ptr normals = ne_->getNormals(_cloud);
 
-    float res1 = 0.5;
-    float res2 = 1;
+    float res1 = resolution_;
+    float res2 = resolution_*2;
 
     // Downsample
     pcl::PointCloud<pcl::PointXYZINormal>::Ptr smaller_cloud;
@@ -499,6 +634,8 @@ void VDepth::don_vis(){
         (*grid)[grid_idx] = big_donormals[i].getNormalVector3fMap();
     }
 
+    computeCorrelation(reinterpret_cast<float*>(donormals->points.data()), 4, donormals->points.size(), sub_idxs);
+
     drawVector3f(grid, _cloud);
 }
 
@@ -509,7 +646,7 @@ void VDepth::hist_vis(){
 
     pcl::PointCloud<pcl::PointXYZINormal>::Ptr filt_cloud;
     std::vector<int> sub_idxs;
-    filt_cloud = downsample(_cloud, 0.01, sub_idxs);
+    filt_cloud = downsample(_cloud, resolution_, sub_idxs);
 
 
     int bins = 20;
@@ -613,7 +750,7 @@ void VDepth::fpfh_vis(){
 
     pcl::PointCloud<pcl::PointXYZINormal>::Ptr filt_cloud;
     std::vector<int> sub_idxs;
-    filt_cloud = downsample(_cloud, 0.1, sub_idxs);
+    filt_cloud = downsample(_cloud, resolution_, sub_idxs);
 
 
     // FPFH
@@ -628,87 +765,89 @@ void VDepth::fpfh_vis(){
     fpfh.compute(*fpfhs);
     qDebug() << "FPFH in " << t.elapsed() << " ms";
 
-    // Map feature to original cloud
-    pcl::PointCloud<pcl::FPFHSignature33>::Ptr fpfhs2 (new pcl::PointCloud<pcl::FPFHSignature33> ());
-    pcl::FPFHSignature33 blankfpfh;
-    for(int i = 0; i < 33; i++){
-        blankfpfh.histogram[i] = 0.0f;
-    }
-    fpfhs2->points.resize(_cloud->size(), blankfpfh);
+    computeCorrelation(reinterpret_cast<float*>(fpfhs->points.data()), 33, fpfhs->points.size(), sub_idxs);
 
-    qDebug() << "resized";
+//    // Map feature to original cloud
+//    pcl::PointCloud<pcl::FPFHSignature33>::Ptr fpfhs2 (new pcl::PointCloud<pcl::FPFHSignature33> ());
+//    pcl::FPFHSignature33 blankfpfh;
+//    for(int i = 0; i < 33; i++){
+//        blankfpfh.histogram[i] = 0.0f;
+//    }
+//    fpfhs2->points.resize(_cloud->size(), blankfpfh);
 
-    for(uint i = 0; i < _cloud->size(); i++) {
-        uint idx = sub_idxs[i];
+//    qDebug() << "resized";
 
-        if(idx != -1u && idx < fpfhs->size())
-            (*fpfhs2)[i] = (*fpfhs)[idx];
-    }
+//    for(uint i = 0; i < _cloud->size(); i++) {
+//        uint idx = sub_idxs[i];
 
-    boost::shared_ptr<const std::vector<int>> grid_to_cloud = _cloud->gridToCloudMap();
+//        if(idx != -1u && idx < fpfhs->size())
+//            (*fpfhs2)[i] = (*fpfhs)[idx];
+//    }
 
-    int w = _cloud->scan_width();
-    int h = _cloud->scan_height();
+//    boost::shared_ptr<const std::vector<int>> grid_to_cloud = _cloud->gridToCloudMap();
 
-    // in the grid, subtract (x, y+1) from every (x, y)
-    boost::shared_ptr<std::vector<float>> diffs = boost::make_shared<std::vector<float>>(_cloud->size(), 0.0f);
+//    int w = _cloud->scan_width();
+//    int h = _cloud->scan_height();
 
-
-    auto distfunc = EuclidianDist;
-/*
-    auto maxval = [] (float * array, int size) {
-        float max = FLT_MIN;
-        for(int i = 0; i < size; i++) {
-            if(array[i] > max)
-                max = array[i];
-        }
-        return max;
-    };
-*/
-    const int feature_size = 33;
-
-    for(int x = 1; x < w-1; x ++) {
-        for(int y = 1; y < h-1; y ++) {
-            int center = (*grid_to_cloud)[x*h + y];
-            int up = (*grid_to_cloud)[x*h + y-1];
-            int down = (*grid_to_cloud)[x*h + y+1];
-            int left = (*grid_to_cloud)[(x-1)*h + y];
-            int right = (*grid_to_cloud)[(x+1)*h + y];
+//    // in the grid, subtract (x, y+1) from every (x, y)
+//    boost::shared_ptr<std::vector<float>> diffs = boost::make_shared<std::vector<float>>(_cloud->size(), 0.0f);
 
 
-            (*diffs)[center] = 0;
+//    auto distfunc = EuclidianDist;
+///*
+//    auto maxval = [] (float * array, int size) {
+//        float max = FLT_MIN;
+//        for(int i = 0; i < size; i++) {
+//            if(array[i] > max)
+//                max = array[i];
+//        }
+//        return max;
+//    };
+//*/
+//    const int feature_size = 33;
 
-            if(center == -1){
-                continue;
-            }
+//    for(int x = 1; x < w-1; x ++) {
+//        for(int y = 1; y < h-1; y ++) {
+//            int center = (*grid_to_cloud)[x*h + y];
+//            int up = (*grid_to_cloud)[x*h + y-1];
+//            int down = (*grid_to_cloud)[x*h + y+1];
+//            int left = (*grid_to_cloud)[(x-1)*h + y];
+//            int right = (*grid_to_cloud)[(x+1)*h + y];
 
-            // NB! assumed histograms are normalised
 
-            if(up != -1 && down != -1){
-                float * feature1 = (*fpfhs2)[up].histogram;
-                float * feature2 = (*fpfhs2)[down].histogram;
-                //float max1 = maxval(feature1, feature_size);
-                //float max2 = maxval(feature2, feature_size);
-                //(*diffs)[center] += fabs(max1 - max2);
-                (*diffs)[center] += distfunc(feature1, feature2, feature_size);
-            }
+//            (*diffs)[center] = 0;
 
-            if(left != -1 && right != -1){
-                float * feature1 = (*fpfhs2)[up].histogram;
-                float * feature2 = (*fpfhs2)[down].histogram;
-                //float max1 = maxval(feature1, feature_size);
-                //float max2 = maxval(feature2, feature_size);
-                //(*diffs)[center] += fabs(max1 - max2);
-                (*diffs)[center] += distfunc(feature1, feature2, feature_size);
-            }
+//            if(center == -1){
+//                continue;
+//            }
 
-        }
-    }
+//            // NB! assumed histograms are normalised
 
-    boost::shared_ptr<const std::vector<float>> img = cloudToGrid(_cloud->cloudToGridMap(), w*h, diffs);
+//            if(up != -1 && down != -1){
+//                float * feature1 = (*fpfhs2)[up].histogram;
+//                float * feature2 = (*fpfhs2)[down].histogram;
+//                //float max1 = maxval(feature1, feature_size);
+//                //float max2 = maxval(feature2, feature_size);
+//                //(*diffs)[center] += fabs(max1 - max2);
+//                (*diffs)[center] += distfunc(feature1, feature2, feature_size);
+//            }
 
-    qDebug() << "about to draw";
-    drawFloats(img, _cloud);
+//            if(left != -1 && right != -1){
+//                float * feature1 = (*fpfhs2)[up].histogram;
+//                float * feature2 = (*fpfhs2)[down].histogram;
+//                //float max1 = maxval(feature1, feature_size);
+//                //float max2 = maxval(feature2, feature_size);
+//                //(*diffs)[center] += fabs(max1 - max2);
+//                (*diffs)[center] += distfunc(feature1, feature2, feature_size);
+//            }
+
+//        }
+//    }
+
+//    boost::shared_ptr<const std::vector<float>> img = cloudToGrid(_cloud->cloudToGridMap(), w*h, diffs);
+
+//    qDebug() << "about to draw";
+//    drawFloats(img, _cloud);
 
 }
 
@@ -719,10 +858,7 @@ void VDepth::curve_vis(){
 
     pcl::PointCloud<pcl::PointXYZINormal>::Ptr filt_cloud;
     std::vector<int> big_to_small;
-    filt_cloud = downsample(_cloud, 0.1, big_to_small);
-
-
-    //pcl::io::savePCDFileASCII ("test_pcd.pcd", *filt_cloud);
+    filt_cloud = downsample(_cloud, resolution_, big_to_small);
 
 
     // Setup the principal curvatures computation
@@ -768,10 +904,7 @@ void VDepth::curve_diff_vis(){
 
     pcl::PointCloud<pcl::PointXYZINormal>::Ptr filt_cloud;
     std::vector<int> sub_idxs;
-    filt_cloud = downsample(_cloud, 0.1, sub_idxs);
-
-
-    //pcl::io::savePCDFileASCII ("test_pcd.pcd", *filt_cloud);
+    filt_cloud = downsample(_cloud, resolution_, sub_idxs);
 
 
     // Setup the principal curvatures computation
@@ -959,7 +1092,7 @@ void VDepth::eigen_ratio(){
 
     // Downsample
     std::vector<int> sub_idxs;
-    pcl::PointCloud<pcl::PointXYZI>::Ptr smaller_cloud = octreeDownsample(cloud.get(), 0.1, sub_idxs);
+    pcl::PointCloud<pcl::PointXYZI>::Ptr smaller_cloud = octreeDownsample(cloud.get(), resolution_, sub_idxs);
 
 
     boost::shared_ptr<std::vector<Eigen::Vector3f> > pca = getPCA(smaller_cloud.get(), 0.3f, 0);

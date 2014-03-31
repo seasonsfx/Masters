@@ -292,7 +292,7 @@ PluginMetaData::PluginMetaData(QString path){
 
     QJsonArray dep_arr = dep_it.value().toArray();
 
-    qDebug() << "Deps for " << name_ << " " << dep_arr;
+    //qDebug() << "Deps for " << name_ << " " << dep_arr;
 
     for(QJsonValueRef valref : dep_arr){
         QString name = valref.toObject().find("name").value().toString();

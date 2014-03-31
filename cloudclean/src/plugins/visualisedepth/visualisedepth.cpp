@@ -189,16 +189,6 @@ void VDepth::disable(){
     is_enabled_ = false;
 }
 
-// to correlate, we need an x and y
-
-//float mean(float * data, int vector_size, int index, int size){
-//    float sum = 0;
-//    for(int i = 0; i < size; i++){
-//        sum += data[i*vector_size + index];
-//    }
-//    return sum/float(size);
-//}
-
 void sum_calc(float * data, int vector_size, int size, float * sum, float * sum_of_squares){
     for(int j = 0; j < vector_size; j++){
         sum[j] = 0.0f;
@@ -213,15 +203,19 @@ void sum_calc(float * data, int vector_size, int size, float * sum, float * sum_
     }
 }
 
-float sum_product_calc(float * y_data, float * x_data, int x_vector_size, int size, float * sum_product){
+// uses y value for the last row of mat
+float sum_product_mat_calc(float * y_data, float * x_data, int x_vector_size, int size, Eigen::MatrixXf & sum_product){
 
-    for(int j = 0; j < x_vector_size; j++){
-        sum_product[j] = 0.0f;
-    }
+    sum_product.setIdentity();
 
     for(int i = 0; i < size; i++){
-        for(int j = 0; j < x_vector_size; j++){
-            sum_product[j] += y_data[i] * x_data[i*x_vector_size + j];
+        for(int r = 0; r < x_vector_size; r++){
+            for(int c = r+1; c < x_vector_size; c++){
+                sum_product(r, c) += (x_data[i*x_vector_size + r]) + (x_data[i*x_vector_size + c]);
+                sum_product(c, r) = sum_product(r, c);
+            }
+
+            sum_product(r, size) += y_data[i] * x_data[i*x_vector_size + r];
         }
     }
 }
@@ -233,26 +227,27 @@ inline float correlate(float sx, float sxx, float sy, float syy, float sxy, floa
 // blend the large segmentation to small!!!
 
 // correlate binaryish with vector
-std::vector<float> correlate_with_vector(std::vector<float> & segment, float * data, int x_vector_size, int size){
-    std::vector<float> sum_x(x_vector_size);
-    std::vector<float> sum_of_squares_x(x_vector_size);
-    sum_calc(data, x_vector_size, size, sum_x.data(), sum_of_squares_x.data());
+Eigen::MatrixXf  multi_correlate(std::vector<float> & y_data, float * x_data, int x_vector_size, int size){
+    std::vector<float> sum(x_vector_size + 1);
+    std::vector<float> sum_of_squares(x_vector_size + 1);
+    sum_calc(x_data, x_vector_size, size, sum.data(), sum_of_squares.data());
 
-    float sum_y;
-    float sum_of_squares_y;
-    sum_calc(segment.data(), 1, size, &sum_y, &sum_of_squares_y);
+    sum_calc(y_data.data(), 1, size, &sum[x_vector_size], &sum_of_squares[x_vector_size]);
 
-    std::vector<float> sum_xy(x_vector_size);
-    sum_product_calc(segment.data(), data, x_vector_size, size, sum_xy.data());
+    Eigen::MatrixXf sum_product_mat(x_vector_size + 1, x_vector_size + 1);
+    sum_product_mat_calc(y_data.data(), x_data, x_vector_size, size, sum_product_mat);
 
-    std::vector<float> correlation(x_vector_size);
+    Eigen::MatrixXf correlation_mat(x_vector_size + 1, x_vector_size + 1);
+    correlation_mat.setIdentity();
 
-    for(int j = 0; j < x_vector_size; j++){
-        correlation[j] = correlate(sum_x[j], sum_of_squares_x[j], sum_y, sum_of_squares_y, sum_xy[j], size);
-        correlation[x_vector_size] = correlation[j]*correlation[j];
+    for(int r = 0; r < x_vector_size + 1; r++){
+        for(int c = r+1; c < x_vector_size + 1; c++){
+            correlation_mat(r, c) = correlate(sum[c], sum_of_squares[c], sum[r], sum_of_squares[r], sum_product_mat(r, c), size);
+            correlation_mat(c, r) = correlation_mat(r, c);
+        }
     }
 
-    return correlation;
+    return correlation_mat;
 }
 
 std::vector<float> get_scaled_layer_mask(
@@ -304,13 +299,19 @@ void VDepth::computeCorrelation(float * data, int vector_size, int size, std::ve
                           big_to_small,
                           size);
 
-    //MatrixXf a(10,15);
-    //VectorXf b(30);
-    std::vector<float> correlation = correlate_with_vector(layer, data, vector_size, size);
+    Eigen::MatrixXf correlation_mat = multi_correlate(layer, data, vector_size, size);
+    Eigen::MatrixXf Rxx = correlation_mat.topLeftCorner(vector_size, vector_size);
+    Eigen::VectorXf c = correlation_mat.bottomLeftCorner(1, vector_size);
 
-    for(int i = 0; i < correlation.size(); i++){
-        qDebug() << "Correlate " << i << ": " << correlation[i];
+    std::cout << correlation_mat << std::endl;
+
+    float R = c.transpose() * Rxx.inverse() * c;
+
+    for(int i = 0; i < c.size(); i++){
+        qDebug() << "Correlate " << i << ": " << c[i];
     }
+
+    qDebug() << "R: " << R;
 }
 
 

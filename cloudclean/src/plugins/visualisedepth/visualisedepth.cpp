@@ -204,7 +204,7 @@ void sum_calc(float * data, int vector_size, int size, float * sum, float * sum_
 }
 
 // uses y value for the last row of mat
-float sum_product_mat_calc(float * y_data, float * x_data, int x_vector_size, int size, Eigen::MatrixXf & sum_product){
+void sum_product_mat_calc(float * y_data, float * x_data, int x_vector_size, int size, Eigen::MatrixXf & sum_product){
 
     sum_product.setIdentity();
 
@@ -215,7 +215,8 @@ float sum_product_mat_calc(float * y_data, float * x_data, int x_vector_size, in
                 sum_product(c, r) = sum_product(r, c);
             }
 
-            sum_product(r, size) += y_data[i] * x_data[i*x_vector_size + r];
+            sum_product(r, x_vector_size) += y_data[i] * x_data[i*x_vector_size + r];
+            sum_product(x_vector_size, r) = sum_product(r, x_vector_size);
         }
     }
 }
@@ -242,6 +243,7 @@ Eigen::MatrixXf  multi_correlate(std::vector<float> & y_data, float * x_data, in
 
     for(int r = 0; r < x_vector_size + 1; r++){
         for(int c = r+1; c < x_vector_size + 1; c++){
+            // qDebug() << r << c << ": " <<  sum[c] << sum_of_squares[c] << sum[r] << sum_of_squares[r] << sum_product_mat(r, c);
             correlation_mat(r, c) = correlate(sum[c], sum_of_squares[c], sum[r], sum_of_squares[r], sum_product_mat(r, c), size);
             correlation_mat(c, r) = correlation_mat(r, c);
         }
@@ -259,7 +261,7 @@ std::vector<float> get_scaled_layer_mask(
     std::vector<float> mask(small_size, 0.0f);
     std::vector<int> mask_count(small_size, 0);
 
-    for(int big_idx = 0; big_idx < big_to_small.size(); big_idx++){
+    for(uint big_idx = 0; big_idx < big_to_small.size(); big_idx++){
         int small_idx = big_to_small[big_idx];
         mask_count[small_idx]++;
         uint16_t label = labels_[big_idx];
@@ -301,17 +303,22 @@ void VDepth::computeCorrelation(float * data, int vector_size, int size, std::ve
 
     Eigen::MatrixXf correlation_mat = multi_correlate(layer, data, vector_size, size);
     Eigen::MatrixXf Rxx = correlation_mat.topLeftCorner(vector_size, vector_size);
-    Eigen::VectorXf c = correlation_mat.bottomLeftCorner(1, vector_size);
+    Eigen::VectorXf c = correlation_mat.block(0, vector_size, vector_size, 1);
 
     std::cout << correlation_mat << std::endl;
 
-    float R = c.transpose() * Rxx.inverse() * c;
+    float R = c.transpose() * (Rxx.inverse() * c);
 
-    for(int i = 0; i < c.size(); i++){
-        qDebug() << "Correlate " << i << ": " << c[i];
-    }
+    qDebug() << "R^2: " << R;
+    qDebug() << "R: " << sqrt(R);
 
-    qDebug() << "R: " << R;
+    Eigen::VectorXf tmp = (Rxx.inverse() * c);
+
+    qDebug() << "Y -> X correlation <<<<<<<<<<<<<";
+    std::cout << c << std::endl;
+    qDebug() << "Coefs <<<<<<<<<<<<<";
+    std::cout << tmp << std::endl;
+
 }
 
 
@@ -875,6 +882,9 @@ void VDepth::curve_vis(){
     // Actually compute the principal curvatures
     pcl::PointCloud<pcl::PrincipalCurvatures>::Ptr principal_curvatures (new pcl::PointCloud<pcl::PrincipalCurvatures> ());
     principal_curvatures_estimation.compute (*principal_curvatures);
+
+
+    computeCorrelation(reinterpret_cast<float*>(principal_curvatures->points.data()), sizeof(pcl::PrincipalCurvatures)/sizeof(float), principal_curvatures->points.size(), big_to_small);
 
 
     int w = _cloud->scan_width();

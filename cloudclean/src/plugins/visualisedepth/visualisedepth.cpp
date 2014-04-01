@@ -189,7 +189,8 @@ void VDepth::disable(){
     is_enabled_ = false;
 }
 
-int sum_calc(float * data, int vector_size, int size, float * sum, float * sum_of_squares, int stride){
+int sum_calc(float * data, int vector_size, int size, float * sum, float * sum_of_squares, int stride = 0){
+    stride = stride ? stride : vector_size;
     int skipped = 0;
     for(int j = 0; j < vector_size; j++){
         sum[j] = 0.0f;
@@ -199,7 +200,7 @@ int sum_calc(float * data, int vector_size, int size, float * sum, float * sum_o
     float val = 0;
     for(int i = 0; i < size; i++){
         for(int j = 0; j < vector_size; j++){
-            val = data[i*vector_size + j];
+            val = data[i*stride + j];
             if(val != val){
                 skipped++;
                 continue;
@@ -212,15 +213,16 @@ int sum_calc(float * data, int vector_size, int size, float * sum, float * sum_o
 }
 
 // uses y value for the last row of mat
-void sum_product_mat_calc(float * y_data, float * x_data, int x_vector_size, int size, Eigen::MatrixXf & sum_product, int stride){
+void sum_product_mat_calc(float * y_data, float * x_data, int x_vector_size, int size, Eigen::MatrixXf & sum_product, int stride = 0){
+    stride = stride ? stride : x_vector_size;
     sum_product.setIdentity();
 
     float val1 = 0, val2 = 0;
     for(int i = 0; i < size; i++){
         for(int r = 0; r < x_vector_size; r++){
             for(int c = r+1; c < x_vector_size; c++){
-                val1 = (x_data[i*x_vector_size + r]);
-                val2 = (x_data[i*x_vector_size + c]);
+                val1 = (x_data[i*stride + r]);
+                val2 = (x_data[i*stride + c]);
 
                 if(val1 != val1 || val1 != val1){
                     continue;
@@ -230,7 +232,7 @@ void sum_product_mat_calc(float * y_data, float * x_data, int x_vector_size, int
                 sum_product(c, r) = sum_product(r, c);
             }
 
-            sum_product(r, x_vector_size) += y_data[i] * x_data[i*x_vector_size + r];
+            sum_product(r, x_vector_size) += y_data[i] * x_data[i*stride + r];
             sum_product(x_vector_size, r) = sum_product(r, x_vector_size);
         }
     }
@@ -249,7 +251,7 @@ Eigen::MatrixXf  multi_correlate(std::vector<float> & y_data, float * x_data, in
     std::vector<float> sum_of_squares(x_vector_size + 1);
 
     int skipped = sum_calc(x_data, x_vector_size, size, sum.data(), sum_of_squares.data(), stride);
-    skipped += sum_calc(y_data.data(), 1, size, &sum[x_vector_size], &sum_of_squares[x_vector_size], stride);
+    skipped += sum_calc(y_data.data(), 1, size, &sum[x_vector_size], &sum_of_squares[x_vector_size]);
 
     qDebug() << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1";
     qDebug() << "skipped: " << skipped << "size: " << size;
@@ -663,7 +665,7 @@ void VDepth::don_vis(){
         (*grid)[grid_idx] = big_donormals[i].getNormalVector3fMap();
     }
 
-    computeCorrelation(reinterpret_cast<float*>(donormals->points.data()), 4, donormals->points.size(), sub_idxs);
+    computeCorrelation(reinterpret_cast<float*>(donormals->points.data()), 3, donormals->points.size(), sub_idxs, 4);
 
     drawVector3f(grid, _cloud);
 }

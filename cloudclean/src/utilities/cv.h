@@ -6,6 +6,7 @@
 #include <cassert>
 #include <limits>
 #include <QDebug>
+#include <QTime>
 #include <boost/make_shared.hpp>
 #include <boost/serialization/shared_ptr.hpp>
 
@@ -61,7 +62,7 @@ UTIL_API boost::shared_ptr<std::vector<float> > interpolate(
         int w, int h, const int nsize,
         boost::shared_ptr<std::vector<float>> out_image = nullptr);
 
-UTIL_API boost::shared_ptr<std::vector<float> > stdev_dist(boost::shared_ptr<PointCloud> cloud,
+UTIL_API boost::shared_ptr<std::vector<float> > stdev_dist(pcl::PointCloud<pcl::PointXYZI>::Ptr cloud,
                                  const double radius, int max_nn = 0, bool use_depth = false);
 
 UTIL_API boost::shared_ptr<std::vector<float>> cloudToGrid(const std::vector<int> & map, uint img_size,
@@ -129,9 +130,95 @@ boost::shared_ptr<std::vector<Eigen::Vector3f> > getPCA(pcl::PointCloud<PointT> 
     return eigen_vals;
 }
 
-UTIL_API boost::shared_ptr<std::vector<float> > normal_stdev(boost::shared_ptr<PointCloud> cloud,
-                  pcl::PointCloud<pcl::Normal>::Ptr normals,
-                  double radius, int max_nn);
+inline float clamp(float x, float a, float b)
+{
+    return x < a ? a : (x > b ? b : x);
+}
+
+template<class PointT, class NormalT>
+boost::shared_ptr<std::vector<float> > normal_stdev(
+        typename pcl::PointCloud<PointT>::Ptr cloud,
+        typename pcl::PointCloud<NormalT>::Ptr normals,
+        double radius,
+        int max_nn) {
+
+    boost::shared_ptr<std::vector<float> > std_devs =
+            boost::make_shared<std::vector<float>>(cloud->size(), 0);
+
+    pcl::KdTreeFLANN<PointT> search;
+    search.setInputCloud(cloud);
+
+
+    QTime t;
+    t.start();
+
+    int less_than_three_points_count = 0;
+
+    boost::shared_ptr <std::vector<int> > kIdxs;
+    kIdxs = boost::shared_ptr <std::vector<int> >(new std::vector<int>(cloud->size(), 0));
+    std::vector<float> kDist;
+
+    // For every point
+    for(unsigned int i = 0; i < cloud->size(); i++){
+
+        if(i % 20000 == 0) {
+            int ms = t.restart();
+            qDebug() << "so " << less_than_three_points_count << "out of " << i << "points have less than 2 neighbours";
+            qDebug() << "Radius: " << radius << "Max nn: " << max_nn;
+            qDebug() << "% done: " << float(i) / cloud->size();
+            qDebug() << "MS per loop: " << float(ms)/20000.0f;
+        }
+
+        // TODO(Rickert): Sort out Nan in formal estimation
+        // Skip NAN's
+        if((*normals)[i].data_n[0] != (*normals)[i].data_n[0])
+            continue;
+
+        search.radiusSearch(i, radius, *kIdxs, kDist, max_nn);
+
+        if(kDist.size() < 3) {
+            less_than_three_points_count++;
+            continue;
+        }
+
+        std::vector<float> angles;
+        angles.resize(kDist.size());
+
+        Eigen::Map<Eigen::Vector3f> current((*normals)[i].data_n);
+
+        float sumOfSquares = 0.0f;
+        float sum = 0.0f;
+
+        for(int idx : *kIdxs) {
+
+            Eigen::Map<Eigen::Vector3f> neighbour((*normals)[idx].data_n);
+
+            float cosine = neighbour.dot(current) /
+                    neighbour.norm()*current.norm();
+
+            cosine = clamp(cosine, 0.0f, 1.0f);
+
+            // Normalised angle
+            float angle = acos(cosine)/M_PI;
+
+            sum += angle;
+            sumOfSquares += angle*angle;
+        }
+
+        float std_dev = sqrt( (sumOfSquares/angles.size()) - pow(sum/angles.size(), 2));
+
+        if(std_dev != std_dev) {
+            //qDebug() << "Bugger! NAN";
+            continue;
+        }
+
+
+        (*std_devs)[i] = std_dev;
+
+    }
+
+    return std_devs;
+}
 
 /// Inline functions:
 
@@ -414,11 +501,6 @@ static const double gaussian[25] = {
     0.013306209891014005, 0.05963429543618023, 0.09832033134884507, 0.05963429543618023, 0.013306209891014005,
     0.00296901674395065, 0.013306209891014005, 0.02193823127971504, 0.013306209891014005, 0.00296901674395065,
 };
-
-inline float clamp(float x, float a, float b)
-{
-    return x < a ? a : (x > b ? b : x);
-}
 
 inline float angle(Eigen::Vector3f &a, Eigen::Vector3f &b){
     float cosine = a.dot(b) / (a.norm()*b.norm());

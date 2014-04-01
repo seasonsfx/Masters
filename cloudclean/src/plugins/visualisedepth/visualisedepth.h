@@ -34,7 +34,7 @@ class VDepth : public IPlugin {
     ~VDepth();
 
  private:
-    void computeCorrelation(float * data, int vector_size, int size, std::vector<int> & big_to_small);
+    void computeCorrelation(float * data, int vector_size, int size, std::vector<int> & big_to_small, int stride = 0);
     void drawFloats(boost::shared_ptr<const std::vector<float> > out_img, boost::shared_ptr<PointCloud> cloud);
     void drawVector3f(boost::shared_ptr<const std::vector<Eigen::Vector3f> > out_img, boost::shared_ptr<PointCloud> cloud);
 

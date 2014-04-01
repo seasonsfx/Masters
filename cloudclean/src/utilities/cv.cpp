@@ -3,7 +3,6 @@
 #include <cfloat>
 #include <Eigen/Dense>
 #include <QDebug>
-#include <QTime>
 #include <vector>
 #include <memory>
 #include "plugins/visualisedepth/gridsearch.h"
@@ -164,7 +163,7 @@ boost::shared_ptr<std::vector<float> > interpolate(
     return out_image;
 }
 
-boost::shared_ptr<std::vector<float> > stdev_dist(boost::shared_ptr<PointCloud> cloud,
+boost::shared_ptr<std::vector<float> > stdev_dist(pcl::PointCloud<pcl::PointXYZI>::Ptr cloud,
                             const double radius, int max_nn, bool use_depth) {
 
     boost::shared_ptr<std::vector<float>> stdevs
@@ -176,19 +175,25 @@ boost::shared_ptr<std::vector<float> > stdev_dist(boost::shared_ptr<PointCloud> 
     // 1m radius
     //const double radius = 1.0;
 
-    GridSearch gs(*cloud);
+    //GridSearch gs(*cloud);
 
     // center
     Eigen::Map<Eigen::Vector3f> center(cloud->sensor_origin_.data());
 
-    const Octree::Ptr ot = cloud->octree();
+    double resolution = 0.02;
+    Octree::Ptr octree = Octree::Ptr(new Octree(resolution));
+    octree->setInputCloud(cloud);
+    octree->defineBoundingBox();
+    octree->addPointsFromInputCloud();
+
+    //const Octree::Ptr ot = cloud->octree();
     for(uint i = 0; i < cloud->size(); i++){
         idxs.clear();
         dists.clear();
 
-        //ot->radiusSearch(cloud->points[i], radius, idxs, dists);
+        octree->radiusSearch(cloud->points[i], radius, idxs, dists, max_nn);
         //grid_nn_op(i, *cloud, idxs, 1, 50);
-        gs.radiusSearch((*cloud)[i], radius, idxs, dists, max_nn);
+        //gs.radiusSearch((*cloud)[i], radius, idxs, dists, max_nn);
 
         // calculate stdev of the distances?
         // bad idea because you have a fixed radius
@@ -300,86 +305,4 @@ boost::shared_ptr<std::vector<Eigen::Vector3f> > getHist(boost::shared_ptr<Point
     qDebug("Max: %f, Min: %f", max, min);
 
     return eigen_vals;
-}
-
-boost::shared_ptr<std::vector<float> > normal_stdev(boost::shared_ptr<PointCloud> cloud,
-                  pcl::PointCloud<pcl::Normal>::Ptr normals,
-                  double radius, int max_nn) {
-
-    boost::shared_ptr<std::vector<float> > std_devs =
-            boost::make_shared<std::vector<float>>(cloud->size(), 0);
-
-    pcl::KdTreeFLANN<pcl::PointXYZI> search;
-    search.setInputCloud(pcl::PointCloud<pcl::PointXYZI>::ConstPtr(cloud.get(), boost::serialization::null_deleter()));
-
-
-    QTime t;
-    t.start();
-
-    int less_than_three_points_count = 0;
-
-    boost::shared_ptr <std::vector<int> > kIdxs;
-    kIdxs = boost::shared_ptr <std::vector<int> >(new std::vector<int>(cloud->size(), 0));
-    std::vector<float> kDist;
-
-    // For every point
-    for(unsigned int i = 0; i < cloud->size(); i++){
-
-        if(i % 20000 == 0) {
-            int ms = t.restart();
-            qDebug() << "so " << less_than_three_points_count << "out of " << i << "points have less than 2 neighbours";
-            qDebug() << "Radius: " << radius << "Max nn: " << max_nn;
-            qDebug() << "% done: " << float(i) / cloud->size();
-            qDebug() << "MS per loop: " << float(ms)/20000.0f;
-        }
-
-        // TODO(Rickert): Sort out Nan in formal estimation
-        // Skip NAN's
-        if((*normals)[i].data_n[0] != (*normals)[i].data_n[0])
-            continue;
-
-        search.radiusSearch(i, radius, *kIdxs, kDist, max_nn);
-
-        if(kDist.size() < 3) {
-            less_than_three_points_count++;
-            continue;
-        }
-
-        std::vector<float> angles;
-        angles.resize(kDist.size());
-
-        Eigen::Map<Eigen::Vector3f> current((*normals)[i].data_n);
-
-        float sumOfSquares = 0.0f;
-        float sum = 0.0f;
-
-        for(int idx : *kIdxs) {
-
-            Eigen::Map<Eigen::Vector3f> neighbour((*normals)[idx].data_n);
-
-            float cosine = neighbour.dot(current) /
-                    neighbour.norm()*current.norm();
-
-            cosine = clamp(cosine, 0.0f, 1.0f);
-
-            // Normalised angle
-            float angle = acos(cosine)/M_PI;
-
-            sum += angle;
-            sumOfSquares += angle*angle;
-        }
-
-        float std_dev = sqrt( (sumOfSquares/angles.size()) - pow(sum/angles.size(), 2));
-
-        if(std_dev != std_dev) {
-            //qDebug() << "Bugger! NAN";
-            continue;
-        }
-
-
-        (*std_devs)[i] = std_dev;
-
-    }
-
-    return std_devs;
 }

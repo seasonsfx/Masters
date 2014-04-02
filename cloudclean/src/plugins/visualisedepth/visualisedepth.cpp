@@ -105,9 +105,9 @@ void VDepth::initialize2(PluginManager * pm) {
 
     // round up functions
     functions_.push_back(std::bind(&VDepth::don_vis, this));
-    functions_.push_back(std::bind(&VDepth::fpfh_vis, this));
+    functions_.push_back(std::bind(&VDepth::fpfh_correl, this));
     functions_.push_back(std::bind(&VDepth::curve_vis, this));
-    functions_.push_back(std::bind(&VDepth::normalnoise, this));
+    functions_.push_back(std::bind(&VDepth::normal_stdev_vis, this));
     functions_.push_back(std::bind(&VDepth::eigen_ratio, this));
 
 //    layout->addWidget(new QLabel("Correlate with layer:"));
@@ -387,11 +387,12 @@ void VDepth::drawFloats(boost::shared_ptr<const std::vector<float> > out_img, bo
                 return;
             }
 
+/*
             // Select
             if(lookup->at(i) != -1 && intensity > 100) {
                 select->push_back(lookup->at(i));
             }
-/*
+
             if(intensity < 40) {
                 intensity = 0;
             } else {
@@ -550,11 +551,7 @@ pcl::PointCloud<pcl::PointXYZINormal>::Ptr VDepth::gridDownsample(boost::shared_
 
 
     /////////////////////////
-    //qDebug() << "Output size: " << output->size() << ", orig size: " << input->size();
     time = t.elapsed();
-    //qDebug() << "Subsample cloud in " << time << " ms";
-    //qDebug() << "Enter to comntinue"; std::string enter; std::cin >> enter;
-    //qDebug() << "Ok";
 
     return output;
 
@@ -585,9 +582,10 @@ pcl::PointCloud<pcl::PointXYZINormal>::Ptr VDepth::downsample(
 
 
 template<typename PointT, typename NormalT>
-pcl::PointCloud<pcl::Normal>::Ptr don(pcl::PointCloud<PointT> & cloud,
-            pcl::PointCloud<NormalT> & normals, float radius1 = 0.2,
-            float radius2 = 0.5){
+pcl::PointCloud<pcl::Normal>::Ptr don(
+        pcl::PointCloud<PointT> & cloud,
+        pcl::PointCloud<NormalT> & normals, float radius1 = 0.2,
+        float radius2 = 0.5){
 
     pcl::PointCloud<pcl::Normal>::Ptr donormals;
     donormals.reset(new pcl::PointCloud<pcl::Normal>());
@@ -653,8 +651,12 @@ void VDepth::don_vis(){
 
     pcl::PointCloud<pcl::Normal>::Ptr donormals = don(*smaller_cloud, *smaller_cloud, res1, res2);
 
-    pcl::PointCloud<pcl::Normal> big_donormals;
+    // Correlate
+    computeCorrelation(reinterpret_cast<float*>(donormals->points.data()), 3, donormals->points.size(), sub_idxs, 4);
 
+
+    // Draw
+    pcl::PointCloud<pcl::Normal> big_donormals;
     map_small_to_big((*donormals).points, big_donormals.points, sub_idxs);
 
     const std::vector<int> & cloudtogrid = _cloud->cloudToGridMap();
@@ -665,8 +667,7 @@ void VDepth::don_vis(){
         (*grid)[grid_idx] = big_donormals[i].getNormalVector3fMap();
     }
 
-    computeCorrelation(reinterpret_cast<float*>(donormals->points.data()), 3, donormals->points.size(), sub_idxs, 4);
-
+    // Draw
     drawVector3f(grid, _cloud);
 }
 
@@ -675,19 +676,33 @@ void VDepth::hist_vis(){
     if(_cloud == nullptr)
         return;
 
-    pcl::PointCloud<pcl::PointXYZINormal>::Ptr filt_cloud;
+    pcl::PointCloud<pcl::PointXYZINormal>::Ptr smaller_cloud;
     std::vector<int> sub_idxs;
-    filt_cloud = downsample(_cloud, resolution_, sub_idxs);
+    smaller_cloud = downsample(_cloud, resolution_, sub_idxs);
 
 
     int bins = 20;
     float radius = 0.05;
     int max_nn = 0;
 
+    // Compute
+    QTime t; t.start(); qDebug() << "Timer started (Intensity histogram)";
+    boost::shared_ptr<std::vector<std::vector<float> > > hists = calcIntensityHist(*smaller_cloud, bins, radius, max_nn);
+    qDebug() << "Intensity histogram" << t.elapsed() << " ms";
 
-    boost::shared_ptr<std::vector<std::vector<float> > > hists = calcIntensityHist(*filt_cloud, bins, radius, max_nn);
-    //boost::shared_ptr<std::vector<std::vector<float> > > hists = calcDistHist(*filt_cloud, bins, radius, max_nn);
+    // Copy to contigious structure
+    std::vector<float> tmp(bins*smaller_cloud->size());
+    for(int i = 0; i < smaller_cloud->size(); i++){
+        for(int j = 0; j < bins; j++){
+            tmp[i*bins+j] = (*hists)[i][j];
+        }
+    }
 
+    // Correlate
+    computeCorrelation(tmp.data(), bins, tmp.size(), sub_idxs);
+
+
+    // Draw, TODO; Multidimentional draw
     boost::shared_ptr<std::vector<std::vector<float> > > hists2 = boost::make_shared<std::vector<std::vector<float> > >(_cloud->size());
 
     // map back to cloud
@@ -696,9 +711,7 @@ void VDepth::hist_vis(){
         (*hists2)[i] = (*hists)[idx];
     }
 
-    qDebug() << "Crash 1?";
     hists.reset();
-    qDebug() << "Nope 1";
 
     boost::shared_ptr<const std::vector<int>> grid_to_cloud = _cloud->gridToCloudMap();
 
@@ -766,15 +779,11 @@ void VDepth::hist_vis(){
 
     boost::shared_ptr<const std::vector<float>> img = cloudToGrid(_cloud->cloudToGridMap(), w*h, diffs);
 
-    qDebug() << "about to draw";
     drawFloats(img, _cloud);
-    qDebug() << "Crash 2?";
     hists2.reset();
-    qDebug() << "Nope 2";
-
 }
 
-void VDepth::fpfh_vis(){
+void VDepth::fpfh_correl(){
     boost::shared_ptr<PointCloud> _cloud = core_->cl_->active_;
     if(_cloud == nullptr)
         return;
@@ -783,7 +792,7 @@ void VDepth::fpfh_vis(){
     std::vector<int> sub_idxs;
     filt_cloud = downsample(_cloud, resolution_, sub_idxs);
 
-    // FPFH
+    // Compute
     QTime t; t.start(); qDebug() << "Timer started (FPFH)";
     pcl::FPFHEstimation<pcl::PointXYZINormal, pcl::PointXYZINormal, pcl::FPFHSignature33> fpfh;
     fpfh.setInputCloud(filt_cloud);
@@ -794,6 +803,8 @@ void VDepth::fpfh_vis(){
     pcl::PointCloud<pcl::FPFHSignature33>::Ptr fpfhs (new pcl::PointCloud<pcl::FPFHSignature33> ());
     fpfh.compute(*fpfhs);
     qDebug() << "FPFH in " << t.elapsed() << " ms";
+
+    // Correlate
     computeCorrelation(reinterpret_cast<float*>(fpfhs->points.data()), 33, fpfhs->points.size(), sub_idxs);
 }
 
@@ -806,24 +817,23 @@ void VDepth::curve_vis(){
     std::vector<int> big_to_small;
     filt_cloud = downsample(_cloud, resolution_, big_to_small);
 
+    // Compute
     QTime t; t.start(); qDebug() << "Timer started (Curvature)";
 
-    // Setup the principal curvatures computation
     pcl::PrincipalCurvaturesEstimation<pcl::PointXYZINormal, pcl::PointXYZINormal, pcl::PrincipalCurvatures> principal_curvatures_estimation;
     principal_curvatures_estimation.setInputCloud (filt_cloud);
     principal_curvatures_estimation.setInputNormals (filt_cloud);
     pcl::search::KdTree<pcl::PointXYZINormal>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZINormal>);
     principal_curvatures_estimation.setSearchMethod (tree);
     principal_curvatures_estimation.setRadiusSearch (0.5);
-
-    // Actually compute the principal curvatures
     pcl::PointCloud<pcl::PrincipalCurvatures>::Ptr principal_curvatures (new pcl::PointCloud<pcl::PrincipalCurvatures> ());
     principal_curvatures_estimation.compute (*principal_curvatures);
-
     qDebug() << "Curvature in " << t.elapsed() << " ms";
+
+    // Correlate
     computeCorrelation(reinterpret_cast<float*>(principal_curvatures->points.data()), sizeof(pcl::PrincipalCurvatures)/sizeof(float), principal_curvatures->points.size(), big_to_small);
 
-    // Make image...
+    // Draw
     int w = _cloud->scan_width();
     int h = _cloud->scan_height();
 
@@ -837,15 +847,11 @@ void VDepth::curve_vis(){
         (*grid)[grid_idx] = pc.pc1 + pc.pc2;
     }
 
-
-    //boost::shared_ptr<const std::vector<float>> img = cloudToGrid(cloudtogrid, w*h, grid);
-
-    qDebug() << "about to draw";
     drawFloats(grid, _cloud);
 
 }
 
-void VDepth::normalnoise(){
+void VDepth::normal_stdev_vis(){
     boost::shared_ptr<PointCloud> cloud = core_->cl_->active_;
     if(cloud == nullptr)
         return;
@@ -860,13 +866,15 @@ void VDepth::normalnoise(){
 
     float radius = 1, max_nn = 100;
 
+    // Compute
     QTime t; t.start(); qDebug() << "Timer started (Normal stdev)";
     boost::shared_ptr<std::vector<float>> stdev = normal_stdev<pcl::PointXYZINormal, pcl::PointXYZINormal>(smaller_cloud, smaller_cloud, radius, max_nn);
     qDebug() << "Normal stdev in " << t.elapsed() << " ms";
 
+    // Correlate
     computeCorrelation(stdev->data(), 1, stdev->size(), sub_idxs);
 
-    // Make image
+    // Draw
     int h = cloud->scan_width();
     int w = cloud->scan_height();
 
@@ -878,7 +886,6 @@ void VDepth::normalnoise(){
         int grid_idx = cloudtogrid[big_idx];
         (*grid)[grid_idx] = (*stdev)[small_idx];
     }
-    //boost::shared_ptr<const std::vector<float>> img = cloudToGrid(cloud->cloudToGridMap(), w*h, stdev);
     drawFloats(grid, cloud);
 }
 
@@ -896,7 +903,10 @@ void VDepth::dist_stdev(){
     boost::shared_ptr<std::vector<float> > stdev = stdev_dist(smaller_cloud, 0.05f, 20, false);
     qDebug() << "Dist stdev in " << t.elapsed() << " ms";
 
-    // Make image
+    // Correlate
+    computeCorrelation(stdev->data(), 1, stdev->size(), sub_idxs);
+
+    // Draw
     int h = cloud->scan_width();
     int w = cloud->scan_height();
 
@@ -908,7 +918,7 @@ void VDepth::dist_stdev(){
         int grid_idx = cloudtogrid[big_idx];
         (*grid)[grid_idx] = (*stdev)[small_idx];
     }
-    //boost::shared_ptr<const std::vector<float>> img = cloudToGrid(cloud->cloudToGridMap(), w*h, stdev);
+
     drawFloats(grid, cloud);
 }
 
@@ -942,18 +952,17 @@ void VDepth::eigen_ratio(){
     boost::shared_ptr<PointCloud> cloud = core_->cl_->active_;
     if(cloud == nullptr)
         return;
-    int h = cloud->scan_width();
-    int w = cloud->scan_height();
-
-
 
     // Downsample
     std::vector<int> sub_idxs;
     pcl::PointCloud<pcl::PointXYZI>::Ptr smaller_cloud = octreeDownsample(cloud.get(), resolution_, sub_idxs);
 
-
+    // Compute
+    QTime t; t.start(); qDebug() << "Timer started (PCA and speculaion)";
     boost::shared_ptr<std::vector<Eigen::Vector3f> > pca = getPCA(smaller_cloud.get(), 0.3f, 0);
 
+
+    // Speculate
     boost::shared_ptr<std::vector<float>> likely_veg =
                boost::make_shared<std::vector<float>>(pca->size(), 0.0f);
 
@@ -992,36 +1001,14 @@ void VDepth::eigen_ratio(){
 
     }
 
-    /*
-    // 2nd check
-    pca = getPCA(smaller_cloud.get(), 0.1f, 0);
+    qDebug() << "PCA in " << t.elapsed() << " ms";
 
-    for(uint i = 0; i < pca->size(); i++) {
-        if((*likely_veg)[i] == 0)
-            continue;
+    computeCorrelation(likely_veg->data(), 1, likely_veg->size(), sub_idxs);
 
-        Eigen::Vector3f eig = (*pca)[i];
 
-        // Not enough neighbours
-        if(eig[1] < eig[2]) {
-            (*likely_veg)[i] = 0;
-            continue;
-        }
-
-        float eig_sum = eig.sum();
-
-        eig /= eig_sum;
-
-        float fudge_factor = 5.0f;
-        if(eig[1] < 0.05 * fudge_factor || eig[2] < 0.01 * fudge_factor) {
-            (*likely_veg)[i] = 0;
-        } else {
-            (*likely_veg)[i] = 1;
-        }
-
-    }
-    */
-
+    // Draw
+    int h = cloud->scan_width();
+    int w = cloud->scan_height();
 
     boost::shared_ptr<std::vector<float>> likely_veg2 =
                boost::make_shared<std::vector<float>>(cloud->size(), 0.0f);
@@ -1039,14 +1026,43 @@ void VDepth::eigen_ratio(){
 }
 
 void VDepth::pca(){
-    qDebug() << "Myfunc";
     boost::shared_ptr<PointCloud> cloud = core_->cl_->active_;
     if(cloud == nullptr)
         return;
-    int h = cloud->scan_width();
-    int w = cloud->scan_height();
 
-    boost::shared_ptr<std::vector<Eigen::Vector3f> > pca = getPCA(cloud.get(), 0.05f, 20);
+    std::vector<int> sub_idxs;
+    pcl::PointCloud<pcl::PointXYZI>::Ptr smaller_cloud = octreeDownsample(cloud.get(), resolution_, sub_idxs);
+
+    QTime t; t.start(); qDebug() << "Timer started (PCA)";
+    boost::shared_ptr<std::vector<Eigen::Vector3f> > pca = getPCA(smaller_cloud.get(), 0.05f, 20);
+    qDebug() << "PCA in " << t.elapsed() << " ms";
+
+
+    computeCorrelation(reinterpret_cast<float *>(pca->data()), 3, pca->size(), sub_idxs, sizeof(Eigen::Vector3f)/sizeof(float));
+
+//    // Draw
+//    boost::shared_ptr<std::vector<Eigen::Vector3f> > grid = boost::make_shared<std::vector<Eigen::Vector3f> >(grid_to_cloud->size(), Eigen::Vector3f(0.0f, 0.0f, 0.0f));
+//    for(int i = 0; i < grid_to_cloud->size(); i++) {
+//        int idx = (*grid_to_cloud)[i];
+//        if(idx != -1)
+//            (*grid)[i] = (*pca)[idx];
+//    }
+
+//    drawVector3f(grid, cloud);
+
+
+}
+
+void VDepth::eigen_plane_consine_similarity(){
+    boost::shared_ptr<PointCloud> cloud = core_->cl_->active_;
+    if(cloud == nullptr)
+        return;
+
+    std::vector<int> sub_idxs;
+    pcl::PointCloud<pcl::PointXYZI>::Ptr smaller_cloud = octreeDownsample(cloud.get(), resolution_, sub_idxs);
+
+    QTime t; t.start(); qDebug() << "Timer started (eigen_plane_consine_similarity)";
+    boost::shared_ptr<std::vector<Eigen::Vector3f> > pca = getPCA(smaller_cloud.get(), 0.05f, 20);
 
     boost::shared_ptr<std::vector<float>> plane_likelyhood =
                boost::make_shared<std::vector<float>>(pca->size(), 0.0f);
@@ -1066,6 +1082,15 @@ void VDepth::pca(){
         float similarity = cosine(val, ideal_plane);
         (*plane_likelyhood)[i] = similarity;
     }
+
+    qDebug() << "eigen_plane_consine_similarity in " << t.elapsed() << " ms";
+
+    // Correlate
+    computeCorrelation(plane_likelyhood->data(), 1, plane_likelyhood->size(), sub_idxs);
+
+    // Draw
+    int h = cloud->scan_width();
+    int w = cloud->scan_height();
 /*
     boost::shared_ptr<std::vector<Eigen::Vector3f> > grid = boost::make_shared<std::vector<Eigen::Vector3f> >(grid_to_cloud->size(), Eigen::Vector3f(0.0f, 0.0f, 0.0f));
     for(int i = 0; i < grid_to_cloud->size(); i++) {
@@ -1160,77 +1185,6 @@ void VDepth::intensity_play() {
     drawFloats(highfreq, cloud);
 */
     drawFloats(smooth_grad_image, cloud);
-
-}
-
-
-void VDepth::myFunc(){
-    qDebug() << "Myfunc";
-    boost::shared_ptr<PointCloud> cloud = core_->cl_->active_;
-    if(cloud == nullptr)
-        return;
-    //int h = cloud->scan_width();
-    //int w = cloud->scan_height();
-
-    boost::shared_ptr<const std::vector<int>> grid_to_cloud = cloud->gridToCloudMap();
-
-    boost::shared_ptr<std::vector<Eigen::Vector3f> > pca = getPCA(cloud.get(), 1.0f, 50);
-
-    boost::shared_ptr<std::vector<Eigen::Vector3f> > grid = boost::make_shared<std::vector<Eigen::Vector3f> >(grid_to_cloud->size(), Eigen::Vector3f(0.0f, 0.0f, 0.0f));
-    for(uint i = 0; i < grid_to_cloud->size(); i++) {
-        int idx = (*grid_to_cloud)[i];
-        if(idx != -1)
-            (*grid)[i] = (*pca)[idx];
-    }
-
-    //boost::shared_ptr<std::vector<float> > stdev = stdev_depth(cloud, 1.0f);
-    //boost::shared_ptr<const std::vector<float>> img = cloudToGrid(cloud->cloudToGridMap(), w*h, stdev);
-
-
-    /*
-    // Create distance map
-    boost::shared_ptr<std::vector<float>> distmap = makeDistmap(cloud);
-    //distmap = interpolate(distmap, w, h, 21);
-
-    boost::shared_ptr<std::vector<float> > smooth_grad_image = convolve(distmap, w, h, gaussian, 5);
-    smooth_grad_image = convolve(smooth_grad_image, w, h, gaussian, 5);
-    smooth_grad_image = convolve(smooth_grad_image, w, h, gaussian, 5);
-    smooth_grad_image = convolve(smooth_grad_image, w, h, gaussian, 5);
-
-    boost::shared_ptr<std::vector<float>> highfreq = distmap;
-
-    for(int i = 0; i < distmap->size(); i++){
-        (*highfreq)[i] = (*distmap)[i] - (*smooth_grad_image)[i];
-    }
-
-    //boost::shared_ptr<std::vector<float> > grad_image = gradientImage(distmap, w, h, size);
-    boost::shared_ptr<std::vector<float> > int_image = interpolate(distmap, w, h, 50);
-    boost::shared_ptr<std::vector<float> > stdev_image = stdev(int_image, w, h, 5);
-
-
-    boost::shared_ptr<std::vector<float> > grad_image = gradientImage(distmap, w, h, size);
-    boost::shared_ptr<std::vector<float> > smooth_grad_image = convolve(grad_image, w, h, gaussian, 5);
-
-    // Threshold && Erode
-
-    const int strct[] = {
-        0, 1, 0,
-        1, 0, 1,
-        0, 1, 0,
-    };
-
-    boost::shared_ptr<std::vector<float> > dilated_image =  morphology(
-            smooth_grad_image,
-            w, h, strct, 3, Morphology::ERODE,
-            grad_image); // <-- reuse
-*/
-
-
-    ///////// OUTPUT //////////
-
-    //drawFloats(img, cloud);
-
-    drawVector3f(grid, cloud);
 
 }
 

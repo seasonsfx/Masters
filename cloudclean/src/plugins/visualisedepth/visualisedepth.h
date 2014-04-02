@@ -55,18 +55,18 @@ signals:
 
     void don_vis();
     void hist_vis();
-    void fpfh_vis();
+    void fpfh_correl();
     void curve_vis();
     void curve_diff_vis();
-    void normalnoise();
+    void normal_stdev_vis();
     void dist_stdev();
     void sutract_lowfreq_noise();
     void eigen_ratio();
     void pca();
+    void eigen_plane_consine_similarity();
     void sobel_erode();
     void sobel_blur();
     void intensity_play();
-    void myFunc();
 
  private:
     Core * core_;

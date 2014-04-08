@@ -53,12 +53,12 @@ signals:
     void enable();
     void disable();
 
-    void don_vis();
-    void hist_vis();
-    void fpfh_correl();
-    void curve_vis();
+    void difference_of_normals();
+    void intensity_histogram();
+    void fast_point_feature_histogram();
+    void curvature();
     void curve_diff_vis();
-    void normal_stdev_vis();
+    void normal_standard_deviation();
     void dist_stdev();
     void sutract_lowfreq_noise();
     void eigen_ratio();
@@ -95,7 +95,10 @@ signals:
     int layer_idx_;
 
     double resolution_;
+    double search_radius_;
+    int max_nn_;
 
+    bool visualise_on_;
     std::vector<std::function<void()>> functions_;
 };
 

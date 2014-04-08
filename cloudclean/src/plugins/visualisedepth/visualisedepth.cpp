@@ -55,9 +55,12 @@ void VDepth::initialize2(PluginManager * pm) {
         return;
     }
 
+    visualise_on_ = true;
     function_idx_ = 0;
     layer_idx_ = -1;
     resolution_ = 0.5;
+    search_radius_ = 0.2;
+    max_nn_ = 20;
 
     // Set up viz tab
     depth_widget_ = new QWidget(0);
@@ -104,11 +107,11 @@ void VDepth::initialize2(PluginManager * pm) {
     });
 
     // round up functions
-    functions_.push_back(std::bind(&VDepth::don_vis, this));
-    functions_.push_back(std::bind(&VDepth::fpfh_correl, this));
-    functions_.push_back(std::bind(&VDepth::curve_vis, this));
-    functions_.push_back(std::bind(&VDepth::normal_stdev_vis, this));
-    functions_.push_back(std::bind(&VDepth::eigen_ratio, this));
+    functions_.push_back(std::bind(&VDepth::difference_of_normals, this));
+    functions_.push_back(std::bind(&VDepth::fast_point_feature_histogram, this));
+    functions_.push_back(std::bind(&VDepth::curvature, this));
+    functions_.push_back(std::bind(&VDepth::normal_standard_deviation, this));
+    functions_.push_back(std::bind(&VDepth::pca_eigen_value_ratio, this));
 
 //    layout->addWidget(new QLabel("Correlate with layer:"));
 //    layer_cb_ = new QComboBox(settings_);
@@ -346,6 +349,9 @@ void VDepth::computeCorrelation(float * data, int vector_size, int size, std::ve
 
 
 void VDepth::drawFloats(boost::shared_ptr<const std::vector<float> > out_img, boost::shared_ptr<PointCloud> cloud){
+    if(!visualise_on)
+        return;
+
     qDebug() << "DRAW!";
     // translates grid idx to cloud idx
     boost::shared_ptr<const std::vector<int>> lookup = cloud->gridToCloudMap();
@@ -417,6 +423,8 @@ void VDepth::drawFloats(boost::shared_ptr<const std::vector<float> > out_img, bo
 }
 
 void VDepth::drawVector3f(boost::shared_ptr<const std::vector<Eigen::Vector3f> > out_img, boost::shared_ptr<PointCloud> cloud){
+    if(!visualise_on)
+        return;
 
     // translates grid idx to cloud idx
     boost::shared_ptr<const std::vector<int>> lookup = cloud->gridToCloudMap();
@@ -631,7 +639,7 @@ pcl::PointCloud<pcl::Normal>::Ptr don(
     return donormals;
 }
 
-void VDepth::don_vis(){
+void VDepth::difference_of_normals(){
     boost::shared_ptr<PointCloud> _cloud = core_->cl_->active_;
     if(_cloud == nullptr)
         return;
@@ -653,7 +661,7 @@ void VDepth::don_vis(){
 
     // Correlate
     computeCorrelation(reinterpret_cast<float*>(donormals->points.data()), 3, donormals->points.size(), sub_idxs, 4);
-
+    if(!visualise_on_) return;
 
     // Draw
     pcl::PointCloud<pcl::Normal> big_donormals;
@@ -671,7 +679,7 @@ void VDepth::don_vis(){
     drawVector3f(grid, _cloud);
 }
 
-void VDepth::hist_vis(){
+void VDepth::intensity_histogram(){
     boost::shared_ptr<PointCloud> _cloud = core_->cl_->active_;
     if(_cloud == nullptr)
         return;
@@ -700,7 +708,7 @@ void VDepth::hist_vis(){
 
     // Correlate
     computeCorrelation(tmp.data(), bins, tmp.size(), sub_idxs);
-
+    if(!visualise_on_) return;
 
     // Draw, TODO; Multidimentional draw
     boost::shared_ptr<std::vector<std::vector<float> > > hists2 = boost::make_shared<std::vector<std::vector<float> > >(_cloud->size());
@@ -783,7 +791,7 @@ void VDepth::hist_vis(){
     hists2.reset();
 }
 
-void VDepth::fpfh_correl(){
+void VDepth::fast_point_feature_histogram(){
     boost::shared_ptr<PointCloud> _cloud = core_->cl_->active_;
     if(_cloud == nullptr)
         return;
@@ -799,16 +807,17 @@ void VDepth::fpfh_correl(){
     fpfh.setInputNormals(filt_cloud);
     pcl::search::KdTree<pcl::PointXYZINormal>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZINormal>);
     fpfh.setSearchMethod(tree);
-    fpfh.setRadiusSearch(0.20);
+    fpfh.setRadiusSearch(search_radius_);
     pcl::PointCloud<pcl::FPFHSignature33>::Ptr fpfhs (new pcl::PointCloud<pcl::FPFHSignature33> ());
     fpfh.compute(*fpfhs);
     qDebug() << "FPFH in " << t.elapsed() << " ms";
 
     // Correlate
     computeCorrelation(reinterpret_cast<float*>(fpfhs->points.data()), 33, fpfhs->points.size(), sub_idxs);
+    if(!visualise_on_) return;
 }
 
-void VDepth::curve_vis(){
+void VDepth::curvature(){
     boost::shared_ptr<PointCloud> _cloud = core_->cl_->active_;
     if(_cloud == nullptr)
         return;
@@ -825,13 +834,14 @@ void VDepth::curve_vis(){
     principal_curvatures_estimation.setInputNormals (filt_cloud);
     pcl::search::KdTree<pcl::PointXYZINormal>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZINormal>);
     principal_curvatures_estimation.setSearchMethod (tree);
-    principal_curvatures_estimation.setRadiusSearch (0.5);
+    principal_curvatures_estimation.setRadiusSearch (search_radius_);
     pcl::PointCloud<pcl::PrincipalCurvatures>::Ptr principal_curvatures (new pcl::PointCloud<pcl::PrincipalCurvatures> ());
     principal_curvatures_estimation.compute (*principal_curvatures);
     qDebug() << "Curvature in " << t.elapsed() << " ms";
 
     // Correlate
     computeCorrelation(reinterpret_cast<float*>(principal_curvatures->points.data()), sizeof(pcl::PrincipalCurvatures)/sizeof(float), principal_curvatures->points.size(), big_to_small);
+    if(!visualise_on_) return;
 
     // Draw
     int w = _cloud->scan_width();
@@ -851,7 +861,7 @@ void VDepth::curve_vis(){
 
 }
 
-void VDepth::normal_stdev_vis(){
+void VDepth::normal_standard_deviation(){
     boost::shared_ptr<PointCloud> cloud = core_->cl_->active_;
     if(cloud == nullptr)
         return;
@@ -863,16 +873,14 @@ void VDepth::normal_stdev_vis(){
     pcl::PointCloud<pcl::PointXYZINormal>::Ptr smaller_cloud = zipNormals(cloud, normals);
     smaller_cloud = octreeDownsample(smaller_cloud.get(), resolution_, sub_idxs);
 
-
-    float radius = 1, max_nn = 100;
-
     // Compute
     QTime t; t.start(); qDebug() << "Timer started (Normal stdev)";
-    boost::shared_ptr<std::vector<float>> stdev = normal_stdev<pcl::PointXYZINormal, pcl::PointXYZINormal>(smaller_cloud, smaller_cloud, radius, max_nn);
+    boost::shared_ptr<std::vector<float>> stdev = normal_stdev<pcl::PointXYZINormal, pcl::PointXYZINormal>(smaller_cloud, smaller_cloud, search_radius_, max_nn_);
     qDebug() << "Normal stdev in " << t.elapsed() << " ms";
 
     // Correlate
     computeCorrelation(stdev->data(), 1, stdev->size(), sub_idxs);
+    if(!visualise_on_) return;
 
     // Draw
     int h = cloud->scan_width();
@@ -890,21 +898,22 @@ void VDepth::normal_stdev_vis(){
 }
 
 
-void VDepth::dist_stdev(){
+void VDepth::distance_standard_deviation(){
     boost::shared_ptr<PointCloud> cloud = core_->cl_->active_;
     if(cloud == nullptr)
         return;
 
-    // Downsample and zipper up normals and xyzi
+    // Downsample
     std::vector<int> sub_idxs;
     pcl::PointCloud<pcl::PointXYZI>::Ptr smaller_cloud = octreeDownsample(cloud.get(), resolution_, sub_idxs);
 
     QTime t; t.start(); qDebug() << "Timer started (Dist stdev)";
-    boost::shared_ptr<std::vector<float> > stdev = stdev_dist(smaller_cloud, 0.05f, 20, false);
+    boost::shared_ptr<std::vector<float> > stdev = stdev_dist(smaller_cloud, search_radius_, max_nn, false);
     qDebug() << "Dist stdev in " << t.elapsed() << " ms";
 
     // Correlate
     computeCorrelation(stdev->data(), 1, stdev->size(), sub_idxs);
+    if(!visualise_on_) return;
 
     // Draw
     int h = cloud->scan_width();
@@ -922,7 +931,11 @@ void VDepth::dist_stdev(){
     drawFloats(grid, cloud);
 }
 
-void VDepth::sutract_lowfreq_noise(){
+// TODO: THIS IS A 2D FEATURE CALCULATION! help!
+// Compute the distance for each point
+// Gaussian weighted average in neighbourhood
+// Subtract
+void VDepth::difference_of_gaussian_distances(){
     boost::shared_ptr<PointCloud> cloud = core_->cl_->active_;
     if(cloud == nullptr)
         return;
@@ -948,7 +961,8 @@ void VDepth::sutract_lowfreq_noise(){
     drawFloats(highfreq, cloud);
 }
 
-void VDepth::eigen_ratio(){
+// PCA for each point, ratio of eigen values
+void VDepth::pca_eigen_value_ratio(){
     boost::shared_ptr<PointCloud> cloud = core_->cl_->active_;
     if(cloud == nullptr)
         return;
@@ -957,12 +971,12 @@ void VDepth::eigen_ratio(){
     std::vector<int> sub_idxs;
     pcl::PointCloud<pcl::PointXYZI>::Ptr smaller_cloud = octreeDownsample(cloud.get(), resolution_, sub_idxs);
 
-    // Compute
+    // Compute PCA
     QTime t; t.start(); qDebug() << "Timer started (PCA and speculaion)";
-    boost::shared_ptr<std::vector<Eigen::Vector3f> > pca = getPCA(smaller_cloud.get(), 0.3f, 0);
+    boost::shared_ptr<std::vector<Eigen::Vector3f> > pca = getPCA(smaller_cloud.get(), search_radius_, max_nn_);
 
 
-    // Speculate
+    // Compute ratio
     boost::shared_ptr<std::vector<float>> likely_veg =
                boost::make_shared<std::vector<float>>(pca->size(), 0.0f);
 
@@ -1004,7 +1018,7 @@ void VDepth::eigen_ratio(){
     qDebug() << "PCA in " << t.elapsed() << " ms";
 
     computeCorrelation(likely_veg->data(), 1, likely_veg->size(), sub_idxs);
-
+    if(!visualise_on_) return;
 
     // Draw
     int h = cloud->scan_width();
@@ -1034,11 +1048,12 @@ void VDepth::pca(){
     pcl::PointCloud<pcl::PointXYZI>::Ptr smaller_cloud = octreeDownsample(cloud.get(), resolution_, sub_idxs);
 
     QTime t; t.start(); qDebug() << "Timer started (PCA)";
-    boost::shared_ptr<std::vector<Eigen::Vector3f> > pca = getPCA(smaller_cloud.get(), 0.05f, 20);
+    boost::shared_ptr<std::vector<Eigen::Vector3f> > pca = getPCA(smaller_cloud.get(), search_radius_, max_nn_);
     qDebug() << "PCA in " << t.elapsed() << " ms";
 
 
     computeCorrelation(reinterpret_cast<float *>(pca->data()), 3, pca->size(), sub_idxs, sizeof(Eigen::Vector3f)/sizeof(float));
+    if(!visualise_on_) return;
 
 //    // Draw
 //    boost::shared_ptr<std::vector<Eigen::Vector3f> > grid = boost::make_shared<std::vector<Eigen::Vector3f> >(grid_to_cloud->size(), Eigen::Vector3f(0.0f, 0.0f, 0.0f));
@@ -1087,6 +1102,7 @@ void VDepth::eigen_plane_consine_similarity(){
 
     // Correlate
     computeCorrelation(plane_likelyhood->data(), 1, plane_likelyhood->size(), sub_idxs);
+    if(!visualise_on_) return;
 
     // Draw
     int h = cloud->scan_width();
@@ -1154,7 +1170,7 @@ void VDepth::sobel_blur(){
     drawFloats(smooth_grad_image, cloud);
 }
 
-void VDepth::intensity_play() {
+void VDepth::blurred_intensity() {
     boost::shared_ptr<PointCloud> cloud = core_->cl_->active_;
     if(cloud == nullptr)
         return;

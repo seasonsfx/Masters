@@ -1,0 +1,88 @@
+{
+	"features": [
+		{
+			"name": "difference_of_normals",
+			"parameters" : {
+				"subsample_res": [
+					{ "small": 0.1, "big": 0.2 },
+					{ "small": 0.2, "big": 0.3 },
+				],
+			}
+		},
+		{
+			"name": "intensity_histogram",
+			"parameters" : {
+				"subsample_res": [0.1, 0.2, 0.3, 0.4, 0.5],
+				"max_nn": [10, 20, 30, 40],
+				"search_radius": [0.1, 0.5, 1],
+				"bins": [10, 15, 16]
+			}
+		},
+		{
+			"name": "fast_point_feature_histogram",
+			"parameters" : {
+				"subsample_res": [0.1, 0.2, 0.3, 0.4, 0.5],
+				"search_radius": [0.1, 0.5, 1],
+			}
+		},
+		{
+			"name": "curvature",
+			"parameters" : {
+				"subsample_res": [0.1, 0.2, 0.3, 0.4, 0.5],
+				"search_radius": [0.1, 0.5, 1],
+			}
+		},
+		{
+			"name": "distance_standard_deviation",
+			"parameters" : {
+				"subsample_res": [0.1, 0.2, 0.3, 0.4, 0.5],
+				"max_nn": [10, 20, 30, 40],
+				"search_radius": [0.1, 0.5, 1],
+			}
+		},
+		{
+			"name": "normal_standard_deviation",
+			"parameters" : {
+				"subsample_res": [0.1, 0.2, 0.3, 0.4, 0.5],
+				"max_nn": [10, 20, 30, 40],
+				"search_radius": [0.1, 0.5, 1],
+			}
+		},
+		{
+			"name": "pca_eigen_value_ratio",
+			"parameters" : {
+				"subsample_res": [0.1, 0.2, 0.3, 0.4, 0.5],
+				"max_nn": [10, 20, 30, 40],
+				"search_radius": [0.1, 0.5, 1],
+			}
+		},
+		{
+			"name": "pca",
+			"parameters" : {
+				"subsample_res": [0.1, 0.2, 0.3, 0.4, 0.5],
+				"max_nn": [10, 20, 30, 40],
+				"search_radius": [0.1, 0.5, 1],
+			}
+		},
+		{
+			"name": "eigen_plane_consine_similarity",
+			"parameters" : {
+				"subsample_res": [0.1, 0.2, 0.3, 0.4, 0.5],
+				"max_nn": [10, 20, 30, 40],
+				"search_radius": [0.1, 0.5, 1],
+			}
+		},
+	],
+
+	"testcases": [
+		{
+			"file": "test.ccp",
+			"correlations": [
+				{
+					"layer_name": "test_layer",
+					"features": ["fpfh", "don"],
+				}
+			]
+		}
+	]
+}

@@ -221,6 +221,10 @@ void GLWidget::paintEvent(QPaintEvent *event) {
         boost::shared_ptr<PointCloud> pc = pair.first;
         boost::shared_ptr<CloudGLData> cd = pair.second;
 
+        // TODO: Why can this happen?
+        if(!pc)
+            continue;
+
         if(pc->isMoving())
             clouds_moving = true;
 

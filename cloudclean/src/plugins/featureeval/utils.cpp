@@ -1,5 +1,5 @@
 
-#include "plugins/visualisedepth/utils.h"
+#include "plugins/featureeval/utils.h"
 #include "model/pointcloud.h"
 #include "Eigen/Dense"
 #include <QDebug>
@@ -9,7 +9,7 @@
 #include <pcl/common/pca.h>
 #include <pcl/search/flann_search.h>
 #include <pcl/kdtree/kdtree_flann.h>
-#include "plugins/visualisedepth/gridsearch.h"
+#include "plugins/featureeval/gridsearch.h"
 #include "utilities/cv.h"
 
 boost::shared_ptr<std::vector<float> > test_feature(boost::shared_ptr<PointCloud> cloud,

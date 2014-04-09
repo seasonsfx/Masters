@@ -5,7 +5,7 @@
 #include <QDebug>
 #include <vector>
 #include <memory>
-#include "plugins/visualisedepth/gridsearch.h"
+//#include "plugins/visualisedepth/gridsearch.h"
 
 boost::shared_ptr<std::vector<int>> makeLookup(boost::shared_ptr<PointCloud> cloud) {
     int size = cloud->scan_width() * cloud->scan_height();

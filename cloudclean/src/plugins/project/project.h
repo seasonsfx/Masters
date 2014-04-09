@@ -1,7 +1,8 @@
-#ifndef JSONEXPORT_H
-#define JSONEXPORT_H
+#ifndef project_H
+#define project_H
 
 #include "pluginsystem/iplugin.h"
+#include "plugins/project/export.h"
 class QAction;
 class QWidget;
 class Core;
@@ -11,15 +12,17 @@ class FlatView;
 class GLWidget;
 class MainWindow;
 
-class JsonExport : public IPlugin {
+class PROJECT_API Project : public IPlugin {
     Q_INTERFACES(IPlugin)
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "za.co.circlingthesun.cloudclean.jsonexport" FILE "jsonexport.json")
+    Q_PLUGIN_METADATA(IID "za.co.circlingthesun.cloudclean.project" FILE "project.json")
  public:
     QString getName();
     void initialize(Core * core);
     void cleanup();
-    ~JsonExport();
+    ~Project();
+
+    void load(QString filename);
 
  private slots:
     void save();
@@ -37,4 +40,4 @@ class JsonExport : public IPlugin {
     QAction * load_action_;
 };
 
-#endif  // JSONEXPORT_H
+#endif  // project_H

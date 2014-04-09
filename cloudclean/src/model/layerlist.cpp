@@ -165,6 +165,15 @@ boost::shared_ptr<std::vector<uint16_t> > LayerList::getHiddenLabels(){
     return hidden;
 }
 
+int LayerList::getLayerIdxByName(QString name){
+    for(int idx = 0; idx < layers_.size(); idx++){
+        if(layers_[idx]->getName().trimmed().compare(name.trimmed()) == 0 ){
+            return idx;
+        }
+    }
+    return -1;
+}
+
 void LayerList::deleteLayer(){
     int id = sender()->property("layer_id").toInt();
     deleteLayer(id);
@@ -211,12 +220,17 @@ void LayerList::deleteLayer(int idx){
 
     // Do actual deleting of layer
     layer_id_map_.erase(layers_[idx]->id_);
+
+    // might be a bug
+    emit lookupTableUpdate();
+
+    disconnect(layers_.at(idx).get(), SIGNAL(colorChanged()),
+               this, SIGNAL(lookupTableUpdate()));
+
     layers_.erase(layers_.begin()+idx);
 
     endRemoveRows();
-    emit lookupTableUpdate();
-    disconnect(layers_.at(idx).get(), SIGNAL(colorChanged()),
-               this, SIGNAL(lookupTableUpdate()));
+
 }
 
 int16_t LayerList::createLabelId() {
@@ -250,6 +264,7 @@ void LayerList::copyLayerSet(uint8_t source_label, uint8_t dest_label){
     }
     emit lookupTableUpdate(); // TODO(Rickert): Might be inefficient with many calls to this slot
 }
+
 
 void LayerList::selectionChanged(const std::vector<int> &selection) {
 

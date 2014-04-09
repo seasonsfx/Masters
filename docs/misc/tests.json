@@ -1,87 +1,65 @@
 {
-	"features": [
-		{
-			"name": "difference_of_normals",
-			"parameters" : {
-				"subsample_res": [
-					{ "small": 0.1, "big": 0.2 },
-					{ "small": 0.2, "big": 0.3 },
-				],
-			}
+	"features": {
+		"difference_of_normals": {
+			"subsample_res": [
+				{ "small": 0.1, "big": 0.2 },
+				{ "small": 0.2, "big": 0.3 }
+			]
 		},
-		{
-			"name": "intensity_histogram",
-			"parameters" : {
-				"subsample_res": [0.1, 0.2, 0.3, 0.4, 0.5],
-				"max_nn": [10, 20, 30, 40],
-				"search_radius": [0.1, 0.5, 1],
-				"bins": [10, 15, 16]
-			}
+		"intensity_histogram": {
+			"subsample_res": [0.1, 0.2, 0.3, 0.4, 0.5],
+			"max_nn": [10, 20, 30, 40],
+			"search_radius": [0.1, 0.5, 1],
+			"bins": [10, 15, 16]
 		},
-		{
-			"name": "fast_point_feature_histogram",
-			"parameters" : {
-				"subsample_res": [0.1, 0.2, 0.3, 0.4, 0.5],
-				"search_radius": [0.1, 0.5, 1],
-			}
+		"fast_point_feature_histogram": {
+			"subsample_res": [0.1, 0.2, 0.3, 0.4, 0.5],
+			"search_radius": [0.1, 0.5, 1]
 		},
-		{
-			"name": "curvature",
-			"parameters" : {
-				"subsample_res": [0.1, 0.2, 0.3, 0.4, 0.5],
-				"search_radius": [0.1, 0.5, 1],
-			}
+		"curvature": {
+			"subsample_res": [0.1, 0.2, 0.3, 0.4, 0.5],
+			"search_radius": [0.1, 0.5, 1]
 		},
-		{
-			"name": "distance_standard_deviation",
-			"parameters" : {
-				"subsample_res": [0.1, 0.2, 0.3, 0.4, 0.5],
-				"max_nn": [10, 20, 30, 40],
-				"search_radius": [0.1, 0.5, 1],
-			}
+		"distance_standard_deviation": {
+			"subsample_res": [0.1, 0.2, 0.3, 0.4, 0.5],
+			"max_nn": [10, 20, 30, 40],
+			"search_radius": [0.1, 0.5, 1]
 		},
-		{
-			"name": "normal_standard_deviation",
-			"parameters" : {
-				"subsample_res": [0.1, 0.2, 0.3, 0.4, 0.5],
-				"max_nn": [10, 20, 30, 40],
-				"search_radius": [0.1, 0.5, 1],
-			}
+		"normal_standard_deviation": {
+			"subsample_res": [0.1, 0.2, 0.3, 0.4, 0.5],
+			"max_nn": [10, 20, 30, 40],
+			"search_radius": [0.1, 0.5, 1]
 		},
-		{
-			"name": "pca_eigen_value_ratio",
-			"parameters" : {
-				"subsample_res": [0.1, 0.2, 0.3, 0.4, 0.5],
-				"max_nn": [10, 20, 30, 40],
-				"search_radius": [0.1, 0.5, 1],
-			}
+		"pca_eigen_value_ratio": {
+			"subsample_res": [0.1, 0.2, 0.3, 0.4, 0.5],
+			"max_nn": [10, 20, 30, 40],
+			"search_radius": [0.1, 0.5, 1]
 		},
-		{
-			"name": "pca",
-			"parameters" : {
-				"subsample_res": [0.1, 0.2, 0.3, 0.4, 0.5],
-				"max_nn": [10, 20, 30, 40],
-				"search_radius": [0.1, 0.5, 1],
-			}
+		"pca": {
+			"subsample_res": [0.1, 0.2, 0.3, 0.4, 0.5],
+			"max_nn": [10, 20, 30, 40],
+			"search_radius": [0.1, 0.5, 1]
 		},
-		{
-			"name": "eigen_plane_consine_similarity",
-			"parameters" : {
-				"subsample_res": [0.1, 0.2, 0.3, 0.4, 0.5],
-				"max_nn": [10, 20, 30, 40],
-				"search_radius": [0.1, 0.5, 1],
-			}
-		},
-	],
+		"eigen_plane_consine_similarity": {
+			"subsample_res": [0.1, 0.2, 0.3, 0.4, 0.5],
+			"max_nn": [10, 20, 30, 40],
+			"search_radius": [0.1, 0.5, 1]
+		}
+	},
 
-	"testcases": [
+	"tests": [
 		{
-			"file": "test.ccp",
+			"project": "/home/rickert/Workspace/uscans/scan1-2.ccp",
 			"correlations": [
 				{
-					"layer_name": "test_layer",
-					"features": ["fpfh", "don"],
-				}
+					"layer_name": "walls",
+					"features": ["fast_point_feature_histogram", "difference_of_normals"]
+                },
+                {
+                    "layer_name": "ground",
+                    "features": ["fast_point_feature_histogram", "difference_of_normals"]
+                }
+	
 			]
 		}
 	]

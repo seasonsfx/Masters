@@ -1,4 +1,4 @@
-#include "plugins/visualisedepth/visualisedepth.h"
+#include "plugins/featureeval/featureeval.h"
 #include <iostream>
 #include <QDebug>
 #include <QAction>
@@ -27,13 +27,13 @@
 #include "utilities/cv.h"
 #include "utilities/utils.h"
 #include "plugins/normalestimation/normalestimation.h"
-#include "plugins/visualisedepth/utils.h"
+#include "plugins/featureeval/utils.h"
 
-QString VDepth::getName(){
-    return "visualisedepth";
+QString FeatureEval::getName(){
+    return "featureeval";
 }
 
-void VDepth::initialize(Core *core){
+void FeatureEval::initialize(Core *core){
     settings_ = nullptr;
     tab_idx_ = -1;
 
@@ -48,16 +48,19 @@ void VDepth::initialize(Core *core){
     mw_ = core_->mw_;
 }
 
-void VDepth::initialize2(PluginManager * pm) {
+void FeatureEval::initialize2(PluginManager * pm) {
     ne_ = pm->findPlugin<NormalEstimator>();
     if (ne_ == nullptr) {
         qDebug() << "Normal estimator plugin needed for normal viz";
         return;
     }
 
-    visualise_on_ = true;
+    // GUI STUFF
+    visualise_on_ = false;
     function_idx_ = 0;
     layer_idx_ = -1;
+
+    // PARAMS
     resolution_ = 0.5;
     search_radius_ = 0.2;
     max_nn_ = 20;
@@ -76,7 +79,7 @@ void VDepth::initialize2(PluginManager * pm) {
 
     // set up settings
     is_enabled_ = false;
-    enable_ = new QAction(QIcon(":/images/visualisedepth.png"), "Correlate and visualise", 0);
+    enable_ = new QAction(QIcon(":/images/featureeval.png"), "Correlate and visualise", 0);
     enable_->setCheckable(true);
 
     connect(enable_, SIGNAL(triggered()), this, SLOT(enable()));
@@ -92,26 +95,52 @@ void VDepth::initialize2(PluginManager * pm) {
     feature_cb_ = new QComboBox(settings_);
     layout->addWidget(feature_cb_);
 
-    feature_cb_->addItem("Difference of normals", 0);
-    feature_cb_->addItem("Fast point feature histograms", 1);
-    feature_cb_->addItem("Curvature", 2);
-    feature_cb_->addItem("Normal standard deviation", 3);
-    feature_cb_->addItem("Eigen ratio", 4);
-//    feature_cb_->addItem("Difference of normals", 5);
-//    feature_cb_->addItem("Difference of normals", 6);
-//    feature_cb_->addItem("Difference of normals", 7);
+
+
+
 
     connect(feature_cb_, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [this] (int idx){
         function_idx_ = feature_cb_->itemData(idx).toInt();
         qDebug() << "changed";
     });
 
+
     // round up functions
-    functions_.push_back(std::bind(&VDepth::difference_of_normals, this));
-    functions_.push_back(std::bind(&VDepth::fast_point_feature_histogram, this));
-    functions_.push_back(std::bind(&VDepth::curvature, this));
-    functions_.push_back(std::bind(&VDepth::normal_standard_deviation, this));
-    functions_.push_back(std::bind(&VDepth::pca_eigen_value_ratio, this));
+    feature_cb_->addItem("Difference of normals", (int)functions_.size());
+    functions_.push_back(std::bind(&FeatureEval::difference_of_normals, this));
+    name_to_function_["difference_of_normals"] = functions_[functions_.size()-1];
+
+    feature_cb_->addItem("intensity_histogram", (int)functions_.size());
+    functions_.push_back(std::bind(&FeatureEval::intensity_histogram, this));
+    name_to_function_["intensity_histogram"] = functions_[functions_.size()-1];
+
+    feature_cb_->addItem("Fast point feature histograms", (int)functions_.size());
+    functions_.push_back(std::bind(&FeatureEval::fast_point_feature_histogram, this));
+    name_to_function_["fast_point_feature_histogram"] = functions_[functions_.size()-1];
+
+    feature_cb_->addItem("Curvature", (int)functions_.size());
+    functions_.push_back(std::bind(&FeatureEval::curvature, this));
+    name_to_function_["curvature"] = functions_[functions_.size()-1];
+
+    feature_cb_->addItem("Distance standard deviation", (int)functions_.size());
+    functions_.push_back(std::bind(&FeatureEval::distance_standard_deviation, this));
+    name_to_function_["distance_standard_deviation"] = functions_[functions_.size()-1];
+
+    feature_cb_->addItem("Normal standard deviation", (int)functions_.size());
+    functions_.push_back(std::bind(&FeatureEval::normal_standard_deviation, this));
+    name_to_function_["normal_standard_deviation"] = functions_[functions_.size()-1];
+
+    feature_cb_->addItem("Eigen ratio", (int)functions_.size());
+    functions_.push_back(std::bind(&FeatureEval::pca_eigen_value_ratio, this));
+    name_to_function_["pca_eigen_value_ratio"] = functions_[functions_.size()-1];
+
+    feature_cb_->addItem("PCA", (int)functions_.size());
+    functions_.push_back(std::bind(&FeatureEval::pca, this));
+    name_to_function_["pca"] = functions_[functions_.size()-1];
+
+    feature_cb_->addItem("eigen_plane_consine_similarity", (int)functions_.size());
+    functions_.push_back(std::bind(&FeatureEval::pca, this));
+    name_to_function_["eigen_plane_consine_similarity"] = functions_[functions_.size()-1];
 
 //    layout->addWidget(new QLabel("Correlate with layer:"));
 //    layer_cb_ = new QComboBox(settings_);
@@ -148,7 +177,7 @@ void VDepth::initialize2(PluginManager * pm) {
     connect(ll_, SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(layersModified()));
 }
 
-void VDepth::layersModified(){
+void FeatureEval::layersModified(){
     layer_cb_->clear();
     layer_cb_->addItem("Select", -1);
 
@@ -160,7 +189,7 @@ void VDepth::layersModified(){
     }
 }
 
-void VDepth::cleanup(){
+void FeatureEval::cleanup(){
     mw_->tooloptions_->removeWidget(settings_);
     mw_->toolbar_->removeAction(enable_);
     mw_->removeTab(tab_idx_);
@@ -168,12 +197,20 @@ void VDepth::cleanup(){
     delete depth_widget_;
 }
 
-VDepth::~VDepth(){
+FeatureEval::~FeatureEval(){
     if(image_ != nullptr)
         delete image_;
 }
 
-void VDepth::enable() {
+std::function<void()> FeatureEval::getFunction(QString name){
+    return name_to_function_[name];
+}
+
+void FeatureEval::setReportFuction(QDebug *dbg){
+    report_ = dbg;
+}
+
+void FeatureEval::enable() {
     if(is_enabled_){
         disable();
         return;
@@ -186,7 +223,7 @@ void VDepth::enable() {
     is_enabled_ = true;
 }
 
-void VDepth::disable(){
+void FeatureEval::disable(){
     enable_->setChecked(false);
     disconnect(core_, SIGNAL(endEdit()), this, SLOT(disable()));
     is_enabled_ = false;
@@ -242,7 +279,7 @@ void sum_product_mat_calc(float * y_data, float * x_data, int x_vector_size, int
 }
 
 inline float correlate(float sx, float sxx, float sy, float syy, float sxy, float n){
-    qDebug() << "sx: " << sx << "sxx: " << sxx << "sy: " << sy << "syy: " << syy << "sxy: " << sxy << "n: " << n;
+    //qDebug() << "sx: " << sx << "sxx: " << sxx << "sy: " << sy << "syy: " << syy << "sxy: " << sxy << "n: " << n;
     return (n*sxy-sx*sy)/sqrt((n*sxx-sx*sx) * (n*syy-sy*sy));
 }
 
@@ -256,8 +293,7 @@ Eigen::MatrixXf  multi_correlate(std::vector<float> & y_data, float * x_data, in
     int skipped = sum_calc(x_data, x_vector_size, size, sum.data(), sum_of_squares.data(), stride);
     skipped += sum_calc(y_data.data(), 1, size, &sum[x_vector_size], &sum_of_squares[x_vector_size]);
 
-    qDebug() << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1";
-    qDebug() << "skipped: " << skipped << "size: " << size;
+    //qDebug() << "skipped: " << skipped << "size: " << size;
 
     Eigen::MatrixXf sum_product_mat(x_vector_size + 1, x_vector_size + 1);
     sum_product_mat_calc(y_data.data(), x_data, x_vector_size, size, sum_product_mat, stride);
@@ -309,7 +345,7 @@ int gridToCloudIdx(int x, int y, boost::shared_ptr<PointCloud> pc, int * lookup)
 }
 
 
-void VDepth::computeCorrelation(float * data, int vector_size, int size, std::vector<int> & big_to_small, int stride){
+void FeatureEval::computeCorrelation(float * data, int vector_size, int size, std::vector<int> & big_to_small, int stride){
 
     stride = stride ? stride : vector_size;
 
@@ -338,18 +374,20 @@ void VDepth::computeCorrelation(float * data, int vector_size, int size, std::ve
     qDebug() << "R^2: " << R;
     qDebug() << "R: " << sqrt(R);
 
+    *report_ << "R^2: " << R;
+
     Eigen::VectorXf tmp = (Rxx.inverse() * c);
 
     qDebug() << "Y -> X correlation <<<<<<<<<<<<<";
     std::cout << c << std::endl;
-    qDebug() << "Coefs <<<<<<<<<<<<<";
-    std::cout << tmp << std::endl;
+    //qDebug() << "Coefs <<<<<<<<<<<<<";
+    //std::cout << tmp << std::endl;
 
 }
 
 
-void VDepth::drawFloats(boost::shared_ptr<const std::vector<float> > out_img, boost::shared_ptr<PointCloud> cloud){
-    if(!visualise_on)
+void FeatureEval::drawFloats(boost::shared_ptr<const std::vector<float> > out_img, boost::shared_ptr<PointCloud> cloud){
+    if(!visualise_on_)
         return;
 
     qDebug() << "DRAW!";
@@ -422,8 +460,8 @@ void VDepth::drawFloats(boost::shared_ptr<const std::vector<float> > out_img, bo
 
 }
 
-void VDepth::drawVector3f(boost::shared_ptr<const std::vector<Eigen::Vector3f> > out_img, boost::shared_ptr<PointCloud> cloud){
-    if(!visualise_on)
+void FeatureEval::drawVector3f(boost::shared_ptr<const std::vector<Eigen::Vector3f> > out_img, boost::shared_ptr<PointCloud> cloud){
+    if(!visualise_on_)
         return;
 
     // translates grid idx to cloud idx
@@ -521,7 +559,7 @@ pcl::PointCloud<pcl::PointXYZINormal>::Ptr zipNormals(
     return zipped;
 }
 
-pcl::PointCloud<pcl::PointXYZINormal>::Ptr VDepth::gridDownsample(boost::shared_ptr<PointCloud> input, float resolution, std::vector<int>& sub_idxs) {
+pcl::PointCloud<pcl::PointXYZINormal>::Ptr FeatureEval::gridDownsample(boost::shared_ptr<PointCloud> input, float resolution, std::vector<int>& sub_idxs) {
     pcl::PointCloud<pcl::Normal>::Ptr normals = ne_->getNormals(input);
 
     // HACK: Make sure normals are not NaN or inf
@@ -565,7 +603,7 @@ pcl::PointCloud<pcl::PointXYZINormal>::Ptr VDepth::gridDownsample(boost::shared_
 
 }
 
-pcl::PointCloud<pcl::PointXYZINormal>::Ptr VDepth::downsample(
+pcl::PointCloud<pcl::PointXYZINormal>::Ptr FeatureEval::downsample(
         boost::shared_ptr<PointCloud> input,
         float resolution,
         std::vector<int>& sub_idxs){
@@ -639,7 +677,7 @@ pcl::PointCloud<pcl::Normal>::Ptr don(
     return donormals;
 }
 
-void VDepth::difference_of_normals(){
+void FeatureEval::difference_of_normals(){
     boost::shared_ptr<PointCloud> _cloud = core_->cl_->active_;
     if(_cloud == nullptr)
         return;
@@ -679,7 +717,7 @@ void VDepth::difference_of_normals(){
     drawVector3f(grid, _cloud);
 }
 
-void VDepth::intensity_histogram(){
+void FeatureEval::intensity_histogram(){
     boost::shared_ptr<PointCloud> _cloud = core_->cl_->active_;
     if(_cloud == nullptr)
         return;
@@ -700,7 +738,7 @@ void VDepth::intensity_histogram(){
 
     // Copy to contigious structure
     std::vector<float> tmp(bins*smaller_cloud->size());
-    for(int i = 0; i < smaller_cloud->size(); i++){
+    for(uint i = 0; i < smaller_cloud->size(); i++){
         for(int j = 0; j < bins; j++){
             tmp[i*bins+j] = (*hists)[i][j];
         }
@@ -791,7 +829,7 @@ void VDepth::intensity_histogram(){
     hists2.reset();
 }
 
-void VDepth::fast_point_feature_histogram(){
+void FeatureEval::fast_point_feature_histogram(){
     boost::shared_ptr<PointCloud> _cloud = core_->cl_->active_;
     if(_cloud == nullptr)
         return;
@@ -817,7 +855,7 @@ void VDepth::fast_point_feature_histogram(){
     if(!visualise_on_) return;
 }
 
-void VDepth::curvature(){
+void FeatureEval::curvature(){
     boost::shared_ptr<PointCloud> _cloud = core_->cl_->active_;
     if(_cloud == nullptr)
         return;
@@ -861,7 +899,7 @@ void VDepth::curvature(){
 
 }
 
-void VDepth::normal_standard_deviation(){
+void FeatureEval::normal_standard_deviation(){
     boost::shared_ptr<PointCloud> cloud = core_->cl_->active_;
     if(cloud == nullptr)
         return;
@@ -898,7 +936,7 @@ void VDepth::normal_standard_deviation(){
 }
 
 
-void VDepth::distance_standard_deviation(){
+void FeatureEval::distance_standard_deviation(){
     boost::shared_ptr<PointCloud> cloud = core_->cl_->active_;
     if(cloud == nullptr)
         return;
@@ -908,7 +946,7 @@ void VDepth::distance_standard_deviation(){
     pcl::PointCloud<pcl::PointXYZI>::Ptr smaller_cloud = octreeDownsample(cloud.get(), resolution_, sub_idxs);
 
     QTime t; t.start(); qDebug() << "Timer started (Dist stdev)";
-    boost::shared_ptr<std::vector<float> > stdev = stdev_dist(smaller_cloud, search_radius_, max_nn, false);
+    boost::shared_ptr<std::vector<float> > stdev = stdev_dist(smaller_cloud, search_radius_, max_nn_, false);
     qDebug() << "Dist stdev in " << t.elapsed() << " ms";
 
     // Correlate
@@ -935,7 +973,7 @@ void VDepth::distance_standard_deviation(){
 // Compute the distance for each point
 // Gaussian weighted average in neighbourhood
 // Subtract
-void VDepth::difference_of_gaussian_distances(){
+void FeatureEval::difference_of_gaussian_distances(){
     boost::shared_ptr<PointCloud> cloud = core_->cl_->active_;
     if(cloud == nullptr)
         return;
@@ -962,7 +1000,7 @@ void VDepth::difference_of_gaussian_distances(){
 }
 
 // PCA for each point, ratio of eigen values
-void VDepth::pca_eigen_value_ratio(){
+void FeatureEval::pca_eigen_value_ratio(){
     boost::shared_ptr<PointCloud> cloud = core_->cl_->active_;
     if(cloud == nullptr)
         return;
@@ -1039,7 +1077,7 @@ void VDepth::pca_eigen_value_ratio(){
     drawFloats(img, cloud);
 }
 
-void VDepth::pca(){
+void FeatureEval::pca(){
     boost::shared_ptr<PointCloud> cloud = core_->cl_->active_;
     if(cloud == nullptr)
         return;
@@ -1068,7 +1106,7 @@ void VDepth::pca(){
 
 }
 
-void VDepth::eigen_plane_consine_similarity(){
+void FeatureEval::eigen_plane_consine_similarity(){
     boost::shared_ptr<PointCloud> cloud = core_->cl_->active_;
     if(cloud == nullptr)
         return;
@@ -1123,7 +1161,7 @@ void VDepth::eigen_plane_consine_similarity(){
     drawFloats(img, cloud);
 }
 
-void VDepth::sobel_erode(){
+void FeatureEval::sobel_erode(){
     boost::shared_ptr<PointCloud> cloud = core_->cl_->active_;
     if(cloud == nullptr)
         return;
@@ -1152,7 +1190,7 @@ void VDepth::sobel_erode(){
     drawFloats(dilated_image, cloud);
 }
 
-void VDepth::sobel_blur(){
+void FeatureEval::sobel_blur(){
     boost::shared_ptr<PointCloud> cloud = core_->cl_->active_;
     if(cloud == nullptr)
         return;
@@ -1170,7 +1208,7 @@ void VDepth::sobel_blur(){
     drawFloats(smooth_grad_image, cloud);
 }
 
-void VDepth::blurred_intensity() {
+void FeatureEval::blurred_intensity() {
     boost::shared_ptr<PointCloud> cloud = core_->cl_->active_;
     if(cloud == nullptr)
         return;
@@ -1204,4 +1242,4 @@ void VDepth::blurred_intensity() {
 
 }
 
-Q_PLUGIN_METADATA(IID "za.co.circlingthesun.cloudclean.visualisedepth")
+Q_PLUGIN_METADATA(IID "za.co.circlingthesun.cloudclean.featureeval")

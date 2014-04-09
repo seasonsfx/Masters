@@ -42,6 +42,8 @@ class MODEL_API LayerList : public QAbstractListModel {
 
     boost::shared_ptr<std::vector<uint16_t> > getHiddenLabels();
 
+    int getLayerIdxByName(QString name);
+
 
  signals:
     void layerUpdate(boost::shared_ptr<Layer> layer);

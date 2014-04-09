@@ -1,4 +1,4 @@
-#include "plugins/jsonexport/jsonexport.h"
+#include "plugins/project/project.h"
 #include <QDebug>
 #include <QAction>
 #include <QFileDialog>
@@ -20,11 +20,11 @@
 
 #include <pcl/search/kdtree.h>
 
-QString JsonExport::getName(){
-    return "JsonExport";
+QString Project::getName(){
+    return "project";
 }
 
-void JsonExport::initialize(Core *core){
+void Project::initialize(Core *core){
     core_= core;
     cl_ = core_->cl_;
     ll_ = core_->ll_;
@@ -52,7 +52,7 @@ void JsonExport::initialize(Core *core){
     //mw_->toolbar_->addAction(load_action_);
 }
 
-void JsonExport::cleanup(){
+void Project::cleanup(){
     mw_->removeMenu(save_action_, "File");
     mw_->removeMenu(load_action_, "File");
     //mw_->toolbar_->removeAction(save_action_);
@@ -61,11 +61,11 @@ void JsonExport::cleanup(){
     delete load_action_;
 }
 
-JsonExport::~JsonExport(){
-    qDebug() << "JsonExport deleted";
+Project::~Project(){
+    qDebug() << "project deleted";
 }
 
-void JsonExport::save(){
+void Project::save(){
     qDebug() << "Myfunc";
 
 //    cloudcleanproject
@@ -158,21 +158,8 @@ void JsonExport::save(){
     file.close();
 }
 
-void JsonExport::load(){
-    QSettings settings;
-
-    QString path = settings.value("load/lastlocation", QDir::home().absolutePath()).toString();
-
-    QString filename = QFileDialog::getOpenFileName(
-                 nullptr, tr("Open project"), path, tr("Cloud clean project files (*.ccp)"));
-    if (filename.length() == 0)
-        return;
-
-    // look up root of where the ccp file is
+void Project::load(QString filename){
     QString ccppath = QFileInfo(filename).absolutePath();
-
-    settings.setValue("load/lastlocation", ccppath);
-    settings.sync();
 
     std::ifstream file(filename.toLocal8Bit().data());
     if (!file.is_open()){
@@ -311,8 +298,28 @@ void JsonExport::load(){
     file.close();
 
     emit ll_->lookupTableUpdate();
+}
+
+void Project::load(){
+    QSettings settings;
+
+    QString path = settings.value("load/lastlocation", QDir::home().absolutePath()).toString();
+
+    QString filename = QFileDialog::getOpenFileName(
+                 nullptr, tr("Open project"), path, tr("Cloud clean project files (*.ccp)"));
+    if (filename.length() == 0)
+        return;
+
+    // look up root of where the ccp file is
+    QString ccppath = QFileInfo(filename).absolutePath();
+
+    settings.setValue("load/lastlocation", ccppath);
+    settings.sync();
+
+    load(filename);
+
 
     //std::thread(&CloudList::loadFile, cl_, filename).detach();
 }
 
-Q_PLUGIN_METADATA(IID "za.co.circlingthesun.cloudclean.jsonexport")
+Q_PLUGIN_METADATA(IID "za.co.circlingthesun.cloudclean.project")

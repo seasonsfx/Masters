@@ -1,5 +1,5 @@
-#ifndef VDEPTH_CUT_H
-#define VDEPTH_CUT_H
+#ifndef FEATURE_EVAL_H
+#define FEATURE_EVAL_H
 
 #include <memory>
 #include <functional>
@@ -8,6 +8,7 @@
 #include "pluginsystem/iplugin.h"
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
+#include <plugins/featureeval/export.h>
 
 class PointCloud;
 class QAction;
@@ -21,17 +22,22 @@ class MainWindow;
 class QLabel;
 class NormalEstimator;
 class QComboBox;
+class QDebug;
 
-class VDepth : public IPlugin {
+class FE_API FeatureEval : public IPlugin {
     Q_INTERFACES(IPlugin)
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "za.co.circlingthesun.cloudclean.visualisedepth" FILE "visualisedepth.json")
+    Q_PLUGIN_METADATA(IID "za.co.circlingthesun.cloudclean.featureeval" FILE "featureeval.json")
  public:
     QString getName();
     void initialize(Core * core);
     void initialize2(PluginManager * pm);
     void cleanup();
-    ~VDepth();
+    ~FeatureEval();
+
+    std::function<void()> getFunction(QString name);
+    void setReportFuction(QDebug * dbg);
+
 
  private:
     void computeCorrelation(float * data, int vector_size, int size, std::vector<int> & big_to_small, int stride = 0);
@@ -59,14 +65,14 @@ signals:
     void curvature();
     void curve_diff_vis();
     void normal_standard_deviation();
-    void dist_stdev();
-    void sutract_lowfreq_noise();
-    void eigen_ratio();
+    void distance_standard_deviation();
+    void difference_of_gaussian_distances();
+    void pca_eigen_value_ratio();
     void pca();
     void eigen_plane_consine_similarity();
     void sobel_erode();
     void sobel_blur();
-    void intensity_play();
+    void blurred_intensity();
 
  private:
     Core * core_;
@@ -100,6 +106,9 @@ signals:
 
     bool visualise_on_;
     std::vector<std::function<void()>> functions_;
+    std::map<QString, std::function<void()>> name_to_function_;
+
+    QDebug * report_;
 };
 
-#endif  // VDEPTH_CUT_H
+#endif  // FEATURE_EVAL_H

@@ -1,5 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>jsonexport.png</file>
+        <file>project.png</file>
     </qresource>
 </RCC>

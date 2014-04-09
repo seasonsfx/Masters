@@ -61,9 +61,10 @@ void FeatureEval::initialize2(PluginManager * pm) {
     layer_idx_ = -1;
 
     // PARAMS
-    resolution_ = 0.5;
+    subsample_res_ = 0.5;
     search_radius_ = 0.2;
     max_nn_ = 20;
+    bins_ = 20;
 
     // Set up viz tab
     depth_widget_ = new QWidget(0);
@@ -104,6 +105,13 @@ void FeatureEval::initialize2(PluginManager * pm) {
         qDebug() << "changed";
     });
 
+    // round up parameters
+    param_map_["subsample_res"] = (void *) &subsample_res_;
+    param_map_["subsample_res.small"] = (void *) &subsample_res_;
+    param_map_["subsample_res.big"] = (void *) &subsample_res_2_;
+    param_map_["bins"] = (void *) &bins_;
+    param_map_["search_radius"] = (void *) &search_radius_;
+    param_map_["max_nn"] = (void *) &max_nn_;
 
     // round up functions
     feature_cb_->addItem("Difference of normals", (int)functions_.size());
@@ -152,9 +160,9 @@ void FeatureEval::initialize2(PluginManager * pm) {
     downsample_sb->setAccelerated(true);
     downsample_sb->setMinimum(0.001);
     downsample_sb->setMaximum(1);
-    downsample_sb->setValue(resolution_);
+    downsample_sb->setValue(subsample_res_);
     connect(downsample_sb, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), [=] (double value){
-        resolution_ = value;
+        subsample_res_ = value;
     });
 
     layout->addWidget(new QLabel("Downsample resolution (meters)"));
@@ -210,6 +218,38 @@ void FeatureEval::setReportFuction(QDebug *dbg){
     report_ = dbg;
 }
 
+void FeatureEval::reportResult(float r2, float * correl, int correl_size){
+    *report_
+             << scan_ << ", "
+             << layer_ << ", "
+             << fname_ << ", "
+             << time_ << ", "
+             << subsample_res_ << ", "
+             << subsample_res_2_ << ", "
+             << search_radius_ << ", "
+             << max_nn_ << ", "
+             << bins_ << ", "
+             << r2;
+
+    for(int idx = 0; idx < correl_size; idx++){
+        *report_ << ", " << correl[idx];
+    }
+
+    *report_ << "\n";
+}
+
+void FeatureEval::resetParams(){
+    subsample_res_ = -1;
+    subsample_res_2_ = -1;
+    search_radius_ = -1;
+    max_nn_ = -1;
+    bins_ = -1;
+}
+
+void FeatureEval::reportHeader(){
+    *report_ << "\"scan\", \"layer\", \"feature\", \"time\", \"subsample_res_\", \"subsample_res_2_\", \"search_radius_ \", \"max_nn_\", \"bins_\", \"R^2\", \"component correlations\"\n";
+}
+
 void FeatureEval::enable() {
     if(is_enabled_){
         disable();
@@ -253,7 +293,7 @@ int sum_calc(float * data, int vector_size, int size, float * sum, float * sum_o
 }
 
 // uses y value for the last row of mat
-void sum_product_mat_calc(float * y_data, float * x_data, int x_vector_size, int size, Eigen::MatrixXf & sum_product, int stride = 0){
+void sum_productmat_calc(float * y_data, float * x_data, int x_vector_size, int size, Eigen::MatrixXf & sum_product, int stride = 0){
     stride = stride ? stride : x_vector_size;
     sum_product.setIdentity();
 
@@ -295,16 +335,16 @@ Eigen::MatrixXf  multi_correlate(std::vector<float> & y_data, float * x_data, in
 
     //qDebug() << "skipped: " << skipped << "size: " << size;
 
-    Eigen::MatrixXf sum_product_mat(x_vector_size + 1, x_vector_size + 1);
-    sum_product_mat_calc(y_data.data(), x_data, x_vector_size, size, sum_product_mat, stride);
+    Eigen::MatrixXf sum_productmat(x_vector_size + 1, x_vector_size + 1);
+    sum_productmat_calc(y_data.data(), x_data, x_vector_size, size, sum_productmat, stride);
 
     Eigen::MatrixXf correlation_mat(x_vector_size + 1, x_vector_size + 1);
     correlation_mat.setIdentity();
 
     for(int r = 0; r < x_vector_size + 1; r++){
         for(int c = r+1; c < x_vector_size + 1; c++){
-            // qDebug() << r << c << ": " <<  sum[c] << sum_of_squares[c] << sum[r] << sum_of_squares[r] << sum_product_mat(r, c);
-            correlation_mat(r, c) = correlate(sum[c], sum_of_squares[c], sum[r], sum_of_squares[r], sum_product_mat(r, c), size-skipped);
+            // qDebug() << r << c << ": " <<  sum[c] << sum_of_squares[c] << sum[r] << sum_of_squares[r] << sum_productmat(r, c);
+            correlation_mat(r, c) = correlate(sum[c], sum_of_squares[c], sum[r], sum_of_squares[r], sum_productmat(r, c), size-skipped);
             correlation_mat(c, r) = correlation_mat(r, c);
         }
     }
@@ -367,16 +407,16 @@ void FeatureEval::computeCorrelation(float * data, int vector_size, int size, st
     Eigen::MatrixXf Rxx = correlation_mat.topLeftCorner(vector_size, vector_size);
     Eigen::VectorXf c = correlation_mat.block(0, vector_size, vector_size, 1);
 
-    std::cout << correlation_mat << std::endl;
+    //std::cout << correlation_mat << std::endl;
 
     float R = c.transpose() * (Rxx.inverse() * c);
 
     qDebug() << "R^2: " << R;
-    qDebug() << "R: " << sqrt(R);
+    //qDebug() << "R: " << sqrt(R);
 
-    *report_ << "R^2: " << R;
+    reportResult(R, c.data(), vector_size);
 
-    Eigen::VectorXf tmp = (Rxx.inverse() * c);
+    //Eigen::VectorXf tmp = (Rxx.inverse() * c);
 
     qDebug() << "Y -> X correlation <<<<<<<<<<<<<";
     std::cout << c << std::endl;
@@ -575,7 +615,7 @@ pcl::PointCloud<pcl::PointXYZINormal>::Ptr FeatureEval::gridDownsample(boost::sh
     // Zipper up normals and xyzi
     pcl::PointCloud<pcl::PointXYZINormal>::Ptr cloud = zipNormals(*input, *normals);
 
-    QTime t; t.start(); //qDebug() << "Timer started (Subsample)";
+    t_.start(); //qDebug() << "Timer started (Subsample)";
     /////////////////////////
 
     pcl::PointCloud<pcl::PointXYZINormal>::Ptr output(new pcl::PointCloud<pcl::PointXYZINormal>());
@@ -597,7 +637,7 @@ pcl::PointCloud<pcl::PointXYZINormal>::Ptr FeatureEval::gridDownsample(boost::sh
 
 
     /////////////////////////
-    time = t.elapsed();
+    time = t_.elapsed();
 
     return output;
 
@@ -620,7 +660,7 @@ pcl::PointCloud<pcl::PointXYZINormal>::Ptr FeatureEval::downsample(
     // Zipper up normals and xyzi
     pcl::PointCloud<pcl::PointXYZINormal>::Ptr cloud = zipNormals(*input, *normals);
 
-    pcl::PointCloud<pcl::PointXYZINormal>::Ptr output = octreeDownsample(cloud.get(), resolution_, sub_idxs);
+    pcl::PointCloud<pcl::PointXYZINormal>::Ptr output = octreeDownsample(cloud.get(), subsample_res_, sub_idxs);
 
     return output;
 
@@ -655,9 +695,6 @@ pcl::PointCloud<pcl::Normal>::Ptr don(
         return sum;
     };
 
-    QTime t;
-    t.start();
-
     for(uint idx = 0; idx < cloud.size(); idx++){
         std::vector<float> rads;
         rads.push_back(radius1);
@@ -687,15 +724,17 @@ void FeatureEval::difference_of_normals(){
 
     pcl::PointCloud<pcl::Normal>::Ptr normals = ne_->getNormals(_cloud);
 
-    float res1 = resolution_;
-    float res2 = resolution_*2;
+    float res1 = subsample_res_;
+    float res2 = subsample_res_*2;
 
     // Downsample
     pcl::PointCloud<pcl::PointXYZINormal>::Ptr smaller_cloud;
     std::vector<int> sub_idxs;
     smaller_cloud = downsample(_cloud, res1, sub_idxs);
 
+    t_.start();
     pcl::PointCloud<pcl::Normal>::Ptr donormals = don(*smaller_cloud, *smaller_cloud, res1, res2);
+    (time_ = t_.elapsed());
 
     // Correlate
     computeCorrelation(reinterpret_cast<float*>(donormals->points.data()), 3, donormals->points.size(), sub_idxs, 4);
@@ -724,28 +763,23 @@ void FeatureEval::intensity_histogram(){
 
     pcl::PointCloud<pcl::PointXYZINormal>::Ptr smaller_cloud;
     std::vector<int> sub_idxs;
-    smaller_cloud = downsample(_cloud, resolution_, sub_idxs);
-
-
-    int bins = 20;
-    float radius = 0.05;
-    int max_nn = 0;
+    smaller_cloud = downsample(_cloud, subsample_res_, sub_idxs);
 
     // Compute
-    QTime t; t.start(); qDebug() << "Timer started (Intensity histogram)";
-    boost::shared_ptr<std::vector<std::vector<float> > > hists = calcIntensityHist(*smaller_cloud, bins, radius, max_nn);
-    qDebug() << "Intensity histogram" << t.elapsed() << " ms";
+    t_.start(); qDebug() << "Timer started (Intensity histogram)";
+    boost::shared_ptr<std::vector<std::vector<float> > > hists = calcIntensityHist(*smaller_cloud, bins_, search_radius_, max_nn_);
+    qDebug() << "Intensity histogram" << (time_ = t_.elapsed()) << " ms";
 
     // Copy to contigious structure
-    std::vector<float> tmp(bins*smaller_cloud->size());
+    std::vector<float> tmp(bins_*smaller_cloud->size());
     for(uint i = 0; i < smaller_cloud->size(); i++){
-        for(int j = 0; j < bins; j++){
-            tmp[i*bins+j] = (*hists)[i][j];
+        for(int j = 0; j < bins_; j++){
+            tmp[i*bins_+j] = (*hists)[i][j];
         }
     }
 
     // Correlate
-    computeCorrelation(tmp.data(), bins, tmp.size(), sub_idxs);
+    computeCorrelation(tmp.data(), bins_, tmp.size(), sub_idxs);
     if(!visualise_on_) return;
 
     // Draw, TODO; Multidimentional draw
@@ -782,7 +816,7 @@ void FeatureEval::intensity_histogram(){
     };
     */
 
-    const int feature_size = bins;
+    const int feature_size = bins_;
 
     for(int x = 1; x < w-1; x ++) {
         //qDebug() << "yes";
@@ -836,10 +870,10 @@ void FeatureEval::fast_point_feature_histogram(){
 
     pcl::PointCloud<pcl::PointXYZINormal>::Ptr filt_cloud;
     std::vector<int> sub_idxs;
-    filt_cloud = downsample(_cloud, resolution_, sub_idxs);
+    filt_cloud = downsample(_cloud, subsample_res_, sub_idxs);
 
     // Compute
-    QTime t; t.start(); qDebug() << "Timer started (FPFH)";
+    t_.start(); qDebug() << "Timer started (FPFH)";
     pcl::FPFHEstimation<pcl::PointXYZINormal, pcl::PointXYZINormal, pcl::FPFHSignature33> fpfh;
     fpfh.setInputCloud(filt_cloud);
     fpfh.setInputNormals(filt_cloud);
@@ -848,7 +882,7 @@ void FeatureEval::fast_point_feature_histogram(){
     fpfh.setRadiusSearch(search_radius_);
     pcl::PointCloud<pcl::FPFHSignature33>::Ptr fpfhs (new pcl::PointCloud<pcl::FPFHSignature33> ());
     fpfh.compute(*fpfhs);
-    qDebug() << "FPFH in " << t.elapsed() << " ms";
+    qDebug() << "FPFH in " << (time_ = t_.elapsed()) << " ms";
 
     // Correlate
     computeCorrelation(reinterpret_cast<float*>(fpfhs->points.data()), 33, fpfhs->points.size(), sub_idxs);
@@ -862,10 +896,10 @@ void FeatureEval::curvature(){
 
     pcl::PointCloud<pcl::PointXYZINormal>::Ptr filt_cloud;
     std::vector<int> big_to_small;
-    filt_cloud = downsample(_cloud, resolution_, big_to_small);
+    filt_cloud = downsample(_cloud, subsample_res_, big_to_small);
 
     // Compute
-    QTime t; t.start(); qDebug() << "Timer started (Curvature)";
+    t_.start(); qDebug() << "Timer started (Curvature)";
 
     pcl::PrincipalCurvaturesEstimation<pcl::PointXYZINormal, pcl::PointXYZINormal, pcl::PrincipalCurvatures> principal_curvatures_estimation;
     principal_curvatures_estimation.setInputCloud (filt_cloud);
@@ -875,7 +909,7 @@ void FeatureEval::curvature(){
     principal_curvatures_estimation.setRadiusSearch (search_radius_);
     pcl::PointCloud<pcl::PrincipalCurvatures>::Ptr principal_curvatures (new pcl::PointCloud<pcl::PrincipalCurvatures> ());
     principal_curvatures_estimation.compute (*principal_curvatures);
-    qDebug() << "Curvature in " << t.elapsed() << " ms";
+    qDebug() << "Curvature in " << (time_ = t_.elapsed()) << " ms";
 
     // Correlate
     computeCorrelation(reinterpret_cast<float*>(principal_curvatures->points.data()), sizeof(pcl::PrincipalCurvatures)/sizeof(float), principal_curvatures->points.size(), big_to_small);
@@ -909,12 +943,12 @@ void FeatureEval::normal_standard_deviation(){
     // Downsample and zipper up normals and xyzi
     std::vector<int> sub_idxs;
     pcl::PointCloud<pcl::PointXYZINormal>::Ptr smaller_cloud = zipNormals(cloud, normals);
-    smaller_cloud = octreeDownsample(smaller_cloud.get(), resolution_, sub_idxs);
+    smaller_cloud = octreeDownsample(smaller_cloud.get(), subsample_res_, sub_idxs);
 
     // Compute
-    QTime t; t.start(); qDebug() << "Timer started (Normal stdev)";
+    t_.start(); qDebug() << "Timer started (Normal stdev)";
     boost::shared_ptr<std::vector<float>> stdev = normal_stdev<pcl::PointXYZINormal, pcl::PointXYZINormal>(smaller_cloud, smaller_cloud, search_radius_, max_nn_);
-    qDebug() << "Normal stdev in " << t.elapsed() << " ms";
+    qDebug() << "Normal stdev in " << (time_ = t_.elapsed()) << " ms";
 
     // Correlate
     computeCorrelation(stdev->data(), 1, stdev->size(), sub_idxs);
@@ -943,11 +977,11 @@ void FeatureEval::distance_standard_deviation(){
 
     // Downsample
     std::vector<int> sub_idxs;
-    pcl::PointCloud<pcl::PointXYZI>::Ptr smaller_cloud = octreeDownsample(cloud.get(), resolution_, sub_idxs);
+    pcl::PointCloud<pcl::PointXYZI>::Ptr smaller_cloud = octreeDownsample(cloud.get(), subsample_res_, sub_idxs);
 
-    QTime t; t.start(); qDebug() << "Timer started (Dist stdev)";
+    t_.start(); qDebug() << "Timer started (Dist stdev)";
     boost::shared_ptr<std::vector<float> > stdev = stdev_dist(smaller_cloud, search_radius_, max_nn_, false);
-    qDebug() << "Dist stdev in " << t.elapsed() << " ms";
+    qDebug() << "Dist stdev in " << t_.elapsed() << " ms";
 
     // Correlate
     computeCorrelation(stdev->data(), 1, stdev->size(), sub_idxs);
@@ -1007,10 +1041,10 @@ void FeatureEval::pca_eigen_value_ratio(){
 
     // Downsample
     std::vector<int> sub_idxs;
-    pcl::PointCloud<pcl::PointXYZI>::Ptr smaller_cloud = octreeDownsample(cloud.get(), resolution_, sub_idxs);
+    pcl::PointCloud<pcl::PointXYZI>::Ptr smaller_cloud = octreeDownsample(cloud.get(), subsample_res_, sub_idxs);
 
     // Compute PCA
-    QTime t; t.start(); qDebug() << "Timer started (PCA and speculaion)";
+    t_.start(); qDebug() << "Timer started (PCA and speculaion)";
     boost::shared_ptr<std::vector<Eigen::Vector3f> > pca = getPCA(smaller_cloud.get(), search_radius_, max_nn_);
 
 
@@ -1053,7 +1087,7 @@ void FeatureEval::pca_eigen_value_ratio(){
 
     }
 
-    qDebug() << "PCA in " << t.elapsed() << " ms";
+    qDebug() << "PCA in " << (time_ = t_.elapsed()) << " ms";
 
     computeCorrelation(likely_veg->data(), 1, likely_veg->size(), sub_idxs);
     if(!visualise_on_) return;
@@ -1083,11 +1117,11 @@ void FeatureEval::pca(){
         return;
 
     std::vector<int> sub_idxs;
-    pcl::PointCloud<pcl::PointXYZI>::Ptr smaller_cloud = octreeDownsample(cloud.get(), resolution_, sub_idxs);
+    pcl::PointCloud<pcl::PointXYZI>::Ptr smaller_cloud = octreeDownsample(cloud.get(), subsample_res_, sub_idxs);
 
-    QTime t; t.start(); qDebug() << "Timer started (PCA)";
+    t_.start(); qDebug() << "Timer started (PCA)";
     boost::shared_ptr<std::vector<Eigen::Vector3f> > pca = getPCA(smaller_cloud.get(), search_radius_, max_nn_);
-    qDebug() << "PCA in " << t.elapsed() << " ms";
+    qDebug() << "PCA in " << (time_ = t_.elapsed()) << " ms";
 
 
     computeCorrelation(reinterpret_cast<float *>(pca->data()), 3, pca->size(), sub_idxs, sizeof(Eigen::Vector3f)/sizeof(float));
@@ -1112,9 +1146,9 @@ void FeatureEval::eigen_plane_consine_similarity(){
         return;
 
     std::vector<int> sub_idxs;
-    pcl::PointCloud<pcl::PointXYZI>::Ptr smaller_cloud = octreeDownsample(cloud.get(), resolution_, sub_idxs);
+    pcl::PointCloud<pcl::PointXYZI>::Ptr smaller_cloud = octreeDownsample(cloud.get(), subsample_res_, sub_idxs);
 
-    QTime t; t.start(); qDebug() << "Timer started (eigen_plane_consine_similarity)";
+    t_.start(); qDebug() << "Timer started (eigen_plane_consine_similarity)";
     boost::shared_ptr<std::vector<Eigen::Vector3f> > pca = getPCA(smaller_cloud.get(), 0.05f, 20);
 
     boost::shared_ptr<std::vector<float>> plane_likelyhood =
@@ -1136,7 +1170,7 @@ void FeatureEval::eigen_plane_consine_similarity(){
         (*plane_likelyhood)[i] = similarity;
     }
 
-    qDebug() << "eigen_plane_consine_similarity in " << t.elapsed() << " ms";
+    qDebug() << "eigen_plane_consine_similarity in " << (time_ = t_.elapsed()) << " ms";
 
     // Correlate
     computeCorrelation(plane_likelyhood->data(), 1, plane_likelyhood->size(), sub_idxs);

@@ -4,6 +4,8 @@
 #include <memory>
 #include <functional>
 #include <Eigen/Dense>
+#include <QTime>
+#include <QMap>
 #include "glheaders.h"
 #include "pluginsystem/iplugin.h"
 #include <pcl/point_types.h>
@@ -37,7 +39,9 @@ class FE_API FeatureEval : public IPlugin {
 
     std::function<void()> getFunction(QString name);
     void setReportFuction(QDebug * dbg);
-
+    void reportResult(float r2, float * correl, int correl_size);
+    void reportHeader();
+    void resetParams();
 
  private:
     void computeCorrelation(float * data, int vector_size, int size, std::vector<int> & big_to_small, int stride = 0);
@@ -74,6 +78,7 @@ signals:
     void sobel_blur();
     void blurred_intensity();
 
+
  private:
     Core * core_;
     CloudList * cl_;
@@ -100,15 +105,29 @@ signals:
     int function_idx_;
     int layer_idx_;
 
-    double resolution_;
-    double search_radius_;
-    int max_nn_;
-
     bool visualise_on_;
     std::vector<std::function<void()>> functions_;
     std::map<QString, std::function<void()>> name_to_function_;
 
     QDebug * report_;
+
+    QTime t_;
+    float time_;
+
+ public:
+    QMap<QString, void *> param_map_;
+
+    QString fname_;
+    QString scan_;
+    QString layer_;
+
+    double subsample_res_;
+    double subsample_res_2_;
+    double search_radius_;
+    int max_nn_;
+    int bins_;
+    float r2_;
+
 };
 
 #endif  // FEATURE_EVAL_H

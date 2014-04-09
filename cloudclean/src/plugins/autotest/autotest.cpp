@@ -91,10 +91,12 @@ void AutoTest::initialize2(PluginManager *pm){
 
 void AutoTest::runtest() {
     // Setup reporting
-    QFile report_file("report.txt");
+    QFile report_file("report.csv");
     report_file.open(QIODevice::WriteOnly | QIODevice::Text);
-    QDebug dbg(&report_file);
-    feature_eval_->setReportFuction(&dbg);
+    QDebug report(&report_file);
+    report.setAutoInsertSpaces(false);
+    feature_eval_->setReportFuction(&report);
+    feature_eval_->reportHeader();
 
     qDebug() << "Opening file: " << test_path_;
     QFile file(test_path_);
@@ -132,6 +134,8 @@ void AutoTest::runtest() {
             QString layer_name = c["layer_name"].toString();
             QJsonArray feature_names = c["features"].toArray();
 
+            feature_eval_->layer_ = layer_name;
+
             // Select layer
             int idx = ll_->getLayerIdxByName(layer_name);
             if(idx == -1){
@@ -146,28 +150,27 @@ void AutoTest::runtest() {
                 QString fname = feature_name.toString();
                 QJsonObject params = features[fname].toObject();
 
-
-
                 qDebug() << "Correlating " << fname << " with layer " << layer_name;
 
+                feature_eval_->fname_ = fname;
+                //feature_eval_->resetParams();
 
                 for(QJsonObject::Iterator it = params.begin(); it != params.end(); it++){
                     QString param_name = it.key();
                     for(QJsonValueRef valref : it.value().toArray()){
                         float val = valref.toDouble();
+                        if(param_name.trimmed() == "bins" || param_name.trimmed() == "max_nn"){
+                            *((int *) feature_eval_->param_map_[param_name]) = int(val);
+                        } else {
+                            *((float *) feature_eval_->param_map_[param_name]) = val;
+                        }
+
                         qDebug() << "Parameter " << param_name << " set to: " << val;
                     }
                     //param.toObject()
                 }
 
-                //QString fname = feature["name"].toString();
 
-                // Get layer by name
-                // activate layer
-
-                // set parameter permutations
-
-                // resolve function call:
                 feature_eval_->getFunction(fname)();
 
             }

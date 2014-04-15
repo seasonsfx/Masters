@@ -26,6 +26,11 @@ class NormalEstimator;
 class QComboBox;
 class QDebug;
 
+union Param {
+    double * f;
+    int * i;
+};
+
 class FE_API FeatureEval : public IPlugin {
     Q_INTERFACES(IPlugin)
     Q_OBJECT
@@ -115,7 +120,7 @@ signals:
     float time_;
 
  public:
-    QMap<QString, void *> param_map_;
+    std::map<QString, Param> param_map_;
 
     QString fname_;
     QString scan_;
@@ -126,8 +131,6 @@ signals:
     double search_radius_;
     int max_nn_;
     int bins_;
-    float r2_;
-
 };
 
 #endif  // FEATURE_EVAL_H

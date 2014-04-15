@@ -106,12 +106,16 @@ void FeatureEval::initialize2(PluginManager * pm) {
     });
 
     // round up parameters
-    param_map_["subsample_res"] = (void *) &subsample_res_;
-    param_map_["subsample_res.small"] = (void *) &subsample_res_;
-    param_map_["subsample_res.big"] = (void *) &subsample_res_2_;
-    param_map_["bins"] = (void *) &bins_;
-    param_map_["search_radius"] = (void *) &search_radius_;
-    param_map_["max_nn"] = (void *) &max_nn_;
+    param_map_["subsample_res"].f = &subsample_res_;
+    param_map_["subsample_res.small"].f = &subsample_res_;
+    param_map_["subsample_res.big"].f = &subsample_res_2_;
+    param_map_["bins"].i =  &bins_;
+    param_map_["search_radius"].f = &search_radius_;
+    param_map_["max_nn"].i = &max_nn_;
+
+    qDebug() << "orig: " <<  subsample_res_;
+    qDebug() << "dereffed: " <<  * param_map_["subsample_res"].f;
+
 
     // round up functions
     feature_cb_->addItem("Difference of normals", (int)functions_.size());
@@ -864,6 +868,8 @@ void FeatureEval::intensity_histogram(){
 }
 
 void FeatureEval::fast_point_feature_histogram(){
+    qDebug() << "params used: " << subsample_res_ << search_radius_;
+    qDebug() << "-----------------------------------";
     boost::shared_ptr<PointCloud> _cloud = core_->cl_->active_;
     if(_cloud == nullptr)
         return;

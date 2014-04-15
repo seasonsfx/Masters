@@ -1,4 +1,5 @@
 #include "plugins/autotest/autotest.h"
+#include <utility>
 #include <QDebug>
 #include <QAction>
 #include <QToolBar>
@@ -89,6 +90,45 @@ void AutoTest::initialize2(PluginManager *pm){
     feature_eval_ = pm->findPlugin<FeatureEval>();
 }
 
+void AutoTest::setPermuteAndRun(std::vector<std::pair<QString, QJsonArray>> & params, QString fname, int idx){
+    // end recursion and run
+    if(idx == params.size()){
+        feature_eval_->getFunction(fname)();
+        return;
+    }
+
+    std::pair<QString, QJsonArray> values = params[idx];
+    QString name = values.first;
+    QJsonArray array = values.second;
+
+
+    // STL PERMUTE
+    for(QJsonValueRef valref : array){
+        if(feature_eval_->param_map_.find(name) == feature_eval_->param_map_.end()){
+            qDebug() << "cannot find: " << name;
+        } else {
+            qDebug() << "found: " << name;
+        }
+        qDebug() << "---------------------!!!!!!!!!!!!!!!!!!!!!!";
+
+        if(valref.isObject() && name == "subsample_res"){
+            *(feature_eval_->param_map_[name + ".small"].f) = valref.toObject()["small"].toDouble();
+            *(feature_eval_->param_map_[name + ".big"].f) = valref.toObject()["big"].toDouble();
+        } else {
+            // set parameter
+            if(name.trimmed() == "bins" || name.trimmed() == "max_nn"){
+                *(feature_eval_->param_map_[name].i) = int(valref.toDouble());
+            } else {
+                *(feature_eval_->param_map_[name].f) = valref.toDouble();
+            }
+        }
+
+        // Recurse
+        setPermuteAndRun(params, fname, idx+1);
+    }
+
+}
+
 void AutoTest::runtest() {
     // Setup reporting
     QFile report_file("report.csv");
@@ -148,30 +188,22 @@ void AutoTest::runtest() {
 
             for(QJsonValueRef feature_name : feature_names){
                 QString fname = feature_name.toString();
-                QJsonObject params = features[fname].toObject();
+                QJsonObject p = features[fname].toObject();
 
                 qDebug() << "Correlating " << fname << " with layer " << layer_name;
 
                 feature_eval_->fname_ = fname;
-                //feature_eval_->resetParams();
+                feature_eval_->resetParams();
 
-                for(QJsonObject::Iterator it = params.begin(); it != params.end(); it++){
-                    QString param_name = it.key();
-                    for(QJsonValueRef valref : it.value().toArray()){
-                        float val = valref.toDouble();
-                        if(param_name.trimmed() == "bins" || param_name.trimmed() == "max_nn"){
-                            *((int *) feature_eval_->param_map_[param_name]) = int(val);
-                        } else {
-                            *((float *) feature_eval_->param_map_[param_name]) = val;
-                        }
+                // Build list of params
+                std::vector<std::pair<QString, QJsonArray>> params;
 
-                        qDebug() << "Parameter " << param_name << " set to: " << val;
-                    }
-                    //param.toObject()
+                for(QJsonObject::Iterator it = p.begin(); it != p.end(); it++){
+                    params.push_back(std::make_pair(it.key(), it.value().toArray()));
                 }
 
-
-                feature_eval_->getFunction(fname)();
+                // run test
+                setPermuteAndRun(params, fname, 0);
 
             }
 

@@ -21,6 +21,7 @@ class AutoTest : public IPlugin {
     QString getName();
     void initialize(Core * core);
     void initialize2(PluginManager *pm);
+    void setPermuteAndRun(std::vector<std::pair<QString, QJsonArray>> & params, QString fname, int idx);
     void cleanup();
     ~AutoTest();
 

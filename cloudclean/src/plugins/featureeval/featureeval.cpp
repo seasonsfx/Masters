@@ -56,12 +56,13 @@ void FeatureEval::initialize2(PluginManager * pm) {
     }
 
     // GUI STUFF
-    visualise_on_ = false;
+    visualise_on_ = true;
     function_idx_ = 0;
     layer_idx_ = -1;
 
     // PARAMS
-    subsample_res_ = 0.5;
+    subsample_res_ = 0.1;
+    subsample_res_2_ = 0.2;
     search_radius_ = 0.2;
     max_nn_ = 20;
     bins_ = 20;
@@ -96,10 +97,6 @@ void FeatureEval::initialize2(PluginManager * pm) {
     feature_cb_ = new QComboBox(settings_);
     layout->addWidget(feature_cb_);
 
-
-
-
-
     connect(feature_cb_, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [this] (int idx){
         function_idx_ = feature_cb_->itemData(idx).toInt();
         qDebug() << "changed";
@@ -112,10 +109,6 @@ void FeatureEval::initialize2(PluginManager * pm) {
     param_map_["bins"].i =  &bins_;
     param_map_["search_radius"].f = &search_radius_;
     param_map_["max_nn"].i = &max_nn_;
-
-    qDebug() << "orig: " <<  subsample_res_;
-    qDebug() << "dereffed: " <<  * param_map_["subsample_res"].f;
-
 
     // round up functions
     feature_cb_->addItem("Difference of normals", (int)functions_.size());
@@ -151,8 +144,12 @@ void FeatureEval::initialize2(PluginManager * pm) {
     name_to_function_["pca"] = functions_[functions_.size()-1];
 
     feature_cb_->addItem("eigen_plane_consine_similarity", (int)functions_.size());
-    functions_.push_back(std::bind(&FeatureEval::pca, this));
+    functions_.push_back(std::bind(&FeatureEval::eigen_plane_consine_similarity, this));
     name_to_function_["eigen_plane_consine_similarity"] = functions_[functions_.size()-1];
+
+    feature_cb_->addItem("intensity", (int)functions_.size());
+    functions_.push_back(std::bind(&FeatureEval::intensity, this));
+    name_to_function_["intensity"] = functions_[functions_.size()-1];
 
 //    layout->addWidget(new QLabel("Correlate with layer:"));
 //    layer_cb_ = new QComboBox(settings_);
@@ -273,7 +270,7 @@ void FeatureEval::disable(){
     is_enabled_ = false;
 }
 
-int sum_calc(float * data, int vector_size, int size, float * sum, float * sum_of_squares, int stride = 0){
+int sum_calc(float * data, int vector_size, int size, float * sum, float * sum_of_squares, int stride = 0, int offset = 0){
     stride = stride ? stride : vector_size;
     int skipped = 0;
     for(int j = 0; j < vector_size; j++){
@@ -284,7 +281,7 @@ int sum_calc(float * data, int vector_size, int size, float * sum, float * sum_o
     float val = 0;
     for(int i = 0; i < size; i++){
         for(int j = 0; j < vector_size; j++){
-            val = data[i*stride + j];
+            val = data[i*stride + j + offset];
             if(val != val){
                 skipped++;
                 continue;
@@ -297,7 +294,7 @@ int sum_calc(float * data, int vector_size, int size, float * sum, float * sum_o
 }
 
 // uses y value for the last row of mat
-void sum_productmat_calc(float * y_data, float * x_data, int x_vector_size, int size, Eigen::MatrixXf & sum_product, int stride = 0){
+void sum_productmat_calc(float * y_data, float * x_data, int x_vector_size, int size, Eigen::MatrixXf & sum_product, int stride = 0, int offset = 0){
     stride = stride ? stride : x_vector_size;
     sum_product.setIdentity();
 
@@ -305,8 +302,8 @@ void sum_productmat_calc(float * y_data, float * x_data, int x_vector_size, int 
     for(int i = 0; i < size; i++){
         for(int r = 0; r < x_vector_size; r++){
             for(int c = r+1; c < x_vector_size; c++){
-                val1 = (x_data[i*stride + r]);
-                val2 = (x_data[i*stride + c]);
+                val1 = (x_data[i*stride + r + offset]);
+                val2 = (x_data[i*stride + c + offset]);
 
                 if(val1 != val1 || val1 != val1){
                     continue;
@@ -316,7 +313,7 @@ void sum_productmat_calc(float * y_data, float * x_data, int x_vector_size, int 
                 sum_product(c, r) = sum_product(r, c);
             }
 
-            sum_product(r, x_vector_size) += y_data[i] * x_data[i*stride + r];
+            sum_product(r, x_vector_size) += y_data[i] * x_data[i*stride + r + offset];
             sum_product(x_vector_size, r) = sum_product(r, x_vector_size);
         }
     }
@@ -330,17 +327,17 @@ inline float correlate(float sx, float sxx, float sy, float syy, float sxy, floa
 // blend the large segmentation to small!!!
 
 // correlate binaryish with vector
-Eigen::MatrixXf  multi_correlate(std::vector<float> & y_data, float * x_data, int x_vector_size, int size, int stride){
+Eigen::MatrixXf  multi_correlate(std::vector<float> & y_data, float * x_data, int x_vector_size, int size, int stride, int offset){
     std::vector<float> sum(x_vector_size + 1);
     std::vector<float> sum_of_squares(x_vector_size + 1);
 
-    int skipped = sum_calc(x_data, x_vector_size, size, sum.data(), sum_of_squares.data(), stride);
+    int skipped = sum_calc(x_data, x_vector_size, size, sum.data(), sum_of_squares.data(), stride, offset);
     skipped += sum_calc(y_data.data(), 1, size, &sum[x_vector_size], &sum_of_squares[x_vector_size]);
 
     //qDebug() << "skipped: " << skipped << "size: " << size;
 
     Eigen::MatrixXf sum_productmat(x_vector_size + 1, x_vector_size + 1);
-    sum_productmat_calc(y_data.data(), x_data, x_vector_size, size, sum_productmat, stride);
+    sum_productmat_calc(y_data.data(), x_data, x_vector_size, size, sum_productmat, stride, offset);
 
     Eigen::MatrixXf correlation_mat(x_vector_size + 1, x_vector_size + 1);
     correlation_mat.setIdentity();
@@ -389,7 +386,7 @@ int gridToCloudIdx(int x, int y, boost::shared_ptr<PointCloud> pc, int * lookup)
 }
 
 
-void FeatureEval::computeCorrelation(float * data, int vector_size, int size, std::vector<int> & big_to_small, int stride){
+void FeatureEval::computeCorrelation(float * data, int vector_size, int size, std::vector<int> & big_to_small, int stride, int offset){
 
     stride = stride ? stride : vector_size;
 
@@ -407,7 +404,7 @@ void FeatureEval::computeCorrelation(float * data, int vector_size, int size, st
                           big_to_small,
                           size);
 
-    Eigen::MatrixXf correlation_mat = multi_correlate(layer, data, vector_size, size, stride);
+    Eigen::MatrixXf correlation_mat = multi_correlate(layer, data, vector_size, size, stride, offset);
     Eigen::MatrixXf Rxx = correlation_mat.topLeftCorner(vector_size, vector_size);
     Eigen::VectorXf c = correlation_mat.block(0, vector_size, vector_size, 1);
 
@@ -760,6 +757,28 @@ void FeatureEval::difference_of_normals(){
     drawVector3f(grid, _cloud);
 }
 
+void FeatureEval::intensity(){
+    boost::shared_ptr<PointCloud> _cloud = core_->cl_->active_;
+    if(_cloud == nullptr)
+        return;
+
+    // Subsample
+    pcl::PointCloud<pcl::PointXYZINormal>::Ptr smaller_cloud;
+    std::vector<int> sub_idxs;
+    smaller_cloud = downsample(_cloud, subsample_res_, sub_idxs);
+
+    time_ = 0;
+
+    // Copy to contigious structure
+    std::vector<float> tmp(smaller_cloud->size());
+    for(uint i = 0; i < smaller_cloud->size(); i++){
+        tmp[i] = smaller_cloud->points[i].intensity;
+    }
+
+    // Correlate
+    computeCorrelation(reinterpret_cast<float*>(tmp.data()), 1, tmp.size(), sub_idxs);
+}
+
 void FeatureEval::intensity_histogram(){
     boost::shared_ptr<PointCloud> _cloud = core_->cl_->active_;
     if(_cloud == nullptr)
@@ -918,7 +937,8 @@ void FeatureEval::curvature(){
     qDebug() << "Curvature in " << (time_ = t_.elapsed()) << " ms";
 
     // Correlate
-    computeCorrelation(reinterpret_cast<float*>(principal_curvatures->points.data()), sizeof(pcl::PrincipalCurvatures)/sizeof(float), principal_curvatures->points.size(), big_to_small);
+    size_t csize = sizeof(pcl::PrincipalCurvatures)/sizeof(float);
+    computeCorrelation(reinterpret_cast<float*>(principal_curvatures->points.data()), 2, principal_curvatures->points.size(), big_to_small, csize, 3);
     if(!visualise_on_) return;
 
     // Draw

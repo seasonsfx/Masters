@@ -49,7 +49,7 @@ class FE_API FeatureEval : public IPlugin {
     void resetParams();
 
  private:
-    void computeCorrelation(float * data, int vector_size, int size, std::vector<int> & big_to_small, int stride = 0);
+    void computeCorrelation(float * data, int vector_size, int size, std::vector<int> & big_to_small, int stride = 0, int offset = 0);
     void drawFloats(boost::shared_ptr<const std::vector<float> > out_img, boost::shared_ptr<PointCloud> cloud);
     void drawVector3f(boost::shared_ptr<const std::vector<Eigen::Vector3f> > out_img, boost::shared_ptr<PointCloud> cloud);
 
@@ -70,6 +70,7 @@ signals:
 
     void difference_of_normals();
     void intensity_histogram();
+    void intensity();
     void fast_point_feature_histogram();
     void curvature();
     void curve_diff_vis();

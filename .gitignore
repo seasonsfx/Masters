@@ -1,4 +1,7 @@
 # Code
+cloudclean/.excludes
+cloudclean/cloudclean.json
+cloudclean/manifest.json
 *.autosave
 *.dll.manifest
 *.exp

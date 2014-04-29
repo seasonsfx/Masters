@@ -46,6 +46,7 @@ void FeatureEval::initialize(Core *core){
     glwidget_ = core_->mw_->glwidget_;
     flatview_ = core_->mw_->flatview_;
     mw_ = core_->mw_;
+    report_ = nullptr;
 }
 
 void FeatureEval::initialize2(PluginManager * pm) {
@@ -96,11 +97,6 @@ void FeatureEval::initialize2(PluginManager * pm) {
     layout->addWidget(new QLabel("Feature"));
     feature_cb_ = new QComboBox(settings_);
     layout->addWidget(feature_cb_);
-
-    connect(feature_cb_, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [this] (int idx){
-        function_idx_ = feature_cb_->itemData(idx).toInt();
-        qDebug() << "changed";
-    });
 
     // round up parameters
     param_map_["subsample_res"].f = &subsample_res_;
@@ -170,6 +166,27 @@ void FeatureEval::initialize2(PluginManager * pm) {
     layout->addWidget(downsample_sb);
 
 
+    QDoubleSpinBox * downsample_sb2 = new QDoubleSpinBox();
+    downsample_sb2->setAccelerated(true);
+    downsample_sb2->setMinimum(0.001);
+    downsample_sb2->setMaximum(1);
+    downsample_sb2->setValue(subsample_res_2_);
+    connect(downsample_sb2, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), [=] (double value){
+        subsample_res_2_ = value;
+    });
+
+    QLabel * sb2_label = new QLabel("Downsample resolution 2 (meters)");
+    layout->addWidget(sb2_label);
+    layout->addWidget(downsample_sb2);
+
+    // feature change
+    connect(feature_cb_, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [=] (int idx){
+        function_idx_ = feature_cb_->itemData(idx).toInt();
+        sb2_label->setVisible(function_idx_ == 0);
+        downsample_sb2->setVisible(function_idx_ == 0);
+        qDebug() << "changed";
+    });
+
     // Run button
     QPushButton * run = new QPushButton("Correlate and visualise");
     connect(run, &QPushButton::clicked, [=] (){
@@ -187,6 +204,9 @@ void FeatureEval::initialize2(PluginManager * pm) {
 }
 
 void FeatureEval::layersModified(){
+    if(layer_cb_ == nullptr)
+        return;
+
     layer_cb_->clear();
     layer_cb_->addItem("Select", -1);
 
@@ -220,6 +240,9 @@ void FeatureEval::setReportFuction(QDebug *dbg){
 }
 
 void FeatureEval::reportResult(float r2, float * correl, int correl_size){
+    if(report_ == nullptr)
+        return;
+
     *report_
              << scan_ << ", "
              << layer_ << ", "
@@ -726,7 +749,7 @@ void FeatureEval::difference_of_normals(){
     pcl::PointCloud<pcl::Normal>::Ptr normals = ne_->getNormals(_cloud);
 
     float res1 = subsample_res_;
-    float res2 = subsample_res_*2;
+    float res2 = subsample_res_2_;
 
     // Downsample
     pcl::PointCloud<pcl::PointXYZINormal>::Ptr smaller_cloud;

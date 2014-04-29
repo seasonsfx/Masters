@@ -111,7 +111,7 @@ signals:
     int function_idx_;
     int layer_idx_;
 
-    bool visualise_on_;
+
     std::vector<std::function<void()>> functions_;
     std::map<QString, std::function<void()>> name_to_function_;
 
@@ -121,6 +121,8 @@ signals:
     float time_;
 
  public:
+    bool visualise_on_;
+
     std::map<QString, Param> param_map_;
 
     QString fname_;

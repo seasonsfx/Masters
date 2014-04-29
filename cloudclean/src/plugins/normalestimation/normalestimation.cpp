@@ -391,6 +391,16 @@ NormalEstimator::estimateNormals(boost::shared_ptr<PointCloud> cloud) {
 
         pcl::Normal & normal_ref = normals->points[grid_to_cloud[i]];
 
+        // TESTING REMOVE THIS:
+
+//        normal_ref.data_n[0] = 1.0f;
+//        normal_ref.data_n[1] = 0.0f;
+//        normal_ref.data_n[2] = 0.0f;
+//        normal_ref.data_n[3] = 0.0f;
+//        continue;
+
+        //////////////////////
+
         // Face count can be 0
         // Should set to point to camera
         if (face_count == 0) {

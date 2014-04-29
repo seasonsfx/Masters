@@ -130,6 +130,7 @@ void AutoTest::setPermuteAndRun(std::vector<std::pair<QString, QJsonArray>> & pa
 }
 
 void AutoTest::runtest() {
+    feature_eval_->visualise_on_ = false;
     // Setup reporting
     QFile report_file("report.csv");
     report_file.open(QIODevice::WriteOnly | QIODevice::Text);
@@ -225,7 +226,7 @@ void AutoTest::runtest() {
         report_file.close();
     }
     //features;
-
+    feature_eval_->visualise_on_ = true;
 
 }
 

@@ -2,15 +2,15 @@
 	"features": {
 		"difference_of_normals": {
 			"subsample_res": [
-				{ "small": 0.1, "big": 0.2 },
-                { "small": 0.1, "big": 0.3 },
-                { "small": 0.1, "big": 0.4 },
-				{ "small": 0.2, "big": 0.3 },
-                { "small": 0.2, "big": 0.4 },
-                { "small": 0.2, "big": 0.5 },
-                { "small": 0.3, "big": 0.4 },
-                { "small": 0.3, "big": 0.5 },
-                { "small": 0.4, "big": 0.5 }
+				{ "small": 0.01, "big": 0.02 },
+                { "small": 0.01, "big": 0.03 },
+                { "small": 0.01, "big": 0.04 },
+				{ "small": 0.05, "big": 0.06 },
+                { "small": 0.05, "big": 0.07 },
+                { "small": 0.05, "big": 0.08 },
+                { "small": 0.1, "big": 0.11 },
+                { "small": 0.1, "big": 0.12 },
+                { "small": 0.1, "big": 0.13 }
 			]
 		},
 		"intensity_histogram": {

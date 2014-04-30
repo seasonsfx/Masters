@@ -20,6 +20,7 @@ class GUI_API FlatView : public QGLWidget {
     FlatView(QGLFormat &fmt, CloudList * cl,
              LayerList * ll, QWidget *parent = 0,
              QGLWidget * sharing = 0);
+    ~FlatView();
     void setGLD(GLData *gld);
     const Eigen::Affine2f getCamera();
     const Eigen::Affine2f getNDCCamera();

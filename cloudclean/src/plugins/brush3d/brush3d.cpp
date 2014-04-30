@@ -250,7 +250,8 @@ void Brush3D::select2D(int x, int y){
     } else {
         int idx = flatview_->imageToCloudIdx(int(coord.x() + 0.5),
                                   int(coord.y() + 0.5), pc);
-        select(idx, x, y);
+        if(idx != -1)
+            select(idx, x, y);
     }
 
 
@@ -260,6 +261,9 @@ void Brush3D::select2D(int x, int y){
 }
 
 int Brush3D::select(int idx, int x, int y){
+    if(idx == -1)
+        return idx;
+
     Eigen::Vector3f p1, p2;
     int r = radius_ * 100;
 

@@ -1,0 +1,47 @@
+Dataset preprocessing:
+	Remove points too far away to be useful
+	Remove scanner band noise
+
+Datasets:
+	Segmented into interesting classes
+		Noise
+			Grass
+
+			Scaffolding
+			Stick Person
+			Person
+			Leaves
+			Branch/trunk
+			Trees / bushes leaning against buildings, walls
+		Points of interests
+			Regular wall
+			Eroded wall
+			Roof
+			Ground
+			Relevant structures
+
+Describe each datasets
+	classes:
+		10% Grass
+		80% Walls
+	scene type:
+		outdoor ruins: quantify this
+		building: regular shapes and such
+
+
+Feature tests
+	Find good features
+	Size of scans are not important?
+	Get the full spectum of objects
+
+
+
+Roshan can you please explain why this is difficult?
+
+User testing:
+	Save selections requested
+
+
+Data:
+	Keep uniform scale and subsample
+	Throw away data at radius X

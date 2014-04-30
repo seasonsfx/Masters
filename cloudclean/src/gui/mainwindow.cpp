@@ -61,9 +61,9 @@ MainWindow::MainWindow(QUndoStack *us, CloudList * cl, LayerList * ll, QWidget *
     //QGLFormat::setDefaultFormat(base_format);
 
     // Important! Context invalidates when reparenting the glwidget on windows
-    glwidget_ = new GLWidget(base_format, cl, ll, tabs_);
+    glwidget_ = new GLWidget(base_format, cl, ll, this);
     tabs_->addTab(glwidget_, "3D View");
-    flatview_ = new FlatView(base_format, cl, ll, tabs_, glwidget_);
+    flatview_ = new FlatView(base_format, cl, ll, this, glwidget_);
     tabs_->addTab(flatview_, "2D View");
 
     qDebug() << "Format: " << glwidget_->format().majorVersion() << glwidget_->format().minorVersion() << "Core:" << (glwidget_->format().profile() == QGLFormat::CoreProfile);

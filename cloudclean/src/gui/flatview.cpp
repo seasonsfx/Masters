@@ -24,6 +24,10 @@ FlatView::FlatView(QGLFormat & fmt, CloudList * cl,
     gl_init_ = false;
 }
 
+FlatView::~FlatView(){
+
+}
+
 void FlatView::setGLD(GLData * gld){
     gld_ = gld;
     rotate(M_PI/2 *3);

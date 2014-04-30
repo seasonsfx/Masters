@@ -12,7 +12,7 @@
 class COMMAND_API Select : public QUndoCommand
 {
 public:
-    explicit Select(boost::shared_ptr<PointCloud> pc,
+    Select(boost::shared_ptr<PointCloud> pc,
                            boost::shared_ptr<std::vector<int> > selected,
                            bool deselect = false,
                            uint8_t selection_type = 1,

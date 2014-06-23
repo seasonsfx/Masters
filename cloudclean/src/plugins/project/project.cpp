@@ -214,11 +214,21 @@ void Project::load(QString filename){
             for(int j = 0; j < i; j++){
                 c << l[j];
             }
+            QString candidate_dir = c.join(sep).trimmed();
             c << name;
             QString candidate_path = c.join(sep).trimmed();
             QFileInfo fi(candidate_path);
 
             qDebug() << "candidate: |" << candidate_path.toLocal8Bit().data() << '|' <<exists;
+
+            // attempt other names
+            QStringList sl = QDir(candidate_dir).entryList();
+            QString original_name = name.split(".")[0].split("#")[0];
+            for(QString str : sl){
+                if(str.startsWith(original_name)){
+                    return candidate_dir + sep + str;
+                }
+            }
 
             if(fi.exists())
                 return candidate_path;

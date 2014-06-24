@@ -300,9 +300,6 @@ void FlatView::paintEvent(QPaintEvent *event) {
         cd = gld_->cloudgldata_[pc];
     }
 
-//    QPainter p(this);
-//    p.beginNativePainting();
-
     glEnable(GL_DEPTH_TEST);
 
 
@@ -346,9 +343,6 @@ void FlatView::paintEvent(QPaintEvent *event) {
     glBindTexture(GL_TEXTURE_BUFFER, 0); CE();
 
     program_.release();
-
-//    p.endNativePainting();
-//    p.end();
 
     emit pluginPaint();
     glFinish();

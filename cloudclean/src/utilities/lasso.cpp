@@ -147,7 +147,7 @@ void Lasso::drawLasso(Eigen::Vector2f mouseLoc, QPaintDevice * device){
     size_t b_size = 3*sizeof(float)*(points_.size()+1);
     buff.allocate(b_size); CE();
 
-    int third_component = 0;
+    float third_component = -1;
 
 //    buff.write(0, mouseLoc.data(), 2*sizeof(float));
 //    buff.write(2*sizeof(float), &third_component, sizeof(float));

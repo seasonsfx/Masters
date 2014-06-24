@@ -96,7 +96,7 @@ void Project::save(){
     QString path = settings.value("load/lastlocation", QDir::home().absolutePath()).toString();
 
     QString filename = QFileDialog::getSaveFileName(
-                 nullptr, tr("Save project"), path, tr("Cloud clean project files (*.ccp)"));
+                 mw_, tr("Save project"), path, tr("Cloud clean project files (*.ccp)"));
     if (filename.length() == 0)
         return;
 
@@ -306,7 +306,7 @@ void Project::load(){
     QString path = settings.value("load/lastlocation", QDir::home().absolutePath()).toString();
 
     QString filename = QFileDialog::getOpenFileName(
-                 nullptr, tr("Open project"), path, tr("Cloud clean project files (*.ccp)"));
+                 mw_, tr("Open project"), path, tr("Cloud clean project files (*.ccp)"));
     if (filename.length() == 0)
         return;
 

@@ -24,7 +24,7 @@ void LeapListener::onDisconnect(const Leap::Controller& controller) {
 }
 
 void LeapListener::onExit(const Leap::Controller& controller) {
-    std::cout << "Exited";
+    std::cout << "Exited" << std::endl;
 }
 
 void LeapListener::onFrame(const Leap::Controller& controller) {
@@ -38,17 +38,22 @@ void LeapListener::onFrame(const Leap::Controller& controller) {
             << ", gestures: " << frame.gestures().count();
   */
 
-  if (!frame.hands().empty()) {
+  if (!frame.hands().isEmpty()) {
     // Get the first hand
     const Leap::Hand hand = frame.hands()[0];
 
 
-    if(frame.fingers().count() < 2 && frame.hands().count() == 1){
+    qDebug() << "Radius: " << hand.sphereRadius();
+
+    // Grab
+    if(hand.sphereRadius() < 50.0 && hand.translationProbability(controller.frame(1)) > 0.6){
         Leap::Vector v = hand.translation(controller.frame(1));
         v = 0.1 * v;
         glwidget_->camera_.translate(v.x, v.y, v.z);
         glwidget_->update();
     }
+
+    qDebug() << "Hand pos" << hand.palmPosition().x << hand.palmPosition().y << hand.palmPosition().z;
 
     if(frame.fingers().count() > 200 && frame.hands().count() == 1){
         Leap::Vector trans = hand.translation(controller.frame(1));
@@ -57,7 +62,7 @@ void LeapListener::onFrame(const Leap::Controller& controller) {
         trans = 0.1 * trans;
         //glwidget_->camera_.translate(0, 0, dir*0.1);
 
-        //Leap::Vector rot = hand.rotationAxis(controller.frame(1));
+        //Leap::Vector rot = hand.rotationAxis(controller.frame());
 
         float yaw = hand.rotationAngle(controller.frame(1), Leap::Vector(1, 0, 0));
         float pitch = hand.rotationAngle(controller.frame(1), Leap::Vector(1, 0, 0)); // works
@@ -120,7 +125,7 @@ void LeapListener::onFrame(const Leap::Controller& controller) {
         // Calculate angle swept since last frame
         float sweptAngle = 0;
         if (circle.state() != Leap::Gesture::STATE_START) {
-          Leap::CircleGesture previousUpdate = Leap::CircleGesture(controller.frame(1).gesture(circle.id()));
+          Leap::CircleGesture previousUpdate = Leap::CircleGesture(controller.frame().gesture(circle.id()));
           sweptAngle = (circle.progress() - previousUpdate.progress()) * 2 * M_PI;
         }
         std::cout << "Circle id: " << gesture.id()
@@ -173,4 +178,22 @@ void LeapListener::onFocusGained(const Leap::Controller& controller) {
 
 void LeapListener::onFocusLost(const Leap::Controller& controller) {
     //std::cout << "Focus Lost";
+}
+
+void LeapListener::onDeviceChange(const Leap::Controller& controller) {
+  std::cout << "Device Changed" << std::endl;
+  const Leap::DeviceList devices = controller.devices();
+
+  for (int i = 0; i < devices.count(); ++i) {
+    std::cout << "id: " << devices[i].toString() << std::endl;
+    std::cout << "  isStreaming: " << (devices[i].isStreaming() ? "true" : "false") << std::endl;
+  }
+}
+
+void LeapListener::onServiceConnect(const Leap::Controller& controller) {
+  std::cout << "Service Connected" << std::endl;
+}
+
+void LeapListener::onServiceDisconnect(const Leap::Controller& controller) {
+  std::cout << "Service Disconnected" << std::endl;
 }

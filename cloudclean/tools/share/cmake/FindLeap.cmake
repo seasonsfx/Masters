@@ -30,8 +30,14 @@ FIND_LIBRARY(Leap_LIBRARIES NAMES Leap
    $ENV{LeapROOT}/lib
    $ENV{Leap_ROOT}/lib
    $ENV{Leap_DIR}/lib
+   PATH_SUFFIXES
+   .
+   Leap
    DOC "Leap library name"
 )
+
+MESSAGE("LEAP include: " ${Leap_INCLUDE_DIR})
+MESSAGE("LEAP lib: " ${Leap_LIBRARIES})
 
 if(Leap_INCLUDE_DIR AND Leap_LIBRARIES)
    set(Leap_FOUND TRUE)

@@ -346,7 +346,7 @@ Eigen::Affine3f PointCloud::modelview() {
 
     AngleAxis<float> rotation(0, Vector3f(1, 0, 0));
     if(frame_ == CoordinateFrame::Camera){
-        rotation = AngleAxis<float>(-M_PI/2, Vector3f(1, 0, 0));
+        rotation = AngleAxis<float>(-M_PI/2, Vector3f(0, 0, 1));
     }
 
     return  rotation * sensor_orientation_ * tr * Affine3f::Identity();

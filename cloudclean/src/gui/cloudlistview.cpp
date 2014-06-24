@@ -88,6 +88,7 @@ void CloudListView::contextMenu(const QPoint &pos) {
             else
                 cl_->clouds_[row]->frame_ =CoordinateFrame::Camera;
 
+            pc->resetOrientation();
             glwidget_->update();
         });
         menu.addAction(&tfc);

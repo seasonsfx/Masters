@@ -100,36 +100,46 @@ Picker::~Picker(){
 }
 
 uint Picker::renderPick3d(int x, int y){
-    glBindFramebuffer(GL_FRAMEBUFFER, fbo_);CE();
+
     // Create the texture object for the primitive information buffer
     glBindTexture(GL_TEXTURE_2D, picking_texture_id_);CE();
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32UI, glwidget_->width(), glwidget_->height(),
-                    0, GL_RGB_INTEGER, GL_UNSIGNED_INT, NULL);CE();
-    glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
-                    picking_texture_id_, 0);CE();
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R32UI, glwidget_->width(), glwidget_->height(),
+                    0, GL_RGBA_INTEGER, GL_UNSIGNED_INT, NULL);CE();
+
+
 
     // Create the texture object for the depth buffer
     glBindTexture(GL_TEXTURE_2D, depth_texture_id_);CE();
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, glwidget_->width(), glwidget_->height(),
                     0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);CE();
-    glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D,
+
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo_);CE();
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
+                    picking_texture_id_, 0);CE();
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D,
                     depth_texture_id_, 0);CE();
 
     // Disable reading to avoid problems with older GPUs
-    glReadBuffer(GL_NONE);CE();
+    //glReadBuffer(GL_NONE);CE();
 
     // Verify that the FBO is correct
     GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);CE();
 
     if (status != GL_FRAMEBUFFER_COMPLETE) {
         printf("FB error, status: 0x%x\n", status);
+
+        // Restore the default framebuffer
+        glBindTexture(GL_TEXTURE_2D, 0); CE();
+        glBindFramebuffer(GL_FRAMEBUFFER, 0); CE();
         return false;
     }
 
+    glDrawBuffer(GL_COLOR_ATTACHMENT0);
 
-    glClearColor(1.0, 1.0, 1.0, 1.0);CE();
+
+    glClearColor(0, 0, 0, 0);CE();
     glEnable(GL_DEPTH_TEST);CE();
-    glEnable(GL_MULTISAMPLE);CE();
+    //glEnable(GL_MULTISAMPLE);CE();
     //glEnable(GL_POINT_SMOOTH);CE();
     glPointSize(glwidget_->pointRenderSize());CE();
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT); CE();
@@ -180,23 +190,23 @@ uint Picker::renderPick3d(int x, int y){
     program_3d_.release(); CE();
 
     // read point
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo_); CE();
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo_); CE();
     glReadBuffer(GL_COLOR_ATTACHMENT0);CE();
-    uint data[3];
-    glReadPixels(x, glwidget_->height() - y, 1, 1, GL_RGB_INTEGER, GL_UNSIGNED_INT, &data);CE();
+    uint data;
+    glReadPixels(x, glwidget_->height() - y, 1, 1, GL_RED_INTEGER, GL_UNSIGNED_INT, &data);CE();
     glReadBuffer(GL_NONE);CE();
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);CE();
+    //glBindFramebuffer(GL_FRAMEBUFFER, 0);CE();
 
     // Restore the default framebuffer
     glBindTexture(GL_TEXTURE_2D, 0); CE();
     glBindFramebuffer(GL_FRAMEBUFFER, 0); CE();
 
-    qDebug() << "render pick" << data[0];
+    qDebug() << "render pick" << data;
 
-    if(data[0] > 1000000000)
+    if(data > 1000000000)
         return -1;
 
-    return data[0];
+    return data;
 }
 
 bool Picker::eventFilter(QObject *object, QEvent *event){

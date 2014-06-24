@@ -179,13 +179,13 @@ void Lasso::drawLasso(Eigen::Vector2f mouseLoc, QPaintDevice * device){
                        identity.data());CE();
 
     float color[] = {0.0f, 1.0f, 0.0f};
-    glUniform3fv(uni_color, 1, color);
+    glUniform3fv(uni_color, 1, color); CE();
 
-    glLineWidth(2.0f);
+    glLineWidth(2.0f); CE();
     glDrawArrays(GL_LINE_LOOP, 0, points_.size()); CE();
 
     buff.release(); CE();
-    glBindVertexArray(0);
+    glBindVertexArray(0); CE();
     program_->release();
 }
 

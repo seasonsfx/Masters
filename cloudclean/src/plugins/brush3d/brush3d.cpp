@@ -349,7 +349,8 @@ bool Brush3D::mouseMoveEvent(QMouseEvent * event) {
                     float dist = 0;
                     Eigen::Vector3f dir = diff.normalized();
                     // Interpolate
-                    while(dist < len){
+                    while(dist < len && last_rad_ > 0.001){
+                        //qDebug() << dist << len << last_rad_;
                         Eigen::Vector3f p = p1 + dist*dir;
                         dist+=last_rad_/4;
 

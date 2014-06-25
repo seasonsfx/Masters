@@ -15,12 +15,5 @@ void main( void ) {
     int layer_id = color_index;
     bool is_selected = bool(flags);
 
-
-    // Selections will make this fail
-//    if(layer_colour.a == 0) {
-//        gl_Position = vec4(1e6, 1e6, 1e6, 1);
-//        return;
-//    }
-
     gl_Position = projection * modelview * vertex;
 }

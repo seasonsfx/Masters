@@ -89,6 +89,8 @@ Picker::Picker(GLWidget *glwidget, FlatView *flatview, CloudList * cl, std::func
     glGenTextures(1, &depth_texture_id_); CE();
     glGenVertexArrays(1, &vao_); CE();
     glGenFramebuffers(1, &fbo_); CE();
+    glGenRenderbuffers(1, &depth_rbo_);
+    glGenRenderbuffers(1, &color_rbo_);
 }
 
 Picker::~Picker(){
@@ -97,6 +99,130 @@ Picker::~Picker(){
     glDeleteTextures(1, &depth_texture_id_); CE();
     glDeleteVertexArrays(1, &vao_);CE();
     glDeleteFramebuffers(1, &fbo_);CE();
+    glDeleteRenderbuffers(1, &depth_rbo_);CE();
+    glDeleteRenderbuffers(1, &color_rbo_);CE();
+}
+
+uint Picker::renderPick3d_(int x, int y){
+
+
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo_);CE();
+
+    // Create the render buffer for the primitive information buffer
+    glBindRenderbuffer(GL_RENDERBUFFER, depth_rbo_);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, glwidget_->width(), glwidget_->height());
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depth_rbo_);
+
+    // Create the render buffer for the depth buffer
+    glBindRenderbuffer(GL_RENDERBUFFER, color_rbo_);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_R32UI, glwidget_->width(), glwidget_->height());
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, color_rbo_);
+
+
+    // Disable reading to avoid problems with older GPUs
+    glReadBuffer(GL_NONE);CE();
+
+    // Verify that the FBO is correct
+    GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);CE();
+
+    if (status != GL_FRAMEBUFFER_COMPLETE) {
+        printf("FB incomplete, status: 0x%x\n", status);
+        std::cout.flush();
+
+        // Restore the default framebuffer
+        glBindTexture(GL_TEXTURE_2D, 0); CE();
+        glBindFramebuffer(GL_FRAMEBUFFER, 0); CE();
+        return false;
+    }
+
+    glDrawBuffer(GL_COLOR_ATTACHMENT0);
+
+
+    glClearColor(0, 0, 0, 0);CE();
+    glEnable(GL_DEPTH_TEST);CE();
+    glPointSize(glwidget_->pointRenderSize());CE();
+    glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT); CE();
+
+
+    program_3d_.bind(); CE();
+
+    glBindVertexArray(vao_);CE();
+
+    boost::shared_ptr<PointCloud> pc = cl_->active_;
+    boost::shared_ptr<CloudGLData> cd = glwidget_->gld()->cloudgldata_.at(pc);
+
+    /////////
+
+    // Point buffer
+    cd->point_buffer_->bind(); CE();
+    glEnableVertexAttribArray(0); CE();
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float)*4, 0); CE();
+    glEnableVertexAttribArray(1); CE();
+    int offset = sizeof(float)*3;
+    glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(float)*4,
+                          reinterpret_cast<const void *>(offset)); CE();
+    cd->point_buffer_->release(); CE();
+
+    // Label buffer
+    cd->label_buffer_->bind(); CE();
+    glEnableVertexAttribArray(2); CE(); CE();
+    glVertexAttribIPointer(2, 1, GL_SHORT, 0, 0); CE();
+    cd->label_buffer_->release(); CE();
+
+    // Flag buffer
+    cd->flag_buffer_->bind(); CE();
+    glEnableVertexAttribArray(3); CE();
+    glVertexAttribIPointer(3, 1, GL_BYTE, 0, 0); CE();
+    cd->flag_buffer_->release(); CE();
+
+    glUniformMatrix4fv(uni_projection_, 1, GL_FALSE,
+                       glwidget_->camera_.projectionMatrix().data());CE();
+
+    glUniformMatrix4fv(uni_modelview_, 1, GL_FALSE,
+                       (glwidget_->camera_.modelviewMatrix()*pc->modelview())
+                       .data());CE();
+
+    cd->draw(vao_);
+
+    /////////
+    glBindVertexArray(0);CE();
+    program_3d_.release(); CE();
+
+    // read point
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo_); CE();
+    glReadBuffer(GL_COLOR_ATTACHMENT0);CE();
+
+    uint data;
+    glReadPixels(x, glwidget_->height() - y, 1, 1, GL_RED_INTEGER, GL_UNSIGNED_INT, &data);CE();
+
+//    std::vector<uint> data_buff(glwidget_->width() * glwidget_->height(), 0);
+
+//    glBindTexture(GL_TEXTURE_2D, picking_texture_id_);
+//    glGetTexImage(GL_TEXTURE_2D, 0, GL_RED_INTEGER, GL_UNSIGNED_INT, data_buff.data());
+
+//    data = data_buff[y*glwidget_->width() + x];
+
+//    for(int i =  0; i < glwidget_->height(); i++){
+//        for(int j =  0; j < glwidget_->width(); j++){
+//            //glReadPixels(j, i, 1, 1, GL_RED_INTEGER, GL_UNSIGNED_INT, &data);CE();
+//            data_buff[i*glwidget_->width() + j];
+//            std::cout << data << " ";
+//        }
+//        std::cout << std::endl;
+//    }
+
+    glReadBuffer(GL_NONE);CE();
+
+    // Restore the default framebuffer
+    glBindTexture(GL_TEXTURE_2D, 0); CE();
+    glBindFramebuffer(GL_FRAMEBUFFER, 0); CE();
+
+    qDebug() << "render pick" << data;
+
+    if(data > 1000000000)
+        return -1;
+
+    return data;
 }
 
 uint Picker::renderPick3d(int x, int y){
@@ -110,34 +236,35 @@ uint Picker::renderPick3d(int x, int y){
 
     // Create the texture object for the depth buffer
     glBindTexture(GL_TEXTURE_2D, depth_texture_id_);CE();
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, glwidget_->width(), glwidget_->height(),
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, glwidget_->width(), glwidget_->height(),
                     0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);CE();
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo_);CE();
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
+    glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
                     picking_texture_id_, 0);CE();
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D,
+    glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D,
                     depth_texture_id_, 0);CE();
 
     // Disable reading to avoid problems with older GPUs
-    //glReadBuffer(GL_NONE);CE();
+    glReadBuffer(GL_NONE);CE();
 
     // Verify that the FBO is correct
-    GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);CE();
+    GLenum status = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER);CE();
 
     if (status != GL_FRAMEBUFFER_COMPLETE) {
         printf("FB error, status: 0x%x\n", status);
 
         // Restore the default framebuffer
         glBindTexture(GL_TEXTURE_2D, 0); CE();
-        glBindFramebuffer(GL_FRAMEBUFFER, 0); CE();
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); CE();
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, 0); CE();
         return false;
     }
 
     glDrawBuffer(GL_COLOR_ATTACHMENT0);
 
 
-    glClearColor(0, 0, 0, 0);CE();
+    glClearColor(1, 1, 1, 1);CE();
     glEnable(GL_DEPTH_TEST);CE();
     //glEnable(GL_MULTISAMPLE);CE();
     //glEnable(GL_POINT_SMOOTH);CE();
@@ -190,16 +317,35 @@ uint Picker::renderPick3d(int x, int y){
     program_3d_.release(); CE();
 
     // read point
-    glBindFramebuffer(GL_FRAMEBUFFER, fbo_); CE();
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo_); CE();
     glReadBuffer(GL_COLOR_ATTACHMENT0);CE();
+
     uint data;
     glReadPixels(x, glwidget_->height() - y, 1, 1, GL_RED_INTEGER, GL_UNSIGNED_INT, &data);CE();
-    glReadBuffer(GL_NONE);CE();
-    //glBindFramebuffer(GL_FRAMEBUFFER, 0);CE();
+
+//    std::vector<uint> data_buff(glwidget_->width() * glwidget_->height(), 0);
+
+//    glBindTexture(GL_TEXTURE_2D, picking_texture_id_);
+//    glGetTexImage(GL_TEXTURE_2D, 0, GL_RED_INTEGER, GL_UNSIGNED_INT, data_buff.data());
+
+//    data = data_buff[y*glwidget_->width() + x];
+
+//    for(int i =  0; i < glwidget_->height(); i++){
+//        for(int j =  0; j < glwidget_->width(); j++){
+//            //glReadPixels(j, i, 1, 1, GL_RED_INTEGER, GL_UNSIGNED_INT, &data);CE();
+//            data_buff[i*glwidget_->width() + j];
+//            std::cout << data << " ";
+//        }
+//        std::cout << std::endl;
+//    }
+
+
+    glReadBuffer(GL_NONE); CE();
 
     // Restore the default framebuffer
     glBindTexture(GL_TEXTURE_2D, 0); CE();
-    glBindFramebuffer(GL_FRAMEBUFFER, 0); CE();
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); CE();
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, 0); CE();
 
     qDebug() << "render pick" << data;
 
@@ -235,7 +381,7 @@ bool Picker::mouseReleaseEvent(QMouseEvent * event){
 //                   glwidget_->camera_.modelviewMatrix(),
 //                   cl_->active_);
 
-    uint idx = -1;
+    int idx = -1;
     if(is3d()) {
         idx = renderPick3d(event->x(), event->y());
     }

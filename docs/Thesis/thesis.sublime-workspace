@@ -20,6 +20,7 @@
 			}
 		},
 		{
+<<<<<<< HEAD
 			"file": "02-background.tex",
 			"settings":
 			{
@@ -43,10 +44,17 @@
 			"settings":
 			{
 				"buffer_size": 359,
+=======
+			"file": ".sublime-project",
+			"settings":
+			{
+				"buffer_size": 115,
+>>>>>>> 6644a414c2eafa0c0b66883a20e891aaab604b41
 				"line_ending": "Unix"
 			}
 		},
 		{
+<<<<<<< HEAD
 			"file": "makefile.sh",
 			"settings":
 			{
@@ -59,45 +67,82 @@
 			"settings":
 			{
 				"buffer_size": 551,
+=======
+			"contents": "Package Control Messages\n========================\n\nLaTeXing:\n--------\n\n  LaTeXing Plugin\n  \n  Thank you for installing the LaTeXing plugin!\n  \n  To learn more about the features of this plugin, check the project website:\n  \n  http://www.latexing.com\n  \n  The autocompletion of many LaTeX commands is available via the Plugin LaTeX-cwl.\n  \n  The documentation of LaTeXing is accessable via:\n  \n  http://www.latexing.com/docs.html (stable version)\n  http://www.latexing.com/docs/testing.html (testing version)\n  \n  Enjoy the work with LaTeXing!\n  Chris\n\n\nLaTeXTools:\n----------\n\n  LaTeXTools Plugin version 2012-09-17 17:03:16\n  \n  Thank you for installing the LaTeXTools plugin!\n  \n  If you have not updated your LaTeXTools plugin in a while, please note:\n  THE KEYBOARD SHORTCUTS HAVE CHANGED!\n  \n  To learn about the features of this plugin, go to the Github page:\n  \n  https://github.com/SublimeText/LaTeXTools\n  \n  and scroll down to the README file. Actually, the Markdown source of that file is in the plugin directory, which you can open using \"Browse Packages...\" in Sublime Text 2.\n  \n  You can also check out my blog at\n  \n  tekonomist.wordpress.com\n  \n  and/or circle me on Google Plus.\n  \n  Happy TeXing!\n  Marciano Siniscalchi\n  \n",
+			"settings":
+			{
+				"buffer_size": 1242,
+>>>>>>> 6644a414c2eafa0c0b66883a20e891aaab604b41
 				"line_ending": "Unix",
 				"name": "Package Control Messages",
 				"scratch": true
 			}
 		},
 		{
+<<<<<<< HEAD
 			"file": "thesis.sublime-project",
 			"settings":
 			{
 				"buffer_size": 301,
+=======
+			"file": "02-background.tex",
+			"settings":
+			{
+				"buffer_size": 8072,
+>>>>>>> 6644a414c2eafa0c0b66883a20e891aaab604b41
 				"line_ending": "Unix"
 			}
 		},
 		{
+<<<<<<< HEAD
 			"file": "05-evaluation.tex",
 			"settings":
 			{
 				"buffer_size": 197,
+=======
+			"file": "02-background.aux",
+			"settings":
+			{
+				"buffer_size": 3323,
+>>>>>>> 6644a414c2eafa0c0b66883a20e891aaab604b41
 				"line_ending": "Unix"
 			}
 		},
 		{
+<<<<<<< HEAD
 			"file": "thesis.tex",
 			"settings":
 			{
 				"buffer_size": 2019,
+=======
+			"settings":
+			{
+				"buffer_size": 0,
+>>>>>>> 6644a414c2eafa0c0b66883a20e891aaab604b41
 				"line_ending": "Unix"
 			}
 		},
 		{
+<<<<<<< HEAD
 			"file": "/home/rickert/.config/sublime-text-3/Packages/User/LaTeXing.sublime-settings",
 			"settings":
 			{
 				"buffer_size": 18460,
+=======
+			"file": "thesis.tex",
+			"settings":
+			{
+				"buffer_size": 1873,
+>>>>>>> 6644a414c2eafa0c0b66883a20e891aaab604b41
 				"line_ending": "Unix"
 			}
 		},
 		{
+<<<<<<< HEAD
 			"file": "literature.notes",
+=======
+			"contents": "literature:\n\nhow can existing methods be used to segment \n\nrandom forests used in simultaneous localisation and mapping",
+>>>>>>> 6644a414c2eafa0c0b66883a20e891aaab604b41
 			"settings":
 			{
 				"buffer_size": 119,
@@ -109,7 +154,11 @@
 	"build_system": "",
 	"command_palette":
 	{
+<<<<<<< HEAD
 		"height": 390.0,
+=======
+		"height": 75.0,
+>>>>>>> 6644a414c2eafa0c0b66883a20e891aaab604b41
 		"selected_items":
 		[
 			[
@@ -121,6 +170,7 @@
 				"Package Control: Remove Package"
 			],
 			[
+<<<<<<< HEAD
 				"build",
 				"LaTeXing: Rebuild Cache (Hard)"
 			],
@@ -133,6 +183,8 @@
 				"Package Control: Install Package"
 			],
 			[
+=======
+>>>>>>> 6644a414c2eafa0c0b66883a20e891aaab604b41
 				"remo",
 				"Package Control: Remove Package"
 			],
@@ -145,6 +197,7 @@
 				"Package Control: Install Package"
 			]
 		],
+<<<<<<< HEAD
 		"width": 467.0
 	},
 	"console":
@@ -176,6 +229,15 @@
 			"import oauth",
 			"import pip",
 			"dir",
+=======
+		"width": 449.0
+	},
+	"console":
+	{
+		"height": 139.0,
+		"history":
+		[
+>>>>>>> 6644a414c2eafa0c0b66883a20e891aaab604b41
 			"import urllib.request,os,hashlib; h = '7183a2d3e96f11eeadd761d777e62404e330c659d4bb41d3bdf022e94cab3cd0'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://sublime.wbond.net/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by) ",
 			"import urllib.request,os; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); open(os.path.join(ipp, pf), 'wb').write(urllib.request.urlopen( 'http://sublime.wbond.net/' + pf.replace(' ','%20')).read()) "
 		]
@@ -191,12 +253,15 @@
 	},
 	"file_history":
 	[
+<<<<<<< HEAD
 		"/home/rickert/.config/sublime-text-3/Packages/User/LaTeXing.sublime-settings",
 		"/home/rickert/.config/sublime-text-3/Packages/LaTeXing/LaTeXing.sublime-settings",
 		"/home/rickert/Masters/docs/Thesis/03-design.tex:8 Reference `todolbl",
 		"/home/rickert/Masters/docs/Thesis/thesis.bbl",
 		"/home/rickert/Masters/docs/Thesis/03-design.tex:9 Reference `todolbl",
 		"/home/rickert/Masters/docs/Thesis/02-background.aux",
+=======
+>>>>>>> 6644a414c2eafa0c0b66883a20e891aaab604b41
 		"/home/rickert/.config/sublime-text-3/Packages/LaTeXing/latexing/api/mendeley.map",
 		"/home/rickert/Masters/cloudclean/CMakeLists.txt",
 		"/home/rickert/Desktop/software.sh",
@@ -206,7 +271,11 @@
 	],
 	"find":
 	{
+<<<<<<< HEAD
 		"height": 38.0
+=======
+		"height": 25.0
+>>>>>>> 6644a414c2eafa0c0b66883a20e891aaab604b41
 	},
 	"find_in_files":
 	{
@@ -220,10 +289,13 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+<<<<<<< HEAD
 			"mendel",
 			"mende",
 			"todo",
 			"tod",
+=======
+>>>>>>> 6644a414c2eafa0c0b66883a20e891aaab604b41
 			"id",
 			"op_smt_formtrain_req_reason",
 			"93",
@@ -260,7 +332,11 @@
 	"groups":
 	[
 		{
+<<<<<<< HEAD
 			"selected": 2,
+=======
+			"selected": 0,
+>>>>>>> 6644a414c2eafa0c0b66883a20e891aaab604b41
 			"sheets":
 			[
 				{
@@ -276,8 +352,13 @@
 						"selection":
 						[
 							[
+<<<<<<< HEAD
 								1397,
 								1397
+=======
+								832,
+								832
+>>>>>>> 6644a414c2eafa0c0b66883a20e891aaab604b41
 							]
 						],
 						"settings":
@@ -289,28 +370,46 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
+<<<<<<< HEAD
 					"stack_index": 4,
+=======
+					"stack_index": 0,
+>>>>>>> 6644a414c2eafa0c0b66883a20e891aaab604b41
 					"type": "text"
 				},
 				{
 					"buffer": 1,
+<<<<<<< HEAD
 					"file": "02-background.tex",
 					"semi_transient": false,
 					"settings":
 					{
 						"buffer_size": 8072,
+=======
+					"file": ".sublime-project",
+					"semi_transient": true,
+					"settings":
+					{
+						"buffer_size": 115,
+>>>>>>> 6644a414c2eafa0c0b66883a20e891aaab604b41
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
+<<<<<<< HEAD
 								3984,
 								3984
+=======
+								115,
+								115
+>>>>>>> 6644a414c2eafa0c0b66883a20e891aaab604b41
 							]
 						],
 						"settings":
 						{
+<<<<<<< HEAD
 							"spell_check": true,
 							"syntax": "Packages/LaTeX/LaTeX.tmLanguage",
 							"translate_tabs_to_spaces": false
@@ -320,55 +419,99 @@
 						"zoom_level": 1.0
 					},
 					"stack_index": 3,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "03-design.tex",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 232,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								231,
-								231
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/LaTeXing/support/LaTeX.tmLanguage"
+=======
+							"syntax": "Packages/Text/Plain text.tmLanguage"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 2,
+>>>>>>> 6644a414c2eafa0c0b66883a20e891aaab604b41
 					"type": "text"
 				},
 				{
-					"buffer": 3,
-					"file": "04-implementation.tex",
+					"buffer": 2,
+<<<<<<< HEAD
+					"file": "03-design.tex",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 359,
+						"buffer_size": 232,
+=======
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1242,
+>>>>>>> 6644a414c2eafa0c0b66883a20e891aaab604b41
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								359,
-								359
+<<<<<<< HEAD
+								231,
+								231
+=======
+								1242,
+								1242
+>>>>>>> 6644a414c2eafa0c0b66883a20e891aaab604b41
 							]
 						],
 						"settings":
 						{
+<<<<<<< HEAD
+							"syntax": "Packages/LaTeXing/support/LaTeX.tmLanguage"
+=======
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"word_wrap": true
+>>>>>>> 6644a414c2eafa0c0b66883a20e891aaab604b41
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+<<<<<<< HEAD
+					"stack_index": 0,
+=======
+					"stack_index": 1,
+>>>>>>> 6644a414c2eafa0c0b66883a20e891aaab604b41
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+<<<<<<< HEAD
+					"file": "04-implementation.tex",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 359,
+=======
+					"file": "02-background.tex",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 8072,
+>>>>>>> 6644a414c2eafa0c0b66883a20e891aaab604b41
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+<<<<<<< HEAD
+								359,
+								359
+=======
+								8072,
+								8072
+>>>>>>> 6644a414c2eafa0c0b66883a20e891aaab604b41
+							]
+						],
+						"settings":
+						{
+<<<<<<< HEAD
 							"syntax": "Packages/LaTeXing/support/LaTeX.tmLanguage"
 						},
 						"translation.x": 0.0,
@@ -376,34 +519,66 @@
 						"zoom_level": 1.0
 					},
 					"stack_index": 5,
+=======
+							"spell_check": true,
+							"syntax": "Packages/LaTeX/LaTeX.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 2108.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+>>>>>>> 6644a414c2eafa0c0b66883a20e891aaab604b41
 					"type": "text"
 				},
 				{
 					"buffer": 4,
+<<<<<<< HEAD
 					"file": "makefile.sh",
 					"semi_transient": false,
 					"settings":
 					{
 						"buffer_size": 68,
+=======
+					"file": "02-background.aux",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3323,
+>>>>>>> 6644a414c2eafa0c0b66883a20e891aaab604b41
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
+<<<<<<< HEAD
 								68,
 								68
+=======
+								0,
+								0
+>>>>>>> 6644a414c2eafa0c0b66883a20e891aaab604b41
 							]
 						],
 						"settings":
 						{
+<<<<<<< HEAD
 							"syntax": "Packages/ShellScript/Shell-Unix-Generic.tmLanguage"
+=======
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+>>>>>>> 6644a414c2eafa0c0b66883a20e891aaab604b41
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
+<<<<<<< HEAD
 					"stack_index": 7,
+=======
+					"stack_index": 6,
+>>>>>>> 6644a414c2eafa0c0b66883a20e891aaab604b41
 					"type": "text"
 				},
 				{
@@ -411,6 +586,7 @@
 					"semi_transient": false,
 					"settings":
 					{
+<<<<<<< HEAD
 						"buffer_size": 551,
 						"regions":
 						{
@@ -441,18 +617,27 @@
 					"settings":
 					{
 						"buffer_size": 301,
+=======
+						"buffer_size": 0,
+>>>>>>> 6644a414c2eafa0c0b66883a20e891aaab604b41
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
+<<<<<<< HEAD
 								299,
 								299
+=======
+								0,
+								0
+>>>>>>> 6644a414c2eafa0c0b66883a20e891aaab604b41
 							]
 						],
 						"settings":
 						{
+<<<<<<< HEAD
 							"syntax": "Packages/JavaScript/JSON.tmLanguage",
 							"translate_tabs_to_spaces": false
 						},
@@ -483,12 +668,19 @@
 						"settings":
 						{
 							"syntax": "Packages/LaTeXing/support/LaTeX.tmLanguage"
+=======
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+>>>>>>> 6644a414c2eafa0c0b66883a20e891aaab604b41
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
+<<<<<<< HEAD
 					"stack_index": 6,
+=======
+					"stack_index": 7,
+>>>>>>> 6644a414c2eafa0c0b66883a20e891aaab604b41
 					"type": "text"
 				}
 			]
@@ -498,25 +690,39 @@
 			"sheets":
 			[
 				{
+<<<<<<< HEAD
 					"buffer": 8,
+=======
+					"buffer": 6,
+>>>>>>> 6644a414c2eafa0c0b66883a20e891aaab604b41
 					"file": "thesis.tex",
 					"semi_transient": false,
 					"settings":
 					{
+<<<<<<< HEAD
 						"buffer_size": 2019,
+=======
+						"buffer_size": 1873,
+>>>>>>> 6644a414c2eafa0c0b66883a20e891aaab604b41
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
+<<<<<<< HEAD
 								646,
 								646
+=======
+								1403,
+								1403
+>>>>>>> 6644a414c2eafa0c0b66883a20e891aaab604b41
 							]
 						],
 						"settings":
 						{
 							"spell_check": true,
+<<<<<<< HEAD
 							"syntax": "Packages/LaTeXing/support/LaTeX.tmLanguage"
 						},
 						"translation.x": 0.0,
@@ -559,6 +765,19 @@
 				{
 					"buffer": 10,
 					"file": "literature.notes",
+=======
+							"syntax": "Packages/LaTeX/LaTeX.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 126.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+>>>>>>> 6644a414c2eafa0c0b66883a20e891aaab604b41
 					"semi_transient": false,
 					"settings":
 					{
@@ -582,7 +801,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
+<<<<<<< HEAD
 					"stack_index": 10,
+=======
+					"stack_index": 4,
+>>>>>>> 6644a414c2eafa0c0b66883a20e891aaab604b41
 					"type": "text"
 				}
 			]
@@ -590,11 +813,19 @@
 	],
 	"incremental_find":
 	{
+<<<<<<< HEAD
 		"height": 38.0
 	},
 	"input":
 	{
 		"height": 38.0
+=======
+		"height": 25.0
+	},
+	"input":
+	{
+		"height": 0.0
+>>>>>>> 6644a414c2eafa0c0b66883a20e891aaab604b41
 	},
 	"layout":
 	{
@@ -628,7 +859,11 @@
 	"menu_visible": true,
 	"output.exec":
 	{
+<<<<<<< HEAD
 		"height": 335.0
+=======
+		"height": 112.0
+>>>>>>> 6644a414c2eafa0c0b66883a20e891aaab604b41
 	},
 	"output.find_results":
 	{

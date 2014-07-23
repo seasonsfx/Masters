@@ -113,7 +113,7 @@ boost::shared_ptr<std::vector<int> > mergeUnique(
         boost::shared_ptr<std::vector<int> > b){
 
     boost::shared_ptr<std::vector<int> > c;
-    c.reset(new std::vector<int>(a->size() + b->size()));
+    c.reset(new std::vector<int>(a->size() + b->size(), 0));
 
     std::copy(a->begin(), a->end(), c->begin());
     std::copy(b->begin(), b->end(), c->begin() + a->size());

@@ -1,5 +1,7 @@
 \documentclass[a4paper,11pt]{report}
 \usepackage{fullpage}
+\usepackage{comment}
+\usepackage[colorinlistoftodos]{todonotes}
 %\usepackage{cite}
 \usepackage{lmodern}
 \usepackage[T1]{fontenc}
@@ -21,7 +23,11 @@
 \usepackage{listings}
 %\usepackage{algorithmic}
 
+% http://www.tex.ac.uk/ctan/macros/latex/contrib/todonotes/todonotes.pdf
+
 \begin{document}
+
+\listoftodos
 
 \pagestyle{plain} % just page numbers at the bottom
 \title{Interactive point cloud segmentation}
@@ -35,17 +41,17 @@ Point cloud cleaning is an important but time consuming step in a 3d reconstruct
 \tableofcontents
 \newpage
 
-\include{01-introduction}
+\include{chapters/01-introduction}
 % Motivation & research question
 % Ethics
-\include{02-background}
+\include{chapters/02-background}
 % Background we need to know
-% \include{03-design}
+\include{chapters/03-design}
 % % What is needed to evaluate this question
 % % research design
-% \include{04-implementation}
+\include{chapters/04-implementation}
 % % Technical details of implementation
-% \include{05-evaluation}
+\include{chapters/05-evaluation}
 % % Evaluation procedure
 % % First tried experts in participatory design
 % % Its bad so we try technology probe (put this in design)

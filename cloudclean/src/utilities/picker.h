@@ -58,6 +58,7 @@ class UTIL_API Picker : public QObject{
     Picker(GLWidget *glwidget, FlatView *flatview, CloudList * cl, std::function<void (int)> callback = nullptr, bool *enabled = &yes);
     ~Picker();
     uint renderPick3d(int x, int y);
+    uint renderPick3d_(int x, int y);
     bool eventFilter(QObject *object, QEvent *event);
     bool is3d();
 
@@ -79,6 +80,8 @@ class UTIL_API Picker : public QObject{
     GLuint depth_texture_id_;
     GLuint vao_;
     GLuint fbo_;
+    GLuint color_rbo_;
+    GLuint depth_rbo_;
     int uni_sampler_;
     int uni_projection_;
     int uni_modelview_;

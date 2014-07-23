@@ -4,7 +4,7 @@
 In order to expedited the segmentation of laser range scans its important to both understand the problem domain as well as constrain the problem. We start this chapter by examining laser range scanning technology and how it is employed in the context cultural heritage domain.
 
 \section{Range scanners}
-	
+
 There is an enormous variety of range scanners. Time of flight scanners are generally used in the cultural heritage domain because of their long range (up to kilometers). Time of flight scanners work by sending out a laser pulses that reflect of objects and is then recorded by a sensor at the source. The time it takes to the pulse to return, along with the angle at which the pulse was fired, is used to determine the position of a point on a surface. There is more measurement error (millimeters) along the direction of the laser than the other two axis. This is due to measurement inaccuracies when timing the laser's travel time. Triangulation scanners are more accurate along the direction of the beam (tens of micrometers), but they have a shorter range compared to time of flight scanners. This makes them less popular when people try minimize the number of scans required to capture a site. (Other types of range scanners include structure from motion and structured light.)
 
 Time of flight scanners can be set to sample at different resolutions. Low resolution scans (10 000 points) may take seconds while higher resolution scans (millions of points) may take minutes depending on the model. All scanners return the X,Y and Z coordinates per sample. Most also return an intensity value of the reflected light. More expensive scanners are also mounted with a camera that associates RGB values with every sample. This makes it easier to texture (texture) the final model. Measuring the orientation and GPS position of the scanner is another optional feature that can ease registration process (discussed later).
@@ -159,5 +159,11 @@ Point cloud cleaning is a interactive segmentation problem. Segmentation is by n
 		
 
 \section{Conclusion}
-%What do I conclude from all this and lead into the next chapter.		
+%What do I conclude from all this and lead into the next chapter.	
+
+
+
+\section{Review of literature}
+
+\cite{Spina2010} Cultural heritage segmentation
 

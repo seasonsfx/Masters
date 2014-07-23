@@ -1,0 +1,56 @@
+literature:
+
+how can existing methods be used to segment 
+
+random forests used in simultaneous localisation and mapping
+
+propriety scanners may have access to raw scan data that may be of use in the cleaning process. we however choose to focus on a simple xyzi representation as manisfested in leice ptx format.
+
+
+
+Goals
+    Speed up pointcloud cleaning
+    Point cloud cleaning in an interactive task
+    We cannot hope to clean a pointcloud in a fully automated way
+    Hence we try to enhance the users ability to perform the task
+
+    Methods for augmenting the user's ability to perform the cleaning task can be characterised in the following ways.
+
+    The speed at which a user is able to clean a scene is affected by the following.
+
+    Speed at which the system performs
+        Does it get in the way
+        No undo is a major bummer
+
+    The amount of work it does for the user
+        Does it magically select things
+        Does it allow me to discriminate between two distict things that are not specially seperated
+
+    Discriminative power the tools have.
+        Lasso tool
+            If spacially seperated
+        Brush tool
+            Nice for 
+
+    Point cloud cleaning is a segmentation task
+        We need to discriminate between n or more sets
+        Our tools need to seperate points
+        How do we seperate points
+        We seperate points using point features
+
+        Humans an use some features better than machines
+
+        Let the human do what they do best and help with some augmentation
+
+        In our point sets we have 4 elementary features.
+            3 spacial ones
+            1 reflectance
+
+        A user can effectively be modeled at large complicated neural network which has been trained for years to combine these low level features into higher level semantic classes. See gestalt theory.
+
+        It is out of the scope of the project to out do the human in terms of accuracy in point cloud cleaning task. It is very hard to break a point cloud up into sets that correspond to semantic classes. Even a human has a hard time with this.
+
+        We will therefore focus on augmenting the user's ability to exploit the 4 primary features in the dataset.
+
+        While a system may not be able to determine what point correspond to a house or a person, it can classify simpler geometric primitives with greater 
+

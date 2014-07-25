@@ -1,0 +1,66 @@
+problem:
+	point clouds are hard to clean
+		artefacts
+			variation in return values
+			semi points
+			windows
+
+		unwanted objects
+			people walking past
+			equipment
+			trees
+
+	manual job
+	time consuming
+
+motivation:
+	zamani
+
+research question:
+	how can we make it faster?
+
+problem analysis?
+	describe the cleaning task
+		segmentation
+		interactive task through photoshop like system
+
+	what parts of the task makes it slow
+		its hard for humans to distinguish bewteen unwanted and wanted stuff
+		system limitations:
+			no undo
+			memory limitations
+			navigation
+				2d
+				3d, rolling
+
+	how do we make it faster?
+		we create tools to help users seperate data from artefacts
+
+
+Objectives
+	Create a system to speed up the cleaning process
+		reduce system friction
+			good navigation of the cloud
+			unlimted layers
+			maintain interactivity
+				batch jobs are seldom correct
+
+		tools that help segment the pointcloud
+			lasso
+			region growing
+			brush
+			random forest
+
+
+Limitations
+	Only ptx files with intensity and x y z
+		many proriety formats
+		some contain more useful information
+			full waveform analysis
+			colour information
+
+	Only medium sized files
+		many out of core issues with larger files
+
+	Only looking at heritage datasets
+

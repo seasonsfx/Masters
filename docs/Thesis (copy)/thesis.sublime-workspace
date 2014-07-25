@@ -12,6 +12,56 @@
 	"buffers":
 	[
 		{
+			"file": "01-introduction.tex",
+			"settings":
+			{
+				"buffer_size": 2662,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "thesis.sublime-project",
+			"settings":
+			{
+				"buffer_size": 237,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "04-implementation.tex",
+			"settings":
+			{
+				"buffer_size": 91,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "Package Control Messages\n========================\n\nLaTeXing:\n--------\n\n  LaTeXing Plugin\n  \n  Thank you for installing the LaTeXing plugin!\n  \n  To learn more about the features of this plugin, check the project website:\n  \n  http://www.latexing.com\n  \n  The autocompletion of many LaTeX commands is available via the Plugin LaTeX-cwl.\n  \n  The documentation of LaTeXing is accessable via:\n  \n  http://www.latexing.com/docs.html (stable version)\n  http://www.latexing.com/docs/testing.html (testing version)\n  \n  Enjoy the work with LaTeXing!\n  Chris\n\n\nLaTeXTools:\n----------\n\n  LaTeXTools Plugin version 2012-09-17 17:03:16\n  \n  Thank you for installing the LaTeXTools plugin!\n  \n  If you have not updated your LaTeXTools plugin in a while, please note:\n  THE KEYBOARD SHORTCUTS HAVE CHANGED!\n  \n  To learn about the features of this plugin, go to the Github page:\n  \n  https://github.com/SublimeText/LaTeXTools\n  \n  and scroll down to the README file. Actually, the Markdown source of that file is in the plugin directory, which you can open using \"Browse Packages...\" in Sublime Text 2.\n  \n  You can also check out my blog at\n  \n  tekonomist.wordpress.com\n  \n  and/or circle me on Google Plus.\n  \n  Happy TeXing!\n  Marciano Siniscalchi\n  \n",
+			"settings":
+			{
+				"buffer_size": 1242,
+				"line_ending": "Unix",
+				"name": "Package Control Messages",
+				"scratch": true
+			}
+		},
+		{
+			"file": "02-background.tex",
+			"settings":
+			{
+				"buffer_size": 8072,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "02-background.aux",
+			"settings":
+			{
+				"buffer_size": 3323,
+				"line_ending": "Unix"
+			}
+		},
+		{
 			"settings":
 			{
 				"buffer_size": 0,
@@ -19,68 +69,36 @@
 			}
 		},
 		{
-			"file": "chapters/01-introduction.tex",
-			"settings":
-			{
-				"buffer_size": 3892,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "chapters/04-implementation.tex",
-			"settings":
-			{
-				"buffer_size": 359,
-				"line_ending": "Unix"
-			}
-		},
-		{
 			"file": "thesis.tex",
 			"settings":
 			{
-				"buffer_size": 2064,
+				"buffer_size": 1873,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "chapters/05-evaluation.tex",
+			"contents": "literature:\n\nhow can existing methods be used to segment \n\nrandom forests used in simultaneous localisation and mapping",
 			"settings":
 			{
-				"buffer_size": 198,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "chapters/problem.txt",
-			"settings":
-			{
-				"buffer_size": 1241,
+				"buffer_size": 119,
 				"line_ending": "Unix",
-				"name": "problem:"
+				"name": "literature:"
 			}
 		}
 	],
 	"build_system": "",
 	"command_palette":
 	{
-		"height": 96.0,
+		"height": 75.0,
 		"selected_items":
 		[
 			[
-				"istall ",
-				"Package Control: Install Package"
-			],
-			[
-				"inst",
+				"insta",
 				"Package Control: Install Package"
 			],
 			[
 				"remove",
 				"Package Control: Remove Package"
-			],
-			[
-				"insta",
-				"Package Control: Install Package"
 			],
 			[
 				"remo",
@@ -89,9 +107,13 @@
 			[
 				"instal",
 				"Package Control: Install Package"
+			],
+			[
+				"inst",
+				"Package Control: Install Package"
 			]
 		],
-		"width": 467.0
+		"width": 449.0
 	},
 	"console":
 	{
@@ -113,10 +135,6 @@
 	},
 	"file_history":
 	[
-		"/home/rickert/Masters/docs/Thesis/02-background.aux",
-		"/home/rickert/Masters/docs/Thesis/thesis.sublime-project",
-		"/home/rickert/Masters/docs/Thesis/02-background.tex",
-		"/home/rickert/Masters/docs/Thesis/01-introduction.tex",
 		"/home/rickert/.config/sublime-text-3/Packages/LaTeXing/latexing/api/mendeley.map",
 		"/home/rickert/Masters/cloudclean/CMakeLists.txt",
 		"/home/rickert/Desktop/software.sh",
@@ -126,7 +144,7 @@
 	],
 	"find":
 	{
-		"height": 35.0
+		"height": 25.0
 	},
 	"find_in_files":
 	{
@@ -140,7 +158,6 @@
 		"case_sensitive": false,
 		"find_history":
 		[
-			"cite",
 			"id",
 			"op_smt_formtrain_req_reason",
 			"93",
@@ -177,11 +194,182 @@
 	"groups":
 	[
 		{
-			"selected": 1,
+			"selected": 2,
 			"sheets":
 			[
 				{
 					"buffer": 0,
+					"file": "01-introduction.tex",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2662,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								832,
+								832
+							]
+						],
+						"settings":
+						{
+							"spell_check": true,
+							"syntax": "Packages/LaTeX/LaTeX.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "thesis.sublime-project",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 237,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								64,
+								64
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JSON.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "04-implementation.tex",
+					"semi_transient": true,
+					"settings":
+					{
+						"buffer_size": 91,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								91,
+								91
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/LaTeX/LaTeX.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1242,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1242,
+								1242
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"word_wrap": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "02-background.tex",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 8072,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								8072,
+								8072
+							]
+						],
+						"settings":
+						{
+							"spell_check": true,
+							"syntax": "Packages/LaTeX/LaTeX.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 2108.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "02-background.aux",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3323,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 7,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
 					"semi_transient": false,
 					"settings":
 					{
@@ -204,87 +392,30 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 5,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "chapters/01-introduction.tex",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 3892,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1075,
-								1075
-							]
-						],
-						"settings":
-						{
-							"spell_check": true,
-							"syntax": "Packages/LaTeXing/support/LaTeX.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 0,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "chapters/04-implementation.tex",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 359,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/LaTeXing/support/LaTeX.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
+					"stack_index": 8,
 					"type": "text"
 				}
 			]
 		},
 		{
-			"selected": 2,
+			"selected": 1,
 			"sheets":
 			[
 				{
-					"buffer": 3,
+					"buffer": 7,
 					"file": "thesis.tex",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2064,
+						"buffer_size": 1873,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								519,
-								519
+								1403,
+								1403
 							]
 						],
 						"settings":
@@ -296,64 +427,35 @@
 						"translation.y": 126.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 4,
+					"stack_index": 6,
 					"type": "text"
 				},
 				{
-					"buffer": 4,
-					"file": "chapters/05-evaluation.tex",
+					"buffer": 8,
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 198,
+						"buffer_size": 119,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								198,
-								198
+								119,
+								119
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/LaTeXing/support/LaTeX.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 3,
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "chapters/problem.txt",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1241,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								108,
-								108
-							]
-						],
-						"settings":
-						{
-							"auto_name": "problem:",
+							"auto_name": "literature:",
 							"syntax": "Packages/Text/Plain text.tmLanguage"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 0,
 					"type": "text"
 				}
 			]
@@ -365,7 +467,7 @@
 	},
 	"input":
 	{
-		"height": 33.0
+		"height": 0.0
 	},
 	"layout":
 	{

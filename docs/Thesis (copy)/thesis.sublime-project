@@ -1,0 +1,29 @@
+{
+	"folders":
+	[
+		{
+			"follow_symlinks": true,
+			"path": ".",
+			"file_exclude_patterns": [
+				".*",
+				"*.aux",
+				"*.out",
+				"*.log",
+				"*.synctex.gz",
+				"*.toc",
+				"*.bbl",
+				"*.fdb_latexmk",
+				"*.blg",
+				"*.fls",
+				"*.tdo"
+				]
+		}
+	],
+	"options": {
+		"root": "thesis.tex",
+		"pdf": "thesis.pdf"
+	},
+	"settings": {
+		"mendeley": false,
+	}
+}

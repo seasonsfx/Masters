@@ -1,50 +1,15 @@
 %!TEX root = thesis.tex
 \chapter{Introduction}
+Point cloud cleaning in an important part of modeling a scene from laser range scans. Digitally reconstructing a large structure or environment from a set of unprocessed laser scans is unlikely to result a very pleasing model. Raw laser scans typically not only contain instrument artefact's but also points associated with unwanted objects. Laser light that partially hits a foreground and background surface will result in a false data point somewhere in between. Capturing people walking through a scanning environment or cars parked nearby may also be unavoidable. After all the raw scans have been captured, it is someone's job to remove these unwanted points.
 
-In this thesis we show how the interactive segmentation of point clouds can be expedited by using machine learning and computer vision techniques. We also introduce a new open source interactive point cloud segmentation framework that we use to implement and evaluate various high and low level vision algorithms.
+Cleaning laser range scans is very big problem in the heritage preservation domain. Organizations tasked with digitally preserving historically significant sites around the world produce thousands of laser range scans. Cleaning one scan can take up to 2 hours. Many man months of manual labor are therefore dedicated to cleaning point clouds \cite{Ruther2011}.
 
-\section{Motivation}
-Interactive segmentation of point clouds is performed when removing noise or unwanted objects from laser range scans. This in an important step in the 3d reconstruction of environments from laser range scans. It can however be very time consuming and costly task.
+In this context, the goal of this thesis is to provide an analysis of why range scans are hard to clean, then propose and evaluate methods for expediting the process.
 
-Organizations like Zamani and CyArk use laser range scan technology to digitally record and preserve culturally significant heritage sites around the world. They spend thousands of man hours on each scanning expedition meticulously removing unwanted objects and artifacts from range scans. Points that may require excision include those that represent people, card birds or trees that were present at the time of the scan but are objects of interest. Scanner artifacts caused by reflections or the sun are also problematic.
-
-Employing faster and simpler point cloud segmentation methods promises to make cultural heritage preservation more efficient and save organizations like Zamani many man hours.
-
-\section{Goals and objectives}
 \begin{itemize}
-\item Find point features that can be used to distinguish between common objects in heritage scenes.
-\item Use point features to isolate points associated with unwanted objects and artifacts.
+	\item First, we describe the problem domain and set the scope of the investigation.
+	\item Second, systemic issues in existing software packages are highlighted
+	\item Third, limitations of the human visual system with respect to a segmentation task is discussed and methods are proposed to augment it. 
 \end{itemize}
 
-\section{Contributions}
-\begin{itemize}
-\item A cross platform and open source interactive point cloud cleaning framework.
-\item New interactive technique for segmenting laser range scans.
-\end{itemize}
-
-\section{Outline}
-Explain what is discussed in the following chapters
-
-% \begin{itemize}
-
-% %Various high and low level vision algorithms were implemented in this framework and evaluated against reference datasets produced by a collaborating research group. Interactively trained random forests was found to produce the most accurate results. Test subjects were then 
-
-
-% \item 3d reconstruction pipeline
-
-% \item Input: range scans
-
-% \item Output: 3d model
-
-% \item Point cloud cleaning is a segmentation/classification task
-
-% \item Done interactively because its difficult to produce accurate segmentations automatically
-
-% \item Time consuming task
-
-% \item Computer vision and machine learning can expedite the task
-
-% \item Non interactive segmentation algorithms can be applied in interactive ways to achieve greater accuracy.
-% \end{itemize}
-
-
+Following this review a system was designed to test the proposed methods evaluate their effectiveness. During the design efforts were made to overcome problems problems in existing software. Resulting contribution is a extensible open source cross-platform point cloud cleaning system for others to use and build on.

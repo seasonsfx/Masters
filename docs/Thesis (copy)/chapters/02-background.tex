@@ -1,19 +1,9 @@
 %!TEX root = thesis.tex
 \chapter{Background} \label{ch2}
 
-In this chapter, we introduce laser scanning and the 3D-reconstruction pipeline. In section~\ref{sec:heritage} we describe our problem's heritage preservation context. In section~\ref{sec:scanners} we introduce laser scanning followed by the process by which raw scanner data transformed into a model in section~\ref{sec:pipeline}. We then discuss the cleaning process in section~\ref{sec:cleaning}.
+In order to expedited the segmentation of laser range scans its important to both understand the problem domain as well as constrain the problem. We start this chapter by examining laser range scanning technology and how it is employed in the context cultural heritage domain.
 
-
-
-
-\section{Digital heritage preservation} \label{sec:heritage}
-
-Architectural heritage sites in many parts of the world are under threat of deterioration and destruction especially in developing countries. There is a need to preserve these heritage sites due to their historical relevance, if not physically, at least digitally. The demolition of  the Buddhas of Bamiyan by the Taliban in 2001 \cite{Toubekis2009} is a clear illustration of this need. Preservation efforts have used various techniques to record historical sites. Early efforts used tape measures and theodolites to produce simple ground plans. More recently photogrammetry allowed geomaticians to produce 3D models \cite{Heritage}. Now laser range scanners allows us to create extremely high resolution 3D model.
-
-
-\section{Laser range scanning} \label{sec:scanners}
-
-
+\section{Range scanners}
 
 There is an enormous variety of range scanners. Time of flight scanners are generally used in the cultural heritage domain because of their long range (up to kilometers). Time of flight scanners work by sending out a laser pulses that reflect of objects and is then recorded by a sensor at the source. The time it takes to the pulse to return, along with the angle at which the pulse was fired, is used to determine the position of a point on a surface. There is more measurement error (millimeters) along the direction of the laser than the other two axis. This is due to measurement inaccuracies when timing the laser's travel time. Triangulation scanners are more accurate along the direction of the beam (tens of micrometers), but they have a shorter range compared to time of flight scanners. This makes them less popular when people try minimize the number of scans required to capture a site. (Other types of range scanners include structure from motion and structured light.)
 
@@ -24,8 +14,7 @@ Time of flight scanners can be set to sample at different resolutions. Low resol
 (Mention non uniform point density somewhere? too obvious?)
 (Mention scanner resolution increasing over time?)
 
-\section{3D reconstruction pipeline} \label{sec:pipeline}
-
+\section{3D reconstruction pipeline}
 Some processing is required in order to create a 3d model from a collection of laser range scans. Unwanted objects need to be removed or cleaned. Holes created by removals and occlusions need to be filled. The scans need to registered. Registration is the process of aligning all the scans on a common coordinate system (mention Iterative closest points?).Then the registered point sets have to turned into a surface model. This is also called meshing. Finally the model has to be textured. RGB data from the scanner can be used if it available. Alternatively photos from the site has to be mapped to the model. The second approach is somewhat more time consuming.
 
 The cleaning step can be omitted but the quality of the model will be affected. Objects such as trees or grass do not always mesh nicely, and floating bits of people as they walk around may not be aesthetically pleasing. Hole filling is also not strictly necessary. It can even be argued that it compromises the integrity of the historical record as the filled area would be fabricated.
@@ -33,7 +22,7 @@ The cleaning step can be omitted but the quality of the model will be affected. 
 The first 3 step also do not have to happen in order. It is often the case that hole filling, cleaning and registration tasks are interspersed. Cleaning may be detrimental to the reregistration process as useful correspondences may be removed. Cleaning scans after registration can however be problematic. If the scans have been merged into a single point cloud, loading the scan into main memory may not be an option on some programs. One also loses the 2d grid structure of the scan after merging. The scan's grid allows one to interpret the scan as a 2d image which may be easier to clean.
 
 
-\section{Point cloud cleaning} \label{sec:cleaning}
+\section{Point cloud cleaning}
 	Focused specifically on the task of point cloud cleaning in heritage scenes
 
 	\subsection{Problem}

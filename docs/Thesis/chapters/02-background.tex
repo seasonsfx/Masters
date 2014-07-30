@@ -1,21 +1,72 @@
 %!TEX root = thesis.tex
-\chapter{Background} \label{ch2}
+\chapter{Background} \label{ch:background}
 
-In this chapter, we introduce laser scanning and the 3D-reconstruction pipeline. In section~\ref{sec:heritage} we describe our problem's heritage preservation context. In section~\ref{sec:scanners} we introduce laser scanning followed by the process by which raw scanner data transformed into a model in section~\ref{sec:pipeline}. We then discuss the cleaning process in section~\ref{sec:cleaning}.
+In this chapter, we introduce laser scanning and the 3D-reconstruction pipeline. In section~\ref{sec:heritage} we describe our problem's heritage preservation context. In section~\ref{sec:scanners} we introduce 3d scanning followed by the process by which raw scanner data transformed into a model in section~\ref{sec:pipeline}. We then discuss the cleaning process in section~\ref{sec:cleaning}.
 
 
 
 
 \section{Digital heritage preservation} \label{sec:heritage}
 
-Architectural heritage sites in many parts of the world are under threat of deterioration and destruction especially in developing countries. There is a need to preserve these heritage sites due to their historical relevance, if not physically, at least digitally. The demolition of  the Buddhas of Bamiyan by the Taliban in 2001 \cite{Toubekis2009} is a clear illustration of this need. Preservation efforts have used various techniques to record historical sites. Early efforts used tape measures and theodolites to produce simple ground plans. More recently photogrammetry allowed geomaticians to produce 3D models \cite{Heritage}. Now laser range scanners allows us to create extremely high resolution 3D model.
+Architectural heritage sites in many parts of the world are under threat of deterioration and destruction especially in developing countries. There is a need to preserve these heritage sites due to their historical relevance, if not physically, at least digitally. The demolition of  the Buddhas of Bamiyan by the Taliban in 2001 \cite{Toubekis2009} is a good illustration of this need. Preservation efforts have used various techniques to record historical sites. Early efforts used tape measures and theodolites to produce simple ground plans. More recently photogrammetry allowed geomaticians to produce 3D models \cite{Heritage}. Now laser range scanners allows us to create extremely high resolution 3D model.
 
 
-\section{Laser range scanning} \label{sec:scanners}
+\section{3D scanning} \label{sec:scanners}
+
+There is an enormous variety of 3D scanners available on the market today. Each scanner has properties that make them more of less suitable for various scanning tasks. Generally the size of the object and the level of detail one wishes to capture dictates the technology. There are also other considerations, including imaging speed, portability and cost.
+
+Scanning technologies can generally be classified into 2 categories, namely triangulation and time of flight scanners.
+
+Triangulation scanners, as the name suggests, uses trigonometric triangulation to locate of a point in a scene. Triangulation can be performed by either emitting a laser light or by projecting a series of linear patterns and then picking up the reflection with a sensor at a known position. During laser triangulation, the displacement of the object affects the angle at which the beam is returned. When using structured light, the distortions in the patterns from the sensor's perspective can be used to determine the angles of reflected light. Given the distance between the light source and sensor and as well as the angle of emitted and reflection light, Pythagorean theorem can be applied to location of a point on an surface relative to the scanner.
+
+Triangulation scanners are typically used for focal distances 
 
 
 
-There is an enormous variety of range scanners. Time of flight scanners are generally used in the cultural heritage domain because of their long range (up to kilometers). Time of flight scanners work by sending out a laser pulses that reflect of objects and is then recorded by a sensor at the source. The time it takes to the pulse to return, along with the angle at which the pulse was fired, is used to determine the position of a point on a surface. There is more measurement error (millimeters) along the direction of the laser than the other two axis. This is due to measurement inaccuracies when timing the laser's travel time. Triangulation scanners are more accurate along the direction of the beam (tens of micrometers), but they have a shorter range compared to time of flight scanners. This makes them less popular when people try minimize the number of scans required to capture a site. (Other types of range scanners include structure from motion and structured light.)
+
+TOF shoot a laser and times the return
+Phase based scanners are also TOF. It 
+
+
+Triangulation
+
+TOF
+
+Phase
+
+
+Sometimes an object will fall inbetween the technologies
+
+
+Small objects require accuracy over a short range. The degree of accuracy depends on the level of detail one wishes to capture. Very dense sampling is required to capture submilimetre objects. Conoscopic holography provides
+
+
+While this technology may be considered stable on a quite large variety of ”stan- dard" objects, there still exist many complex objects which still require lot of planning, tweaking and specific work, in order to obtain usable and high quality results
+
+
+
+Scanners:
+	Types
+		conoscopy, submillimetric object size
+		TOF
+		Phase shifting TOF, 1 to 20 meter sized objects
+		Laser Triangulation, small to human sized objects
+
+
+	Speed
+	Resolution
+	Accuracy
+	Range
+
+
+
+
+
+
+
+ Time of flight scanners are generally used in the cultural heritage domain because of their long range (up to kilometers).
+
+Time of flight scanners work by sending out laser pulses that reflect off objects and is then recorded by a sensor at the source. The time it takes to the pulse to return, along with the angle at which the pulse was fired, is used to determine the position of a point on a surface. There is more measurement error (millimeters) along the direction of the laser than the other two axis. This is due to measurement inaccuracies when timing the laser's travel time. Triangulation scanners are more accurate along the direction of the beam (tens of micrometers), but they have a shorter range compared to time of flight scanners. This makes them less popular when people try minimize the number of scans required to capture a site. (Other types of range scanners include structure from motion and structured light.)
 
 Time of flight scanners can be set to sample at different resolutions. Low resolution scans (10 000 points) may take seconds while higher resolution scans (millions of points) may take minutes depending on the model. All scanners return the X,Y and Z coordinates per sample. Most also return an intensity value of the reflected light. More expensive scanners are also mounted with a camera that associates RGB values with every sample. This makes it easier to texture (texture) the final model. Measuring the orientation and GPS position of the scanner is another optional feature that can ease registration process (discussed later).
 
@@ -70,103 +121,6 @@ The first 3 step also do not have to happen in order. It is often the case that 
 		\item extensibility (why did I not use it)
 	\end{itemize}
 
-
-\section{Previous work}
-Point cloud cleaning is a interactive segmentation problem. Segmentation is by no means a new problem.
-
-\subsection{Taxonomy}
-\begin{itemize}
-	\item Interactive/Automated
-	\item Information: 2D/2.5D/3D/nD, color, multi-sample, intensity
-	\item Resolution: High, Medium, Low
-	\item Features: Texture, FPFH, Normals, ...
-	\item Target: trees, ground, walls, people, generic
-	\item Parameters: Low, Medium, High
-\end{itemize}
-
-
-\subsection{Image segmentation}
-	Scans are simply a depth maps so 2D image techniques should be investigated
-	\subsection{Image gradients}
-	\subsection{Edge detection}
-	\subsection{Blob extraction}
-	\subsection{Contour extraction}
-
-\subsection{Laser scan segmentation}
-	\subsection{Point features}
-		\subsubsection{Normals}
-			Basic building block for other features
-			\begin{itemize}
-			\item Ways of performing normal estimation
-			\item Neighbour search
-				\begin{itemize}
-				\item KD Trees
-				\item Scan grid
-				\end{itemize}
-			\item Cost vs Quality
-			\item Dealing with noise
-			\item Used with machine learning algorithms
-			\end{itemize}
-				
-		\subsubsection{Fast point feature histograms (FPFH)}
-			\begin{itemize}
-			\item Good discrimination for primitive geometric objects
-			\item Costly to calculate
-			\end{itemize}
-			
-		\subsubsection{Principle components}
-			\begin{itemize}					
-			\item Good for finding edges and planes
-			\item Solves part of the inverse problem
-			\end{itemize}
-			
-
-	\subsection{Region growing}
-		\begin{itemize}
-		\item Grow neighbourhood from seed point
-		\item Add neighbour if it satisfies some similarity criteria
-		\item Point feature can be used to determine similarity
-		\end{itemize}
-
-	\subsection{K-means clustering}
-		Problems with non uniform density
-
-	\subsection{Graph cuts}
-		\begin{itemize}
-		\item Binary classification
-		\item Encode point similarity edges
-		\item Shown to work well with arbitrary objects
-		\item Results are parameter depended
-		\end{itemize}
-
-	\subsection{Machine learning}
-		\begin{itemize}
-		\item Used in navigation \& aerial scans
-		\item Support vector machines
-		\item Markov models
-		\item Conditional random fields
-		\item Requires training
-		\end{itemize}
-		
-	% \subsection{Evaluation of literature}
-	% 	\begin{itemize}
-	% 	\item FPFH seems to discriminate well for primitive geometry. Might be a useful feature to use in tree classification.
-	% 	\item Machine learning has been used to classify vegetation. It however requires training and classified datasets are rare. Possibility to train a classifier on the on scans in the application. Unpredictable accuracy.
-	% 	\item Graph cuts have been shown be effective for automated object classification. Augmented with more edge information accuracy may be improved with minimal user interaction.
-	% 	\end{itemize}
-
-\section{Evaluation techniques}
-\begin{itemize}
-	\item What was used in previous work and would it be suitable in this instance?
-\end{itemize}
-	
-% \section{User interaction}
-% 	\begin{itemize}
-% 		\item Level of interactivity expected?
-% 		\item Characteristics of interfaces?
-% 		\item Basic expected functionality?
-% 		\item Suitable evaluation techniques
-% 	\end{itemize}
 		
 
 \section{Conclusion}

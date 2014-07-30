@@ -1,0 +1,99 @@
+%!TEX root = thesis.tex
+\chapter{Literature review} \label{ch:lit}
+
+\section{Previous work}
+Point cloud cleaning is a interactive segmentation problem. Segmentation is by no means a new problem.
+
+\subsection{Taxonomy}
+\begin{itemize}
+	\item Interactive/Automated
+	\item Information: 2D/2.5D/3D/nD, color, multi-sample, intensity
+	\item Resolution: High, Medium, Low
+	\item Features: Texture, FPFH, Normals, ...
+	\item Target: trees, ground, walls, people, generic
+	\item Parameters: Low, Medium, High
+\end{itemize}
+
+
+\subsection{Image segmentation}
+	Scans are simply a depth maps so 2D image techniques should be investigated
+	\subsection{Image gradients}
+	\subsection{Edge detection}
+	\subsection{Blob extraction}
+	\subsection{Contour extraction}
+
+\subsection{Laser scan segmentation}
+	\subsection{Point features}
+		\subsubsection{Normals}
+			Basic building block for other features
+			\begin{itemize}
+			\item Ways of performing normal estimation
+			\item Neighbour search
+				\begin{itemize}
+				\item KD Trees
+				\item Scan grid
+				\end{itemize}
+			\item Cost vs Quality
+			\item Dealing with noise
+			\item Used with machine learning algorithms
+			\end{itemize}
+				
+		\subsubsection{Fast point feature histograms (FPFH)}
+			\begin{itemize}
+			\item Good discrimination for primitive geometric objects
+			\item Costly to calculate
+			\end{itemize}
+			
+		\subsubsection{Principle components}
+			\begin{itemize}					
+			\item Good for finding edges and planes
+			\item Solves part of the inverse problem
+			\end{itemize}
+			
+
+	\subsection{Region growing}
+		\begin{itemize}
+		\item Grow neighbourhood from seed point
+		\item Add neighbour if it satisfies some similarity criteria
+		\item Point feature can be used to determine similarity
+		\end{itemize}
+
+	\subsection{K-means clustering}
+		Problems with non uniform density
+
+	\subsection{Graph cuts}
+		\begin{itemize}
+		\item Binary classification
+		\item Encode point similarity edges
+		\item Shown to work well with arbitrary objects
+		\item Results are parameter depended
+		\end{itemize}
+
+	\subsection{Machine learning}
+		\begin{itemize}
+		\item Used in navigation \& aerial scans
+		\item Support vector machines
+		\item Markov models
+		\item Conditional random fields
+		\item Requires training
+		\end{itemize}
+		
+	% \subsection{Evaluation of literature}
+	% 	\begin{itemize}
+	% 	\item FPFH seems to discriminate well for primitive geometry. Might be a useful feature to use in tree classification.
+	% 	\item Machine learning has been used to classify vegetation. It however requires training and classified datasets are rare. Possibility to train a classifier on the on scans in the application. Unpredictable accuracy.
+	% 	\item Graph cuts have been shown be effective for automated object classification. Augmented with more edge information accuracy may be improved with minimal user interaction.
+	% 	\end{itemize}
+
+\section{Evaluation techniques}
+\begin{itemize}
+	\item What was used in previous work and would it be suitable in this instance?
+\end{itemize}
+	
+% \section{User interaction}
+% 	\begin{itemize}
+% 		\item Level of interactivity expected?
+% 		\item Characteristics of interfaces?
+% 		\item Basic expected functionality?
+% 		\item Suitable evaluation techniques
+% 	\end{itemize}

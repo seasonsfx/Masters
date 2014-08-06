@@ -29,7 +29,7 @@ Our approach is to add a numerical label to each point in a cloud and then keep 
 
 In this scheme, each point initially carries a 0 label that doesn't map to a layer. When the first layer set is created, the points in that set are labeled with 1. An entry is then created associating the new layer with the label 1 (see figure~\ref{fig:layer2}).
 
-When a second layer is created, the points in that layer are labeled with the next available interger label (see figure~\ref{fig:layer3}).
+When a second layer is created, the points in that layer are labeled with the next available integer label (see figure~\ref{fig:layer3}).
 
 If a layer is created that contain points already in another layer, the newly labeled points will simply get the next available label. Overlapping points however need to be relabeled with the next available label. The label associated with with the overlapping points is then assigned to both the old layer and the new layer (see figure~\ref{fig:layer4}).
 

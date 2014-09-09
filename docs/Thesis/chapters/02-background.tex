@@ -1,18 +1,22 @@
 %!TEX root = thesis.tex
 \chapter{Background} \label{ch:background}
 
+\todo[inline]{Lots more citations, preferably state that it's someone else's work, cite and then write about it.}
+
 In this chapter, we introduce laser scanning and the 3D-reconstruction pipeline. In section~\ref{sec:heritage} we describe the heritage preservation context of this work. In section~\ref{sec:scanners} we introduce 3d scanning and describe the process by which raw scanner data transformed into a model in section~\ref{sec:pipeline}. We then discuss the point cloud cleaning process in section~\ref{sec:cleaning}.
 
 
 \section{Digital heritage preservation} \label{sec:heritage}
 
-Architectural heritage sites in many parts of the world are under threat of deterioration and destruction especially in developing countries. There is a need to preserve these heritage sites due to their historical relevance, if not physically, at least digitally. The demolition of  the Buddhas of Bamiyan by the Taliban in 2001 \cite{Toubekis2009} is one illustration of this need. Preservation efforts have utilised various technologies to record historical sites. Early efforts used tape measures and theodolites to produce simple ground plans. \todo{Patrick need more general background: projects? other other todr? photo/text archiver? say why they are no longer used} More recently, photogrammetry let geomaticians produce 3D models \cite{Heritage}. Now laser range scanners allow us to create extremely high resolution 3D models.
+Architectural heritage sites in many parts of the world are under threat of deterioration and destruction especially in developing countries. There is a need to preserve these heritage sites due to their historical relevance, if not physically, at least digitally. The demolition of  the Buddhas of Bamiyan by the Taliban in 2001 \cite{Toubekis2009} is one illustration of this need. Preservation efforts have utilised several technologies to record historical sites. Early efforts used tape measures and theodolites to produce simple ground plans. \todo{Patrick need more general background: projects? other other todr? photo/text archiver? say why they are no longer used} More recently, photogrammetry lets geomaticians produce 3D models \cite{Heritage}. Now laser range scanners allow us to create extremely high resolution 3D models.
 
-\todo{expand}
+\todo{expand, say more, justify focus on laser scanning}
 
 \section{3D scanning} \label{sec:scanners}
 
-There are an enormous variety of 3D scanners on the market today. Each scanner has properties that make it more of less suitable for various scanning tasks. Generally the size of the object and the level of detail one wishes to capture dictate the technology. The imaging speed, portability and cost or a scanner are also considered.
+\todo[inline]{What is a range scanner, what is a point cloud, what is a range scan?}
+
+There are many known types of 3D scanner on the market today. Each scanner has properties that make it more of less suitable for various scanning tasks. Generally, the size of the object and the level of detail one wishes to capture dictate the technology. The imaging speed, portability and cost or a scanner should also be considered.
 
 3D Scanning technologies can generally be classified into 2 categories, namely triangulation and time of flight scanners.
 
@@ -22,14 +26,12 @@ There are an enormous variety of 3D scanners on the market today. Each scanner h
 	\begin{subfigure}[b]{.33\textwidth}
 	  \centering
 	  \includegraphics[width=.9\linewidth]{images/structured-light-scan}
-	  % \caption{Structured light 3D scanning \cite{Form2014}}
-	  % \label{fig:structured-light-scan}
+	  \caption{}
 	\end{subfigure}%
 	\begin{subfigure}[b]{.33\textwidth}
 	  \centering
 	  \includegraphics[width=.9\linewidth]{images/triangulate-laser-scan}
-	  % \caption{Laser 3D scanning}
-	  % \label{fig:images/triangulate-laser-scan}
+	  \caption{}
 	\end{subfigure}
 	\begin{subfigure}[b]{.33\textwidth}
 	  \centering
@@ -56,14 +58,15 @@ There are an enormous variety of 3D scanners on the market today. Each scanner h
 		% \tkzLabelAngle[pos= 0.15](B,C,A){$ $}
 
 		\end{tikzpicture}
+		\caption{}
 	\end{subfigure}
 	\caption{Triangulation 3D scanners \protect\footnotemark}
 	\label{fig:triangulation-scanners}
 \end{figure}
 
-Triangulation scanners, as the name suggests, uses trigonometric triangulation \cite{Frohlich2004} to locate a point in a scene relative to scanner. Triangulation can be performed by either emitting a laser pulse, laser bear or by projecting a series of linear light patterns and then picking up the reflection with a sensor at a known position. During laser triangulation, the displacement of the object affects the angle at which the laser is returned (see \autoref{fig:triangulation-scanners}). Using structured light, the distortions in the patterns from the sensor's perspective can be used to determine the angle of reflected light \cite{Brown2012}. Given the precise distance between the light source and sensor ($\begingroup\color{green}c\endgroup$) and as well as the outgoing angle of emitted light ($\begingroup\color{blue}A\endgroup$) and incoming angle of reflected light ($\begingroup\color{orange}B\endgroup$), the distance to the object is given by $\begingroup\color{red}b\endgroup = \begingroup\color{green}c\endgroup\frac{ sin(\begingroup\color{orange}B\endgroup)}{sin(\pi - \begingroup\color{blue}A\endgroup-\begingroup\color{orange}B\endgroup)}$.
+Triangulation scanners, as the name suggests, uses trigonometric triangulation \cite{Frohlich2004} to locate a point in a scene relative to the scanner. Triangulation can be performed by either emitting a laser pulse, laser beam or by projecting a series of linear light patterns and then picking up the reflection with a sensor at a known position. During laser triangulation, the displacement of the object affects the angle at which the laser signal is returned (see \autoref{fig:triangulation-scanners}). Using structured light, the distortions in the patterns from the sensor's perspective can be used to determine the angle of reflected light \cite{Brown2012}. Given the precise distance between the light source and sensor ($\begingroup\color{green}c\endgroup$) and as well as the outgoing angle of emitted light ($\begingroup\color{blue}A\endgroup$) and incoming angle of reflected light ($\begingroup\color{orange}B\endgroup$), the distance to the object is given by $\begingroup\color{red}b\endgroup = \begingroup\color{green}c\endgroup\frac{ sin(\begingroup\color{orange}B\endgroup)}{sin(\pi - \begingroup\color{blue}A\endgroup-\begingroup\color{orange}B\endgroup)}$.
 
-\subsection{Time of flight scanners (TOF)}
+\subsection{Time of flight scanners (TOF)} \label{subsec:tof}
 
 \begin{figure}[ht]
   \centering
@@ -73,7 +76,7 @@ Triangulation scanners, as the name suggests, uses trigonometric triangulation \
 \end{figure}
 \footnotetext{Source: \url{http://www.rapidform.com/3d-scanners/}}
 
-Time of flight scanners emit laser pulses and measure the time it takes for a pulse reflection to be detected by the scanner's sensor (see \autoref{fig:tof}). Given the speed of light, the distance traveled by the light can be determined. Given the time it takes for light to travel to a surface and back to the scanner ($t$), the distance ($d$) is given by $d = ct/2$ where $c$ is the speed of light. The accuracy of the distance calculation depends on how precisely time can be measured \cite{Form2014}.
+Time of flight scanners emit laser pulses and measure the time it takes for a pulse reflection to be detected by the scanner's sensor (see \autoref{fig:tof}). Given the speed of light, the distance traveled by the pulse can be determined. Given the time it takes for a pulses to travel to a surface and back to the scanner ($t$), the distance ($d$) is given by $d = ct/2$ where $c$ is the speed of light. The accuracy of the distance calculation depends on how precisely time can be measured \cite{Form2014}.
 
 \begin{figure}[ht]
 	\begin{tikzpicture}[scale=1]
@@ -109,9 +112,9 @@ Laser phase-shift scanners \cite{Frohlich2004} are a variation on the standard T
 
 Triangulation scanners can achieve 10 micrometer accuracy over distances less than one meter. Over longer distances the triangle in \autoref{fig:triangulation-scanners} becomes to long and the distance calculation error prone. Structured light scanners tend to be faster than laser scanners as the whole scene is captured instead of a single point at a time \cite{Brown2012}. Scanners are also less prone to motion distortions. Hand held scanners of this type exists which reduces setup time compared to other scanners.
 
-Time of flight scanners can measure a round trip of a laser pulse to an object more accurately over long distances than triangulation scanners can measure perspective distortions. This technology does not however deal well with distances less than 2 meters. Pure TOF scanners can scan distances up to 1000 meters \cite{Form2014}. TOF scanners can be set to sample at different resolutions. Low resolution scans (10 000 points) may take seconds while higher resolution scans (millions of points) may take minutes.
+Time of flight scanners can measure the time a laser pulse takes to go to and from an object very accurately over long distances. Pure TOF scanners can scan distances of up to 1000 meters \cite{Form2014}. TOF technology does not, however, deal well with distances less than 2 meters. Triangulation scanners on the other hand perform very well in the 2 meter range but suffers from accuracy issues beyond it. TOF scanners can be set to sample at different resolutions; low resolution scans (tens of thousands of points) may take seconds while higher resolution scans (millions of points) may take minutes.
 
-Phase-based scanners are more limited in range due to the ambiguity of returned signals from beyond the design distance \cite{Bhurtha}. Objects from beyond the scanner's designed range can sometimes be at closer distances when the scanner software fails to discard far away points. Phase based scanners make up for this shortfall by being much faster and more accurate within its range \cite{Form2014}.
+Phase-based scanners have limited range due to the ambiguity of returned signals from beyond the design distance \cite{Bhurtha}; objects from beyond the scanner's designed range can sometimes be erroneously returned as closer distances when the scanner software fails to discard far away points. Phase based scanners make up for this deficiency by being much faster and more accurate within its range \cite{Form2014}.
 
 
 \begin{table}
@@ -131,24 +134,28 @@ Phase-based scanners are more limited in range due to the ambiguity of returned 
 
 \subsection{Data} \label{sec:data}
 
+\footnotetext{Source: \url{http://www.rapidform.com/3d-scanners/}}
+
 \begin{figure}[ht]
   \centering
   \includegraphics[width=1\linewidth]{images/grid}
-  \caption{2D scan grid of intensity values}
+  \caption{2D scan grid of intensity values \protect\footnotemark[\value{footnote}]}
   \label{fig:grid}
 \end{figure}
-\footnotetext{Source: \url{http://www.rapidform.com/3d-scanners/}}
 
-The terrestrial laser scanners described above all produce angle and range measurements that are converted into 3D coordinates relative to the scanner. Scanners also record the intensity of the light returned. High end scanners sometimes have integrated cameras that are used to map colors to captured data points \cite{Frohlich2004}. Data points are typically saved in 2D grid data structure (see \autoref{fig:grid}). Orientation and GPS measurements are also available in some models which help speed up registration (\todo{see section X}).
+\footnotetext{Rendering based on data provided by the \href{http://www.zamaniproject.org/}{Zamani Project}}
 
-Scanner manufacturers may also record lower level measurements that are specific to their scanners. This data may valuable in cleaning artifacts from scans. However, this data tends to be locked away in propriety formats which are not readily accessible. We therefore limit our investigation to data that can be readily exported from scanner software. We also do not consider color information as such datasets were not readily available for this work.
+
+The terrestrial laser scanners described above all produce angle and range measurements that are converted into 3D coordinates relative to the scanner. Scanners also record the intensity of the light returned. High end scanners sometimes have integrated cameras that are used to map colors to captured data points \cite{Frohlich2004}. Data points are typically saved in 2D grid data structure (see \autoref{fig:grid}). Orientation and GPS measurements are also available in some models which help speed up registration (see \ref{sec:registration}).
+
+Scanner manufacturers may also record lower level measurements that are specific to their scanners. This data may valuable in cleaning artifacts from scans. Unfortunately, this data tends to be locked away in propriety formats which are not readily accessible. We therefore limit our investigation to data that can be readily exported from scanner software. We also do not consider color information as such datasets were not readily available for this work.
 
 % (Mention non uniform point density somewhere? too obvious?)
 % (Mention scanner resolution increasing over time?)
 
 \subsection{Artifacts} \label{sec:artifacts}
 
-In addition to the phase binning issues which occur in phase-based TOF scanners, scanners are subject to a number of other limitations. Due to the optical nature of the above scanners \todo{why did Patrick underline above scanners?}, difficulties are often encountered when dealing with shiny, mirroring or transparent objects. Windows cannot be captured as light passes through without being reflected. Mirror-like surfaces are also missed because light does not reflect back towards the scanner. The sun and other bright objects and cause points not associated with any physical object to appear in a scan. Fog and smoke can also cause problems.
+In addition to the phase shifting issues (see \ref{subsec:tof}) which occur in phase-based TOF scanners, scanners are subject to a number of other limitations. Due to the optical nature of the described scanners, difficulties are often encountered when dealing with shiny, mirroring or transparent objects. Windows cannot be captured as light passes through without being reflected. Mirror-like surfaces are also missed because light does not reflect back towards the scanner. The sun and other bright objects and cause points not associated with any physical object to appear in a scan. Fog and smoke can also cause problems \cite{Ruther2011}.
 
 \todo[inline]{More detail on artifacts}
 
@@ -159,10 +166,10 @@ In addition to the phase binning issues which occur in phase-based TOF scanners,
   \label{fig:mixed-pixel}
 \end{figure}
 
-Mixed pixels is another problematic aspect of laser scanning. When a laser pulse partially hits a near and then subsequently a far object, the result is a data point between the near and far object \cite{Tuley2005} (see \autoref{fig:mixed-pixel}).
+Mixed pixels are another problematic aspect of laser scanning: when a laser pulse partially strikes a nearby and then, subsequently, a distant object, the result is a data point between the near and far object \cite{Tuley2005} (see \autoref{fig:mixed-pixel}).
 
 
-Time of flight scanners are generally used in the cultural heritage domain because of their long range, these scanners will be the focus of our research.
+Since time of flight scanners are generally used in the cultural heritage domain, because of their long range, these scanners will be the focus of our research. We thus limit ourselves to managing the artifacts introduced by such scanners when developing point processing algorithms.
 
 
 \section{3D reconstruction pipeline} \label{sec:pipeline}
@@ -213,18 +220,18 @@ Time of flight scanners are generally used in the cultural heritage domain becau
 
 	\end{tikzpicture}
 
-	\caption{Reconstruction pipeline.}
+	\caption{Reconstruction pipeline \protect\footnotemark[\value{footnote}]}
 	\label{fig:pipeline}
 
 \end{figure}
+\footnotetext{Adapted from \cite{Ruther2011}}
 
-
-3D reconstruction of a site starts with the acquisition of range scans in the field. The collection of raw scans are then subject to a series of processing steps. Unwanted objects and noise may need to be removed and missing data could be synthesized. The scans then need to transformed to coincide on a common coordinate frame in a process called registration. A surface model can then be constructed from the registered point sets. The final model is complete when the reconstructed mesh is textured (see \autoref{fig:pipeline}).
+3D reconstruction of a site starts with the acquisition of range scans in the field. The collection of raw scans are then subject to a series of processing steps. Unwanted objects and noise are typically removed and missing data can be synthesized. The scans then need to transformed to onto a common coordinate frame in a process called registration. A surface model can then be constructed from the registered point sets. The final model is complete when the reconstructed mesh is textured (see \autoref{fig:pipeline}) \cite{Ruther2011}.
 
 \subsection{Data acquisition}
-Some degree of planning is required to ensure a successful 3D reconstruction of a heritage site. One needs to decide on an appropriate level of scan detail for different areas as the set resolution of a scanner determines the data acquisition rate. Scanner positions that result in flat angles of incidence with surfaces should be avoided to maximize surface detail. Choosing good scanning positions will ensure that maximum site coverage is achieved in the most economical way \cite{Ruther2011}.
+Some degree of planning is required to ensure the successful 3D reconstruction of a heritage site \cite{Ruther2011}. One needs to decide on an appropriate level of scan detail for different areas as the set resolution of a scanner determines the data acquisition rate. Scanner positions that result in flat angles of incidence with surfaces should be avoided to maximize surface detail. Choosing good scanning positions will ensure that maximum site coverage is achieved in the most economical way \cite{Ruther2011}.
 
-Some additional consideration can speed up later steps in the pipeline. Automated registration tools require requires that that overlap between scans are achieved. Positioning the scanner in the same level orientation also helps with registration \cite{Ruther2011}.
+Some additional considerations can speed up later steps in the pipeline. For example automated registration tools require requires that that overlap between scans are achieved. Positioning the scanner in the same level orientation also helps with registration \cite{Ruther2011}.
 
 \subsection{Registration}  \label{sec:registration}
 
@@ -236,13 +243,13 @@ Some additional consideration can speed up later steps in the pipeline. Automate
 \end{figure}
 \footnotetext{Source: \url{http://pointclouds.org/documentation/}}
 
-Two approaches exist to transform all scans onto a uniform coordinate system. The first approach requires placing reference objects, called targets, around a site during data acquisition. When the same object is found in two scans, the object's shape can be used to align the scans. The second approach is called Iterated Closest Point (ICP) that aligns scans by using surface features \cite{Besl1992}.
+Two approaches exist to transform all scans into a common coordinate system. The first approach requires placing reference objects, called targets, around a site during data acquisition. When the same object is found in two scans, the object's shape can be used to align the scans. The second approach, Iterated Closest Point (ICP) aligns scans by using surface features \cite{Besl1992}.
 
-Automated software make targets are easy to identify and provides highly accurate registration. They do however have to captured in high resolution in order to be useful. This may require one to capture more scans than what is required for documentation purposes. In the heritage domain they have been found to be impractical as they often need to be placed in hard to reach places and intricate indoor environments require too many targets \cite{Ruther2011}. 
+Automated software easily identify targets and provide highly accurate registration. Targets do, however, have to captured in high resolution in order to be useful. This may require one to capture more scans than required for simple documentation purposes. In the heritage domain targets have been found to be impractical as they often need to be placed in hard to reach places and intricate indoor environments require too many targets \cite{Ruther2011}. 
 
-ICP requires less effort during data acquisition. The procedure however does not lend itself to as high a level of automated registration. The algorithm requires that two surfaces are roughly aligned as an initial condition. Correspondences are then computed between the surfaces where after an incremental transformation is computed to minimize the distance between all the correspondences. After the transformation is applied, the procedure is repeated until convergence is reached. There are many variations to the ICP algorithm that vary mainly on the type of correspondent matching and optimization procedure used \cite{Besl1992}.  
+ICP requires less effort during data acquisition. However the registration procedure requires that two surfaces are roughly aligned as an initial condition, usually by hand. Correspondences are then computed between the surfaces where after an incremental transformation is computed to minimize the distance between all the correspondences. After the transformation is applied, the procedure is repeated until convergence is reached. There are many variations to the ICP algorithm that vary mainly on the type of correspondent matching and optimization procedure used \cite{Besl1992}.  
 
-A user needs to ensure a good initial alignment or no convergence may be achieved. Featureless surfaces are also problematic as the optimization problem will have multiple solutions which may lead to misalignment.
+A user needs to ensure a good initial alignment or convergence may not be achieved. Featureless surfaces are also problematic as the optimization problem will have multiple solutions which may lead to misalignment.
 
 \subsection{Cleaning}\label{sec:cleaning}
 
@@ -263,15 +270,15 @@ A user needs to ensure a good initial alignment or no convergence may be achieve
   \label{fig:cleaning}
 \end{figure}
 
-Cleaning an optional step for documentation purposes but neglecting it in the modeling pipeline can lead to bad results during surface reconstruction (see \autoref{sec:reconstruction}). Trees, people, cables, cars, doors, animals and other random unwanted objects as well as scanner artifacts as mentioned in \autoref{sec:artifacts} are removed during the cleaning process. Cleaning can be performed on individual scans before registration or/and on the complete point cloud after registration.
+Cleaning is considered an optional step for documentation purposes, however, neglecting it in the modeling pipeline can lead to poor results during surface reconstruction (see \autoref{sec:reconstruction}). Trees, people, cables, cars, doors, animals and other random unwanted objects, as well as scanner artifacts (\autoref{sec:artifacts}) are removed during the cleaning process. Cleaning can be performed on individual scans before registration or/and on the complete point cloud after registration \cite{Ruther2011}.
 
-Cleaning one scan at a time requires less system resources and reduces the combined point cloud size. In some instances one may however end up removing unwanted objects that are necessary for registering otherwise featureless surfaces. A tree on a flat surface could help the correspondence matching step in ICP that would otherwise not converge. One may therefore leave some unwanted objects that will have to be removed from the combined model. Range scans are in some ways harder to clean as the cleaner only gets to see objects from one perspective. Laser range scanners also produce point sets that have non uniform density. Objects further away from the scanner are sampled less densely. It is thus harder to identify objects that are far away. Having an individual 2D scan grid allows one to view the 3D scan like a photograph (see \autoref{fig:grid}). This 2D perspective may disambiguate objects that are are to identify in 3D. 
+Cleaning one scan at a time requires less system resources and reduces the combined point cloud size. Unfortunately in some instances one may remove unwanted objects that are necessary for registering otherwise featureless surfaces. A tree on a flat surface could help the correspondence matching step in ICP that would otherwise not converge. One may therefore leave some unwanted objects that will have to be removed from the combined model. Range scans are may be hard to clean as the cleaner only gets to see objects from one perspective. Laser range scanners also produce point sets that have non uniform density: objects further away from the scanner are sampled less densely. It is thus harder to identify objects that are far away. Having an individual 2D scan grid allows one to view the 3D scan like a photograph (see \autoref{fig:grid}). This 2D perspective may disambiguate objects that are hard to identify in 3D. 
 
-Registering all scans and combining them into a single point model destroys the embedded 2D grid structure and results in a large unorganized point cloud. With this transformation one loses the ability to perform constant time neighbour lookups via a grid. Neighborhood searches are important for normal estimation which is used during surface reconstruction. Without the scan grid, less efficient ($O(log(n))$) octrees or kd-trees are necessary for neighborhood searches. There is also an increased risk of estimating bad normals from merged data sets \cite{Ruther2011}. One may alternatively opt to pre-compute point normals prior to merging data sets. This will however increase the file size.
+Registering all scans and combining them into a single point model destroys the embedded 2D grid structure and results in a large unorganized point cloud. With this transformation one loses the ability to perform constant time neighbour lookups via a grid. Neighborhood searches are important for normal estimation which is used during surface reconstruction. Without the scan grid, less efficient ($O(log(n))$) octrees or kd-trees are necessary for neighborhood searches. There is also an increased risk of estimating bad normals from merged data sets \cite{Ruther2011}. Alternatively one may choose to pre-compute point normals prior to merging data sets. This will however increase the file size.
 
-Combining scans into a single point cloud does reduce the workload as overlapping areas only require a single cleaning pass. A complete model will however be too large to fit into main memory and thus out-of-core techniques are required to manage the data sets.
+Combining scans into a single point cloud does reduce the workload as overlapping areas only require a single cleaning pass. A complete model will typically be too large to fit into main memory and thus out-of-core techniques \todo{Explain, we do not address this} are required to manage the data sets.
 
-Heritage scanning projects have reported typical scans taking from 30 minutes up to 2 hours to clean by an experienced person. High resolution scans can take up to a full day to clean. Existing tools leave much to be desired in terms of cleaning efficiency \cite{Ruther2011}. As this is the part of the pipeline that is the focus of this work, more detail follows in the next section.
+Some heritage scanning projects have reported typical scans taking from 30 minutes up to 120 minutes to clean by an experienced person \cite{Ruther2011}. High resolution scans can take up to a full day to clean. Existing tools leave much to be desired in terms of cleaning efficiency. As cleaning is the part of the pipeline that is the focus of this work, more detail is presented in the next section.
 
 \todo[inline]{software packages? Focus on accuracy}
 
@@ -285,13 +292,13 @@ Heritage scanning projects have reported typical scans taking from 30 minutes up
 % \end{figure}
 % \footnotetext{Source: \url{http://en.wikipedia.org/wiki/File:Linear_regression.svg}}
 
-Surface reconstruction is the process by which the discrete point model is converted to a triangulated surface model. This can be achieved either via interpolation methods that aims to connect neighboring points by computing a triangulation or by approximation methods that aims to approximate a surface that fit the samples \cite{Schall2005}.
+Surface reconstruction is the process by which the discrete point model is converted to a triangulated surface model. This can be achieved either via interpolation methods, that aim to connect neighboring points by computing a triangulation, or by approximation methods that aim to approximate a surface that fits the samples \cite{Schall2005}.
 
-Interpolation methods are very susceptible to noise. Poor triangulations are achieved when scans are not properly registered or the sampling exhibits high variance. A preprocessing can mitigate these problems but tends to be time consuming and leads to a loss of detail \cite{Ruther2011}.
+Interpolation methods are very sensitive to noise. Poor triangulations are achieved when scans are not properly registered or the sampling exhibits high variance. A preprocessing can mitigate these problems but tends to be time consuming and often lead to a loss of detail \cite{Ruther2011}.
 
-Surface approximation algorithms are less susceptible to noise. Poisson surface reconstruction \cite{Kazhdan2006} is a popular method that is noise resistant and achieves great detail. It uses samples with normals to interpolate a normal field and then solves a Poisson equation to compute an indicator function. Results are dependent on good normal estimations. It is thus preferable to compute normals prior to registration when using this approach. Poisson surface reconstruction produces water-tight surfaces and automatically fills small holes. While this is useful for producing a visually pleasing 3D model, it does not result in a historically accurate model.
+Surface approximation algorithms are less susceptible to noise. Poisson surface reconstruction \cite{Kazhdan2006} is a popular method that is noise resistant and achieves great detail. It uses samples with normals to interpolate a normal field and then solves a Poisson equation to compute an indicator function. Results are dependent on good normal estimations. It is thus preferable to compute normals prior to registration when using this approach. Poisson surface reconstruction produces ``water-tight'' surfaces and automatically fills small holes. While this is useful for producing a visually pleasing 3D model, it does not result in a historically accurate model because some data may be synthesized in the process.
 
-Moving Least Squares (MLS) is another popular surface approximation method that does not over smooth and interpolate missing data \cite{Merry2014}. Like Poisson, it also requires normal estimates. MLS computes a local surface approximation at a sample point by considering its neighborhood. Every point in a neighborhood is weighed according to its importance. A surface is then computed by minimizing the weighed distance to the surface for each point in the neighborhood. Poisson and MLS have both been adapted for out-of-core execution and GPU acceleration. 
+Moving Least Squares (MLS) is another popular surface approximation method that does not over smooth and interpolate missing data \cite{Merry2014}. Like Poisson, it also requires normal estimates. MLS computes a local surface approximation at a sample point by considering its neighborhood. Every point in a neighborhood is weighed according to its importance. A surface is then computed by minimizing the weighed distance to the surface for each point in the neighborhood. Poisson and MLS have both been adapted for out-of-core execution and GPU acceleration \cite{Merry2014}. 
 
 
 % This is especially problematic when working with individual scans as the sampling density reduces away from the scan origin.
@@ -302,17 +309,19 @@ Moving Least Squares (MLS) is another popular surface approximation method that 
 
 \subsection{Hole filling} \label{sec:filling}
 
-It is unlikely that a scanning expedition will achieve complete coverage of a site. In addition to that, points are removed during cleaning and reconstruction of the surface. Hole filling is an optional step in the reconstruction pipeline. For historical records hole filling is not desirable but models that have been filled are more aesthetically pleasing. If holes are filled it is thus important to know what data has been synthesized.
+It is unlikely that a scanning expedition will achieve complete coverage of a site. Furthermore, points are removed during cleaning and reconstruction of the surface. Hole filling is an optional step in the reconstruction pipeline that seeks to synthesis missing data. For historical accuracy, hole filling is not desirable since data is synthesized. However, models that have been filled are more aesthetically pleasing. If holes are filled it is thus important to know what data has been synthesized.
 
 Small holes can be filled automatically by surface reconstruction algorithms (as discussed above). Larger patches are hard to fill convincingly with automated methods and may require manual effort to produce good results \cite{Ruther2011}. 
 
+\todo{ask patrick for citations}
 
 \subsection{Texturing} \label{sec:texturing}
 
-The final but also optional step of the reconstruction pipeline is texturing. Coloring a model is not only visually pleasing but is also part of the historical record. Some laser scanners come equipped with cameras to capture color information for each sample. This is very convenient but some in the heritage community has however reported that sub par texturing is achieved when compared to external cameras. The biggest problem with texturing a model is different light conditions during the day. Capturing photos around the same time of day across multiple days is one way to mitigate the problem.
+The final, optional, step of the reconstruction pipeline is texturing. Coloring a model is not only visually pleasing but also forms part of the historical record. Some laser scanners come equipped with cameras to capture color information for each sample. Although this is very convenient, some in the heritage community have reported that poor texturing is achieved when compared to external cameras \cite{Ruther2011}. The biggest problem when texturing a model is dealing with different light conditions during the day. Capturing photos around the same time of day across multiple days is one way to mitigate the problem.
 
-A model is textured from a series of photos by projecting the images onto the model. In order to achieve this internal and external camera parameters needs to be known from time the picture is taken. This includes the position and orientation of the camera as well as the focal length. If this is not known it can be estimated via software by selecting or computing correspondences between pictures.
+A model is textured from a series of photos by projecting the images onto the model. In order to achieve this, internal and external camera parameters needs to be known from time the picture is taken. This includes the position and orientation of the camera as well as the focal length. If this is not known it can be estimated via software by selecting or computing correspondences between pictures \cite{Ruther2011}.
 
+\todo{more citations on texturing, ask rudy}
 
 
 % \section{Point cloud cleaning} \label{sec:cleaning}

@@ -3,12 +3,12 @@
 
 \todo[inline]{Lots more citations, preferably state that it's someone else's work, cite and then write about it.}
 
-In this chapter, we introduce laser scanning and the 3D-reconstruction pipeline. In section~\ref{sec:heritage} we describe the heritage preservation context of this work. In section~\ref{sec:scanners} we introduce 3d scanning and describe the process by which raw scanner data transformed into a model in section~\ref{sec:pipeline}. We then discuss the point cloud cleaning process in section~\ref{sec:cleaning}.
+In this chapter, we introduce laser scanning and the 3D-reconstruction pipeline. In section~\ref{sec:heritage} we describe the heritage preservation context of this work. In section~\ref{sec:scanners} we introduce 3d scanning and describe the process by which raw scanner data transformed into a model in section~\ref{sec:pipeline}. This is then followed by a discussion the point cloud cleaning process in section~\ref{sec:cleaning}.
 
 
 \section{Digital heritage preservation} \label{sec:heritage}
 
-Architectural heritage sites in many parts of the world are under threat of deterioration and destruction especially in developing countries. There is a need to preserve these heritage sites due to their historical relevance, if not physically, at least digitally. The demolition of  the Buddhas of Bamiyan by the Taliban in 2001 \cite{Toubekis2009} is one illustration of this need. Preservation efforts have utilised several technologies to record historical sites. Early efforts used tape measures and theodolites to produce simple ground plans. \todo{Patrick need more general background: projects? other other todr? photo/text archiver? say why they are no longer used} More recently, photogrammetry lets geomaticians produce 3D models \cite{Heritage}. Now laser range scanners allow us to create extremely high resolution 3D models.
+Architectural heritage sites in many parts of the world are under threat of destruction or deterioration, especially in developing countries. There is a need to preserve heritage sites due to their historical importance, if not physically, digitally. The demolition of  the Buddhas of Bamiyan by the Taliban in 2001 \cite{Toubekis2009} underlines the need for digital preservation efforts. Past preservation efforts have utilised many techniques to create a historical record of buildings and ruins. Early efforts made use of tape measures and theodolites to produce simple ground plans. \todo{Patrick need more general background: projects? other other todr? photo/text archiver? say why they are no longer used} More recently, photogrammetry lets geomaticians produce 3D models \cite{Heritage}. Laser range scanning is the latest technique that allows archivists to create extremely high resolution 3D models.
 
 \todo{expand, say more, justify focus on laser scanning}
 
@@ -16,11 +16,13 @@ Architectural heritage sites in many parts of the world are under threat of dete
 
 \todo[inline]{What is a range scanner, what is a point cloud, what is a range scan?}
 
-There are many known types of 3D scanner on the market today. Each scanner has properties that make it more of less suitable for various scanning tasks. Generally, the size of the object and the level of detail one wishes to capture dictate the technology. The imaging speed, portability and cost or a scanner should also be considered.
+There are many known types of 3D scanner on the market today. Each scanner has properties that make it more of less suitable for various scanning tasks. Generally, the size of the object and the level of detail one wishes to capture dictate the technology. Other factors like imaging speed, portability and cost or a scanner then comes into play.
 
 3D Scanning technologies can generally be classified into 2 categories, namely triangulation and time of flight scanners.
 
 \subsection{Triangulation scanners}
+
+Triangulation scanners, as the name suggests, uses trigonometric triangulation \cite{Frohlich2004} to locate a point in a scene relative to the scanner. Triangulation scanners come in two flavors, those that use laser light and those that use white light \cite{Brown2012}. Laser scanners emit a laser pulse and records the reflected beam with a sensor at a known position relative to the laser. Light scanners emit a series of linear patterns that is also captured a sensor at a known position. The difference is that the sensor in the laser scanner directly measures the angle of the returned light where as the light sensors record perspective distortions in the reflected patterns to compute the angle of the returned light indirectly. Once the angle of incoming light is determined, the position of a far away point can be computed.
 
 \begin{figure}[H]
 	\begin{subfigure}[b]{.33\textwidth}
@@ -64,7 +66,7 @@ There are many known types of 3D scanner on the market today. Each scanner has p
 	\label{fig:triangulation-scanners}
 \end{figure}
 
-Triangulation scanners, as the name suggests, uses trigonometric triangulation \cite{Frohlich2004} to locate a point in a scene relative to the scanner. Triangulation can be performed by either emitting a laser pulse, laser beam or by projecting a series of linear light patterns and then picking up the reflection with a sensor at a known position. During laser triangulation, the displacement of the object affects the angle at which the laser signal is returned (see \autoref{fig:triangulation-scanners}). Using structured light, the distortions in the patterns from the sensor's perspective can be used to determine the angle of reflected light \cite{Brown2012}. Given the precise distance between the light source and sensor ($\begingroup\color{green}c\endgroup$) and as well as the outgoing angle of emitted light ($\begingroup\color{blue}A\endgroup$) and incoming angle of reflected light ($\begingroup\color{orange}B\endgroup$), the distance to the object is given by $\begingroup\color{red}b\endgroup = \begingroup\color{green}c\endgroup\frac{ sin(\begingroup\color{orange}B\endgroup)}{sin(\pi - \begingroup\color{blue}A\endgroup-\begingroup\color{orange}B\endgroup)}$.
+Given the precise distance between the light source and sensor ($\begingroup\color{green}c\endgroup$) and as well as the outgoing angle of emitted light ($\begingroup\color{blue}A\endgroup$) and incoming angle of reflected light ($\begingroup\color{orange}B\endgroup$), the distance to the object is given by $\begingroup\color{red}b\endgroup = \begingroup\color{green}c\endgroup\frac{ sin(\begingroup\color{orange}B\endgroup)}{sin(\pi - \begingroup\color{blue}A\endgroup-\begingroup\color{orange}B\endgroup)}$.
 
 \subsection{Time of flight scanners (TOF)} \label{subsec:tof}
 
@@ -107,12 +109,11 @@ Time of flight scanners emit laser pulses and measure the time it takes for a pu
 Laser phase-shift scanners \cite{Frohlich2004} are a variation on the standard TOF scanner. These scanners modulate the power of the laser pulse in a sinusoidal wave during a scan. The phase shift in the returning pulse is used to compute the round trip time (see \autoref{fig:phase-shift}). Due to the cyclical nature of the signal, phase shift is ambiguous. This ambiguity is resolved by using measurements at multiple frequencies \cite{Bhurtha}.
 
 
-
 \subsection{Comparison}
 
-Triangulation scanners can achieve 10 micrometer accuracy over distances less than one meter. Over longer distances the triangle in \autoref{fig:triangulation-scanners} becomes to long and the distance calculation error prone. Structured light scanners tend to be faster than laser scanners as the whole scene is captured instead of a single point at a time \cite{Brown2012}. Scanners are also less prone to motion distortions. Hand held scanners of this type exists which reduces setup time compared to other scanners.
+Triangulation scanners can achieve 10 micrometer accuracy over distances less than one meter. Over longer distances the triangle in \autoref{fig:triangulation-scanners} becomes elongated and the distance calculation error prone. Structured light scanners tend to be faster than laser scanners as the whole scene is captured instead of a single point at a time \cite{Brown2012}. Structured light scanners are also less prone to motion distortions. Hand held scanners of this type exists which reduces setup time compared to other scanners.
 
-Time of flight scanners can measure the time a laser pulse takes to go to and from an object very accurately over long distances. Pure TOF scanners can scan distances of up to 1000 meters \cite{Form2014}. TOF technology does not, however, deal well with distances less than 2 meters. Triangulation scanners on the other hand perform very well in the 2 meter range but suffers from accuracy issues beyond it. TOF scanners can be set to sample at different resolutions; low resolution scans (tens of thousands of points) may take seconds while higher resolution scans (millions of points) may take minutes.
+Time of flight scanners can measure the time a laser pulse takes to travel to and from an object very accurately over long distances. Pure TOF scanners can scan distances of up to 1000 meters \cite{Form2014}. TOF technology does not, however, deal well with distances less than 2 meters. Triangulation scanners on the other hand perform very well in the 2 meter range but suffers from accuracy issues beyond it. TOF scanners can be set to sample at different resolutions; low resolution scans (tens of thousands of points) may take seconds while higher resolution scans (millions of points) may take minutes.
 
 Phase-based scanners have limited range due to the ambiguity of returned signals from beyond the design distance \cite{Bhurtha}; objects from beyond the scanner's designed range can sometimes be erroneously returned as closer distances when the scanner software fails to discard far away points. Phase based scanners make up for this deficiency by being much faster and more accurate within its range \cite{Form2014}.
 
@@ -148,7 +149,7 @@ Phase-based scanners have limited range due to the ambiguity of returned signals
 
 The terrestrial laser scanners described above all produce angle and range measurements that are converted into 3D coordinates relative to the scanner. Scanners also record the intensity of the light returned. High end scanners sometimes have integrated cameras that are used to map colors to captured data points \cite{Frohlich2004}. Data points are typically saved in 2D grid data structure (see \autoref{fig:grid}). Orientation and GPS measurements are also available in some models which help speed up registration (see \ref{sec:registration}).
 
-Scanner manufacturers may also record lower level measurements that are specific to their scanners. This data may valuable in cleaning artifacts from scans. Unfortunately, this data tends to be locked away in propriety formats which are not readily accessible. We therefore limit our investigation to data that can be readily exported from scanner software. We also do not consider color information as such datasets were not readily available for this work.
+Scanner manufacturers may also record lower level measurements that are specific to their scanners. This data may valuable in identifying artifacts from scans. Unfortunately, this data tends to be locked away in propriety formats which are not readily accessible. We therefore limit our investigation to data that can be readily exported from scanner software. We also do not consider color information as such datasets were not readily available for this work.
 
 % (Mention non uniform point density somewhere? too obvious?)
 % (Mention scanner resolution increasing over time?)

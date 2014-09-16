@@ -4,6 +4,22 @@
 		"selected_items":
 		[
 			[
+				"foo",
+				"footnotetext{text}	latex-document"
+			],
+			[
+				"la",
+				"label{key}	latex-document"
+			],
+			[
+				"pro",
+				"protect	tex"
+			],
+			[
+				"foot",
+				"footnote	tex"
+			],
+			[
 				"aut",
 				"autoref{label}	hyperref"
 			],
@@ -36,26 +52,10 @@
 			}
 		},
 		{
-			"file": "chapters/02-literature-review.tex",
-			"settings":
-			{
-				"buffer_size": 3250,
-				"line_ending": "Unix"
-			}
-		},
-		{
 			"file": "chapters/05-evaluation.tex",
 			"settings":
 			{
 				"buffer_size": 255,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "chapters/02-background.tex",
-			"settings":
-			{
-				"buffer_size": 19486,
 				"line_ending": "Unix"
 			}
 		},
@@ -87,7 +87,7 @@
 			"file": "thesis.tex",
 			"settings":
 			{
-				"buffer_size": 2565,
+				"buffer_size": 2660,
 				"line_ending": "Unix"
 			}
 		},
@@ -98,14 +98,6 @@
 				"buffer_size": 1241,
 				"line_ending": "Unix",
 				"name": "problem:"
-			}
-		},
-		{
-			"contents": "",
-			"settings":
-			{
-				"buffer_size": 0,
-				"line_ending": "Unix"
 			}
 		}
 	],
@@ -194,6 +186,8 @@
 	},
 	"file_history":
 	[
+		"/home/rickert/Masters/docs/Thesis/chapters/02-background.tex",
+		"/home/rickert/Masters/docs/Thesis/chapters/02-literature-review.tex",
 		"/home/rickert/Masters/docs/Thesis/chapters/02-background.aux",
 		"/home/rickert/Masters/docs/Thesis/thesis.tex",
 		"/home/rickert/Masters/docs/Thesis/images/old/triangulate-laser-scan.ppm",
@@ -227,6 +221,11 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"sourc PCL",
+			"3d",
+			"foot",
+			"sec:heritage",
+			"mixed-pixel",
 			"init",
 			"clean",
 			"triangulation-scanners",
@@ -275,7 +274,7 @@
 	"groups":
 	[
 		{
-			"selected": 3,
+			"selected": 1,
 			"sheets":
 			[
 				{
@@ -304,39 +303,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 4,
+					"stack_index": 2,
 					"type": "text"
 				},
 				{
 					"buffer": 1,
-					"file": "chapters/02-literature-review.tex",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 3250,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								2045,
-								2045
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/LaTeXing/support/LaTeX.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 3,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
 					"file": "chapters/05-evaluation.tex",
 					"semi_transient": false,
 					"settings":
@@ -348,8 +319,8 @@
 						"selection":
 						[
 							[
-								59,
-								59
+								160,
+								160
 							]
 						],
 						"settings":
@@ -360,41 +331,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "chapters/02-background.tex",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 19486,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								3625,
-								3625
-							]
-						],
-						"settings":
-						{
-							"spell_check": true,
-							"syntax": "Packages/LaTeXing/support/LaTeX.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 204.0,
-						"zoom_level": 1.0
-					},
 					"stack_index": 0,
 					"type": "text"
 				},
 				{
-					"buffer": 4,
+					"buffer": 2,
 					"file": "chapters/04-implementation.tex",
 					"semi_transient": false,
 					"settings":
@@ -419,11 +360,11 @@
 						"translation.y": 517.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 7,
+					"stack_index": 4,
 					"type": "text"
 				},
 				{
-					"buffer": 5,
+					"buffer": 3,
 					"file": "chapters/06-conclusion.tex",
 					"semi_transient": false,
 					"settings":
@@ -448,11 +389,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 8,
+					"stack_index": 5,
 					"type": "text"
 				},
 				{
-					"buffer": 6,
+					"buffer": 4,
 					"file": "chapters/03-design.tex",
 					"semi_transient": false,
 					"settings":
@@ -476,7 +417,7 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 9,
+					"stack_index": 6,
 					"type": "text"
 				}
 			]
@@ -486,20 +427,20 @@
 			"sheets":
 			[
 				{
-					"buffer": 7,
+					"buffer": 5,
 					"file": "thesis.tex",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2565,
+						"buffer_size": 2660,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								859,
-								859
+								1950,
+								1950
 							]
 						],
 						"settings":
@@ -507,14 +448,14 @@
 							"syntax": "Packages/LaTeXing/support/LaTeX.tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 510.0,
+						"translation.y": 561.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 1,
 					"type": "text"
 				},
 				{
-					"buffer": 8,
+					"buffer": 6,
 					"file": "chapters/problem.txt",
 					"semi_transient": false,
 					"settings":
@@ -526,8 +467,8 @@
 						"selection":
 						[
 							[
-								108,
-								108
+								333,
+								333
 							]
 						],
 						"settings":
@@ -537,38 +478,10 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 51.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 5,
-					"type": "text"
-				},
-				{
-					"buffer": 9,
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 0,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"auto_name": "",
-							"syntax": "Packages/Text/Plain text.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 6,
+					"stack_index": 3,
 					"type": "text"
 				}
 			]

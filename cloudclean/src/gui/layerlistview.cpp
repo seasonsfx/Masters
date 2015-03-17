@@ -87,7 +87,7 @@ void LayerListView::selectionToLayer(){
     ui_->tableView->selectRow(ll_->getLayers().size()-1);
 }
 
-void LayerListView::intersectSelectedLayers(){
+void LayerListView::intersectSelectedLayers(bool subtractive){
     if(ll_->getSelection().size() < 2){
         qDebug() << "Select at least 2 layers";
         return;
@@ -108,7 +108,7 @@ void LayerListView::intersectSelectedLayers(){
         // For every other selected layer
         for(uint i = 1; i < ll_->getSelection().size(); i++){
             boost::shared_ptr<Layer> layer = ll_->getSelection()[i].lock();
-            // For every label in the orther layer
+            // For every label in the other layer
             for(uint8_t qlabel : layer->labels_){
                 if(label == qlabel){
                     intersection_count++;
@@ -128,14 +128,18 @@ void LayerListView::intersectSelectedLayers(){
     }
 
     us_->beginMacro("Layer intersection");
-    us_->push(new LayerFromLabels(intersecting_labels, ll_, "Intersection", false));
+    us_->push(new LayerFromLabels(intersecting_labels, ll_, "Intersection", subtractive));
     us_->endMacro();
 
     ui_->tableView->selectRow(ll_->getLayers().size()-1);
 
 }
 
-void LayerListView::mergeSelectedLayers() {
+void LayerListView::intersectSelectedLayersSubtract(){
+    intersectSelectedLayers(true);
+}
+
+void LayerListView::mergeSelectedLayers(bool copy) {
     // Mark for deletion
 
     std::vector<boost::weak_ptr<Layer>> selections = ll_->getSelection();
@@ -155,20 +159,26 @@ void LayerListView::mergeSelectedLayers() {
     labels->erase( unique(labels->begin(), labels->end()), labels->end());
 
     us_->beginMacro("Merge layers");
-    us_->push(new LayerFromLabels(labels, ll_, "Merged layer", true));
+    us_->push(new LayerFromLabels(labels, ll_, "Merged layer", !copy));
 
-    // Delete marked layers
-    for(boost::weak_ptr<Layer> sel : selections) {
-        if(sel.expired()){
-            qDebug() << "Damn selected layer expired";
-            continue;
+    if(!copy){
+        // Delete marked layers
+        for(boost::weak_ptr<Layer> sel : selections) {
+            if(sel.expired()){
+                qDebug() << "Damn selected layer expired";
+                continue;
+            }
+
+            us_->push(new LayerDelete(sel.lock(), ll_));
         }
-
-        us_->push(new LayerDelete(sel.lock(), ll_));
     }
 
     us_->endMacro();
     ui_->tableView->selectRow(ll_->getLayers().size()-1);
+}
+
+void LayerListView::mergeSelectedLayersCopy(){
+    mergeSelectedLayers(true);
 }
 
 void LayerListView::contextMenu(const QPoint &pos) {
@@ -213,10 +223,20 @@ void LayerListView::contextMenu(const QPoint &pos) {
                 SLOT(mergeSelectedLayers()));
         menu.addAction(&merge);
 
+        QAction merge_copy("Merge & Copy", 0);
+        connect(&merge_copy, SIGNAL(triggered()), this,
+                SLOT(mergeSelectedLayersCopy()));
+        menu.addAction(&merge_copy);
+
         QAction inter("Intersect", 0);
         connect(&inter, SIGNAL(triggered()), this,
                 SLOT(intersectSelectedLayers()));
         menu.addAction(&inter);
+
+        QAction intersub("Intersect (Subtract)", 0);
+        connect(&intersub, SIGNAL(triggered()), this,
+                SLOT(intersectSelectedLayersSubtract()));
+        menu.addAction(&intersub);
 
         QAction select_layer("Select points", 0);
         connect(&select_layer, &QAction::triggered, [=] () {

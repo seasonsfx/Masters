@@ -44,10 +44,12 @@ void LayerFromLabels::undo(){
 void LayerFromLabels::redo(){
     boost::shared_ptr<Layer> layer;
 
-    if(!applied_once_)
+    if(!applied_once_){
         layer = ll_->addLayer();
-    else
+    }
+    else {
         layer = ll_->addLayerWithId(new_layer_id_);
+    }
 
     layer->setName(layer_name_);
     new_layer_id_ = layer->getId();

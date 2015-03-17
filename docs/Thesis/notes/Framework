@@ -1,0 +1,133 @@
+Framework
+	Goals
+		Usability
+			Ensures improvements in more advance tools are not hamstrung by a bad interface
+		Support editing multiple scans
+			Pairwise editing is quicker and can disabiguate sparse points
+		Plugin architecture
+			Support for interactive and batch segementation tools
+		Quick development cycle
+			Recompiling a large codebase is debilitating
+		Cross platform
+			Zamani uses windows so it was neccesary
+		Open source
+			Create a good base for future work
+
+	Limitations
+		Supporting range images larger than system or GPU memory is out of this scope of this project. 
+
+	Core system
+		2D + 3D view
+		Navigation
+			Prevent fipping the 3D view upside down
+			Accelerated navigation
+		Segmetation workflow
+			Selections
+				Primary representation of segmentation
+				Needs to support multiple scans
+			Layers
+				Store of segementations
+				Supports combining results from multiple segmentations
+				Set operations
+					Union, intersect, subtract
+		IO
+			Save & load progress
+			Export final cleaned scans to PTX
+
+		Full undo
+
+	Plugin architecture
+		Dynamic reloading of tools
+			Recompiling the system in its entirity and reloading the program and data can be time consuming
+			Recompiling and reloading a plugin is much quicker
+		Tools need to hook themselves into the core system
+			Meshlab vs QTCreator
+				Meshlab has plugin types that are limited
+					IO, Filters, Rendering
+				QTCreator makes no such distinction and is thus more flexible
+
+
+	Implementation
+		C++, PCL, QT, OpenGL
+			Justify choices? To what extent?
+			Should I justify why I coded by own system instead of using VTK?
+
+		Selections & Layers
+			(Section already written)
+
+		Rendering
+			Filter non returned points (less memory)
+			Create index grid that references filtered scan
+
+		Save file format
+			JSON was bad to I created a custom format
+
+		Navigation
+			Custom camera that prevents flipping
+			2d zooming & panning, zoom towards mouse
+
+		Tools for plugins
+			Point picker
+				Ray casting vs selection buffer
+
+			Lasso?
+				Maybe discuss this in another chapter?
+				Should I cover my retarded OpenCL implementation?
+
+
+Segmentation
+	Segmentation
+		Mid level computer vision problem
+		Segmentation is a term used for a wide range of techniques which have the same goal
+		Use features to group related points
+		Groups can be constucted so that they are similar, colour or texture, and then sumarised
+		The details of what the summary representation should be dependent on the task but there are general desirable features
+		Higher level algorithms should not be overwelmed by it
+		It should be in a form that higher level algorithms, such as recognition algorithms, can use
+
+	Clustering
+		Methods that focus on local relations between items.
+		This approach allows us, for example, to assemble together clumps of pixels that look similar. Such clumps are commonly called regions
+
+		A key feature of the human vision system is that context affects how things are perceived. The gestalt school of psychologists emphasized grouping as the key to understanding visual perception. Their work was characterized by attempts to write down a series of rules by which image elements would be associated together and interpreted as a group. They felt some factors predisposed a set of elements to be grouped. Thes factors are important because it is quite clear that the human vision system uses them in some way.
+
+		Rules:
+		- Proximity: Tokens that are nearby tend to be grouped.
+		- Similarity: Similar tokens tend to be grouped together.
+		- Common fate: Tokens that have coherent motion tend to be grouped together.
+		- Common region: Tokens that lie inside the same closed region tend to be grouped together.
+		- Parallelism: Parallel curves or tokens tend to be grouped together.
+		- Closure: Tokens or curves that tend to lead to closed curves tend to be grouped together.
+		- Symmetry: Curves that lead to symmetric groups are grouped together.
+		- Continuity: Tokens that lead to continuous—as in joining up nicely, rather than in the formal sense—curves tend to be grouped.
+		- Familiar configuration: Tokens that, when grouped, lead to a familiar object
+
+		These rules can function fairly well as explanations, but they are insufficiently crisp to be regarded as forming an algorithm. Gestalt factors provide interesting hints, but should be seen as the consequences of a larger grouping process, rather than the process itself.
+
+
+	Applications:
+		Background subtraction, anything that doesnt look like a backgound is interesting
+			Known background then subtract to see segments, some threshold aplied
+			Bad if background changes (avarage bg over time)
+			Bad if background colour matches object
+
+		Interative segmentation:
+			Need to cut out objects
+			Too much work using every pixel
+
+			Background foreground segmentation
+				Assumptions: foreground is coherent, background maybe not
+
+			Inteligent scissors
+				Sketch curve close to boundry, moved closer usig gradient or boundry cues
+				Snakes!
+
+			Painting interface
+				Paint pixels with foreground or background brush
+				Used to produce an appearance model that is fed into a graph based segmenter
+
+				Grab cut (cite this), draw box or paint foreground and background (GrabCut Interactive Foreground Extraction using Iterated Graph Cuts)
+
+				Box yeilds an intial segmentation
+
+

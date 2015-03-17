@@ -1,0 +1,181 @@
+\cite{Ponce2012}
+
+Mid level vision problem: come up with a repreentation that is expressive and compact
+Sumarise information form early visual processing
+Summaries are neccesary because of teh vast amount of data in early vision
+Richness of teh information overwelmes what is significant
+Summaries from pixels or groups of pixels
+	Groups can be constucted so that they are similar, colour or texture, and then sumarised
+Core idea:
+   Collecting pixels together pixels or pattern elements into sumary representations that ephasize important, interesting or distinctive properties
+
+Obtaining such a representation is known as segmentation, fitting or perceptual origanisation
+
+Segmentation is used for a wide range of techniues which have the same goal
+Goal get a compact representation of what is helpful
+
+No theory of segmentation because what is interesting is very objective
+
+Important part of vision is to organise image information ointo organosed assemblies
+Human vision does this well
+
+The details of what the summary representation should be depend on the task but there are general desirable features
+	Later on alogo must be able to cope with it
+
+
+There are two important threads in segmentation, which aren’t wholly different. In the first, our summary is assembled purely locally, by clustering methods that focus on local relations between items. Here we are trying to assemble items that look like one another. This approach allows us, for example, to assemble to- gether clumps of pixels that look similar; such clumps are commonly called regions. In the second approach, we assemble together items based on global relations—for example, all items that lie on a straight line. Figure 9.1 shows a collection of small groups of pixels. When one looks at this figure, these groups of pixels appear to belong together, most likely because taken together they suggest the presence of a surface. In this approach, we are interested in methods that can collect together tokens or pixels of groups of pixels that, when taken together, suggest the presence of a structure of some form. This approach emphasizes methods that can identify parametric models in pools of data; we describe such methods in Chapter 10.
+
+
+
+A key feature of the human vision system is that context affects how things are perceived
+	IE: Bayesian approach (rick insight)
+
+This observation led the Gestalt school of psychologists to reject the study of responses to stimuli and to emphasize grouping as the key to understanding visual perception.
+
+Their work was characterized by attempts to write down a series of rules by which image elements would be associated together and interpreted as a group. There were also attempts to con- struct algorithms, which are of purely historical interest (see Gordon (1997) for an introductory account that places their work in a broad context).
+
+The Gestalt psychologists identified a series of factors, which they felt predis-
+posed a set of elements to be grouped. These factors are important because it is quite clear that the human vision system uses them in some way. Furthermore, it is reasonable to expect that they represent a set of preferences about when tokens belong together that lead to a useful intermediate representation. There are a variety of factors, some of which postdate the main Gestalt move-
+ment:
+
+• Proximity: Tokens that are nearby tend to be grouped.
+• Similarity: Similar tokens tend to be grouped together.
+• Common fate: Tokens that have coherent motion tend to be grouped together.
+• Common region: Tokens that lie inside the same closed region tend to be grouped together.
+• Parallelism: Parallel curves or tokens tend to be grouped together.
+• Closure: Tokens or curves that tend to lead to closed curves tend to be grouped together.
+• Symmetry: Curves that lead to symmetric groups are grouped together.
+• Continuity: Tokens that lead to continuous—as in joining up nicely, rather than in the formal sense—curves tend to be grouped.
+• Familiar configuration: Tokens that, when grouped, lead to a familiar object
+
+These rules can function fairly well as explanations, but they are insufficiently crisp to be regarded as forming an algorithm. The Gestalt psychologists had serious difficulty with the details, such as when one rule applied and when another. It is difficult to supply a satisfactory algorithm for using these rules; the Gestalt movement attempted to use an extremality principle.
+
+Familiar configuration is a particular problem. The key issue is to understand
+just what familiar configuration applies in a problem and how it is selected.
+	Experience is hard to encode in a machine (rick insight)
+	Supervised learning
+	User at the helm
+
+
+The Gestalt rules do offer some insight because they explain what happens
+in various examples. These explanations seem to be sensible because they suggest that the rules help solve problems posed by visual effects that arise commonly in the real world—that is, they are ecologically valid.
+
+Optical illustions also occur through gestalt principals (rick insight)
+
+From our perspective, Gestalt factors provide interesting hints, but should be seen as the consequences of a larger grouping process, rather than the process itself.
+
+Applications:
+	Background subtraction, anything that doesnt look like a backgound is interesting
+		Known background then subtract to see segments, some threshold aplied
+		Bad if background changes (avarage bg over time)
+		Bad if background colour matches object
+
+	Interative segmentation:
+		Need to cut out objects
+		Too much work using every pixel
+
+		Background foreground segmentation
+			Assumptions: foreground is coherent, background maybe not
+
+		Inteligent scissors
+			Sketch curve close to boundry, moved closer usig gradient or boundry cues
+			Snakes!
+
+		Painting interface
+			Paint pixels with foreground or background brush
+			Used to produce an appearance model that is fed into a graph based segmenter
+
+			Grab cut (cite this), draw box or paint foreground and background (GrabCut Interactive Foreground Extraction using Iterated Graph Cuts)
+
+			Box yeilds an intial segmentation
+
+
+	Forming Image Regions
+		One application of segmentation is to decompose an image into regions that have roughly coherent color and texture. Typically, the shape of these regions isn’t particularly important, but the coherence is important. This process is quite widely studied—it is often referred to as the exclusive meaning of the term segmentation— and usually thought of as a first step in recognition. Regions can be used as the backbone of many other visual computations.
+
+		Applcations:
+			Corresponsences
+			Labeling objects
+
+			Need large regions, maybe complex shape
+				Respect object boundries
+				Most clustering algorithms can be modified to respect this
+
+			Need small compact regions
+				Called superpixels
+				For when we need rich
+				Representation called oversegmentation
+
+				Useful:
+					Find human arms that are long and straight
+					Find them by assembing superpixels into groups that resemble an arm
+						Easier than cuttoing up large regions
+
+Image segmentation by clustering pixels
+	Clustering is a process whereby a data set is replaced by clusters, which are collections of data points that belong together.
+
+	The specific criterion to be used depends on the application. Pixels may belong together because they have the same color, they have the same texture, they are nearby, and so on.
+
+	The general recipe for image segmentation by clustering is as follows. We
+	represent each image pixel with a feature vector. This feature vector contains all measurements that may be relevant in describing a pixel. Natural feature vectors include: the intensity at the pixel; the intensity and location of the pixel; the color of the pixel, represented in whatever color space seems appropriate; the color of the pixel and its location; and the color of the pixel, its location, and a vector of filter outputs from a local texture represenation. Notice that this description is extremely general; different feature vectors will lead to different kinds of.
+
+	Whether a particular combination of feature vector and clusterer yields good performance depends on what one needs. It is possible to make some general state- ments, though. The general recipe doesn’t guarantee that segments are connected, which may or may not matter.
+
+
+	If one is segmenting images to compress them, then encoding the US flag as three segments (red, white and blue) might be a good choice; if one is segmenting to represent objects, this is probably a poor representation, because it regards all white stars as a single segment. If the feature vector contains a representation of the position of the pixel, the segments that result tend to be “blobby,” because pixels that lie very far from the center of a segment will tend to belong to other clusters. This is one way to ensure that segments are con- nected. Representing color information tends to make segmenters better, because in this case it’s hard to get easy images wrong (color doesn’t seem to make hard images easier, though). For some applications, doing well at easy images is enough.
+
+
+	Basic clustering methods:
+		divisive clustering,the entire data set is regarded as a cluster, and then clusters are recursively split to yield a good clustering
+
+		agglomerative clustering, each data item is regarded as a cluster, and clusters are recursively merged to yield a good clustering
+
+
+		What is a good distance metric?
+			Best distance is what is appropriate for the dataset
+
+			single-link clustering: closest elements in cluster, yield extended clusters
+			complete-link clustering; furthest two points, yield rounded clusters
+			group average clustering: everage distance between elemets, rounded clusters
+
+
+		How many clusters are there?
+			dendrogram: a representation of the structure of the hierarchy of clusters that displays inter-cluster distances
+
+			set number of clusters by threshold distance between clusters
+			stop merhing or stop splitting
+
+
+			It is straightforward to modify both divisive and agglomerative clusterers to
+			ensure that regions are connected. Agglomerative clusterers need to merge only clusters with shared boundaries. It is more difficult to modify divisive clusterers, which need to ensure that the children of any split are connected. One way to do this is to split along spatial boundaries in the segment being split. It is usually impractical to look for the best split of a cluster (for a divisive method) or the best merge (for an agglomerative method). Divisive methods are usually modified by using some form of summary of a cluster to suggest a good split (for example, a histogram of pixel colors). Agglomerative methods also need to be modified, because the number of pixels means that one needs to be careful about the inter- cluster distance (the distance between cluster centers of gravity is often used). Finally, it can be useful to merge regions simply by scanning the image and merging all pairs whose distance falls below a threshold, rather than searching for the closest pair.
+			9.3.2
+
+
+		Watershed:
+			An early segmentation algorithm that is still widely used is the watershed algorithm. Assume we wish to segment image I. In this algorithm, we compute a map of the image gradient magnitude, ||∇I ||. Zeros of this map are locally extreme intensity values; we take each as a seed for a segment, and give each seed a unique label.
+			Now we assign pixels to seeds by a procedure that is, rather roughly, analogous to filling a height map with water (hence the name). Imagine starting at pixel (i, j);
+			if we travel backward down the gradient of ||∇I ||, we will hit a unique seed. Each pixel gets the label of the seed that is hit by this procedure. You should recognize this description as a form of shortest path algorithm;
+			it can also be seen as a form of agglomerative clusterer. We start with seed clus- ters, then agglomerate pixels to clusters when the path to the cluster is “downhill”
+			Section 9.3 Image Segmentation by Clustering Pixels 272
+			from the pixel. This means that one can produce rather more efficient algorithms than the one we sketched, and there is a considerable literature of these algo- rithms. In this literature, authors tend to criticize the watershed algorithm for oversegmentation—that is, for producing “too many” segments. More recently, watershed algorithms are quite widely used because they produce tolerable super- pixels, and are efficient. Good implementations of watershed algorithms are widely available; to produce Figure 9.16, we used the implementation in Matlab’s Image processing toolbox. It is natural to use the gradientmagnitude to drive a watershed transform, because this divides the image up into regions of relatively small gradi- ent; however, one could also use the image intensity, in which case each region is the domain of attraction of an intensity minimum or maximum. Gradient watersheds tend to produce more useful superpixels (Figure 9.16).
+
+		Segmentation Using K-means
+			Vector qauntitisation
+
+			The main consequence of using k-means is that we know how many segments there will be.
+
+			One difficulty with using this approach for segmenting images is that segments can be scattered.
+			This effect can be reduced by using pixel coordinates as features
+
+			Also convex shape
+
+
+		Mean Shift: Finding Local Modes in Data
+			Clustering can be abstracted as a density estimation problem. We have a set of sample points in some feature space, which came from some underlying probability density. Comaniciu and Meer (2002) created an extremely important segmenter, using the mean shift algorithm, which thinks of clusters as local maxima (local modes) in this density. To do so, we need an approximate representation of the density. One way to build an approximation is to use kernel smoothing.Here we take a set of functions that look like “blobs” or “bumps,” place one over each data point, and so produce a smooth function that is large when there are many data points close together and small when the data points are widely separated.
+
+
+		Clustering and Segmentation with Mean Shift
+			Clustering with mean shift is, in principle, straightforward. We start the mean shift procedure at every data point, producing a mode for each data point. Because we are working with continuous variables, every one of these modes is different, but we expect the modes to be very tightly clustered. There should be a small set of actual modes, and each of these estimates is very close to one of them. These esti- mates are themselves useful, because they represent a form of filtering of the image. We could replace each pixel with its mode representation; this gives a significant smoothing of the image in a way that respects image boundaries (Figure 9.20). To cluster the data, we apply, say, an agglomerative clusterer to the mode estimates. Because we expect the modes to be very tightly clustered, group average distance is a good choice of distance, and we can stop clustering when this distance exceeds a small threshold. This will produce a set of small, tight clusters that are widely separated. We now map each data point to the cluster center corresponding to its mode
+
+		Agglomerative Clustering with a Graph
+			

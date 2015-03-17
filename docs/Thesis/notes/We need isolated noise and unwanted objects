@@ -1,0 +1,25 @@
+We need isolated noise and unwanted objects
+	Scope is rather large
+	Issues
+		Data size
+			Hard to process lots of data online
+			Solutions down sample
+		Non uniform sampling
+		Ambiguity
+			So single source of truth
+			Conditional probability
+			Given X what is probabiliuty of Y
+
+
+Removal of unwanted objects and noise from pointclouds
+	Fully automated vs semi automated
+		Semi automated because of citation
+
+
+Many approaches to segmentation
+	A did b
+	C did d
+	...
+	
+
+

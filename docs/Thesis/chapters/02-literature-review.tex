@@ -1,99 +1,309 @@
 %!TEX root = thesis.tex
 \chapter{Literature review} \label{ch:lit}
 
-\section{Previous work}
-Point cloud cleaning is a interactive segmentation problem. Segmentation is by no means a new problem.
+In the previous section digital reconstruction of 3d environments from laser scans was discussed in a heritage preservation context. The removal of environmental and instrument noise was identified as one of the most time consuming in aspects of the reconstruction pipeline. The goal of this research is to speed up the cleaning process through a combination of manual and semi automated methods. Given the noise characteristics described earlier an overview of the relevant literature is presented below.\\
 
-\subsection{Taxonomy}
-\begin{itemize}
-	\item Interactive/Automated
-	\item Information: 2D/2.5D/3D/nD, color, multi-sample, intensity
-	\item Resolution: High, Medium, Low
-	\item Features: Texture, FPFH, Normals, ...
-	\item Target: trees, ground, walls, people, generic
-	\item Parameters: Low, Medium, High
-\end{itemize}
+% and the characteristics of point cloud data sets available to us
+
+% Objects vs noise
+
+% Dismiss things and say there might be a way of doing x
+
+% After discussion then pull out interesting elements
+
+% We have chosen some of methods
+
+% X y z has does P but some are useful way z
+
+% Should not write paragraph 
+
+% Methods x has been shown to be useful. For z
+
+\section{Denoising}
+
+\section{Segmentation of man made structures}
+
+\section{Segmentation of ruins}
+
+\section{Segmenting vegetation}
+
+Points that represent vegetation is undoubtedly some of the hardest classes of points to classify. Some of the most successful approaches to isolating vegetation have used scanners capable of full wave form analysis \cite{Reitberger2009, Elseberg2011}. These special scanners can detect multiple echos per emitted laser pulse. Multiple laser echos occur when more than one surface reflects the pulse. When scanning vegetation multiple echo's occur frequently because of their structure.\\
+
+\citet{Elseberg2011} demonstrated that full wave form analysis can be used to achieve 95\% accuracy when segmenting trees from terrestrial scans on a university campus. It is unclear whether individual or merged ranges scans are used. The algorithm first projects all points to the ground plane and creates an occupancy grid. Points in in each cell are then classified as vegetation or not according to the pulse characteristics in the cell. The segments are then refined with a two pass clustering algorithm that ensures connected components have the same label. To further refine the segmentation the ratio of the two largest principle components of clusters were used distinguish trees from planar structures. A second approach to refining the clusters was adapted from \citet{Reitberger2009}. It computed a point density histogram along the vertical plane of clusters. The histogram was used with a support vector machine (SVM) to identify tree clusters. This approach produced less accurate results on the campus dataset.\\
+
+The datasets in this research were not produced with full wave form scanners. The structure of vegetation will however produce variation in a range scan depth map. It is worth investigating whether this variation could potentially be exploited in a similar manner.\\
+
+% multiple pulses
+% principle components
+% histograms of clusters
+
+\citet{Reitberger2009} used the shape of the histogram to determine the height of a tree crowns in a clusters. Given the height of tree crown the number of stems could be estimated and an N-cut algorithm could be applied to separate trees in a cluster. This researched focused on segmenting individual trees in aerial scans of forests. In this instance a full wave form scanners was not essential to the segmentation algorithm but rather useful because it penetrates the forest canopy and allow trees below the canopy to be imaged. Terrestrial scanners do not need to penetrate canopies. The technique however, uses watershed segmentation on a projected point cloud to construct initial clusters. This approach is unlikely to be satisfactory when buildings, people and other objects are present. Other vegetation segmentation techniques are similarly inapplicable because the focus are in scenes with only vegetation \cite{Haugerud2001} or the targeted data sets are low density aerial scans \cite{Charaniya2004}.\\
+
+% n-cuts
+
+\citet{Barnea2012} describes an generic approach to extracting objects from color range scans that achieves 99\% accuracy on the test data. Problems with non uniform density is overcome by treating the scan as a panoramic image. Small holes in the image are interpolated from neighboring areas and a preset values are assigned to missing background data and larger regions. Mean shift clustering is used iteratively on individual image channels. The largest segment is removed and then the image is segmented again until no more segments above the threshold remain. Features derived from the range (sum of derivatives, sum of absolute derivatives, cornerness), color (HSV and Luv color space) and intensity (cornerness) are used in this process. The extracted segments are then classified as tree or non tree by a kNN classifier. The kNN classifier is trained with an example set using the same features. The segmentation is further refined using the a graph cut.\\
+
+The color channels in the test data does not seem to contribute much discriminative power. A similar approach could thus be useful for our datasets that have no color information. Learning features means the no domain knowledge is required and the approach generalizes to other objects. Producing test data and training a classifier is however problematic in an interactive scenario. The upfront work required to produce test data may not be worthwhile if the resulting classifier only works on data similar to the training set. The kNN algorithm also poses problems as the optimal number of neighbors and the search radius needs to be determined. Features also need to be scaled correctly in order for the kNN classifier to work. The overhead of a classifier may not be necessary in an interactive environment if the user can easily select and remove unwanted segments.\\
 
 
-\subsection{Image segmentation}
-	Scans are simply a depth maps so 2D image techniques should be investigated
-	\subsection{Image gradients}
-	\subsection{Edge detection}
-	\subsection{Blob extraction}
-	\subsection{Contour extraction}
+% Evaluate features separately based on how well they discriminate between trees and non trees
 
-\subsection{Laser scan segmentation}
-	\subsection{Point features}
-		\subsubsection{Normals}
-			Basic building block for other features
-			\begin{itemize}
-			\item Ways of performing normal estimation
-			\item Neighbour search
-				\begin{itemize}
-				\item KD Trees
-				\item Scan grid
-				\end{itemize}
-			\item Cost vs Quality
-			\item Dealing with noise
-			\item Used with machine learning algorithms
-			\end{itemize}
-				
-		\subsubsection{Fast point feature histograms (FPFH)}
-			\begin{itemize}
-			\item Good discrimination for primitive geometric objects
-			\item Costly to calculate
-			\end{itemize}
-			
-		\subsubsection{Principle components}
-			\begin{itemize}					
-			\item Good for finding edges and planes
-			\item Solves part of the inverse problem
-			\end{itemize}
-			
+% kNN needs to scale features or else it wont work, k & h need to be chosen
+% Need training sets
+% We dont have color
 
-	\subsection{Region growing}
-		\begin{itemize}
-		\item Grow neighbourhood from seed point
-		\item Add neighbour if it satisfies some similarity criteria
-		\item Point feature can be used to determine similarity
-		\end{itemize}
+% Good, doesn't rely on domain knowledge, does require trainig
 
-	\subsection{K-means clustering}
-		Problems with non uniform density
+% Reduced dimensionality by using individual channels:
+%     less compute
+%     less oversegment
 
-	\subsection{Graph cuts}
-		\begin{itemize}
-		\item Binary classification
-		\item Encode point similarity edges
-		\item Shown to work well with arbitrary objects
-		\item Results are parameter depended
-		\end{itemize}
+% http://stackoverflow.com/questions/4831813/image-segmentation-using-mean-shift-explained
 
-	\subsection{Machine learning}
-		\begin{itemize}
-		\item Used in navigation \& aerial scans
-		\item Support vector machines
-		\item Markov models
-		\item Conditional random fields
-		\item Requires training
-		\end{itemize}
-		
-	% \subsection{Evaluation of literature}
-	% 	\begin{itemize}
-	% 	\item FPFH seems to discriminate well for primitive geometry. Might be a useful feature to use in tree classification.
-	% 	\item Machine learning has been used to classify vegetation. It however requires training and classified datasets are rare. Possibility to train a classifier on the on scans in the application. Unpredictable accuracy.
-	% 	\item Graph cuts have been shown be effective for automated object classification. Augmented with more edge information accuracy may be improved with minimal user interaction.
-	% 	\end{itemize}
+% Color, depth values and estimated point normals are used to train kNN is used to construct a classifier from a number of features used in combination with 
 
-\section{Evaluation techniques}
-\begin{itemize}
-	\item What was used in previous work and would it be suitable in this instance?
-\end{itemize}
-	
+% color
+% normals
+% depth
+
+% INSIGHT:
+% classification of clusters is only useful when there are many
+% large clusters can be classified and selected by the users
+
+\section{Building segmentation}
+
+Buildings are generally composed of geometric primitives and are thus far less complex than vegetation.
+
+
+\section{Segmenting}
+\citet{Golovinskiy2009a} proposes a method for recognizes shapes in urban environments.
+
+Recognizing shapes in urban environments
+Unstructured point clouds
+
+
+
+
+
+
+% CRF used to reduce the data 
+
+
+% \cite{Reitberger2009}
+% Goal:
+%     Segment single trees in a forest
+% Input:
+%     Lidar
+%     full wave form
+%         X Y Z I W
+%         I = Maximum amplitude
+%         W = Pulse width
+%     Aerial scans of forest
+%     Interpret as height map
+%     10-25 points/m2
+
+% Method:
+%     Watershed segmentation -> canopy height model
+%     Local maxima are good estimates where the stems are
+%     Stems found via heirarchical clustering below the crown base
+%     Reconstruct stems with ransac
+%     Normalised cut segmentation segment single trees
+
+% Insight:
+%     Trees move and have holes in leaves, pulses thus have variance
+
+% Results:
+%     watershed only 48pct detection
+%     stem detection +4 pct
+%     n-cut 11-17pct improvemnet
+
+%     works well with leaves on or off
+%     5-11pct false positive
+%     upper: 80pct accuracy
+%     mid: 20-30pct
+%     lower: 5-25pct
+
+% Comment
+%     The advantage of full waveform LIDAR data is that, basically, each reflection can be detected by the waveform decomposition.
+
+%     We make use of a modern laser range finder capability to measure multiple echoes per laser pulse via Full Wave Analysis. \cite{Elseberg2011}
+
+%     Good intro on full wave form
+%     Graph cut works well for seperating trees lower and mid levels
+%     Combine 2D watershed with 3D graph cut
+%     Normalised cuts are a graph partitioning algorithm
+%     Watershed works on height maps, find the natural divide between two local minima
+%     You can assign minimas
+%     Intensity is the maximum amplitude of the returned pulse
+
+%     % additional information on the reflecting characteristics of the forest structure like branches and stems
+
+% Applicable:
+%     We are not trying to segment trees from each other, we are trying to segment not just trees from structures.
+
+%     Watershed
+%         unsupervised learning/clustering/segmentation
+%     NCut
+%         3d clustering/graph decompositrion
+
+
+% \cite{Elseberg2011}
+%     Goal: identify vegetation from urban environments
+
+%     Input:
+%         Full waveform
+%             Multiple echos possibles
+%                 Edges
+%                 Trees
+%         Terrestial
+
+%     Insight:
+%         From the grounds stems are not onscured making multiple echose less likely
+%         This has been common in aerial scans
+
+%     Method:
+%         Segment regions of interest that contain a high about on muliple echos
+
+%         For segmented regions shape description features are calculated smallest eigenvalue is below 0.05 or the ratio of the smallest is below 0.01 the cluster is labeled non-vegetation.
+
+%         Regions are afterwards classified according to the features into vegetation and non-vegetation
+                
+%         post-processing: remove large planar surfaces
+
+%     Results
+
+
+%     Dicussion:
+%         Great, seperate structures from vegetation
+%         99pct accuracy
+%         We dont have full wave form scanners
+
+
+
+
+
+
+
+% \subsection{Gradients}
+
+% \subsection{Textures}
+
+% \subsection{Fast point feature histograms (FPFH)}
+%     \begin{itemize}
+%     \item Good discrimination for primitive geometric objects
+%     \item Costly to calculate
+%     \end{itemize}
+    
+% \subsection{Principle components}
+%     \begin{itemize}                 
+%     \item Good for finding edges and planes
+%     \item Solves part of the inverse problem
+%     \end{itemize}
+
+% \section{Classification}
+% Classification algorithms use features described above to interpret the scene. We consider two types in this research namely, heuristics and machine learning.
+
+% \subsection{Heuristics}
+% With heuristics a person makes observations in about a dataset and exploits these observations to classify points in a dataset. Because properties of datasets may vary drastically, assumptions made in a algorithm do not aways hold true. Parameters my need to be adjusted when applying the algorithm to a new dataset or the technique may simply break.
+
+% % consider gestalt principles
+
+
+
+% \section{Existing tools}
+
+
+
+% \section{Taxonomy}
+% \begin{itemize}
+%   \item Interactive/Automated
+%   \item Information: 2D/2.5D/3D/nD, color, multi-sample, intensity
+%   \item Resolution: High, Medium, Low
+%   \item Features: Texture, FPFH, Normals, ...
+%   \item Target: trees, ground, walls, people, generic
+%   \item Parameters: Low, Medium, High
+% \end{itemize}
+
+
+% \section{Image segmentation}
+%   Scans are simply a depth maps so 2D image techniques should be investigated
+%   \section{Image gradients}
+%   \section{Edge detection}
+%   \section{Blob extraction}
+%   \section{Contour extraction}
+
+% \section{Laser scan segmentation}
+%   \section{Point features}
+%       \subsection{Normals}
+%           Basic building block for other features
+%           \begin{itemize}
+%           \item Ways of performing normal estimation
+%           \item Neighbour search
+%               \begin{itemize}
+%               \item KD Trees
+%               \item Scan grid
+%               \end{itemize}
+%           \item Cost vs Quality
+%           \item Dealing with noise
+%           \item Used with machine learning algorithms
+%           \end{itemize}
+                
+%       \subsection{Fast point feature histograms (FPFH)}
+%           \begin{itemize}
+%           \item Good discrimination for primitive geometric objects
+%           \item Costly to calculate
+%           \end{itemize}
+            
+%       \subsection{Principle components}
+%           \begin{itemize}                 
+%           \item Good for finding edges and planes
+%           \item Solves part of the inverse problem
+%           \end{itemize}
+            
+
+    % \subsection{Region growing}
+    %     \begin{itemize}
+    %     \item Grow neighbourhood from seed point
+    %     \item Add neighbour if it satisfies some similarity criteria
+    %     \item Point feature can be used to determine similarity
+    %     \end{itemize}
+
+    % \subsection{K-means clustering}
+    %     Problems with non uniform density
+
+    % \subsection{Graph cuts}
+    %     \begin{itemize}
+    %     \item Binary classification
+    %     \item Encode point similarity edges
+    %     \item Shown to work well with arbitrary objects
+    %     \item Results are parameter depended
+    %     \end{itemize}
+
+    % \subsection{Machine learning}
+    %     \begin{itemize}
+    %     \item Used in navigation \& aerial scans
+    %     \item Support vector machines
+    %     \item Markov models
+    %     \item Conditional random fields
+    %     \item Requires training
+    %     \end{itemize}
+        
+    % \section{Evaluation of literature}
+    %   \begin{itemize}
+    %   \item FPFH seems to discriminate well for primitive geometry. Might be a useful feature to use in tree classification.
+    %   \item Machine learning has been used to classify vegetation. It however requires training and classified datasets are rare. Possibility to train a classifier on the on scans in the application. Unpredictable accuracy.
+    %   \item Graph cuts have been shown be effective for automated object classification. Augmented with more edge information accuracy may be improved with minimal user interaction.
+    %   \end{itemize}
+
+% \section{Evaluation techniques}
+% \begin{itemize}
+%   \item What was used in previous work and would it be suitable in this instance?
+% \end{itemize}
+    
 % \section{User interaction}
-% 	\begin{itemize}
-% 		\item Level of interactivity expected?
-% 		\item Characteristics of interfaces?
-% 		\item Basic expected functionality?
-% 		\item Suitable evaluation techniques
-% 	\end{itemize}
+%   \begin{itemize}
+%       \item Level of interactivity expected?
+%       \item Characteristics of interfaces?
+%       \item Basic expected functionality?
+%       \item Suitable evaluation techniques
+%   \end{itemize}

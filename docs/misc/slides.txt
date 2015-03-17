@@ -1,0 +1,119 @@
+Point cloud cleaning
+
+Removing unwanted objects and noise
+	- Trees
+	- Cars
+	- People
+	- Mixed pixels
+
+2000+ scans
+up to 2 hours to clean a scan
+
+Current tools:
+	Noise filters
+	Lasso tool
+
+Ideally we would automate this
+
+Trade off between automation and control
+
+We propose a mix of high precision low automation tools and lower precision highly automated user driven tools
+
+- Lasso
+- Brush tool
+	- Depth aware
+- Planar flood fill
+- Example based segmentation
+
+How to programatically identify unwanted objects or noise
+
+
+- Features
+	- Local descriptor
+	- e.g. X, Y, Z, I
+	- Feature extraction is the process of transforming input features into new salient features
+		- Point normals, PCA, Gradients
+		- 2D & 3D features
+
+- Clustering
+	- Grouping of homogeneous points
+	- Process
+		- Feature selection
+		- Similarity measure e g. Euclidean distance, Manhattan distance
+		- Grouping algorithm
+			- K-nearest neighbors
+			- split & merge
+		- Optional compact cluster representation
+			- Centroid
+			- Feature vector
+			- Simplifies further processing
+
+	- Coarser representation of the data
+	- Clusters don't always correspond to objects of interest
+
+
+- Classification
+	- Problem of determining what class an observation belongs to given a set of characteristics
+	- A classifier is a model used to solve a classification problem.
+	- Construct model
+		- Expert knowledge
+			- Use human insights
+		- Supervised learning
+			- Learns from example data
+
+
+
+Objects or noise can be found using a combination of features, clustering and classification.
+
+Walls:
+	We know they are flat.
+	X, Y, Z, and intensity values are not directly useful
+	Extract features
+		Principal components
+			- Points on a wall are generally distributed along two primary axis
+		Point normals
+			- On a flat surface point normals should point in the same direction
+
+	Clustering solution:
+		Feature vector: Nx, Ny, Nz
+		Similarity measure: Euclidean distance
+		Grouping algorithm:
+			- Compute PCA for all points
+			- Flat surfaces have a near 1:1 ratio of the largest components and a much smaller smallest component
+			- Order candidate points according to flatness
+			- clusters = []
+			- for X in candidate_list
+				- region = []
+				- Add X to seed_list
+				- for each point Y in seed_list:
+					- neighborhood = find_neighboring_points(Z)
+					- for each point Z in neighborhood:
+						- if normal(X) - normal(Z) < threshold:
+							- region.append(Z)
+							- seed_list.append(Z)
+				
+
+
+Example based classification: find trees, ground, walls
+
+	- Supervised learning requires training data
+		- Hand labeled training sets requires human effort
+		- Training sets need to be representative of data one wishes to classify
+
+	- Our approach is to train the classifier on a labeled subset of the data to be classified
+		- We do not need large training sets because our model does not have to generalize to different scenes
+
+	- Our interface lets a user label points in a scene
+	- These labeled points are then used to train a random forest classifier
+	- The resulting classifier then labels the remainder of the cloud
+
+
+	- Random forest is a type of ensemble learning method
+	- Ensemble methods use multiple classifiers to label data
+	- Random forest use multiple decision trees
+	- The trees are constructed by picking random features to determine branches in the tree
+	- Branching decisions are expressed in terms of a threshold on the selected feature
+	- A branch has a conditional probability associated with every class
+	- A robust estimate of a point's class is achieved by combining the probabilities obtained from each tree
+
+	

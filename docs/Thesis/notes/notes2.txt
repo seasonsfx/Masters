@@ -1,0 +1,65 @@
+Clusting is to group similar data points together
+	Aim can be to segment
+	Distance metric required
+	Does not work on catagorical or ordinal data
+	Assumptions
+
+Classification is to assign a predetermined class to data points
+	Similar to clustering
+
+
+Clustering
+	Hierarcical
+		Top down
+		Bowttom up
+		Split merge algorithms
+	K-means clustering
+		Limits
+			Convex data
+
+
+Classification
+	
+
+
+Problems
+	Noise
+	Incomplete data
+	Non uniform data
+
+
+Unsupervised"
+	Find structures or patterns in data
+
+Supervised
+	Find relationships between input and output
+
+
+How to segment complex objects
+
+Objects vary in terms of complexity
+	Trees
+	Card
+	Lamposts
+	People
+
+Objects are coherent
+	Neighbours are likely to be of the same type
+
+
+Clustering help find natural groups in large amounts of data
+	Summarising data
+
+	“Cluster analysis organizes data by abstracting underlying structure either as a grouping of
+	individuals or as a hierarchy of groups. The representation can then be investigated to see if
+	the data group according to preconceived ideas or to suggest new experiments
+
+ Jain and Dubes [JD88]:
+
+
+Solving our problem we have many tools at our disposal
+
+
+
+For our goals clustering is mainly for data simplifications
+We must either classify clusters directly as one of our target objects or use them as an intermediate step in the segmentation process

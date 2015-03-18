@@ -22,6 +22,7 @@
 #include <tuple>
 
 #include <Eigen/Core>
+#include <pcl/segmentation/extract_clusters.h>
 
 QString Evaluate::getName(){
     return "Evaluate";
@@ -186,17 +187,44 @@ std::tuple<std::vector<int>, std::vector<int> > Evaluate::get_false_selections(s
 std::vector<std::vector<int> > Evaluate::cluster(std::vector<int> & idxs){
     // for every index find the closest point
 
-     std::cout << "Size: " << idxs.size() << "Size n^2: " << idxs.size()*idxs.size() << std::endl;
+    std::cout << "Size: " << idxs.size() << "Size n^2: " << idxs.size()*idxs.size() << std::endl;
 
-//    Eigen::MatrixXi dists(idxs.size(), idxs.size());
-//    for(int i = 0; i < idxs.size(); i++){
-//        auto p_i = cl_->active_->at(idxs[i]).getArray3fMap();
-//        for(int j = i+1; j < idxs.size(); j++){
-//            dists(j, i) = dists(i, j) = Eigen::Vector3f(p_i - cl_->active_->at(idxs[j]).getArray3fMap()).norm();
-//        }
-//    }
+    // make a smaller cloud
 
-    return std::vector<std::vector<int> >();
+
+    pcl::PointCloud<pcl::PointXYZI>::Ptr smaller_cloud = boost::make_shared<pcl::PointCloud<pcl::PointXYZI> >();
+    for(int i = 0; i < idxs.size(); i++){
+       smaller_cloud->push_back(cl_->active_->at(idxs[i]));
+    }
+
+
+    pcl::search::KdTree<pcl::PointXYZI>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZI>);
+    tree->setInputCloud (smaller_cloud);
+
+    std::vector<pcl::PointIndices> cluster_indices;
+    pcl::EuclideanClusterExtraction<pcl::PointXYZI> ec;
+    ec.setClusterTolerance (0.02); // 2cm
+    ec.setMinClusterSize (100);
+    ec.setMaxClusterSize (25000);
+    ec.setSearchMethod (tree);
+    ec.setInputCloud (smaller_cloud);
+    ec.extract (cluster_indices);
+
+    std::vector<std::vector<int> > clusters(cluster_indices.size());
+
+    int i;
+    for (std::vector<pcl::PointIndices>::const_iterator it = cluster_indices.begin (); it != cluster_indices.end (); ++it) {
+
+        for (std::vector<int>::const_iterator pit = it->indices.begin (); pit != it->indices.end (); ++pit){
+            clusters[i].push_back(idxs[*pit]);
+        }
+
+        std::cout << "Cluster: " <<  clusters[i].size() << " data points." << std::endl;
+
+        i++;
+    }
+
+    return clusters;
 
 }
 
@@ -271,8 +299,16 @@ void Evaluate::eval() {
         // select false negative
         //core_->us_->push(new Select(cl_->active_, boost::make_shared<std::vector<int>>(false_negative), false, 4, true));
 
-        cluster(false_positive);
-        cluster(false_negative);
+        std::vector<std::vector<int> > fps = cluster(false_positive);
+        for(std::vector<int> & fp : fps){
+            core_->us_->push(new Select(cl_->active_, boost::make_shared<std::vector<int>>(fp), false, 2, true));
+        }
+
+        std::vector<std::vector<int> > fns = cluster(false_negative);
+        for(std::vector<int> & fn : fns){
+            core_->us_->push(new Select(cl_->active_, boost::make_shared<std::vector<int>>(fn), false, 4, true));
+        }
+
     core_->us_->endMacro();
 
 

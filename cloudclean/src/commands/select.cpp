@@ -62,12 +62,15 @@ void Select::undo(){
     for(int idx : *indices_) {
         PointFlags &pf = pc->flags_[idx];
 
-        if(destructive_)
+        if(destructive_) {
             pf = PointFlags(old_selection_[idx]);
-        else if(deselect_action_)
+        }
+        else if(deselect_action_) {
             pf = PointFlags(selectmask_ | uint8_t(pf));
-        else
+        }
+        else {
             pf = PointFlags(~(selectmask_) & uint8_t(pf));
+        }
         update->push_back(idx);
     }
 

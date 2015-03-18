@@ -43,22 +43,22 @@ void Evaluate::initialize(Core *core){
 
     mw_->tooloptions_->addWidget(settings_);
 
-    QLabel * l = new QLabel(QString("Radius: %1 cm").arg(radius_), settings_);
+//    QLabel * l = new QLabel(QString("Radius: %1 cm").arg(radius_), settings_);
 
-    QSlider * slider = new QSlider(settings_);
-    slider->setOrientation(Qt::Horizontal);
-    slider->setRange(1, 300);
-    slider->setSingleStep(1);
-    slider->setToolTip("Radius in cm");
-    slider->setValue(radius_);
-    slider->setTickPosition(QSlider::TicksBelow);
-    connect(slider, &QSlider::valueChanged, [this, l] (int val){
-        radius_ = val;
-        l->setText(QString("Radius: %1 cm").arg(radius_));
-    });
+//    QSlider * slider = new QSlider(settings_);
+//    slider->setOrientation(Qt::Horizontal);
+//    slider->setRange(1, 300);
+//    slider->setSingleStep(1);
+//    slider->setToolTip("Radius in cm");
+//    slider->setValue(radius_);
+//    slider->setTickPosition(QSlider::TicksBelow);
+//    connect(slider, &QSlider::valueChanged, [this, l] (int val){
+//        radius_ = val;
+//        l->setText(QString("Radius: %1 cm").arg(radius_));
+//    });
 
-    layout->addWidget(l);
-    layout->addWidget(slider);
+//    layout->addWidget(l);
+//    layout->addWidget(slider);
     layout->addStretch();
 }
 

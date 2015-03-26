@@ -37,6 +37,7 @@ class Evaluate : public IPlugin {
  private:
     std::tuple<std::vector<int>, std::vector<int>> get_false_selections(std::vector<int> & world_idxs, std::vector<bool> & target_mask);
     std::vector<std::vector<int> > cluster(std::vector<int> & idxs);
+    std::vector<int> concaveHull(std::vector<int> & idxs);
 
  private:
     Core * core_;

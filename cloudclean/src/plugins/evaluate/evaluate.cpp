@@ -191,7 +191,6 @@ std::vector<std::vector<int> > Evaluate::cluster(std::vector<int> & idxs){
 
     // make a smaller cloud
 
-
     pcl::PointCloud<pcl::PointXYZI>::Ptr smaller_cloud = boost::make_shared<pcl::PointCloud<pcl::PointXYZI> >();
     for(int i = 0; i < idxs.size(); i++){
        smaller_cloud->push_back(cl_->active_->at(idxs[i]));
@@ -205,7 +204,6 @@ std::vector<std::vector<int> > Evaluate::cluster(std::vector<int> & idxs){
     pcl::EuclideanClusterExtraction<pcl::PointXYZI> ec;
     ec.setClusterTolerance (0.02); // 2cm
     ec.setMinClusterSize (100);
-    ec.setMaxClusterSize (25000);
     ec.setSearchMethod (tree);
     ec.setInputCloud (smaller_cloud);
     ec.extract (cluster_indices);
@@ -219,12 +217,78 @@ std::vector<std::vector<int> > Evaluate::cluster(std::vector<int> & idxs){
             clusters[i].push_back(idxs[*pit]);
         }
 
-        std::cout << "Cluster: " <<  clusters[i].size() << " data points." << std::endl;
+//        std::cout << "Cluster: " <<  clusters[i].size() << " data points." << std::endl;
 
         i++;
     }
 
     return clusters;
+
+}
+
+std::vector<int> Evaluate::concaveHull(std::vector<int> & idxs){
+    const std::vector<int> & idxToGrid = cl_->active_->cloudToGridMap();
+    int width = cl_->active_->width;
+    int height = cl_->active_->height;
+
+    pcl::PointCloud<pcl::PointXY>::Ptr flatcloud = boost::make_shared<pcl::PointCloud<pcl::PointXY> >();
+    //pcl::PointCloud<pcl::PointXY> flatcloud;
+
+    float min_y = height;
+    int min_y_idx = -1;
+
+    for(int idx : idxs){
+        pcl::PointXY p;
+        p.x = idxToGrid[idx] / height;
+        p.y = idxToGrid[idx] % height;
+
+        if(p.y < min_y){
+            min_y = p.y;
+            min_y_idx = flatcloud->size();
+        }
+
+        flatcloud->push_back(p);
+    }
+
+    pcl::KdTreeFLANN<pcl::PointXY> kdtree;
+    kdtree.setInputCloud(flatcloud);
+
+    int K = 10;
+    std::vector<int> pointIdxNKNSearch(K);
+    std::vector<float> pointNKNSquaredDistance(K);
+
+    int current_idx = min_y_idx;
+
+    Eigen::Vector2f grad(1f, 0f);
+
+    while(1){
+        pcl::PointXY & currentPoint = flatcloud->at(current_idx);
+        kdtree.nearestKSearch(currentPoint, K, pointIdxNKNSearch, pointNKNSquaredDistance);
+
+        for(int idx: pointIdxNKNSearch){
+            pcl::PointXY & p = flatcloud->at(idx);
+
+            Eigen::Vector2f to(p.x, p.y);
+            Eigen::Vector2f from(currentPoint.x, currentPoint.y);
+
+
+            Eigen::Vector2f gradTo = (from + grad);
+            float fromToDist = (to - from).norm();
+
+            float angle = acos((gradTo - from).dot((to - from)/fromToDist));
+
+
+            // New gradient
+            Eigen::Vector2f diff = (to - from);
+            grad = diff / diff.norm();
+
+
+
+        }
+
+    }
+
+    std::cout << "found " << pointIdxNKNSearch.size() << std::endl;
 
 }
 
@@ -290,18 +354,23 @@ void Evaluate::eval() {
     core_->us_->beginMacro("Eval tool selection");
          // Clear the selection mask
         core_->us_->push(new Select(cl_->active_, all_idxs, true, 0xff, true));
+
         // Reproduce the saved selection
         core_->us_->push(new Select(cl_->active_, select_idxs, false, 1, true));
+
+
         // get false_positive, false_negative
         std::tie(false_positive, false_negative) = get_false_selections(world_points, target_mask);
-        // select false positive & false negative
-        //core_->us_->push(new Select(cl_->active_, boost::make_shared<std::vector<int>>(false_positive), false, 2, true));
-        // select false negative
-        //core_->us_->push(new Select(cl_->active_, boost::make_shared<std::vector<int>>(false_negative), false, 4, true));
+
+        // Clear selection
+        core_->us_->push(new Select(cl_->active_, all_idxs, true, 0xff, true));
+
 
         std::vector<std::vector<int> > fps = cluster(false_positive);
         for(std::vector<int> & fp : fps){
             core_->us_->push(new Select(cl_->active_, boost::make_shared<std::vector<int>>(fp), false, 2, true));
+
+            concaveHull(fp);
         }
 
         std::vector<std::vector<int> > fns = cluster(false_negative);
@@ -310,8 +379,6 @@ void Evaluate::eval() {
         }
 
     core_->us_->endMacro();
-
-
 
 
     // http://en.wikipedia.org/wiki/Precision_and_recall

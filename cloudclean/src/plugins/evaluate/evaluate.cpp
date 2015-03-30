@@ -269,12 +269,19 @@ std::vector<int> Evaluate::concaveHull(std::vector<int> & idxs){
     std::set<int> visited;
     int i = 0;
 
+    auto vecToStr = [](Eigen::Vector2f vec){
+        std::string ret = std::string("(") + std::to_string(float(vec.x())) + std::string(" ") + std::to_string(float(vec.y())) + std::string(")");
+        return ret;
+    };
+
     while(1){
         pcl::PointXY & currentPoint = flatcloud->at(current_idx);
         kdtree.nearestKSearch(currentPoint, K, pointIdxNKNSearch, pointNKNSquaredDistance);
 
         int min_angle = M_PI*2;
         int min_angle_idx = -1;
+
+        std::cout << "=======================================================" << std::endl;
 
         for(int kidx: pointIdxNKNSearch){
 
@@ -293,17 +300,18 @@ std::vector<int> Evaluate::concaveHull(std::vector<int> & idxs){
 
             float angle = acos((gradTo - from).dot((to - from)/fromToDist));
 
-//            std::cout << "------------------------------------------------------" << std::endl;
-//            std::cout << "current_idx: " << current_idx << ", kidx: " << kidx << std::endl;
-//            std::cout << "from:\n " << from << " \nto:\n " << to << " \ngradTo:\n " << gradTo << std::endl;
-//            std::cout << "(gradTo - from): " << (gradTo - from) << "\ndot with (to - from)/fromToDist: \n" << (to - from)/fromToDist << std::endl;
-//            std::cout << "angle: " << angle << std::endl;
+            std::cout << "------------------------------------------------------" << std::endl;
+            std::cout << "current gradient; " << vecToStr(grad) << std::endl;
+            std::cout << "current_idx: " << current_idx << ", kidx: " << kidx << std::endl;
+            std::cout << "from: " << vecToStr(from) << " to:  " << vecToStr(to) << " gradTo: " << vecToStr(gradTo) << std::endl;
+            std::cout << "(gradTo - from): " << vecToStr(gradTo - from) << " dot with (to - from)/fromToDist: " << vecToStr((to - from)/fromToDist) << std::endl;
+            std::cout << "angle: " << angle << std::endl;
 
             if(angle < min_angle){
                 min_angle = angle;
                 min_angle_idx = kidx;
                 current_idx = kidx; // next round idx
-                //std::cout << "Min Angle! " <<  kidx << std::endl;
+                std::cout << "Min Angle! " <<  kidx << std::endl;
             }
 
             // New gradient
@@ -323,6 +331,10 @@ std::vector<int> Evaluate::concaveHull(std::vector<int> & idxs){
             std::cout << "good hull!!!!!!!" << std::endl;
             break;
         }
+
+        pcl::PointXY & next_point = flatcloud->at(min_angle_idx);
+        std::cout << "Next point: (" << next_point.x << ", " << next_point.y << ")" << std::endl;
+        std::cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
 
         hull.push_back(idxs[min_angle_idx]);
         visited.insert(min_angle_idx);

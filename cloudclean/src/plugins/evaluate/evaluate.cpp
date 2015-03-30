@@ -303,7 +303,7 @@ std::vector<int> Evaluate::concaveHull(std::vector<int> & idxs){
 
             std::cout << "------------------------------------------------------" << std::endl;
             std::cout << "current gradient; " << vecToStr(grad) << std::endl;
-            std::cout << "current_idx: " << current_idx << ", kidx: " << kidx << std::endl;
+            std::cout << "current kidx: " << vecToStr(kidx) << std::endl;
             std::cout << "from: " << vecToStr(from) << " to:  " << vecToStr(to) << " gradTo: " << vecToStr(gradTo) << std::endl;
             std::cout << "(gradTo - from): " << vecToStr(gradTo - from) << " dot with (to - from)/fromToDist: " << vecToStr((to - from)/fromToDist) << std::endl;
             std::cout << "angle: " << angle << std::endl;

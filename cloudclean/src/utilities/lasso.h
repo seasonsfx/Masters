@@ -11,6 +11,9 @@
 class QPaintDevice;
 class QGLShaderProgram;
 
+bool UTIL_API pointInsidePolygon(std::vector<Eigen::Vector2f> &polygon,
+                        Eigen::Vector2f point);
+
 class UTIL_API Lasso
 {
 public:

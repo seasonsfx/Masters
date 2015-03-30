@@ -77,7 +77,7 @@ Eigen::Vector2f randomLineSegment(Eigen::Vector2f & origin){
     return endPoint;
 }
 
-bool pointInsidePolygon(std::vector<Eigen::Vector2f> polygon,
+bool pointInsidePolygon(std::vector<Eigen::Vector2f> & polygon,
                         Eigen::Vector2f point){
 
     while(true) {

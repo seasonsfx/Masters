@@ -6,7 +6,6 @@
 #include <QGLShaderProgram>
 #include <QGLBuffer>
 #include <QTabWidget>
-#include <QApplication>
 #include <QToolBar>
 #include <QVBoxLayout>
 #include <QDoubleSpinBox>

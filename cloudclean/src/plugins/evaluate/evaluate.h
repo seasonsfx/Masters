@@ -5,6 +5,7 @@
 #include <set>
 #include <boost/weak_ptr.hpp>
 #include "pluginsystem/iplugin.h"
+#include "utilities/lasso.h"
 class QAction;
 class QWidget;
 class Core;
@@ -29,6 +30,9 @@ class Evaluate : public IPlugin {
  signals:
    void enabling();
 
+ public slots:
+   void paint2d();
+
  private slots:
     void enable();
     void disable();
@@ -38,6 +42,7 @@ class Evaluate : public IPlugin {
     std::tuple<std::vector<int>, std::vector<int>> get_false_selections(std::vector<int> & world_idxs, std::vector<bool> & target_mask);
     std::vector<std::vector<int> > cluster(std::vector<int> & idxs);
     std::vector<int> concaveHull(std::vector<int> & idxs);
+    void lassoPoints(std::vector<int> & idxs);
 
  private:
     Core * core_;
@@ -57,6 +62,7 @@ class Evaluate : public IPlugin {
     std::vector<boost::weak_ptr<Layer> >  world_layers_;
     std::vector<boost::weak_ptr<Layer> >  target_layers_;
     std::vector<boost::weak_ptr<Layer> >  selection_layers_;
+    Lasso * lasso_;
 };
 
 #endif  // EVALUATE_H

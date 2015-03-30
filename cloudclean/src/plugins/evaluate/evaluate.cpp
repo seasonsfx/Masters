@@ -276,6 +276,7 @@ std::vector<int> Evaluate::concaveHull(std::vector<int> & idxs){
 
     while(1){
         pcl::PointXY & currentPoint = flatcloud->at(current_idx);
+        std::cout << "Current point: (" << currentPoint.x << ", " << currentPoint.y << ")" << std::endl;
         kdtree.nearestKSearch(currentPoint, K, pointIdxNKNSearch, pointNKNSquaredDistance);
 
         int min_angle = M_PI*2;
@@ -332,9 +333,9 @@ std::vector<int> Evaluate::concaveHull(std::vector<int> & idxs){
             break;
         }
 
-        pcl::PointXY & next_point = flatcloud->at(min_angle_idx);
-        std::cout << "Next point: (" << next_point.x << ", " << next_point.y << ")" << std::endl;
-        std::cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
+//        pcl::PointXY & next_point = flatcloud->at(min_angle_idx);
+//        std::cout << "Next point: (" << next_point.x << ", " << next_point.y << ")" << std::endl;
+//        std::cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
 
         hull.push_back(idxs[min_angle_idx]);
         visited.insert(min_angle_idx);

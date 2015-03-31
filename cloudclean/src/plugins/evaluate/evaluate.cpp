@@ -21,6 +21,8 @@
 #include "pluginsystem/core.h"
 #include "boost/make_shared.hpp"
 #include <tuple>
+#include <thread>
+#include <chrono>
 
 #include <Eigen/Core>
 #include <pcl/segmentation/extract_clusters.h>
@@ -206,7 +208,7 @@ std::vector<std::vector<int> > Evaluate::cluster(std::vector<int> & idxs){
     std::vector<pcl::PointIndices> cluster_indices;
     pcl::EuclideanClusterExtraction<pcl::PointXYZI> ec;
     ec.setClusterTolerance (0.02); // 2cm
-    ec.setMinClusterSize (100);
+    //ec.setMinClusterSize (100);
     ec.setSearchMethod (tree);
     ec.setInputCloud (smaller_cloud);
     ec.extract (cluster_indices);
@@ -274,8 +276,9 @@ std::vector<int> Evaluate::concaveHull(std::vector<int> & idxs){
         return ret;
     };
 
-    while(1){
+    while(true){
         pcl::PointXY & currentPoint = flatcloud->at(current_idx);
+        Eigen::Vector2f from(currentPoint.x, currentPoint.y);
         std::cout << "Current point: (" << currentPoint.x << ", " << currentPoint.y << ")" << std::endl;
         kdtree.nearestKSearch(currentPoint, K, pointIdxNKNSearch, pointNKNSquaredDistance);
 
@@ -293,39 +296,39 @@ std::vector<int> Evaluate::concaveHull(std::vector<int> & idxs){
             pcl::PointXY & p = flatcloud->at(kidx);
 
             Eigen::Vector2f to(p.x, p.y);
-            Eigen::Vector2f from(currentPoint.x, currentPoint.y);
 
-
-            Eigen::Vector2f gradTo = (from + grad);
             float fromToDist = (to - from).norm();
 
-            float angle = acos((gradTo - from).dot((to - from)/fromToDist));
+            float angle = acos(grad.dot((to - from)/fromToDist));
 
             std::cout << "------------------------------------------------------" << std::endl;
             std::cout << "current gradient; " << vecToStr(grad) << std::endl;
-            std::cout << "current kidx: " << vecToStr(kidx) << std::endl;
-            std::cout << "from: " << vecToStr(from) << " to:  " << vecToStr(to) << " gradTo: " << vecToStr(gradTo) << std::endl;
-            std::cout << "(gradTo - from): " << vecToStr(gradTo - from) << " dot with (to - from)/fromToDist: " << vecToStr((to - from)/fromToDist) << std::endl;
+            //std::cout << "current kidx: " << vecToStr(p) << std::endl;
+            std::cout << "from: " << vecToStr(from) << " to:  " << vecToStr(to) << " grad: " << vecToStr(grad) << std::endl;
+            std::cout << "grad: " << vecToStr(grad) << " dot with (to - from)/fromToDist: " << vecToStr((to - from)/fromToDist) << std::endl;
             std::cout << "angle: " << angle << std::endl;
 
             if(angle < min_angle){
                 min_angle = angle;
                 min_angle_idx = kidx;
-                current_idx = kidx; // next round idx
+
                 std::cout << "Min Angle! " <<  kidx << std::endl;
             }
 
-            // New gradient
-            Eigen::Vector2f diff = (to - from);
-            grad = diff / diff.norm();
-
-
         }
+
 
         if(min_angle_idx == -1){
             std::cout << "bad hull!!!!!!!" << std::endl;
             return hull;
         }
+
+        // New gradient
+        auto to_ = flatcloud->at(min_angle_idx);
+        Eigen::Vector2f to(to_.x, to_.y);
+        Eigen::Vector2f diff = (to - from);
+        grad = diff / diff.norm();
+        current_idx = min_angle_idx;
 
         // If we are at the starting point
         if(min_angle_idx == min_y_idx){
@@ -404,9 +407,9 @@ void Evaluate::lassoPoints(std::vector<int> & idxs){
 
     std::cout << "Points selected: " << selected_indices->size() << std::endl;
 
-    for(int sidx : *selected_indices){
-        std::cout << "index selected: " << sidx << ", ";
-    }
+//    for(int sidx : *selected_indices){
+//        std::cout << "index selected: " << sidx << ", ";
+//    }
 
     std::cout << std::endl;
 
@@ -494,16 +497,26 @@ void Evaluate::eval() {
             //core_->us_->push(new Select(cl_->active_, boost::make_shared<std::vector<int>>(fp), false, 2, true));
 
             std::vector<int> hull = concaveHull(fp);
-            std::cout << "Hull size: " << hull.size() << " around " << fp.size() << " points." << std::endl;
-            //lassoPoints(hull);
-            core_->us_->push(new Select(cl_->active_, boost::make_shared<std::vector<int>>(hull), false, 4, true));
+//            std::cout << "Hull size: " << hull.size() << " around " << fp.size() << " points." << std::endl;
+//            lassoPoints(hull);
+
+//            core_->us_->push(new Select(cl_->active_, boost::make_shared<std::vector<int>>(hull), false, 4, true));
+
+            for(int idx : hull){
+                std::vector<int> one_point = {idx};
+                core_->us_->push(new Select(cl_->active_, boost::make_shared<std::vector<int>>(one_point), false, 4, true));
+                QApplication::processEvents();
+                std::this_thread::sleep_for (std::chrono::seconds(5));
+            }
+
+
         }
 
         std::vector<std::vector<int> > fns = cluster(false_negative);
         for(std::vector<int> & fn : fns){
-            std::vector<int> hull = concaveHull(fn);
+            //std::vector<int> hull = concaveHull(fn);
             //lassoPoints(hull);
-            core_->us_->push(new Select(cl_->active_, boost::make_shared<std::vector<int>>(hull), false, 4, true));
+            //core_->us_->push(new Select(cl_->active_, boost::make_shared<std::vector<int>>(hull), false, 4, true));
         }
 
     core_->us_->endMacro();

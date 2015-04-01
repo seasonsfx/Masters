@@ -254,7 +254,9 @@ void dpR(std::vector<int> & idxs, std::vector<bool> & keep, int start_idx, int e
         Eigen::Vector2f a = p-start;
         Eigen::Vector2f b = end-start;
 
-        float dist = (a.dot(b) / (b.norm()));
+        Eigen::Vector2f proj = (b/b.norm()) * (a.dot(b) / (b.norm()));
+
+        float dist = (proj - p).norm();
 
         if(dist > max_dist){
             max_dist_idx = i;

@@ -231,9 +231,78 @@ std::vector<std::vector<int> > Evaluate::cluster(std::vector<int> & idxs){
 
 }
 
+void dpR(std::vector<int> & idxs, std::vector<bool> & keep, int start_idx, int end_idx, std::function<Eigen::Vector2f(int)> getPoint, float e){
+
+    keep[start_idx] = true;
+    keep[end_idx] = true;
+
+    if(end_idx-start_idx < 2){
+        return;
+    }
+
+
+    Eigen::Vector2f start = getPoint(start_idx);
+    Eigen::Vector2f end = getPoint(end_idx);
+
+    // Find the point woth the maximum distance
+    int max_dist_idx = -1;
+    float max_dist = 0;
+
+    for(int i = start_idx; i < end_idx; i++){
+        Eigen::Vector2f p = getPoint(i);
+
+        Eigen::Vector2f a = p-start;
+        Eigen::Vector2f b = end-start;
+
+        float dist = (a.dot(b) / (b.norm()));
+
+        if(dist > max_dist){
+            max_dist_idx = i;
+            max_dist = dist;
+        }
+    }
+
+
+
+
+    bool keep_it = max_dist > e;
+
+    if(keep_it){
+        keep[max_dist_idx] = true;
+    } else {
+        return;
+    }
+
+    dpR(idxs, keep, start_idx, max_dist_idx, getPoint, e);
+    dpR(idxs, keep, max_dist_idx, end_idx, getPoint, e);
+}
+
+std::vector<int> dp(std::vector<int> & idxs, std::function<Eigen::Vector2f(int)> getPoint, float e){
+    int start = 0;
+    int end = idxs.size()-1;
+
+    std::vector<bool> keep(idxs.size(), false);
+    std::vector<int> simplified;
+    dpR(idxs, keep, start, end, getPoint, e);
+    for(int i = 0; i < idxs.size(); i++){
+        if(keep[i]){
+            simplified.push_back(idxs[i]);
+        }
+    }
+    return simplified;
+}
+
 std::vector<int> Evaluate::concaveHull(std::vector<int> & idxs){
     const std::vector<int> & idxToGrid = cl_->active_->cloudToGridMap();
     int height = cl_->active_->scan_height();
+
+//    std::function<float(int, int)> cloudIdxDist = [&](int idx1, int idx2){
+//        return (Eigen::Vector2f(idxToGrid[idx1] / height, idxToGrid[idx1] % height) - Eigen::Vector2f(idxToGrid[idx2] / height, idxToGrid[idx2] % height)).norm();
+//    };
+
+    std::function<Eigen::Vector2f(int)> getPoint = [&](int idx){
+        return Eigen::Vector2f(idxToGrid[idx] / height, idxToGrid[idx] % height);
+    };
 
     pcl::PointCloud<pcl::PointXY>::Ptr flatcloud = boost::make_shared<pcl::PointCloud<pcl::PointXY> >();
 
@@ -259,9 +328,9 @@ std::vector<int> Evaluate::concaveHull(std::vector<int> & idxs){
     pcl::KdTreeFLANN<pcl::PointXY> kdtree;
     kdtree.setInputCloud(flatcloud);
 
-    int K = 10;
-    std::vector<int> pointIdxNKNSearch(K);
-    std::vector<float> pointNKNSquaredDistance(K);
+    int K = 49;
+    std::vector<int> pointIdxNKNSearch;
+    std::vector<float> pointNKNSquaredDistance;
 
     int current_idx = min_y_idx;
 
@@ -276,14 +345,21 @@ std::vector<int> Evaluate::concaveHull(std::vector<int> & idxs){
         return ret;
     };
 
+    // a is initial
+    auto isRightHandTurn = [](Eigen::Vector2f a, Eigen::Vector2f b){
+       return (b.y() * a.x() - b.x() * a.y()) > 0;
+    };
+
     while(true){
         pcl::PointXY & currentPoint = flatcloud->at(current_idx);
         Eigen::Vector2f from(currentPoint.x, currentPoint.y);
         std::cout << "Current point: (" << currentPoint.x << ", " << currentPoint.y << ")" << std::endl;
+        pointIdxNKNSearch.clear();
+        pointNKNSquaredDistance.clear();
         kdtree.nearestKSearch(currentPoint, K, pointIdxNKNSearch, pointNKNSquaredDistance);
 
-        int min_angle = M_PI*2;
-        int min_angle_idx = -1;
+        float max_angle = 0;
+        int max_angle_idx = -1;
 
         std::cout << "=======================================================" << std::endl;
 
@@ -297,51 +373,57 @@ std::vector<int> Evaluate::concaveHull(std::vector<int> & idxs){
 
             Eigen::Vector2f to(p.x, p.y);
 
-            float fromToDist = (to - from).norm();
+            Eigen::Vector2f heading = to - from;
 
-            float angle = acos(grad.dot((to - from)/fromToDist));
+            float headingDist = heading.norm();
+
+            float angle = acos((-grad).dot(heading/headingDist));
+
+            if(isRightHandTurn(grad, heading/headingDist)){
+                angle = M_PI*2 - angle;
+            }
 
             std::cout << "------------------------------------------------------" << std::endl;
             std::cout << "current gradient; " << vecToStr(grad) << std::endl;
             //std::cout << "current kidx: " << vecToStr(p) << std::endl;
             std::cout << "from: " << vecToStr(from) << " to:  " << vecToStr(to) << " grad: " << vecToStr(grad) << std::endl;
-            std::cout << "grad: " << vecToStr(grad) << " dot with (to - from)/fromToDist: " << vecToStr((to - from)/fromToDist) << std::endl;
+            std::cout << "grad: " << vecToStr(grad) << " dot with (to - from)/fromToDist: " << vecToStr((to - from)/headingDist) << std::endl;
             std::cout << "angle: " << angle << std::endl;
 
-            if(angle < min_angle){
-                min_angle = angle;
-                min_angle_idx = kidx;
+            if(angle > max_angle){
+                max_angle = angle;
+                max_angle_idx = kidx;
 
-                std::cout << "Min Angle! " <<  kidx << std::endl;
+                std::cout << "This is the current max Angle! " << std::endl;
             }
 
         }
 
 
-        if(min_angle_idx == -1){
+        if(max_angle_idx == -1){
             std::cout << "bad hull!!!!!!!" << std::endl;
             return hull;
         }
 
         // New gradient
-        auto to_ = flatcloud->at(min_angle_idx);
+        auto to_ = flatcloud->at(max_angle_idx);
         Eigen::Vector2f to(to_.x, to_.y);
         Eigen::Vector2f diff = (to - from);
         grad = diff / diff.norm();
-        current_idx = min_angle_idx;
+        current_idx = max_angle_idx;
 
         // If we are at the starting point
-        if(min_angle_idx == min_y_idx){
+        if(max_angle_idx == min_y_idx){
             std::cout << "good hull!!!!!!!" << std::endl;
             break;
         }
 
 //        pcl::PointXY & next_point = flatcloud->at(min_angle_idx);
 //        std::cout << "Next point: (" << next_point.x << ", " << next_point.y << ")" << std::endl;
-//        std::cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
+        std::cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
 
-        hull.push_back(idxs[min_angle_idx]);
-        visited.insert(min_angle_idx);
+        hull.push_back(idxs[max_angle_idx]);
+        visited.insert(max_angle_idx);
 
         // Remove the first point
         if(i == 4){
@@ -351,7 +433,7 @@ std::vector<int> Evaluate::concaveHull(std::vector<int> & idxs){
         //std::cout << "Hull size: " << hull.size() << endl;
     }
 
-    return hull;
+    return dp(hull, getPoint, 5);
 }
 
 void Evaluate::paint2d(){
@@ -418,6 +500,7 @@ void Evaluate::lassoPoints(std::vector<int> & idxs){
     //core_->us_->endMacro();
 }
 
+
 void Evaluate::eval() {
     auto is_label_in_set = [=] (uint16_t label, std::vector<boost::weak_ptr<Layer> > & layers){
         const LayerSet & ls = ll_->getLayersForLabel(label);
@@ -431,7 +514,6 @@ void Evaluate::eval() {
 
         return false;
     };
-
 
     // collect the world idxs
 
@@ -497,26 +579,26 @@ void Evaluate::eval() {
             //core_->us_->push(new Select(cl_->active_, boost::make_shared<std::vector<int>>(fp), false, 2, true));
 
             std::vector<int> hull = concaveHull(fp);
-//            std::cout << "Hull size: " << hull.size() << " around " << fp.size() << " points." << std::endl;
-//            lassoPoints(hull);
+            std::cout << "Hull size: " << hull.size() << " around " << fp.size() << " points." << std::endl;
+            lassoPoints(hull);
 
-//            core_->us_->push(new Select(cl_->active_, boost::make_shared<std::vector<int>>(hull), false, 4, true));
+            core_->us_->push(new Select(cl_->active_, boost::make_shared<std::vector<int>>(hull), false, 4, true));
 
-            for(int idx : hull){
-                std::vector<int> one_point = {idx};
-                core_->us_->push(new Select(cl_->active_, boost::make_shared<std::vector<int>>(one_point), false, 4, true));
-                QApplication::processEvents();
-                std::this_thread::sleep_for (std::chrono::seconds(5));
-            }
+//            for(int idx : hull){
+//                std::vector<int> one_point = {idx};
+//                core_->us_->push(new Select(cl_->active_, boost::make_shared<std::vector<int>>(one_point), false, 4, true));
+//                QApplication::processEvents();
+//                std::this_thread::sleep_for (std::chrono::milliseconds(500));
+//            }
 
 
         }
 
         std::vector<std::vector<int> > fns = cluster(false_negative);
         for(std::vector<int> & fn : fns){
-            //std::vector<int> hull = concaveHull(fn);
-            //lassoPoints(hull);
-            //core_->us_->push(new Select(cl_->active_, boost::make_shared<std::vector<int>>(hull), false, 4, true));
+            std::vector<int> hull = concaveHull(fn);
+            lassoPoints(hull);
+            core_->us_->push(new Select(cl_->active_, boost::make_shared<std::vector<int>>(hull), false, 4, true));
         }
 
     core_->us_->endMacro();

@@ -251,12 +251,8 @@ int Evaluate::dpR(std::vector<int> & idxs, std::vector<bool> & keep, int start_i
         return -1;
     }
 
-
     Eigen::Vector2f start = getPoint(idxs[start_idx]);
     Eigen::Vector2f end = getPoint(idxs[end_idx]);
-
-//    std::cout << "start/end:" << start << ", " << end << std::endl;
-//    std::cout << "start/end idx:" << start_idx << ", " << end_idx << std::endl;
 
     // Find the point woth the maximum distance
     int max_dist_idx = -1;
@@ -277,9 +273,6 @@ int Evaluate::dpR(std::vector<int> & idxs, std::vector<bool> & keep, int start_i
             max_dist = dist;
         }
     }
-
-
-
 
     bool keep_it = max_dist > e;
 
@@ -313,12 +306,8 @@ std::vector<int> Evaluate::dp(std::vector<int> & idxs, float e){
         int max = dpR(idxs, keep, left, right, e);
 
         if(max != -1){
-//            if(left != max){
-                stack.push(std::make_tuple(left, max));
-//            }
-//            if(max != right){
-                stack.push(std::make_tuple(max, right));
-//            }
+            stack.push(std::make_tuple(left, max));
+            stack.push(std::make_tuple(max, right));
         }
     }
 
@@ -335,13 +324,11 @@ std::vector<int> Evaluate::dp(std::vector<int> & idxs, float e){
     return simplified;
 }
 
+
+
 std::vector<int> Evaluate::concaveHull(std::vector<int> & idxs){
     const std::vector<int> & idxToGrid = cl_->active_->cloudToGridMap();
     int height = cl_->active_->scan_height();
-
-//    std::function<float(int, int)> cloudIdxDist = [&](int idx1, int idx2){
-//        return (Eigen::Vector2f(idxToGrid[idx1] / height, idxToGrid[idx1] % height) - Eigen::Vector2f(idxToGrid[idx2] / height, idxToGrid[idx2] % height)).norm();
-//    };
 
     pcl::PointCloud<pcl::PointXY>::Ptr flatcloud = boost::make_shared<pcl::PointCloud<pcl::PointXY> >();
 
@@ -353,8 +340,6 @@ std::vector<int> Evaluate::concaveHull(std::vector<int> & idxs){
         pcl::PointXY p;
         p.x = idxToGrid[idx] / height;
         p.y = idxToGrid[idx] % height;
-
-        //std::cout << "p.x: " << p.x << "p.y: " << p.y << "idxToGrid[idx]: " << idxToGrid[idx] << " height: " << height << std::endl;
 
         if(p.y < min_y){
             min_y = p.y;
@@ -400,8 +385,6 @@ std::vector<int> Evaluate::concaveHull(std::vector<int> & idxs){
         float max_angle = 0;
         int max_angle_idx = -1;
 
-        std::cout << "=======================================================" << std::endl;
-
         for(int kidx: pointIdxNKNSearch){
 
             if(kidx == current_idx || visited.find(kidx) != visited.end()){
@@ -422,18 +405,9 @@ std::vector<int> Evaluate::concaveHull(std::vector<int> & idxs){
                 angle = M_PI*2 - angle;
             }
 
-            std::cout << "------------------------------------------------------" << std::endl;
-            std::cout << "current gradient; " << vecToStr(grad) << std::endl;
-            //std::cout << "current kidx: " << vecToStr(p) << std::endl;
-            std::cout << "from: " << vecToStr(from) << " to:  " << vecToStr(to) << " grad: " << vecToStr(grad) << std::endl;
-            std::cout << "grad: " << vecToStr(grad) << " dot with (to - from)/fromToDist: " << vecToStr((to - from)/headingDist) << std::endl;
-            std::cout << "angle: " << angle << std::endl;
-
             if(angle > max_angle){
                 max_angle = angle;
                 max_angle_idx = kidx;
-
-                std::cout << "This is the current max Angle! " << std::endl;
             }
 
         }
@@ -457,10 +431,6 @@ std::vector<int> Evaluate::concaveHull(std::vector<int> & idxs){
             break;
         }
 
-//        pcl::PointXY & next_point = flatcloud->at(min_angle_idx);
-//        std::cout << "Next point: (" << next_point.x << ", " << next_point.y << ")" << std::endl;
-        std::cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
-
         hull.push_back(idxs[max_angle_idx]);
         visited.insert(max_angle_idx);
 
@@ -469,16 +439,25 @@ std::vector<int> Evaluate::concaveHull(std::vector<int> & idxs){
            visited.erase(min_y_idx);
         }
         i++;
-        //std::cout << "Hull size: " << hull.size() << endl;
     }
 
-    return hull;
-    //return dp(hull, 20);
+//    return hull;
+    return dp(hull, 5);
 }
 
 void Evaluate::paint2d(){
     // 0 , 0 is not used
-    lasso_->drawLasso(0, 0, flatview_);
+    //lasso_->drawLasso(0, 0, flatview_);
+}
+
+std::vector<Eigen::Vector2f> Evaluate::makePolygon(std::vector<int> & idxs, float expand = 0){
+    std::vector<Eigen::Vector2f> polygon;
+
+    for(int idx : idxs){
+        polygon.push_back(getPoint(idx));
+    }
+    polygon.push_back(polygon[0]);
+    return polygon;
 }
 
 void Evaluate::lassoPoints(std::vector<int> & idxs){
@@ -488,33 +467,13 @@ void Evaluate::lassoPoints(std::vector<int> & idxs){
         return;
     }
 
-    const std::vector<int> & idxToGrid = cl_->active_->cloudToGridMap();
-    int height = cl_->active_->scan_height();
+    std::vector<Eigen::Vector2f> polygon = makePolygon(idxs, 5.0f);
 
-    //lasso_->clear();
-
-    //Eigen::Affine2f t = flatview_->getNDCCamera();
-
-    std::vector<Eigen::Vector2f> polygon;
-
-    // Create a new cloud with only the 2d idx points
-    for(int idx : idxs){
-        polygon.push_back(Eigen::Vector2f (idxToGrid[idx] / height, idxToGrid[idx] % height));
-//        Eigen::Vector2f ndc_point = t * Lasso::NDCPoint(
-//                    p,
-//                    cl_->active_->scan_width(),
-//                    cl_->active_->scan_height());
-
-//       lasso_->addNormPoint(ndc_point);
-
-    }
-
-    polygon.push_back(polygon[0]);
 
     boost::shared_ptr<std::vector<int>> selected_indices = boost::make_shared<std::vector<int>>();
 
     for (uint idx = 0; idx < cl_->active_->size(); idx++) {
-        Eigen::Vector2f point(Eigen::Vector2f (idxToGrid[idx] / height, idxToGrid[idx] % height));
+        Eigen::Vector2f point(getPoint(idx));
 
         if(pointInsidePolygon(polygon, point)){
             selected_indices->push_back(idx);
@@ -522,22 +481,13 @@ void Evaluate::lassoPoints(std::vector<int> & idxs){
     }
 
     QApplication::processEvents();
-
-
-//    lasso_->getIndices2D(cl_->active_->scan_height(), flatview_->getCamera(),
-//                         cl_->active_->cloudToGridMap(), selected_indices);
-
     std::cout << "Points selected: " << selected_indices->size() << std::endl;
-
-//    for(int sidx : *selected_indices){
-//        std::cout << "index selected: " << sidx << ", ";
-//    }
 
     std::cout << std::endl;
 
-    //core_->us_->beginMacro("Lasso");
+
     core_->us_->push(new Select(cl_->active_, selected_indices, false, core_->mw_->select_mask_, true, ll_->getHiddenLabels()));
-    //core_->us_->endMacro();
+
 }
 
 

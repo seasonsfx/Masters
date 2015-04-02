@@ -44,6 +44,10 @@ class Evaluate : public IPlugin {
     std::vector<int> concaveHull(std::vector<int> & idxs);
     void lassoPoints(std::vector<int> & idxs);
 
+    Eigen::Vector2f getPoint(int idx);
+    int dpR(std::vector<int> & idxs, std::vector<bool> & keep, int start_idx, int end_idx, float e);
+    std::vector<int> dp(std::vector<int> & idxs, float e);
+
  private:
     Core * core_;
     CloudList * cl_;

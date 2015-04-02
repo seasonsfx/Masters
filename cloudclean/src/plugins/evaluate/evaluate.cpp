@@ -23,6 +23,7 @@
 #include <tuple>
 #include <thread>
 #include <chrono>
+#include <stack>
 
 #include <Eigen/Core>
 #include <pcl/segmentation/extract_clusters.h>
@@ -231,32 +232,45 @@ std::vector<std::vector<int> > Evaluate::cluster(std::vector<int> & idxs){
 
 }
 
-void dpR(std::vector<int> & idxs, std::vector<bool> & keep, int start_idx, int end_idx, std::function<Eigen::Vector2f(int)> getPoint, float e){
+Eigen::Vector2f Evaluate::getPoint(int idx){
+    const std::vector<int> & idxToGrid = cl_->active_->cloudToGridMap();
+    int height = cl_->active_->scan_height();
+
+    float x = idxToGrid[idx] / height;
+    float y = idxToGrid[idx] % height;
+    Eigen::Vector2f p(x, y);
+    return p;
+}
+
+int Evaluate::dpR(std::vector<int> & idxs, std::vector<bool> & keep, int start_idx, int end_idx, float e){
 
     keep[start_idx] = true;
     keep[end_idx] = true;
 
     if(end_idx-start_idx < 2){
-        return;
+        return -1;
     }
 
 
-    Eigen::Vector2f start = getPoint(start_idx);
-    Eigen::Vector2f end = getPoint(end_idx);
+    Eigen::Vector2f start = getPoint(idxs[start_idx]);
+    Eigen::Vector2f end = getPoint(idxs[end_idx]);
+
+//    std::cout << "start/end:" << start << ", " << end << std::endl;
+//    std::cout << "start/end idx:" << start_idx << ", " << end_idx << std::endl;
 
     // Find the point woth the maximum distance
     int max_dist_idx = -1;
     float max_dist = 0;
 
-    for(int i = start_idx; i < end_idx; i++){
-        Eigen::Vector2f p = getPoint(i);
+    for(int i = start_idx+1; i < end_idx; i++){
+        Eigen::Vector2f p = getPoint(idxs[i]);
 
         Eigen::Vector2f a = p-start;
         Eigen::Vector2f b = end-start;
 
-        Eigen::Vector2f proj = (b/b.norm()) * (a.dot(b) / (b.norm()));
+        Eigen::Vector2f proj = (b/b.norm()) * (a.dot(b) / b.norm());
 
-        float dist = (proj - p).norm();
+        float dist = ((start + proj) - p).norm();
 
         if(dist > max_dist){
             max_dist_idx = i;
@@ -272,25 +286,52 @@ void dpR(std::vector<int> & idxs, std::vector<bool> & keep, int start_idx, int e
     if(keep_it){
         keep[max_dist_idx] = true;
     } else {
-        return;
+        return -1;
     }
 
-    dpR(idxs, keep, start_idx, max_dist_idx, getPoint, e);
-    dpR(idxs, keep, max_dist_idx, end_idx, getPoint, e);
+
+    return max_dist_idx;
 }
 
-std::vector<int> dp(std::vector<int> & idxs, std::function<Eigen::Vector2f(int)> getPoint, float e){
+std::vector<int> Evaluate::dp(std::vector<int> & idxs, float e){
     int start = 0;
     int end = idxs.size()-1;
 
     std::vector<bool> keep(idxs.size(), false);
     std::vector<int> simplified;
-    dpR(idxs, keep, start, end, getPoint, e);
+
+    std::stack<std::tuple<int, int>> stack;
+    stack.push(std::make_tuple(start, end));
+
+    while(stack.size() > 0){
+        std::tuple<int, int> bounds = stack.top();
+        stack.pop();
+
+        int left = std::get<0>(bounds);
+        int right = std::get<1>(bounds);
+
+        int max = dpR(idxs, keep, left, right, e);
+
+        if(max != -1){
+//            if(left != max){
+                stack.push(std::make_tuple(left, max));
+//            }
+//            if(max != right){
+                stack.push(std::make_tuple(max, right));
+//            }
+        }
+    }
+
+
+    // Return kept values
     for(int i = 0; i < idxs.size(); i++){
         if(keep[i]){
             simplified.push_back(idxs[i]);
         }
     }
+
+    std::cout << "input: " << idxs.size() << ", output: " << simplified.size() << std::endl;
+
     return simplified;
 }
 
@@ -301,10 +342,6 @@ std::vector<int> Evaluate::concaveHull(std::vector<int> & idxs){
 //    std::function<float(int, int)> cloudIdxDist = [&](int idx1, int idx2){
 //        return (Eigen::Vector2f(idxToGrid[idx1] / height, idxToGrid[idx1] % height) - Eigen::Vector2f(idxToGrid[idx2] / height, idxToGrid[idx2] % height)).norm();
 //    };
-
-    std::function<Eigen::Vector2f(int)> getPoint = [&](int idx){
-        return Eigen::Vector2f(idxToGrid[idx] / height, idxToGrid[idx] % height);
-    };
 
     pcl::PointCloud<pcl::PointXY>::Ptr flatcloud = boost::make_shared<pcl::PointCloud<pcl::PointXY> >();
 
@@ -330,7 +367,7 @@ std::vector<int> Evaluate::concaveHull(std::vector<int> & idxs){
     pcl::KdTreeFLANN<pcl::PointXY> kdtree;
     kdtree.setInputCloud(flatcloud);
 
-    int K = 49;
+    int K = 9;//49;
     std::vector<int> pointIdxNKNSearch;
     std::vector<float> pointNKNSquaredDistance;
 
@@ -435,7 +472,8 @@ std::vector<int> Evaluate::concaveHull(std::vector<int> & idxs){
         //std::cout << "Hull size: " << hull.size() << endl;
     }
 
-    return dp(hull, getPoint, 5);
+    return hull;
+    //return dp(hull, 20);
 }
 
 void Evaluate::paint2d(){

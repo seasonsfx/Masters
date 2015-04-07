@@ -450,11 +450,19 @@ void Evaluate::paint2d(){
     //lasso_->drawLasso(0, 0, flatview_);
 }
 
-std::vector<Eigen::Vector2f> Evaluate::makePolygon(std::vector<int> & idxs, float expand = 0){
+std::vector<Eigen::Vector2f> Evaluate::makePolygon(std::vector<int> & idxs, float expand){
     std::vector<Eigen::Vector2f> polygon;
 
-    for(int idx : idxs){
-        polygon.push_back(getPoint(idx));
+    int size = idxs.size();
+    for(int i = 0; i < size; i++){
+        Eigen::Vector2f before = getPoint(i > 1 ? idxs[i-1] : idxs[size+i-1]);
+        Eigen::Vector2f current = getPoint(idxs[i]);
+        Eigen::Vector2f after = getPoint(idxs[(i+1)%size]);
+
+        Eigen::Vector2f point_gradient = ((current - before) + (after - current));
+        point_gradient = point_gradient/point_gradient.norm();
+
+        polygon.push_back(current + (point_gradient *  expand));
     }
     polygon.push_back(polygon[0]);
     return polygon;

@@ -12,6 +12,7 @@
 #include <QVBoxLayout>
 #include <QStackedWidget>
 #include <QLineEdit>
+#include <QMessageBox>
 #include "model/layerlist.h"
 #include "model/cloudlist.h"
 #include "gui/glwidget.h"
@@ -27,6 +28,9 @@
 
 #include <Eigen/Core>
 #include <pcl/segmentation/extract_clusters.h>
+
+float SIMPLIFY = 1.5;
+float EXPAND = SIMPLIFY + 0.5;
 
 QString Evaluate::getName(){
     return "Evaluate";
@@ -193,7 +197,7 @@ std::tuple<std::vector<int>, std::vector<int> > Evaluate::get_false_selections(s
 std::vector<std::vector<int> > Evaluate::cluster(std::vector<int> & idxs){
     // for every index find the closest point
 
-    std::cout << "Size: " << idxs.size() << "Size n^2: " << idxs.size()*idxs.size() << std::endl;
+    //std::cout << "Size: " << idxs.size() << "Size n^2: " << idxs.size()*idxs.size() << std::endl;
 
     // make a smaller cloud
 
@@ -223,8 +227,6 @@ std::vector<std::vector<int> > Evaluate::cluster(std::vector<int> & idxs){
             clusters[i].push_back(idxs[*pit]);
         }
 
-//        std::cout << "Cluster: " <<  clusters[i].size() << " data points." << std::endl;
-
         i++;
     }
 
@@ -241,6 +243,7 @@ Eigen::Vector2f Evaluate::getPoint(int idx){
     Eigen::Vector2f p(x, y);
     return p;
 }
+
 
 int Evaluate::dpR(std::vector<int> & idxs, std::vector<bool> & keep, int start_idx, int end_idx, float e){
 
@@ -325,8 +328,52 @@ std::vector<int> Evaluate::dp(std::vector<int> & idxs, float e){
 }
 
 
+std::vector<int> Evaluate::convexHull(std::vector<int> & idxs){
+    int height = cl_->active_->scan_height();
 
-std::vector<int> Evaluate::concaveHull(std::vector<int> & idxs){
+    float min_y = height;
+    int min_y_idx = -1;
+    float max_y = 0;
+    int max_y_idx = -1;
+
+    // Find min and max
+    for(int i = 0; i < idxs.size(); i++){
+        Eigen::Vector2f p = getPoint(idxs[i]);
+
+        if(p.y < min_y){
+            min_y = p.y();
+            min_y_idx = idxs[i];
+        }
+
+        if(p.y > max_y){
+            max_y = p.y();
+            max_y_idx = idxs[i];
+        }
+    }
+
+
+    Eigen::Vector2f top = getPoint(min_y_idx);
+    Eigen::Vector2f bottom = getPoint(max_y_idx);
+
+
+    std::vector<int> top_idxs;
+    std::vector<int> botton_idxs;
+
+
+    // split the points
+
+
+
+    std::vector<int> top_hull = convexHull(top_idxs);
+    std::vector<int> bottom_hull = convexHull(bottom_idxs);
+
+    top_hull.insert(top_hull.end(), bottom_hull.begin(), bottom_hull.end())
+
+    return top_hull;
+}
+
+
+std::vector<int> Evaluate::concaveHull(std::vector<int> & idxs, float simplify){
     const std::vector<int> & idxToGrid = cl_->active_->cloudToGridMap();
     int height = cl_->active_->scan_height();
 
@@ -364,10 +411,10 @@ std::vector<int> Evaluate::concaveHull(std::vector<int> & idxs){
     std::set<int> visited;
     int i = 0;
 
-    auto vecToStr = [](Eigen::Vector2f vec){
-        std::string ret = std::string("(") + std::to_string(float(vec.x())) + std::string(" ") + std::to_string(float(vec.y())) + std::string(")");
-        return ret;
-    };
+//    auto vecToStr = [](Eigen::Vector2f vec){
+//        std::string ret = std::string("(") + std::to_string(float(vec.x())) + std::string(" ") + std::to_string(float(vec.y())) + std::string(")");
+//        return ret;
+//    };
 
     // a is initial
     auto isRightHandTurn = [](Eigen::Vector2f a, Eigen::Vector2f b){
@@ -377,7 +424,7 @@ std::vector<int> Evaluate::concaveHull(std::vector<int> & idxs){
     while(true){
         pcl::PointXY & currentPoint = flatcloud->at(current_idx);
         Eigen::Vector2f from(currentPoint.x, currentPoint.y);
-        std::cout << "Current point: (" << currentPoint.x << ", " << currentPoint.y << ")" << std::endl;
+//        std::cout << "Current point: (" << currentPoint.x << ", " << currentPoint.y << ")" << std::endl;
         pointIdxNKNSearch.clear();
         pointNKNSquaredDistance.clear();
         kdtree.nearestKSearch(currentPoint, K, pointIdxNKNSearch, pointNKNSquaredDistance);
@@ -441,13 +488,10 @@ std::vector<int> Evaluate::concaveHull(std::vector<int> & idxs){
         i++;
     }
 
-//    return hull;
-    return dp(hull, 5);
+    return dp(hull, simplify);
 }
 
 void Evaluate::paint2d(){
-    // 0 , 0 is not used
-    //lasso_->drawLasso(0, 0, flatview_);
 }
 
 std::vector<Eigen::Vector2f> Evaluate::makePolygon(std::vector<int> & idxs, float expand){
@@ -455,30 +499,32 @@ std::vector<Eigen::Vector2f> Evaluate::makePolygon(std::vector<int> & idxs, floa
 
     int size = idxs.size();
     for(int i = 0; i < size; i++){
-        Eigen::Vector2f before = getPoint(i > 1 ? idxs[i-1] : idxs[size+i-1]);
+        Eigen::Vector2f before = getPoint(i > 0 ? idxs[i-1] : idxs[size+i-1]);
         Eigen::Vector2f current = getPoint(idxs[i]);
         Eigen::Vector2f after = getPoint(idxs[(i+1)%size]);
 
         Eigen::Vector2f point_gradient = ((current - before) + (after - current));
         point_gradient = point_gradient/point_gradient.norm();
 
-        polygon.push_back(current + (point_gradient *  expand));
+        Eigen::Vector2f point_normal(-point_gradient.y(), point_gradient.x());
+
+        polygon.push_back(current + (point_normal *  expand));
     }
     polygon.push_back(polygon[0]);
     return polygon;
 }
 
-void Evaluate::lassoPoints(std::vector<int> & idxs){
+boost::shared_ptr<std::vector<int> > Evaluate::lassoPoints(std::vector<int> & idxs, float expand){
+
+    boost::shared_ptr<std::vector<int> > selected_indices = boost::make_shared<std::vector<int>>();
 
     if(cl_->clouds_.size() == 0){
         std::cout << "No clouds" << std::endl;
-        return;
+        return  selected_indices;
     }
 
-    std::vector<Eigen::Vector2f> polygon = makePolygon(idxs, 5.0f);
+    std::vector<Eigen::Vector2f> polygon = makePolygon(idxs, expand);
 
-
-    boost::shared_ptr<std::vector<int>> selected_indices = boost::make_shared<std::vector<int>>();
 
     for (uint idx = 0; idx < cl_->active_->size(); idx++) {
         Eigen::Vector2f point(getPoint(idx));
@@ -488,14 +534,7 @@ void Evaluate::lassoPoints(std::vector<int> & idxs){
         }
     }
 
-    QApplication::processEvents();
-    std::cout << "Points selected: " << selected_indices->size() << std::endl;
-
-    std::cout << std::endl;
-
-
-    core_->us_->push(new Select(cl_->active_, selected_indices, false, core_->mw_->select_mask_, true, ll_->getHiddenLabels()));
-
+    return selected_indices;
 }
 
 
@@ -531,9 +570,6 @@ void Evaluate::eval() {
     // lasso
 
 
-    int count = 0;
-    int count1 = 0;
-    int count2 = 0;
 
     for(uint i = 0; i < cl_->active_->labels_.size(); i++){
         uint16_t label = cl_->active_->labels_[i];
@@ -557,58 +593,117 @@ void Evaluate::eval() {
     std::vector<int> false_positive;
     std::vector<int> false_negative;
 
+    int MAX_IGNORE = 10;
+
+    auto lassoHull = [&] (std::vector<int> & hull, bool deselect) {
+
+//        QMessageBox msgBox;
+//        msgBox.setText(QString("lasso cluster of size ") + QString::number(cluster.size()));
+//        msgBox.exec();
+
+
+        boost::shared_ptr<std::vector<int>> selected_indices = lassoPoints(hull, EXPAND);
+
+        if(selected_indices->size() == 0){
+            std::cout << "ZERO!!!!! Points selected!!!!!!!!!!!!!!!!!!!!!!!!!!!!! " <<  std::endl;
+            return false;
+        }
+
+        core_->us_->push(new Select(cl_->active_, selected_indices, deselect, 1, true, ll_->getHiddenLabels()));
+
+        std::cout << "Points selected: " << selected_indices->size() << std::endl;
+
+        return true;
+    };
+
     core_->us_->beginMacro("Eval tool selection");
-         // Clear the selection mask
-        core_->us_->push(new Select(cl_->active_, all_idxs, true, 0xff, true));
 
-        // Reproduce the saved selection
-        core_->us_->push(new Select(cl_->active_, select_idxs, false, 1, true));
+    // Reproduce the saved selection
+    core_->us_->push(new Select(cl_->active_, all_idxs, true, 0xff, true));
+    core_->us_->push(new Select(cl_->active_, select_idxs, false, 1, true));
 
+    QApplication::processEvents();
+    std::this_thread::sleep_for(std::chrono::seconds(2));
 
+    bool changes_made = true;
+    while(changes_made){
+        // While there are false clusters with more than MAX_IGNORE points
+
+        std::cout << "Iteration --------------------------------------" << std::endl;
+
+        changes_made = false;
         // get false_positive, false_negative
         std::tie(false_positive, false_negative) = get_false_selections(world_points, target_mask);
 
-        // Clear selection
-        core_->us_->push(new Select(cl_->active_, all_idxs, true, 0xff, true));
+
+        // Create clusters
+        std::vector<std::vector<int> > false_positive_clusters = cluster(false_positive);
+        std::vector<std::vector<int> > false_negative_clusters = cluster(false_negative);
 
 
-        std::vector<std::vector<int> > fps = cluster(false_positive);
-        for(std::vector<int> & fp : fps){
-            //core_->us_->push(new Select(cl_->active_, boost::make_shared<std::vector<int>>(fp), false, 2, true));
+        std::vector<std::vector<int> > false_positive_hulls;
+        std::vector<std::vector<int> > false_negative_hulls;
 
-            std::vector<int> hull = concaveHull(fp);
-            std::cout << "Hull size: " << hull.size() << " around " << fp.size() << " points." << std::endl;
-            lassoPoints(hull);
+        // Create concave hulls
+        for(std::vector<int> & cluster : false_positive_clusters){
+            if(cluster.size() <= MAX_IGNORE){
+                continue;
+            }
 
-            core_->us_->push(new Select(cl_->active_, boost::make_shared<std::vector<int>>(hull), false, 4, true));
+            std::vector<int> hull = concaveHull(cluster, SIMPLIFY);
 
-//            for(int idx : hull){
-//                std::vector<int> one_point = {idx};
-//                core_->us_->push(new Select(cl_->active_, boost::make_shared<std::vector<int>>(one_point), false, 4, true));
-//                QApplication::processEvents();
-//                std::this_thread::sleep_for (std::chrono::milliseconds(500));
-//            }
+            if(hull.size() == cluster.size()){
+                std::cout << "hull size === cluster size" <<  std::endl;
+                continue;
+            }
 
-
+            false_positive_hulls.push_back(hull);
         }
 
-        std::vector<std::vector<int> > fns = cluster(false_negative);
-        for(std::vector<int> & fn : fns){
-            std::vector<int> hull = concaveHull(fn);
-            lassoPoints(hull);
-            core_->us_->push(new Select(cl_->active_, boost::make_shared<std::vector<int>>(hull), false, 4, true));
+        for(std::vector<int> & cluster : false_negative_clusters){
+            if(cluster.size() <= MAX_IGNORE){
+                continue;
+            }
+
+            std::vector<int> hull = concaveHull(cluster, SIMPLIFY);
+
+            if(hull.size() == cluster.size()){
+                std::cout << "hull size === cluster size" <<  std::endl;
+                continue;
+            }
+
+            false_positive_hulls.push_back(hull);
         }
+
+
+
+        // Find out if we can combine hulls without creating more false selections
+
+
+
+        // Lasso the hulls
+        for(std::vector<int> & hull : false_positive_hulls){
+            std::cout << "Hull size: " << hull.size() << " around " << cluster.size() << " points." << std::endl;
+
+            changes_made = lassoHull(hull, true) || changes_made;
+            QApplication::processEvents();
+            std::chrono::seconds(1);
+        }
+
+        for(std::vector<int> & hull : false_negative_hulls){
+            changes_made = lassoHull(hull, false) || changes_made;
+            QApplication::processEvents();
+            std::chrono::seconds(1);
+        }
+
+        std::cout << "Changes made: " << changes_made << std::endl;
+        std::cout << "++++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
+    }
 
     core_->us_->endMacro();
 
-
-    // http://en.wikipedia.org/wiki/Precision_and_recall
-    qDebug() << "overlap: " << count << "truth: " << count1 << "result: " << count2;
-    qDebug() << "Recall: " << float(count)/count1;
-    qDebug() << "Precision: " << float(count)/count2;
-
-    recall_->setText(QString("%1").arg(float(count)/count1));
-    precision_->setText(QString("%1").arg(float(count)/count2));
+//    recall_->setText(QString("%1").arg(float(count)/count1));
+//    precision_->setText(QString("%1").arg(float(count)/count2));
 }
 
 void Evaluate::cleanup(){

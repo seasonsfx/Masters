@@ -340,12 +340,12 @@ std::vector<int> Evaluate::convexHull(std::vector<int> & idxs){
     for(int i = 0; i < idxs.size(); i++){
         Eigen::Vector2f p = getPoint(idxs[i]);
 
-        if(p.y < min_y){
+        if(p.y() < min_y){
             min_y = p.y();
             min_y_idx = idxs[i];
         }
 
-        if(p.y > max_y){
+        if(p.y() > max_y){
             max_y = p.y();
             max_y_idx = idxs[i];
         }
@@ -357,7 +357,7 @@ std::vector<int> Evaluate::convexHull(std::vector<int> & idxs){
 
 
     std::vector<int> top_idxs;
-    std::vector<int> botton_idxs;
+    std::vector<int> bottom_idxs;
 
 
     // split the points
@@ -367,7 +367,7 @@ std::vector<int> Evaluate::convexHull(std::vector<int> & idxs){
     std::vector<int> top_hull = convexHull(top_idxs);
     std::vector<int> bottom_hull = convexHull(bottom_idxs);
 
-    top_hull.insert(top_hull.end(), bottom_hull.begin(), bottom_hull.end())
+    top_hull.insert(top_hull.end(), bottom_hull.begin(), bottom_hull.end());
 
     return top_hull;
 }
@@ -683,7 +683,7 @@ void Evaluate::eval() {
 
         // Lasso the hulls
         for(std::vector<int> & hull : false_positive_hulls){
-            std::cout << "Hull size: " << hull.size() << " around " << cluster.size() << " points." << std::endl;
+            //std::cout << "Hull size: " << hull.size() << " around " << cluster.size() << " points." << std::endl;
 
             changes_made = lassoHull(hull, true) || changes_made;
             QApplication::processEvents();

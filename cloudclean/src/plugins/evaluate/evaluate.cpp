@@ -257,7 +257,9 @@ int Evaluate::dpR(std::vector<int> & idxs, std::vector<bool> & keep, int start_i
     Eigen::Vector2f start = getPoint(idxs[start_idx]);
     Eigen::Vector2f end = getPoint(idxs[end_idx]);
 
-    // Find the point woth the maximum distance
+
+    // Find the point with the maximum distance
+    // Exclude the start end end points
     int max_dist_idx = -1;
     float max_dist = 0;
 
@@ -327,8 +329,105 @@ std::vector<int> Evaluate::dp(std::vector<int> & idxs, float e){
     return simplified;
 }
 
+auto pointLocation = [](Eigen::Vector2f A, Eigen::Vector2f B, Eigen::Vector2f P) {
+    int cp1 = (B.x-A.x)*(P.y-A.y) - (B.y-A.y)*(P.x-A.x);
+    return (cp1>0)?1:-1;
+};
+
+//auto distance = [](Eigen::Vector2f A, Point Eigen::Vector2f, Eigen::Vector2f C) {
+//    int ABx = B.x-A.x;
+//    int ABy = B.y-A.y;
+//    int num = ABx*(A.y-C.y)-ABy*(A.x-C.x);
+//    if (num < 0) num = -num;
+//    return num;
+//};
+
+//auto isRightHandTurn = [](Eigen::Vector2f a, Eigen::Vector2f b){
+//   return (b.y() * a.x() - b.x() * a.y()) > 0;
+//};
+
+
+void Evaluate::cvR(Eigen::Vector2f a, Eigen::Vector2f b, std::vector<int> & idxs, std::vector<int> & hull){
+    // Find the point futhest away from the line in each group
+
+    if(idxs.size() == 0){
+        return;
+    }
+
+    if(idxs.size() == 1){
+        hull.push_back(idxs[0]);
+    }
+
+    auto maxDistIdx = [&](std::vector<int> & idxs, Eigen::Vector2f & start, Eigen::Vector2f & end){
+        int max_dist_idx = -1;
+        float max_dist = 0;
+
+        for(int i = 0; i < idxs.size(); i++){
+            Eigen::Vector2f p = getPoint(idxs[i]);
+
+            Eigen::Vector2f a = p-start;
+            Eigen::Vector2f b = end-start;
+
+            Eigen::Vector2f proj = (b/b.norm()) * (a.dot(b) / b.norm());
+
+            float dist = ((start + proj) - p).norm();
+
+            if(dist > max_dist){
+                max_dist_idx = i;
+                max_dist = dist;
+            }
+        }
+
+        return max_dist_idx;
+    };
+
+
+    int max_idx = maxDistIdx(idxs, a, b);
+
+    Eigen::Vector2f max = getPoint(max_idx);
+
+    std::vector<int> left;
+    std::vector<int> right;
+
+    for(int idx : idxs){
+        if(idx == max_idx){
+            continue;
+        }
+
+        Eigen::Vector2f p = getPoint(idx);
+
+        if (pointLocation(a,b,p) == -1){
+            left.push_back(idx);
+        }
+        else {
+            left.push_back(idx);
+        }
+    }
+
+    int idx_size = idxs.size();
+    idxs.clear();// Save memory
+
+    if(left.size() >= idx_size){
+        std::cout << "Stop left: " << left.size() << " " << idx_size << std::endl;
+        return;
+    } else {
+        cvR(a, max, left, hull);
+    }
+
+    if(right.size() >= idx_size){
+        std::cout << "Stop left" << std::endl;
+        return;
+    } else {
+        cvR(max, b, right, hull);
+    }
+
+
+
+}
 
 std::vector<int> Evaluate::convexHull(std::vector<int> & idxs){
+    std::vector<int> hull;
+
     int height = cl_->active_->scan_height();
 
     float min_y = height;
@@ -337,39 +436,66 @@ std::vector<int> Evaluate::convexHull(std::vector<int> & idxs){
     int max_y_idx = -1;
 
     // Find min and max
-    for(int i = 0; i < idxs.size(); i++){
-        Eigen::Vector2f p = getPoint(idxs[i]);
+    for(int idx : idxs){
+        Eigen::Vector2f p = getPoint(idx);
 
         if(p.y() < min_y){
             min_y = p.y();
-            min_y_idx = idxs[i];
+            min_y_idx = idx;
         }
 
         if(p.y() > max_y){
             max_y = p.y();
-            max_y_idx = idxs[i];
+            max_y_idx = idx;
         }
     }
 
 
+    hull.push_back(max_y_idx);
+    hull.push_back(min_y_idx);
+
+    // Find points on oposite sides of the line
     Eigen::Vector2f top = getPoint(min_y_idx);
     Eigen::Vector2f bottom = getPoint(max_y_idx);
+//    Eigen::Vector2f lineVec = bottom - top;
+
+    std::vector<int> left_idxs;
+    std::vector<int> right_idxs;
+
+    for(int idx : idxs){
+
+        // Skip the line ends
+        if(idx == min_y_idx || idx == max_y_idx){
+            continue;
+        }
+
+        if (pointLocation(top,bottom,getPoint(idx)) == -1){
+            left.push_back(idx);
+        }
+        else {
+            left.push_back(idx);
+        }
+    }
+
+    cvR(top, bottom, left_idxs, hull);
+    cvR(bottom, top, right_idxs, hull);
 
 
-    std::vector<int> top_idxs;
-    std::vector<int> bottom_idxs;
+    // center off mass
+    Eigen::Vector2f center(0, 0);
+    for(int idx : hull){
+        center += getPoint(idx);
+    }
+    center /= hull.size();
 
+    // sort hull
+    std::sort(hull.begin(), hull.end(), [this, &center](int a, int b) -> bool {
+        Eigen::Vector2f p1 = getPoint(a) - center;
+        Eigen::Vector2f p2 = getPoint(b) - center;
+        return atan2(p1.y(), p1.x()) > atan2(p2.y(), p2.x());
+    });
 
-    // split the points
-
-
-
-    std::vector<int> top_hull = convexHull(top_idxs);
-    std::vector<int> bottom_hull = convexHull(bottom_idxs);
-
-    top_hull.insert(top_hull.end(), bottom_hull.begin(), bottom_hull.end());
-
-    return top_hull;
+    return hull;
 }
 
 
@@ -518,13 +644,12 @@ boost::shared_ptr<std::vector<int> > Evaluate::lassoPoints(std::vector<int> & id
 
     boost::shared_ptr<std::vector<int> > selected_indices = boost::make_shared<std::vector<int>>();
 
-    if(cl_->clouds_.size() == 0){
+    if(cl_->clouds_.size() == 0) {
         std::cout << "No clouds" << std::endl;
         return  selected_indices;
     }
 
     std::vector<Eigen::Vector2f> polygon = makePolygon(idxs, expand);
-
 
     for (uint idx = 0; idx < cl_->active_->size(); idx++) {
         Eigen::Vector2f point(getPoint(idx));
@@ -562,15 +687,6 @@ void Evaluate::eval() {
     auto all_idxs = boost::make_shared<std::vector<int>>();
     auto select_idxs = boost::make_shared<std::vector<int>>();
 
-    // collect truth idxs
-    // find false positives
-    // find false negatives
-    // cluster false positives
-    // cluster false negatives
-    // lasso
-
-
-
     for(uint i = 0; i < cl_->active_->labels_.size(); i++){
         uint16_t label = cl_->active_->labels_[i];
 
@@ -593,13 +709,19 @@ void Evaluate::eval() {
     std::vector<int> false_positive;
     std::vector<int> false_negative;
 
+
     int MAX_IGNORE = 10;
+    int lasso_count = 0;
+    int lasso_vertex_count = 0;
 
     auto lassoHull = [&] (std::vector<int> & hull, bool deselect) {
 
 //        QMessageBox msgBox;
 //        msgBox.setText(QString("lasso cluster of size ") + QString::number(cluster.size()));
 //        msgBox.exec();
+
+        lasso_count++;
+        lasso_vertex_count += hull.size();
 
 
         boost::shared_ptr<std::vector<int>> selected_indices = lassoPoints(hull, EXPAND);
@@ -624,6 +746,7 @@ void Evaluate::eval() {
 
     QApplication::processEvents();
     std::this_thread::sleep_for(std::chrono::seconds(2));
+
 
     bool changes_made = true;
     while(changes_made){
@@ -672,14 +795,47 @@ void Evaluate::eval() {
                 continue;
             }
 
-            false_positive_hulls.push_back(hull);
+            false_negative_hulls.push_back(hull);
         }
 
+        auto hasFalseSelection = [this, &target_mask](boost::shared_ptr<std::vector<int> > idxs, bool deselect) {
+            int threshold = 10;
+            int false_selections = 0;
+            for(int idx: *idxs){
+                bool is_selected = uint8_t(cl_->active_->flags_[idx]) & uint8_t(0xff);
+                bool should_be_selected = target_mask[idx];
+                if((deselect && should_be_selected && is_selected) || (!deselect && !should_be_selected && !is_selected)){
+                    false_selections++;
+                    if(false_selections > threshold){
+                        return true;
+                    }
+                }
+            }
 
+            return false;
+        };
 
-        // Find out if we can combine hulls without creating more false selections
+        // Try to combine hulls
+        auto combineConcaveHulls = [this, &hasFalseSelection](std::vector<std::vector<int> > hulls, bool deselect){
+            // We can cobine two concave hulls if the convex hull around them does not create more false selections
+            for(int i = 0; i < hulls.size(); i++) {
+                for(int j = i+1; j < hulls.size(); j++) {
+                    std::vector<int> combined(hulls[i].size() + hulls[j].size());
+                    combined.insert(combined.end(), hulls[i].begin(), hulls[i].end());
+                    combined.insert(combined.end(), hulls[j].begin(), hulls[j].end());
+                    std::vector<int> chull = convexHull(combined);
+                    boost::shared_ptr<std::vector<int> > selected_idxs = lassoPoints(chull, 0);
+                    if(!hasFalseSelection(selected_idxs, deselect)){
+                        hulls[i] = chull;
+                        hulls.erase(hulls.begin()+j);
+                        j--;
+                    }
+                }
+            }
+        };
 
-
+        combineConcaveHulls(false_positive_hulls, true);
+        combineConcaveHulls(false_negative_hulls, false);
 
         // Lasso the hulls
         for(std::vector<int> & hull : false_positive_hulls){
@@ -701,6 +857,16 @@ void Evaluate::eval() {
     }
 
     core_->us_->endMacro();
+
+    std::cout << "Lasso actions: " << lasso_count << std::endl;
+    std::cout << "Total lasso vertices: " << lasso_vertex_count << std::endl;
+
+    float seconds_per_vertex = 1;
+    float seconds_per_lasso = 4;
+
+
+    std::cout << "Estimated user time (seconds): " << lasso_count*seconds_per_lasso + lasso_vertex_count*seconds_per_vertex << std::endl;
+
 
 //    recall_->setText(QString("%1").arg(float(count)/count1));
 //    precision_->setText(QString("%1").arg(float(count)/count2));

@@ -19,27 +19,27 @@ Architectural heritage sites in many parts of the world are deteriorating or are
 
 \section{3D scanning} \label{sec:scanners}
 
-3D scanners are optical devices that capture the shape, position and appearance of real world objects. At the very least a 3D scanner will record coordinates of points on scanned surfaces. Gray scale or color information may also be included. There are many types of 3D scanners on the market today. Each scanner has properties that make it more of less suitable for various scanning tasks. Generally, the size of the object and the level of detail one wishes to capture will determine ones choice of technology. Secondary factors such imaging speed, portability and cost of a scanner may also be important.
+3D scanners are optical devices that capture the shape, position and appearance of real world objects. At the very least a 3D scanner will record coordinates of points on scanned surfaces. Gray scale or colour information may also be included. There are many types of 3D scanners on the market today. Each scanner has properties that make it more of less suitable for various scanning tasks. Generally, the size of the object and the level of detail one wishes to capture will determine ones choice of technology. Secondary factors such imaging speed, portability and cost of a scanner may also be important.
 
 3D scanning technologies can generally be classified into two categories, namely triangulation and time of flight scanners.
 
 \subsection{Triangulation scanners}
 
-Triangulation scanners, as the name suggests, uses trigonometric triangulation \cite{Frohlich2004} to locate surface points in a scene. Triangulation scanners are primarily available in two flavors, those that use laser light and those that use white light \cite{Brown2012}. Laser triangulation scanners emit pulses that are reflected by an object and recorded by a sensor at a known position relative to the pulse origin. The sensor directly measures the angle of the returned beam that can then be used to compute the position of a point on an object surface. Light based scanners emit a series of linear patterns that similarly captured by a sensor at a known position. Unlike laser triangulation scanners, the sensor records perspective distortions in the reflected light patterns. These distortions are used to indirectly compute the angle of the returned light and determine the position of object surfaces.
+Triangulation scanners, as the name suggests, uses trigonometric triangulation \cite{Frohlich2004} to locate surface points in a scene. Triangulation scanners are primarily available in two flavours, those that use laser light and those that use white light \cite{Brown2012}. Laser triangulation scanners emit pulses that are reflected by an object and recorded by a sensor at a known position relative to the pulse origin. The sensor directly measures the angle of the returned beam that can then be used to compute the position of a point on an object surface. Light based scanners emit a series of linear patterns that similarly captured by a sensor at a known position. Unlike laser triangulation scanners, the sensor records perspective distortions in the reflected light patterns. These distortions are used to indirectly compute the angle of the returned light and determine the position of object surfaces.
 
 \begin{figure}[H]
 	\begin{subfigure}[b]{.33\textwidth}
-	  \centering
+	  \centreing
 	  \includegraphics[width=.9\linewidth]{images/structured-light-scan}
 	  \caption{}
 	\end{subfigure}%
 	\begin{subfigure}[b]{.33\textwidth}
-	  \centering
+	  \centreing
 	  \includegraphics[width=.9\linewidth]{images/triangulate-laser-scan}
 	  \caption{}
 	\end{subfigure}
 	\begin{subfigure}[b]{.33\textwidth}
-	  \centering
+	  \centreing
 		\begin{tikzpicture}[scale=2.5]
 
 		\coordinate [label={[black]above:$Source$}] (A) at (0, 1);
@@ -74,14 +74,14 @@ Given the precise distance between the light source and sensor ($\begingroup\col
 \subsection{Time of flight scanners (TOF)} \label{subsec:tof}
 
 \begin{figure}[ht]
-  \centering
+  \centreing
   \includegraphics[width=.5\linewidth]{images/pulse-tof}
   \caption[Time of flight scanner]{Time of flight scanner \protect\footnotemark[\value{footnote}]}
   \label{fig:tof}
 \end{figure}
 \footnotetext{Source: \url{http://www.rapidform.com/3d-scanners/}}
 
-Time of flight (TOF) scanners emit laser pulses just like triangulation laser scanners. Unlike triangulation scanners, time of light scanners measure the time taken by a pulse to reflect to be detected by the scanner's sensor (see \autoref{fig:tof}). The distance traveled by the pulse can be computed by considering the speed of light. Given the time it takes for a pulse to travel to a surface and back to the scanner ($t$), the distance ($d$) is given by $d = ct/2$ where $c$ is the speed of light. The accuracy of the distance calculation depends on how precisely time can be measured \cite{Form2014}.
+Time of flight (TOF) scanners emit laser pulses just like triangulation laser scanners. Unlike triangulation scanners, time of light scanners measure the time taken by a pulse to reflect to be detected by the scanner's sensor (see \autoref{fig:tof}). The distance travelled by the pulse can be computed by considering the speed of light. Given the time it takes for a pulse to travel to a surface and back to the scanner ($t$), the distance ($d$) is given by $d = ct/2$ where $c$ is the speed of light. The accuracy of the distance calculation depends on how precisely time can be measured \cite{Form2014}.
 
 \begin{figure}[ht]
 	\begin{tikzpicture}[scale=1]
@@ -91,7 +91,7 @@ Time of flight (TOF) scanners emit laser pulses just like triangulation laser sc
 	    axis lines = left,
 	    yticklabels={,,},
 	    xticklabels={,,},
-	    axis x line=center,
+	    axis x line=centre,
 	    xlabel = $Time$,
 	    ylabel = {Amplitude},
 	    legend style={
@@ -114,7 +114,7 @@ Laser phase-shift scanners \cite{Frohlich2004} are a variation on the standard T
 
 \subsection{Comparison}
 
-Laser and structured light triangulation scanners can achieve 10 micrometer accuracy over distances less than one meter. Over longer distances, however, the triangle in \autoref{fig:triangulation-scanners} becomes elongated which results in more variance in the distance calculation \cite{Mackinnon2006} when compared to TOF scanners. Structured light scanners specifically are less prone to motion distortions when compared to laser scanners and tend to also be faster \cite{Brown2012}. Hand-held scanners triangulation are easy to setup and use compared to other scanners. Accuracy, speed over short distances in combined with their low cost and portability make these scanners preferable for objects that can be scanned at short range.
+Laser and structured light triangulation scanners can achieve 10 micrometer accuracy over distances less than one meter. Over longer distances, however, the triangle in \autoref{fig:triangulation-scanners} becomes elongated which results in more variance in the distance calculation \cite{Mackinnon2006} when compared to TOF scanners. Structured light scanners specifically are less prone to motion distortions when compared to laser scanners and tend to also be faster \cite{Brown2012}. Hand-held scanners triangulation are easy to set-up and use compared to other scanners. Accuracy, speed over short distances in combined with their low cost and portability make these scanners preferable for objects that can be scanned at short range.
 
 The accuracy of TOF scanners is a function of how accurately a laser pulse round trip time can be measured. TOF scanners tend to be less accurate over short distances (typically less than 2 meters) as there is less distance over which to amortize measurement error. Larger distances up to 1 km can however be measured with high accuracy \cite{Form2014}. The speed of TOF scanners depends on the resolution required. Tens of thousands of points may take seconds while resolutions with millions of points may take minutes.
 
@@ -141,7 +141,7 @@ Phase-based scanners have a more limited range due to the cyclic nature of the s
 \footnotetext{Source: \url{http://www.rapidform.com/3d-scanners/}}
 
 \begin{figure}[ht]
-  \centering
+  \centreing
   \includegraphics[width=1\linewidth]{images/grid}
   \caption{2D scan grid of intensity values \protect\footnotemark[\value{footnote}]}
   \label{fig:grid}
@@ -149,9 +149,9 @@ Phase-based scanners have a more limited range due to the cyclic nature of the s
 
 \footnotetext{Rendering based on data provided by the \href{http://www.zamaniproject.org/}{Zamani Project}}
 
-The terrestrial laser scanner technology described above produces angle and range measurements that are converted into 3D coordinates relative to the scanner and returned as a range image. A range image is a two dimensional array of samples, that in addition to 3D coordinates, may also include the intensity of the returned laser pulse, as well as color measurements, and other information specific to a scanner or manufacturer \cite{Frohlich2004}. We limit our investigation to range images produced by TOF and phase scanners that return an intensity value in addition to coordinates with every point. We exclude color information as such scans were not readily available to us at the time of writing.
+The terrestrial laser scanner technology described above produces angle and range measurements that are converted into 3D coordinates relative to the scanner and returned as a range image. A range image is a two dimensional array of samples, that in addition to 3D coordinates, may also include the intensity of the returned laser pulse, as well as colour measurements, and other information specific to a scanner or manufacturer \cite{Frohlich2004}. We limit our investigation to range images produced by TOF and phase scanners that return an intensity value in addition to coordinates with every point. We exclude colour information as such scans were not readily available to us at the time of writing.
 
-A range image is considered to be 2.5D rather than full 3D as it is limited to representing objects captured from a single perspective. When viewed in 3D, a range scan will contain many occluded objects. One will also notice the sampled point density reduces as one moves away from the scan origin. This can make it hard to identify objects in far away low density regions of a range image. Rendering a range scan as a greyscale 2D panoramic image (see \autoref{fig:grid}) may make objects more recognizable. The grid structure of range scans can also facilitate cheap neighbor searches (discussed later).
+A range image is considered to be 2.5D rather than full 3D as it is limited to representing objects captured from a single perspective. When viewed in 3D, a range scan will contain many occluded objects. One will also notice the sampled point density reduces as one moves away from the scan origin. This can make it hard to identify objects in far away low density regions of a range image. Rendering a range scan as a grey scale 2D panoramic image (see \autoref{fig:grid}) may make objects more recognizable. The grid structure of range scans can also facilitate cheap neighbour searches (discussed later).
 
 \section{3D reconstruction pipeline} \label{sec:pipeline}
 
@@ -161,16 +161,16 @@ A range image is considered to be 2.5D rather than full 3D as it is limited to r
 
 	% Define block styles
 	\tikzstyle{decision} = [diamond, draw, fill=blue!20, 
-	    text width=4.5em, text badly centered, node distance=3cm, inner sep=0pt]
+	    text width=4.5em, text badly centreed, node distance=3cm, inner sep=0pt]
 	\tikzstyle{block} = [rectangle, draw, fill=gray!20, 
-	    text width=5em, text centered, rounded corners, minimum height=4em]
+	    text width=5em, text centreed, rounded corners, minimum height=4em]
 	\tikzstyle{optionalblock} = [rectangle, draw, dashed,
-	    text width=5em, text centered, rounded corners, minimum height=4em]
+	    text width=5em, text centreed, rounded corners, minimum height=4em]
 	\tikzstyle{line} = [draw, -latex']
 	\tikzstyle{cloud} = [draw, ellipse,fill=red!20, node distance=3cm,
 	    minimum height=2em]
 	
-	\centering
+	\centreing
 
 	\begin{tikzpicture}[node distance = 2cm, auto]
 	    % Place nodes
@@ -218,7 +218,7 @@ Additional considerations can speed up later steps in the pipeline. Automated re
 \subsection{Registration}  \label{sec:registration}
 
 \begin{figure}[ht]
-  \centering
+  \centreing
   \includegraphics[width=0.6\linewidth]{images/registration}
   \caption{ICP correspondences \protect\footnotemark.}
   \label{fig:registration}
@@ -237,13 +237,13 @@ A user needs to ensure a good initial alignment or convergence may not be achiev
 
 \begin{figure}[ht]
 	\begin{subfigure}[b]{.5\textwidth}
-	  \centering
+	  \centreing
 	  \includegraphics[width=.9\linewidth]{images/dirty}
 	  % \caption{Structured light 3D scanning \cite{Form2014}}
 	  % \label{fig:structured-light-scan}
 	\end{subfigure}%
 	\begin{subfigure}[b]{.5\textwidth}
-	  \centering
+	  \centreing
 	  \includegraphics[width=.9\linewidth]{images/clean}
 	  % \caption{Laser 3D scanning}
 	  % \label{fig:images/triangulate-laser-scan}
@@ -252,16 +252,16 @@ A user needs to ensure a good initial alignment or convergence may not be achiev
   \label{fig:cleaning}
 \end{figure}
 
-Cleaning is considered an optional step for documentation purposes. However, skipping it in the modeling pipeline can lead to poor results during surface reconstruction (see Section \ref{sec:reconstruction}). The aim of cleaning is to remove trees, people, cables, cars, doors, animals and other unwanted objects, as well as scanner artifacts.
+Cleaning is considered an optional step for documentation purposes. However, skipping it in the modelling pipeline can lead to poor results during surface reconstruction (see Section \ref{sec:reconstruction}). The aim of cleaning is to remove trees, people, cables, cars, doors, animals and other unwanted objects, as well as scanner artefacts.
 
 An object is usually removed either because it is not part of the subject matter or it won't mesh well later in the pipeline. Cars parked near monuments or power lines are frequently removed. Trees or other vegetation may be considered as part of the subject matter but are often removed because meshing algorithms do not produce good results when they are present.
 
-Artifacts are unwanted points that result from of imperfect equipment rather than physical surfaces. Distant samples that are interpreted as being close by in phase-based TOF scanners are one such instance (see Section \ref{subsec:tof}). Incorrectly binned points will appear normal in a 2d rendering but will look like noise in 3D. The sun or other light sources can also result in artifacts. Noisy artifacts can also be the result of fog or smoke in an environment \cite{Ruther2011}.
+Artefacts are unwanted points that result from of imperfect equipment rather than physical surfaces. Distant samples that are interpreted as being close by in phase-based TOF scanners are one such instance (see Section \ref{subsec:tof}). Incorrectly binned points will appear normal in a 2d rendering but will look like noise in 3D. The sun or other light sources can also result in artefacts. Noisy artefacts can also be the result of fog or smoke in an environment \cite{Ruther2011}.
 
 % \todo[inline]{More detail on artifacts}
 
 \begin{figure}[ht]
-  \centering
+  \centreing
   \includegraphics[width=1\linewidth]{images/mixed-pixel}
   \caption{Mixed pixels. Green are valid points and red are not. \cite{Tuley2005}}
   \label{fig:mixed-pixel}
@@ -269,31 +269,31 @@ Artifacts are unwanted points that result from of imperfect equipment rather tha
 
 Mixed pixels is phenomenon that can occur when a laser pulse partially strikes a nearby and distant object. The result is an interpolated data point between the near and far object \cite{Tuley2005} (see \autoref{fig:mixed-pixel}). This typically manifests as column of points behind doorways or close to other edges. \\
 
-Cleaning scan data is typically a manual task requiring expert judgment. It can be performed on individual scans before registration or after registration \cite{Ruther2011}.
+Cleaning scan data is typically a manual task requiring expert judgement. It can be performed on individual scans before registration or after registration \cite{Ruther2011}.
 
 Cleaning single scans before registration typically requires less system resources as less data needs to be loaded. Loading multiple large scans can be problematic on less capable hardware. One may, however, choose not to remove all unwanted objects as some objects may necessary for registration. A tree on a flat surface may be necessary for correspondence matching in ICP. Without these objects automated registration may not converge on feature-sparse surfaces. Registration and cleaning may thus, in practice, be an iterative process. Removing objects from the registered set of range images may be easier due to the following. An increased number of samples from multiple perspectives can make objects easier to recognize. It may also be possible to remove an unwanted set of points from multiple scans in one action. System resource constraints can be managed by loading one or more scans at a time.
 
-After registration, all range images are combined into a single large point cloud. The combined dataset is typically too large to fit into memory and few software packages can support data sets of this size. It is possible to clean the combined point cloud by loading slices. When doing so one does not have the benefit of referencing the 2D range image when cleaning the combined data set. One would also have trouble mapping the result back to the original scans for archival purposes. The 2D array structure of range images also supports performing constant neighbor lookups. If this is not done $O(log(n))$ octrees or kd-trees will be necessary which can slow down feature computations.
+After registration, all range images are combined into a single large point cloud. The combined dataset is typically too large to fit into memory and few software packages can support data sets of this size. It is possible to clean the combined point cloud by loading slices. When doing so one does not have the benefit of referencing the 2D range image when cleaning the combined data set. One would also have trouble mapping the result back to the original scans for archival purposes. The 2D array structure of range images also supports performing constant neighbour lookups. If this is not done $O(log(n))$ octrees or kd-trees will be necessary which can slow down feature computations.
 
 Some large heritage scanning projects have reported typical scans taking from 30 minutes up to 120 minutes to clean by an experienced person \cite{Ruther2011}. High resolution scans can take up to a full day to clean. Existing tools leave much to be desired in terms of cleaning efficiency. More detail is presented in section \ref{sec:interactive-tools}.
 
 \subsection{Surface reconstruction}  \label{sec:reconstruction}
 
 % \begin{figure}[ht]
-%   \centering
+%   \centreing
 %   \includegraphics[width=0.6\linewidth]{images/mls}
 %   \caption{Surface fitting \protect\footnotemark.}
 %   \label{fig:registration}
 % \end{figure}
 % \footnotetext{Source: \url{http://en.wikipedia.org/wiki/File:Linear_regression.svg}}
 
-Surface reconstruction converts the discrete point model into a triangulated surface model. This can be achieved either via interpolation methods, that aim to connect neighboring points by computing a triangulation, or by approximation methods that aim to approximate a surface that fits the samples \cite{Schall2005}.
+Surface reconstruction converts the discrete point model into a triangulated surface model. This can be achieved either via interpolation methods, that aim to connect neighbouring points by computing a triangulation, or by approximation methods that aim to approximate a surface that fits the samples \cite{Schall2005}.
 
 Interpolation methods are very sensitive to noise. Poor triangulations are achieved when scans are not properly registered or the sampling exhibits high variance. A preprocessing step can mitigate these problems but tends to be time consuming and often leads to a loss of detail \cite{Ruther2011}.
 
 Surface approximation algorithms are less susceptible to noise. Poisson surface reconstruction \cite{Kazhdan2006} is a popular method that is noise resistant and achieves great detail. It uses samples with normals to interpolate a normal field and then solves a Poisson equation to compute an indicator function. Results are dependent on good normal estimations. It is thus preferable to compute normals prior to registration when using this approach. Poisson surface reconstruction produces ``water-tight'' surfaces and automatically fills small holes. While this is useful for producing a visually pleasing 3D model, it does not result in a historically accurate model because new surface data may be synthesized in the process.
 
-Moving Least Squares (MLS) is another popular surface approximation method that does not over smooth and interpolate missing data \cite{Alexa2003}. Like Poisson, it also requires normal estimates. MLS computes a local surface approximation at a sample point by considering its neighborhood. Every point in a neighborhood is weighed according to its importance. A surface is then computed by minimizing the weighed distance to the surface for each point in the neighborhood. Poisson and MLS have both been adapted for out-of-core execution and GPU acceleration \cite{Merry2014}. \todo{Discuss issues else it may look perfect}\\
+Moving Least Squares (MLS) is another popular surface approximation method that does not over smooth and interpolate missing data \cite{Alexa2003}. Like Poisson, it also requires normal estimates. MLS computes a local surface approximation at a sample point by considering its neighbourhood. Every point in a neighbourhood is weighed according to its importance. A surface is then computed by minimizing the weighed distance to the surface for each point in the neighbourhood. Poisson and MLS have both been adapted for out-of-core execution and GPU acceleration \cite{Merry2014}. \todo{Discuss issues else it may look perfect}\\
 
 
 \subsection{Hole filling} \label{sec:filling}
@@ -305,7 +305,7 @@ Small holes can be filled automatically by surface reconstruction algorithms (in
 
 \subsection{Texturing} \label{sec:texturing}
 
-The final, but optional, step of the reconstruction pipeline is texturing. Colour in a model is not only visually pleasing but also form part of the historical record. Some laser scanners are equipped with cameras to capture color information for each sample. Although this is very convenient, some in the heritage community have reported that poor texturing is achieved when compared to external cameras \cite{Ruther2011}. The biggest problem when texturing a model is dealing with different light conditions during the day. Capturing photos around the same time of day across multiple days is one way to mitigate the problem.
+The final, but optional, step of the reconstruction pipeline is texturing. Colour in a model is not only visually pleasing but also form part of the historical record. Some laser scanners are equipped with cameras to capture colour information for each sample. Although this is very convenient, some in the heritage community have reported that poor texturing is achieved when compared to external cameras \cite{Ruther2011}. The biggest problem when texturing a model is dealing with different light conditions during the day. Capturing photos around the same time of day across multiple days is one way to mitigate the problem.
 
 A model is textured from a series of photos by projecting the images onto the model. In order to achieve this, internal and external camera parameters needs to be known from time the picture is taken. This includes the position and orientation of the camera as well as the focal length of the lens. If this is not known it can be estimated via software by selecting or computing correspondences between pictures \cite{Ruther2011}.
 
@@ -324,7 +324,7 @@ In the previous section the point cloud cleaning task was framed in the context 
 \subsection{Tools}
 
 \begin{table*}[htb]
-\centering
+\centreing
   \begin{tabular}{| l | x{3cm} | x{3cm} | c |}
 	\hline & Interactive tools & Filters & Open source \\    
     \hline
@@ -393,7 +393,7 @@ In the previous section the point cloud cleaning task was framed in the context 
 
 % An ideal solution would be a fully automated and require no human interaction. It is however sometimes difficult, even for humans, to unambiguously determine whether a point is part of an important structure or simply noise. Different people may segment the same scene differently. It is unlikely that an automated solution would be satisfactory in all cases due a large degree of classification subjectivity between people. \todo{Cite a hard problem in vision to justify this?}\\
 
-% We will not attempt a fully automated solution to the problem but rather frame it as an interactive segmentation problem. The user is thus at the center of the cleaning process. The goal is to provide a set of tools that will speed up or automate parts of the task while maintaining accuracy.
+% We will not attempt a fully automated solution to the problem but rather frame it as an interactive segmentation problem. The user is thus at the centre of the cleaning process. The goal is to provide a set of tools that will speed up or automate parts of the task while maintaining accuracy.
 
 
 Point cloud cleaning is in essence a segmentation problem. The high level goal is to divide a point set into wanted and unwanted points. In order to make this distinction it is important to recognize what points in a scene represent. Humans are very good at object recognition which is part of the reason why point cloud cleaning has remained a very manual task. Despite this general proficiency, software interfaces often make it hard to group points according to their perceived class.
@@ -414,14 +414,14 @@ A number of open source and commercial software point cloud packages are availab
 
 The most basic interactive tool is \emph{point picking} which allows one to select a single point. It is not very effective for cleaning purposes. \emph{Meshlab} \cite{Cignoni2008}, an open source mesh manipulation program, includes this tool. It is more likely to be useful when editing meshes.
 
-The \emph{polygon select} tool is one of the more useful interactive tools. The tool lets the user select points by constructing a 2D polygon around a set of points on the view port. It is useful when selecting points that are isolated in space. Polygon selection becomes problematic when one is unable find a perspective that separates the target points from its neighbors. \emph{Cyclone} is a proprietary package \cite{Leica2012} that solves this problem by restricting the tools area of influence with a limit box. Cyclone also allows a user TO pan the view port while constructing a polygon. Meshlab has a similar tool that is limited to rectangular areas. \emph{Cloud Compare} \cite{CloudCompare} is another open source package that provides both a polygon and rectangular select version of the tool.
+The \emph{polygon select} tool is one of the more useful interactive tools. The tool lets the user select points by constructing a 2D polygon around a set of points on the view port. It is useful when selecting points that are isolated in space. Polygon selection becomes problematic when one is unable find a perspective that separates the target points from its neighbours. \emph{Cyclone} is a proprietary package \cite{Leica2012} that solves this problem by restricting the tools area of influence with a limit box. Cyclone also allows a user TO pan the view port while constructing a polygon. Meshlab has a similar tool that is limited to rectangular areas. \emph{Cloud Compare} \cite{CloudCompare} is another open source package that provides both a polygon and rectangular select version of the tool.
 
 \emph{Brush tools} are another class of interactive tools that lets one select points by painting on the view port. The `brush' shape is typically a sphere but packages like \emph{Pointools Edit} \cite{Pointools2012} also provide additional shapes such as a cube. Brush tools has the same disadvantage as the polygon select tool when it comes to selecting points that cannot be isolated via perspective.
 
 \todo{State that we overcome this by only operating on layers}
 
 \begin{figure}[ht]
-  \centering
+  \centreing
   \includegraphics[width=1\linewidth]{images/plane}
   \caption{Plane selection tool in Pointools \cite{Pointools2012}}
   \label{fig:plane-select}
@@ -433,10 +433,10 @@ Interactive \emph{flood fill} tools not unlike those found in raster image edito
 
 Filters can range from simple denoising functions to complex machine learning algorithms. Software packages generally allows one to restrict a filter's area of influence.
 
-Meshlab provides a number of denoising filters. \emph{Outlier removal} allows a user to specify the number of neighbors a point is required to have in order to not be removed. This tool is problematic when used with range images due to the decreasing point density away from the scan origin. Points close to the origin are less likely to be classified as outliers due to the higher point density while false positives are more common further away where there are fewer samples.
+Meshlab provides a number of denoising filters. \emph{Outlier removal} allows a user to specify the number of neighbours a point is required to have in order to not be removed. This tool is problematic when used with range images due to the decreasing point density away from the scan origin. Points close to the origin are less likely to be classified as outliers due to the higher point density while false positives are more common further away where there are fewer samples.
 
 \begin{figure}[ht]
-  \centering
+  \centreing
   \includegraphics[width=1\linewidth]{images/clustering}
   \caption{Clustering issue in 3D Reshaper \cite{Technodigit2012}}
   \label{fig:clustering-issue}
@@ -445,7 +445,7 @@ Meshlab provides a number of denoising filters. \emph{Outlier removal} allows a 
 \emph{Clustering} tools are also affected by non uniform density. \emph{3D Reshaper} \cite{Technodigit2012} provides a filter that groups spatially related points. This approach work fine on uniform point clouds. However, range scans poses a problem as more clusters are detected further away from the origin (see \autoref{fig:clustering-issue}).
 
 \begin{figure}[ht]
-  \centering
+  \centreing
   \includegraphics[width=1\linewidth]{images/vrmesh-veg}
   \caption{Vegetation filter in VR Mesh Studio \cite{VirtualGrid2012}}
   \label{fig:vegetation-issue}
@@ -463,7 +463,7 @@ Meshlab and Cloud Compare violate the important usability heuristic by not inclu
 % Familiarity helps new users quickly get started. It is thus worth while looking at the interfaces of existing systems.
 The tools surveyed all presented the user with an interactive 3D rendering of a point cloud. In addition to this Z+F \cite{Z+F2014} provides users with a 2D range image view. Humans are more adept at interpreting 2D data despite our environment being 3D \cite{Livingstone1987}. In order to perceive depth on a screen, an object has to move \todo{Cite, move or stereo vision, Patrick: depth cues}. Given that a range scan does not reveal more information as one's 3D perspective shifts, it is questionable whether a 3D view is best suited for range scan segmentation. \note{Depth aware fill fixes this for 2D}\\
 
-Interfaces typically provide two ways to navigate a 3D scene. One can either transform the point cloud (object centric navigation), or manipulate the camera (camera centric navigation). All systems surveyed implemented object centric navigation. Cloud Compare and Meshlab amongst others render a track ball around the center of rotation. This makes it easier to reason about the interaction, especially when the center of mass is not at the scan origin. Cloud Compare and other systems lets a user set the center of rotation. In Meshlab, the center of rotation is fixed at the coordinate system origin. Object centric navigation is more intuitive when viewing movable objects. Environments however, are typically viewed from an upright perspective. Moving in and around a 3D environment from a 1st person perspective is more natural than moving the environment around. A rotated heritage site is not a familiar perspective and is likely to disorient a user.
+Interfaces typically provide two ways to navigate a 3D scene. One can either transform the point cloud (object centric navigation), or manipulate the camera (camera centric navigation). All systems surveyed implemented object centric navigation. Cloud Compare and Meshlab amongst others render a track ball around the centre of rotation. This makes it easier to reason about the interaction, especially when the centre of mass is not at the scan origin. Cloud Compare and other systems lets a user set the centre of rotation. In Meshlab, the centre of rotation is fixed at the coordinate system origin. Object centric navigation is more intuitive when viewing movable objects. Environments however, are typically viewed from an upright perspective. Moving in and around a 3D environment from a 1st person perspective is more natural than moving the environment around. A rotated heritage site is not a familiar perspective and is likely to disorient a user.
 
 Some systems use lighting when rendering the the point cloud. Meshlab lets one toggle lighting on and off. With lighting switched on the interface becomes less responsive when viewing large data sets. Lighting may help interpret a scene when viewing point clouds with no intensity or color information. However, when this information is available, such as with our data sets, it is questionable whether any value is added as artificial lighting may conflict with shadows captured at the time of the scan.
 
@@ -645,7 +645,7 @@ In this chapter a high level overview of digital the heritage preservation proce
 % \subsubsection{Meshlab}
 % Meshlab \cite{Cignoni2008} is the only viable open source tool we know of. It's primary purpose is mesh processing but it does allow one to work with point clouds through various plug-ins. Some plug-ins lets one preview an action but once it is applied it cannot be undone as Meshlab does not support undo. Meshlab supports opening multiple point clouds in the same view port but tools can generally only operate on one at a time.
 
-% The viewport renders a track ball around the point cloud center at allows one to rotate it around its axis.
+% The viewport renders a track ball around the point cloud centre at allows one to rotate it around its axis.
 
 
 

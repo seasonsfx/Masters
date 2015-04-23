@@ -436,14 +436,15 @@ std::vector<int> Evaluate::convexHull(std::vector<int> & idxs){
         }
     }
 
-    // Find points on oposite sides of the line
+    // Line splitting the points
     Eigen::Vector2f a = getPoint(min_x_idx);
     Eigen::Vector2f b = getPoint(max_x_idx);
 
     std::vector<int> left;
     std::vector<int> right;
 
-    for(int idx : idxs){
+    // Find points on oposite sides of the line
+    for(int idx : idxs) {
 
         // Skip the line ends
         if(idx == min_x_idx || idx == max_x_idx){
@@ -463,18 +464,19 @@ std::vector<int> Evaluate::convexHull(std::vector<int> & idxs){
 
     // std::cout << "Left/right/all: " << left.size() << "/" << right.size() << "/" << idxs.size() << std::endl;
 
-    std::vector<int> left_out = cvR(a, b, right);
-    std::vector<int> right_out = cvR(b, a, left);
+    std::vector<int> left_out = cvR(a, b, left);
+    std::vector<int> right_out = cvR(b, a, right);
 
     left_out.insert(left_out.begin(), max_x_idx);
     left_out.push_back(min_x_idx);
     left_out.insert(left_out.end(), right_out.begin(), right_out.end());
 
+    std::reverse(left_out.begin(), left_out.end());
 
     std::cout << "Hull" << std::endl;
     for(int idx : left_out){
         Eigen::Vector2f p = getPoint(idx);
-        std::cout << p.x() << ", " << p.y() << std::endl;
+        std::cout << p.x() << " " << p.y() << std::endl;
     }
     std::cout << "------------------" << std::endl;
 
@@ -897,8 +899,8 @@ void Evaluate::eval() {
     std::cout << "Lasso actions: " << lasso_count << std::endl;
     std::cout << "Total lasso vertices: " << lasso_vertex_count << std::endl;
 
-    float seconds_per_vertex = 1;
-    float seconds_per_lasso = 4;
+    float seconds_per_vertex = 0.78;
+    float seconds_per_lasso = 5;
 
 
     std::cout << "Estimated user time (seconds): " << lasso_count*seconds_per_lasso + lasso_vertex_count*seconds_per_vertex << std::endl;

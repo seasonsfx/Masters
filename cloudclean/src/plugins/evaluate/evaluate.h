@@ -42,8 +42,6 @@ class Evaluate : public IPlugin {
     std::tuple<std::vector<int>, std::vector<int>> get_false_selections(std::vector<int> & world_idxs, std::vector<bool> & target_mask);
     std::vector<std::vector<int> > cluster(std::vector<int> & idxs);
     std::vector<int> concaveHull(std::vector<int> & idxs, float simplify);
-    std::vector<int> cvR(Eigen::Vector2f a, Eigen::Vector2f b, std::vector<int> &idxs);
-    std::vector<int> convexHull(std::vector<int> & idxs);
     boost::shared_ptr<std::vector<int>> lassoPoints(std::vector<int> & idxs, float expand);
     std::vector<Eigen::Vector2f> makePolygon(std::vector<int> & idxs, float expand = 0);
 

@@ -1,4 +1,5 @@
 #include "plugins/evaluate/evaluate.h"
+#include "plugins/evaluate/convexhull.h"
 #include <QApplication>
 #include <QDebug>
 #include <QAction>
@@ -343,177 +344,6 @@ auto distance = [](Eigen::Vector2f A, Eigen::Vector2f B, Eigen::Vector2f C) {
 };
 
 
-std::vector<int> Evaluate::cvR(Eigen::Vector2f a, Eigen::Vector2f b, std::vector<int> & idxs){
-    // Find the point futhest away from the line in each group
-
-    if(idxs.size() == 0){
-        return std::vector<int>();
-    }
-
-    if(idxs.size() == 1){
-        return idxs;
-    }
-
-
-    auto maxDistIdx = [&](std::vector<int> & idxs, Eigen::Vector2f & start, Eigen::Vector2f & end){
-        int max_dist_idx = -1;
-        float max_dist = 0;
-
-        for(int idx : idxs){
-            Eigen::Vector2f p = getPoint(idx);
-            float dist = distance(start, end, p);
-
-            if(dist > max_dist){
-                max_dist_idx = idx;
-                max_dist = dist;
-            }
-        }
-        return max_dist_idx;
-    };
-
-
-    int max_idx = maxDistIdx(idxs, a, b);
-    Eigen::Vector2f m = getPoint(max_idx);
-
-    std::vector<int> left;
-    std::vector<int> right;
-
-    for(int idx : idxs){
-        if(idx == max_idx){
-            continue;
-        }
-
-        Eigen::Vector2f p = getPoint(idx);
-
-        if(pointLocation(a,p,m) == 1){
-            left.push_back(idx);
-        } else if(pointLocation(p,b,m) == 1) {
-            right.push_back(idx);
-        }
-    }
-
-    idxs.clear();// Save memory
-
-    std::vector<int> left_out;
-    std::vector<int> right_out;
-
-    if (left.size() > 0) {
-        left_out = cvR(a, m, left);
-    }
-
-    left_out.push_back(max_idx);
-
-    if (right.size() > 0) {
-        right_out = cvR(m, b, right);
-    }
-
-    left_out.insert(left_out.end(), right_out.begin(), right_out.end());
-
-    return left_out;
-
-}
-
-std::vector<int> Evaluate::convexHull(std::vector<int> & idxs){
-
-    // Find min max
-    float min_x = std::numeric_limits<float>::max();
-    float max_x = std::numeric_limits<float>::min();
-
-    int min_x_idx = -1;
-    int max_x_idx = -1;
-
-    for(int idx : idxs){
-        Eigen::Vector2f p = getPoint(idx);
-
-        if(p.x() < min_x){
-            min_x = p.x();
-            min_x_idx = idx;
-        }
-
-        if(p.x() > max_x){
-            max_x = p.x();
-            max_x_idx = idx;
-        }
-    }
-
-    // Line splitting the points
-    Eigen::Vector2f a = getPoint(min_x_idx);
-    Eigen::Vector2f b = getPoint(max_x_idx);
-
-    std::vector<int> left;
-    std::vector<int> right;
-
-    // Find points on oposite sides of the line
-    for(int idx : idxs) {
-
-        // Skip the line ends
-        if(idx == min_x_idx || idx == max_x_idx){
-            continue;
-        }
-
-        Eigen::Vector2f p = getPoint(idx);
-
-        if (pointLocation(a,b,p) == -1){
-            left.push_back(idx);
-        }
-        else {
-            right.push_back(idx);
-        }
-
-    }
-
-    // std::cout << "Left/right/all: " << left.size() << "/" << right.size() << "/" << idxs.size() << std::endl;
-
-    std::vector<int> left_out = cvR(a, b, left);
-    std::vector<int> right_out = cvR(b, a, right);
-
-    left_out.insert(left_out.begin(), max_x_idx);
-    left_out.push_back(min_x_idx);
-    left_out.insert(left_out.end(), right_out.begin(), right_out.end());
-
-    std::reverse(left_out.begin(), left_out.end());
-
-    std::cout << "Hull" << std::endl;
-    for(int idx : left_out){
-        Eigen::Vector2f p = getPoint(idx);
-        std::cout << p.x() << " " << p.y() << std::endl;
-    }
-    std::cout << "------------------" << std::endl;
-
-    return left_out;
-}
-
-    // Sort hull
-
-    // center off mass
-//    Eigen::Vector2f center(0, 0);
-//    for(int idx : hull){
-//        center += getPoint(idx);
-//    }
-//    center /= hull.size();
-
-//    // sort
-//    std::sort(hull.begin(), hull.end(), [this, &center](int a, int b) -> bool {
-//        Eigen::Vector2f p1 = getPoint(a) - center;
-//        Eigen::Vector2f p2 = getPoint(b) - center;
-//        return atan2(p1.y(), p1.x()) > atan2(p2.y(), p2.x());
-//    });
-
-//    std::cout << "Hull" << std::endl;
-//    for(int idx : hull){
-//        Eigen::Vector2f p = getPoint(idx);
-//        std::cout << p.x() << ", " << p.y() << std::endl;
-//    }
-//    std::cout << "------------------" << std::endl;
-
-//    return hull;
-
-
-//    auto vecToStr = [](Eigen::Vector2f vec){
-//        std::string ret = std::string("(") + std::to_string(float(vec.x())) + std::string(" ") + std::to_string(float(vec.y())) + std::string(")");
-//        return ret;
-//    };
-
 std::vector<int> Evaluate::concaveHull(std::vector<int> & idxs, float simplify){
     const std::vector<int> & idxToGrid = cl_->active_->cloudToGridMap();
     int height = cl_->active_->scan_height();
@@ -832,8 +662,10 @@ void Evaluate::eval() {
             copied_selection[i] = uint8_t(cl_->active_->flags_[i]) & uint8_t(0xff);
         }
 
+        std::function<Eigen::Vector2f(int)> get_point = std::bind(&Evaluate::getPoint, this, std::placeholders::_1);
+
         // Try to combine hulls
-        auto combineConcaveHulls = [this, &hasFalseSelection, &copied_selection](std::vector<std::vector<int> > & hulls, bool deselect){
+        auto combineConcaveHulls = [this, &get_point, &hasFalseSelection, &copied_selection](std::vector<std::vector<int> > & hulls, bool deselect){
             // We can cobine two concave hulls if the convex hull around them does not create more false selections
 
             // For each of the hulls apply the selection to a copy of the original selection
@@ -853,7 +685,11 @@ void Evaluate::eval() {
                     combined.insert(combined.end(), hulls[i].begin(), hulls[i].end());
                     combined.insert(combined.end(), hulls[j].begin(), hulls[j].end());
                     //std::cout << "Combined size: " << combined.size() << " I size: " <<  hulls[i].size() << " J size: " << hulls[j].size() << std::endl;
-                    std::vector<int> chull = convexHull(combined);
+                    //std::vector<int> chull = convexHull(combined);
+
+                    std::vector<int> chull = convex_hull(combined, get_point);
+                    std::reverse(chull.begin(), chull.end());
+
                     boost::shared_ptr<std::vector<int> > selected_idxs = lassoPoints(chull, 0);
                     if(!hasFalseSelection(selected_idxs, deselect, copied_selection)){
                         hulls[i] = chull;

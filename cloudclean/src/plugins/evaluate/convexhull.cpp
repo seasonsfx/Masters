@@ -1,4 +1,4 @@
-#include "convexhull.h"
+#include "plugins/evaluate/convexhull.h"
 #include <Eigen/Core>
 
 // Implementation of Andrew's monotone chain 2D convex hull algorithm.
@@ -23,7 +23,7 @@ std::vector<int> convex_hull(std::vector<int> idxs, std::function<Eigen::Vector2
     // Sort points lexicographically
     sort(idxs.begin(), idxs.end(), [&getPoint](int a_, int b_){
         Eigen::Vector2f a = getPoint(a_);
-        Eigen::Vector2f b = b_);
+        Eigen::Vector2f b = getPoint(b_);
         return a.x() < b.x() || (a.x() == b.x() && a.y() < b.y());
     });
 
@@ -35,7 +35,7 @@ std::vector<int> convex_hull(std::vector<int> idxs, std::function<Eigen::Vector2
 
     // Build upper hull
     for (int i = n-2, t = k+1; i >= 0; i--) {
-        while (k >= t && getPoint(cross(hull[k-2]), getPoint(hull[k-1]), getPoint(idxs[i])) <= 0) k--;
+        while (k >= t && cross(getPoint(hull[k-2]), getPoint(hull[k-1]), getPoint(idxs[i])) <= 0) k--;
         hull[k++] = idxs[i];
     }
 

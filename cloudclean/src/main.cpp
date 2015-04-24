@@ -12,22 +12,6 @@
 void customMessageHandler(QtMsgType type, const QMessageLogContext& context, const QString &msg)
 {
     QString txt;
-    /*
-    switch (type) {
-    case QtDebugMsg:
-        txt = QString("Debug: %1").arg(msg);
-        break;
-    case QtWarningMsg:
-        txt = QString("Warning: %1").arg(msg);
-    break;
-    case QtCriticalMsg:
-        txt = QString("Critical: %1").arg(msg);
-    break;
-    case QtFatalMsg:
-        txt = QString("Fatal: %1").arg(msg);
-        abort();
-    }
-    */
 
     txt = QString("MESSAGE (%1:%2 %3):\n\t %4\n").arg(context.file).arg(context.line).arg(context.function).arg(msg);
 
@@ -52,6 +36,8 @@ int main(int argc, char* argv[])
     srand (time(NULL));
     qInstallMessageHandler(customMessageHandler);
     App app(argc,argv);
-    return app.exec();
+    int status = app.exec();
+    qInstallMessageHandler(0);
+    return status;
 }
 

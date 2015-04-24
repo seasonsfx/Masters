@@ -184,8 +184,8 @@ App::App(int& argc, char** argv) : QApplication(argc,argv),
 }
 
 App::~App() {    
-    delete core_;
     delete pm_;
+    delete core_;
 }
 App* App::INSTANCE() {
     return _instance;

@@ -390,7 +390,7 @@ std::vector<int> Evaluate::concaveHull(std::vector<int> & idxs, float simplify){
     while(true){
         pcl::PointXY & currentPoint = flatcloud->at(current_idx);
         Eigen::Vector2f from(currentPoint.x, currentPoint.y);
-//        std::cout << "Current point: (" << currentPoint.x << ", " << currentPoint.y << ")" << std::endl;
+
         pointIdxNKNSearch.clear();
         pointNKNSquaredDistance.clear();
         kdtree.nearestKSearch(currentPoint, K, pointIdxNKNSearch, pointNKNSquaredDistance);
@@ -517,12 +517,11 @@ void Evaluate::eval() {
         return false;
     };
 
-    // collect the world idxs
-
-
 
     std::vector<int> world_points(cl_->active_->points.size());
     std::vector<bool> target_mask(cl_->active_->points.size());
+
+    std::cout << "World points: " << world_points.size() << std::endl;
 
     auto all_idxs = boost::make_shared<std::vector<int>>();
     auto select_idxs = boost::make_shared<std::vector<int>>();
@@ -546,36 +545,22 @@ void Evaluate::eval() {
         }
     }
 
-    std::vector<int> false_positive;
-    std::vector<int> false_negative;
-
-
-    int MAX_IGNORE = 10;
+    int MAX_IGNORE = 30;
     int lasso_count = 0;
     int lasso_vertex_count = 0;
 
-    auto lassoHull = [&] (std::vector<int> & hull, bool deselect) {
-
-//        QMessageBox msgBox;
-//        msgBox.setText(QString("lasso cluster of size ") + QString::number(cluster.size()));
-//        msgBox.exec();
-
+    auto lassoHull = [&] (std::vector<int> & hull, bool deselect) -> int {
         lasso_count++;
         lasso_vertex_count += hull.size();
-
 
         boost::shared_ptr<std::vector<int>> selected_indices = lassoPoints(hull, EXPAND);
 
         if(selected_indices->size() == 0){
-            std::cout << "ZERO!!!!! Points selected!!!!!!!!!!!!!!!!!!!!!!!!!!!!! " <<  std::endl;
-            return false;
+            return 0;
         }
 
         core_->us_->push(new Select(cl_->active_, selected_indices, deselect, 1, true, ll_->getHiddenLabels()));
-
-        std::cout << "Points selected: " << selected_indices->size() << std::endl;
-
-        return true;
+        return selected_indices->size();
     };
 
     core_->us_->beginMacro("Eval tool selection");
@@ -587,15 +572,20 @@ void Evaluate::eval() {
     QApplication::processEvents();
     std::this_thread::sleep_for(std::chrono::seconds(2));
 
+    std::vector<int> false_positive;
+    std::vector<int> false_negative;
 
+    int iterations_remaining = 10;
+    int modified_points_last_itteration = 0;
+    int false_points_last_itteration = -1;
     bool changes_made = true;
-    while(changes_made){
+
+    while(changes_made && iterations_remaining > 0){
         // While there are false clusters with more than MAX_IGNORE points
 
-        std::cout << "Iteration --------------------------------------" << std::endl;
+        std::cout << "Refinement iteration ---------------------   " << iterations_remaining << std::endl;
 
-        changes_made = false;
-        // get false_positive, false_negative
+        int modified_points_this_itteration = 0;
         std::tie(false_positive, false_negative) = get_false_selections(world_points, target_mask);
 
 
@@ -603,6 +593,20 @@ void Evaluate::eval() {
         std::vector<std::vector<int> > false_positive_clusters = cluster(false_positive);
         std::vector<std::vector<int> > false_negative_clusters = cluster(false_negative);
 
+        std::cout << "false positive / false negative: " << false_positive.size() << " / " << false_negative.size() << std::endl;
+
+        int false_points_this_itteration = false_positive.size() + false_negative.size();
+
+        bool not_converging =
+                false_points_last_itteration != -1 &&
+                false_points_last_itteration <= false_points_this_itteration;
+
+        if(not_converging){
+            std::cout << "false_points_last_itteration < false_points_this_itteration" << std::endl;
+            std::cout << false_points_last_itteration << " < " << false_points_this_itteration << std::endl;
+            std::cout << "NOT CONVERGING!" << std::endl;
+            break;
+        }
 
         std::vector<std::vector<int> > false_positive_hulls;
         std::vector<std::vector<int> > false_negative_hulls;
@@ -666,12 +670,11 @@ void Evaluate::eval() {
 
         // Try to combine hulls
         auto combineConcaveHulls = [this, &get_point, &hasFalseSelection, &copied_selection](std::vector<std::vector<int> > & hulls, bool deselect){
-            // We can cobine two concave hulls if the convex hull around them does not create more false selections
+            // We can combine two concave hulls if the convex hull around them does not create more false selections
 
             // For each of the hulls apply the selection to a copy of the original selection
             for(int i = 0; i < hulls.size(); i++) {
                 boost::shared_ptr<std::vector<int> > selected_idxs = lassoPoints(hulls[i], EXPAND);
-                // Select
                 for(int idx : *selected_idxs){
                     copied_selection[idx] = !deselect;
                 }
@@ -681,11 +684,10 @@ void Evaluate::eval() {
             // Combine hulls if false selections do not occur
             for(int i = 0; i < hulls.size(); i++) {
                 for(int j = i+1; j < hulls.size(); j++) {
+                    QApplication::processEvents();
                     std::vector<int> combined;
                     combined.insert(combined.end(), hulls[i].begin(), hulls[i].end());
                     combined.insert(combined.end(), hulls[j].begin(), hulls[j].end());
-                    //std::cout << "Combined size: " << combined.size() << " I size: " <<  hulls[i].size() << " J size: " << hulls[j].size() << std::endl;
-                    //std::vector<int> chull = convexHull(combined);
 
                     std::vector<int> chull = convex_hull(combined, get_point);
                     std::reverse(chull.begin(), chull.end());
@@ -700,33 +702,35 @@ void Evaluate::eval() {
             }
         };
 
-        //std::cout << "false_positive_hulls before: " << false_positive_hulls.size() << std::endl;
+
         combineConcaveHulls(false_positive_hulls, true);
-        //std::cout << "false_positive_hulls after: " << false_positive_hulls.size() << std::endl;
-        //std::cout << "false_negative_hulls before: " << false_positive_hulls.size() << std::endl;
         combineConcaveHulls(false_negative_hulls, false);
-        //std::cout << "false_negative_hulls after: " << false_positive_hulls.size() << std::endl;
 
         // Lasso the hulls
         for(std::vector<int> & hull : false_positive_hulls){
-            //std::cout << "Hull size: " << hull.size() << " around " << cluster.size() << " points." << std::endl;
-
-            core_->us_->push(new Select(cl_->active_, boost::make_shared<std::vector<int> >(hull), false, 2, true));
-
-            changes_made = lassoHull(hull, true) || changes_made;
+            modified_points_this_itteration += lassoHull(hull, true);
             QApplication::processEvents();
-            //std::this_thread::sleep_for(std::chrono::seconds(10));
         }
 
         for(std::vector<int> & hull : false_negative_hulls){
-            core_->us_->push(new Select(cl_->active_, boost::make_shared<std::vector<int> >(hull), false, 4, true));
-
-            changes_made = lassoHull(hull, false) || changes_made;
+            modified_points_this_itteration += lassoHull(hull, false);
             QApplication::processEvents();
-            //std::this_thread::sleep_for(std::chrono::seconds(10));
         }
 
-        std::cout << "Changes made: " << changes_made << std::endl;
+        iterations_remaining--;
+        if(iterations_remaining == 0){
+            std::cout << "Maximum refinements reached" << std::endl;
+        }
+
+        int delta = abs(modified_points_this_itteration - modified_points_last_itteration);
+        if(delta < 100){
+            std::cout << "Deslta: " << delta << ", Stopping" << std::endl;
+            break;
+        } else {
+            modified_points_last_itteration = modified_points_this_itteration;
+        }
+
+        std::cout << "Modified points: " << modified_points_this_itteration << std::endl;
         std::cout << "++++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
     }
 

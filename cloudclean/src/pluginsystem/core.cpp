@@ -15,8 +15,8 @@ Core::Core() {
 }
 
 Core::~Core() {
-    delete us_;
-    delete ll_;
-    delete cl_;
     delete mw_;
+    delete cl_;
+    delete ll_;
+    delete us_;
 }

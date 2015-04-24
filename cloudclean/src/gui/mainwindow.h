@@ -36,7 +36,7 @@ class GUI_API MainWindow : public QMainWindow {
     
  public:
     explicit MainWindow(QUndoStack * us, CloudList *cl, LayerList *ll, QWidget *parent = 0);
-    ~MainWindow();
+    virtual ~MainWindow();
 
     void setSelectMask(uint8_t mask);
 

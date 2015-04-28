@@ -10,9 +10,16 @@ Reductions in the time consumed by an for manual actions can be achieved via a g
 
 For non synthetic range images, it is unlikely that an algorithm will produce a perfect segmentation. It is thus expected that remedial action by a user will almost always be required. The final segmentation will thus be the total time required by each algorithm action and remedial user actions.
 
-For example, if an automated tool for wall segmentation selected 95\% of the wall and part of a nearby tree, a complete segmentation will only be achieved once the remaining 5\% of the wall is selected and the tree points removed. If a user could previously perform the segmentation in 2 minutes, the automated tool would only be useful if it could allow a user complete the task in less than 2 minutes. If the wall segmentation tool needs 30 seconds to isolate the wall and then requires and additional 30 seconds of user action to refine the result, the tool can be considered useful as it can reduce the segmentation time by 1 minute. If however, the accuracy of the result is such that an additional 2 minutes of user action is required to achieve the same result, the tool provides no advantage over the status quo. The same can be said if the processing time pushed the total time over the 2 minute mark.
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=1\linewidth]{images/walltree.png}
+  \caption[Imperfect segmentation]{Example of a possible imperfect segmentation by a segmentation algorithm. The wall (red and green region) was targeted but the red and blue region were selected. In order the produce the correct wall segmentation, a user will need to deselect the blue region (false positive), and select the green region (false negative) } 
+  \label{fig:imperfectseg}
+\end{figure}
 
-A high accuracy technique can minimize the amount of subsequent remedial user action required following its use. It should however be noted that accuracy is not directly related to reduced effort. Consider a wall selection tool that only selects 50\% of a target wall. If the missing points were clustered together and could be lasso selected with a single action, the total time could still be low. This wall selection tool would exhibit low accuracy but would still be extremely effective.
+For example, if an automated tool for wall segmentation selected 95\% of the wall and part of a nearby tree, a complete segmentation will only be achieved once the remaining 5\% of the wall is selected and the tree points removed (see \autoref{fig:imperfectseg}). If a user could previously perform the segmentation in 2 minutes, the automated tool would only be effective if it could allow a user complete the task in less than 2 minutes. If the wall segmentation tool needs 30 seconds to isolate the wall and then requires and additional 30 seconds of user action to refine the result, the tool can be considered useful as it can reduce the segmentation time by 1 minute. If however, the accuracy of the result is such that an additional 2 minutes of user action is required to achieve the same result, the tool provides no advantage over the status quo. The same can be said if the processing time pushed the total time over the 2 minute mark.
+
+A high accuracy technique can minimize the amount of subsequent remedial user action required following its use. It should however be noted that accuracy is not directly related to reduced effort. Consider a wall selection tool that selects 50\% of a target wall. If the tool selected hard to isolate points and the remaining points could easily be selected with a single user action, the total time could still be low. This wall selection tool would exhibit low accuracy but would still be effective.
 
 
 \section{Evaluation}
@@ -50,7 +57,9 @@ These two measures can be combined as an F-score that represents accuracy. The s
 
 Our position is unique in that user efficiency instead of accuracy is our primary objective. Accuracy is still a good indicator of how useful related research is likely to be. Computational efficiency however is at least as important as it contributes to the total task time.
 
-% later present evaluation technique
+\section{Evaluation technique}
+
+
 
 \section{Segmentation methods}
 

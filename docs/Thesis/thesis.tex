@@ -30,8 +30,15 @@
 \usepackage{subcaption}
 \usepackage{tkz-euclide}
 \usepackage{float}
+\usepackage{subcaption}
 \usepackage[utf8]{inputenc}
-%\usepackage{algorithmic}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+\newcommand*\Let[2]{\State #1 $\gets$ #2}
+
+\widowpenalty 10000
+\clubpenalty 10000
 
 \newcolumntype{x}[1]{%
 >{\raggedleft\hspace{0pt}}p{#1}}%
@@ -54,6 +61,7 @@
 
 % \tableofcontents
 % \listoffigures
+\listofalgorithms
 
 % \newpage
 % \chapter*{Acknowledgements}
@@ -74,7 +82,7 @@
 % Ethics
 % Background we need to know
 % \include{chapters/02-background}
-% \include{chapters/03-software-framework}
+\include{chapters/03-software-framework}
 \include{chapters/03-segmentation-background}
 % \include{chapters/02-literature-review}
 % \include{chapters/03-design}

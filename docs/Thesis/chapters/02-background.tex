@@ -29,17 +29,17 @@ Triangulation scanners, as the name suggests, uses trigonometric triangulation \
 
 \begin{figure}[H]
 	\begin{subfigure}[b]{.33\textwidth}
-	  \centreing
+	  \centering
 	  \includegraphics[width=.9\linewidth]{images/structured-light-scan}
 	  \caption{}
 	\end{subfigure}%
 	\begin{subfigure}[b]{.33\textwidth}
-	  \centreing
+	  \centering
 	  \includegraphics[width=.9\linewidth]{images/triangulate-laser-scan}
 	  \caption{}
 	\end{subfigure}
 	\begin{subfigure}[b]{.33\textwidth}
-	  \centreing
+	  \centering
 		\begin{tikzpicture}[scale=2.5]
 
 		\coordinate [label={[black]above:$Source$}] (A) at (0, 1);
@@ -74,9 +74,9 @@ Given the precise distance between the light source and sensor ($\begingroup\col
 \subsection{Time of flight scanners (TOF)} \label{subsec:tof}
 
 \begin{figure}[ht]
-  \centreing
+  \centering
   \includegraphics[width=.5\linewidth]{images/pulse-tof}
-  \caption[Time of flight scanner]{Time of flight scanner \protect\footnotemark[\value{footnote}]}
+  \caption[Time of flight scanner]{Time of flight scanner \protect\footnotemark}
   \label{fig:tof}
 \end{figure}
 \footnotetext{Source: \url{http://www.rapidform.com/3d-scanners/}}
@@ -91,7 +91,7 @@ Time of flight (TOF) scanners emit laser pulses just like triangulation laser sc
 	    axis lines = left,
 	    yticklabels={,,},
 	    xticklabels={,,},
-	    axis x line=centre,
+	    axis x line=center,
 	    xlabel = $Time$,
 	    ylabel = {Amplitude},
 	    legend style={
@@ -141,9 +141,9 @@ Phase-based scanners have a more limited range due to the cyclic nature of the s
 \footnotetext{Source: \url{http://www.rapidform.com/3d-scanners/}}
 
 \begin{figure}[ht]
-  \centreing
+  \centering
   \includegraphics[width=1\linewidth]{images/grid}
-  \caption{2D scan grid of intensity values \protect\footnotemark[\value{footnote}]}
+  \caption{2D scan grid of intensity values \protect\footnotemark}
   \label{fig:grid}
 \end{figure}
 
@@ -161,16 +161,16 @@ A range image is considered to be 2.5D rather than full 3D as it is limited to r
 
 	% Define block styles
 	\tikzstyle{decision} = [diamond, draw, fill=blue!20, 
-	    text width=4.5em, text badly centreed, node distance=3cm, inner sep=0pt]
+	    text width=4.5em, text badly centered, node distance=3cm, inner sep=0pt]
 	\tikzstyle{block} = [rectangle, draw, fill=gray!20, 
-	    text width=5em, text centreed, rounded corners, minimum height=4em]
+	    text width=5em, text centered, rounded corners, minimum height=4em]
 	\tikzstyle{optionalblock} = [rectangle, draw, dashed,
-	    text width=5em, text centreed, rounded corners, minimum height=4em]
+	    text width=5em, text centered, rounded corners, minimum height=4em]
 	\tikzstyle{line} = [draw, -latex']
 	\tikzstyle{cloud} = [draw, ellipse,fill=red!20, node distance=3cm,
 	    minimum height=2em]
 	
-	\centreing
+	\centering
 
 	\begin{tikzpicture}[node distance = 2cm, auto]
 	    % Place nodes
@@ -202,7 +202,7 @@ A range image is considered to be 2.5D rather than full 3D as it is limited to r
 
 	\end{tikzpicture}
 
-	\caption{Reconstruction pipeline \protect\footnotemark[\value{footnote}]}
+	\caption{Reconstruction pipeline \protect\footnotemark}
 	\label{fig:pipeline}
 
 \end{figure}
@@ -218,7 +218,7 @@ Additional considerations can speed up later steps in the pipeline. Automated re
 \subsection{Registration}  \label{sec:registration}
 
 \begin{figure}[ht]
-  \centreing
+  \centering
   \includegraphics[width=0.6\linewidth]{images/registration}
   \caption{ICP correspondences \protect\footnotemark.}
   \label{fig:registration}
@@ -237,13 +237,13 @@ A user needs to ensure a good initial alignment or convergence may not be achiev
 
 \begin{figure}[ht]
 	\begin{subfigure}[b]{.5\textwidth}
-	  \centreing
+	  \centering
 	  \includegraphics[width=.9\linewidth]{images/dirty}
 	  % \caption{Structured light 3D scanning \cite{Form2014}}
 	  % \label{fig:structured-light-scan}
 	\end{subfigure}%
 	\begin{subfigure}[b]{.5\textwidth}
-	  \centreing
+	  \centering
 	  \includegraphics[width=.9\linewidth]{images/clean}
 	  % \caption{Laser 3D scanning}
 	  % \label{fig:images/triangulate-laser-scan}
@@ -261,7 +261,7 @@ Artefacts are unwanted points that result from of imperfect equipment rather tha
 % \todo[inline]{More detail on artifacts}
 
 \begin{figure}[ht]
-  \centreing
+  \centering
   \includegraphics[width=1\linewidth]{images/mixed-pixel}
   \caption{Mixed pixels. Green are valid points and red are not. \cite{Tuley2005}}
   \label{fig:mixed-pixel}
@@ -280,7 +280,7 @@ Some large heritage scanning projects have reported typical scans taking from 30
 \subsection{Surface reconstruction}  \label{sec:reconstruction}
 
 % \begin{figure}[ht]
-%   \centreing
+%   \centering
 %   \includegraphics[width=0.6\linewidth]{images/mls}
 %   \caption{Surface fitting \protect\footnotemark.}
 %   \label{fig:registration}
@@ -324,7 +324,7 @@ In the previous section the point cloud cleaning task was framed in the context 
 \subsection{Tools}
 
 \begin{table*}[htb]
-\centreing
+\centering
   \begin{tabular}{| l | x{3cm} | x{3cm} | c |}
 	\hline & Interactive tools & Filters & Open source \\    
     \hline
@@ -393,7 +393,7 @@ In the previous section the point cloud cleaning task was framed in the context 
 
 % An ideal solution would be a fully automated and require no human interaction. It is however sometimes difficult, even for humans, to unambiguously determine whether a point is part of an important structure or simply noise. Different people may segment the same scene differently. It is unlikely that an automated solution would be satisfactory in all cases due a large degree of classification subjectivity between people. \todo{Cite a hard problem in vision to justify this?}\\
 
-% We will not attempt a fully automated solution to the problem but rather frame it as an interactive segmentation problem. The user is thus at the centre of the cleaning process. The goal is to provide a set of tools that will speed up or automate parts of the task while maintaining accuracy.
+% We will not attempt a fully automated solution to the problem but rather frame it as an interactive segmentation problem. The user is thus at the center of the cleaning process. The goal is to provide a set of tools that will speed up or automate parts of the task while maintaining accuracy.
 
 
 Point cloud cleaning is in essence a segmentation problem. The high level goal is to divide a point set into wanted and unwanted points. In order to make this distinction it is important to recognize what points in a scene represent. Humans are very good at object recognition which is part of the reason why point cloud cleaning has remained a very manual task. Despite this general proficiency, software interfaces often make it hard to group points according to their perceived class.
@@ -421,7 +421,7 @@ The \emph{polygon select} tool is one of the more useful interactive tools. The 
 \todo{State that we overcome this by only operating on layers}
 
 \begin{figure}[ht]
-  \centreing
+  \centering
   \includegraphics[width=1\linewidth]{images/plane}
   \caption{Plane selection tool in Pointools \cite{Pointools2012}}
   \label{fig:plane-select}
@@ -436,7 +436,7 @@ Filters can range from simple denoising functions to complex machine learning al
 Meshlab provides a number of denoising filters. \emph{Outlier removal} allows a user to specify the number of neighbours a point is required to have in order to not be removed. This tool is problematic when used with range images due to the decreasing point density away from the scan origin. Points close to the origin are less likely to be classified as outliers due to the higher point density while false positives are more common further away where there are fewer samples.
 
 \begin{figure}[ht]
-  \centreing
+  \centering
   \includegraphics[width=1\linewidth]{images/clustering}
   \caption{Clustering issue in 3D Reshaper \cite{Technodigit2012}}
   \label{fig:clustering-issue}
@@ -445,7 +445,7 @@ Meshlab provides a number of denoising filters. \emph{Outlier removal} allows a 
 \emph{Clustering} tools are also affected by non uniform density. \emph{3D Reshaper} \cite{Technodigit2012} provides a filter that groups spatially related points. This approach work fine on uniform point clouds. However, range scans poses a problem as more clusters are detected further away from the origin (see \autoref{fig:clustering-issue}).
 
 \begin{figure}[ht]
-  \centreing
+  \centering
   \includegraphics[width=1\linewidth]{images/vrmesh-veg}
   \caption{Vegetation filter in VR Mesh Studio \cite{VirtualGrid2012}}
   \label{fig:vegetation-issue}
@@ -463,7 +463,7 @@ Meshlab and Cloud Compare violate the important usability heuristic by not inclu
 % Familiarity helps new users quickly get started. It is thus worth while looking at the interfaces of existing systems.
 The tools surveyed all presented the user with an interactive 3D rendering of a point cloud. In addition to this Z+F \cite{Z+F2014} provides users with a 2D range image view. Humans are more adept at interpreting 2D data despite our environment being 3D \cite{Livingstone1987}. In order to perceive depth on a screen, an object has to move \todo{Cite, move or stereo vision, Patrick: depth cues}. Given that a range scan does not reveal more information as one's 3D perspective shifts, it is questionable whether a 3D view is best suited for range scan segmentation. \note{Depth aware fill fixes this for 2D}\\
 
-Interfaces typically provide two ways to navigate a 3D scene. One can either transform the point cloud (object centric navigation), or manipulate the camera (camera centric navigation). All systems surveyed implemented object centric navigation. Cloud Compare and Meshlab amongst others render a track ball around the centre of rotation. This makes it easier to reason about the interaction, especially when the centre of mass is not at the scan origin. Cloud Compare and other systems lets a user set the centre of rotation. In Meshlab, the centre of rotation is fixed at the coordinate system origin. Object centric navigation is more intuitive when viewing movable objects. Environments however, are typically viewed from an upright perspective. Moving in and around a 3D environment from a 1st person perspective is more natural than moving the environment around. A rotated heritage site is not a familiar perspective and is likely to disorient a user.
+Interfaces typically provide two ways to navigate a 3D scene. One can either transform the point cloud (object centric navigation), or manipulate the camera (camera centric navigation). All systems surveyed implemented object centric navigation. Cloud Compare and Meshlab amongst others render a track ball around the center of rotation. This makes it easier to reason about the interaction, especially when the center of mass is not at the scan origin. Cloud Compare and other systems lets a user set the center of rotation. In Meshlab, the center of rotation is fixed at the coordinate system origin. Object centric navigation is more intuitive when viewing movable objects. Environments however, are typically viewed from an upright perspective. Moving in and around a 3D environment from a 1st person perspective is more natural than moving the environment around. A rotated heritage site is not a familiar perspective and is likely to disorient a user.
 
 Some systems use lighting when rendering the the point cloud. Meshlab lets one toggle lighting on and off. With lighting switched on the interface becomes less responsive when viewing large data sets. Lighting may help interpret a scene when viewing point clouds with no intensity or color information. However, when this information is available, such as with our data sets, it is questionable whether any value is added as artificial lighting may conflict with shadows captured at the time of the scan.
 
@@ -645,7 +645,7 @@ In this chapter a high level overview of digital the heritage preservation proce
 % \subsubsection{Meshlab}
 % Meshlab \cite{Cignoni2008} is the only viable open source tool we know of. It's primary purpose is mesh processing but it does allow one to work with point clouds through various plug-ins. Some plug-ins lets one preview an action but once it is applied it cannot be undone as Meshlab does not support undo. Meshlab supports opening multiple point clouds in the same view port but tools can generally only operate on one at a time.
 
-% The viewport renders a track ball around the point cloud centre at allows one to rotate it around its axis.
+% The viewport renders a track ball around the point cloud center at allows one to rotate it around its axis.
 
 
 

@@ -1,0 +1,32 @@
+Background
+
+Point cloud cleaning is tedious
+up to 2 hours per scan
+manual task
+
+The aim is to speed this up
+
+Existing systems
+
+Black boxes so hard to build on
+Good things in there
+
+Lasso, brush, plane select, power line select
+
+Tools lie on a continuem of high area of influence, low area of influence
+
+High area of influence are more automated less precise
+Low area of influence are less automated but more precise
+
+When a tool is not 100% accurate, remdial action will always be required
+
+Cleaning time = sum of the times to apply each action + overhead
+
+a tool that is benficial needs to reduce the overall cleaning time
+
+
+But we cannot build on proprietary systens
+
+We need a basic framework to build on
+
+Requirements

@@ -132,6 +132,8 @@ bool PointCloud::load_ptx(const char* filename, int decimation_factor) {
     // Avoid using a comma delimiter
     setlocale(LC_NUMERIC,"C");
 
+    qDebug() << "Opening: " << filename;
+
     FILE * pfile;
     pfile = fopen (filename , "r");
     if (pfile == NULL){
@@ -145,6 +147,10 @@ bool PointCloud::load_ptx(const char* filename, int decimation_factor) {
     // Matrix dimentions
     int file_width, file_height;
     fscanf(pfile, "%d %d", &file_width, &file_height);
+
+    qDebug() << "w x h" << file_width << file_width;
+    assert(file_width);
+    assert(file_width);
 
     // Subsample
     this->scan_width_ =  file_width/decimation_factor;
@@ -304,6 +310,7 @@ bool PointCloud::load_ptx(const char* filename, int decimation_factor) {
         double resolution = 0.02;
         qDebug() << "Start octree";
         Octree::Ptr octree = Octree::Ptr(new Octree(resolution));
+        assert(this->size());
         pcl::PointCloud<pcl::PointXYZI>::ConstPtr cptr(this, boost::serialization::null_deleter());
         octree->setInputCloud(cptr);
         octree->defineBoundingBox();

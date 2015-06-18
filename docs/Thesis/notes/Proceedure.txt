@@ -1,0 +1,42 @@
+Proceedure
+	Open deminja
+		Familiarise
+			explain undo
+			explain how to activate toold
+
+
+		2d:
+			Segment heinz with lasso tool (count lasso actions)
+			Segmemt heinz with brush tool
+			Select heinz with depth sensitve brush tool
+
+		3d:
+			Segment wall with lasso
+			Segment wall with brush
+			Segment wall with plane select
+
+			Segment tree with lasso
+			Segment tree with brush
+			Random forest tool the tree and wall while hiding the rest
+
+			Navigate from 3 different positions to target
+
+	Open isolatable tree
+		Segment with brush depth sensitive
+		Segment with lasso
+
+
+	Open default
+		Segment far wall lasso
+		Segment far wall with brush
+		Segment close wall with wall tool
+		Use random forest tool with isolated tree and wall
+
+
+	Ask about 2d and 3d? Illustrate this
+
+
+
+I
+Noise in the sky is easy to remove in 2d
+Noise in the sky is really hard in 3d

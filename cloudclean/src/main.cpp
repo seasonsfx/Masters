@@ -9,6 +9,10 @@
     #include <Windows.h>
 #endif
 
+#ifndef WIN32
+    #include <signal.h>
+#endif
+
 void customMessageHandler(QtMsgType type, const QMessageLogContext& context, const QString &msg)
 {
     QString txt;
@@ -31,8 +35,14 @@ void customMessageHandler(QtMsgType type, const QMessageLogContext& context, con
 
 }
 
-int main(int argc, char* argv[])
-{
+void sig_handler(int signum){
+    throw "segfault";
+}
+
+int main(int argc, char* argv[]) {
+
+    signal(SIGSEGV, sig_handler);
+
     srand (time(NULL));
     qInstallMessageHandler(customMessageHandler);
     App app(argc,argv);

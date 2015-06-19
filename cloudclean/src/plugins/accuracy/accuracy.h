@@ -15,6 +15,7 @@ class MainWindow;
 class Layer;
 class QLineEdit;
 class QLabel;
+class QDoubleSpinBox;
 
 class Accuracy : public IPlugin {
     Q_INTERFACES(IPlugin)
@@ -46,8 +47,11 @@ class Accuracy : public IPlugin {
     QWidget * settings_;
     bool is_enabled_;
 
-    QLineEdit * precision_;
-    QLineEdit * recall_;
+    float target_accuracy_;
+
+    //QLineEdit * precision_;
+    //QLineEdit * recall_;
+    QDoubleSpinBox * target_accuracy_input_;
     QAction * fscore_action_;
 
     std::vector<boost::weak_ptr<Layer> >  target_;

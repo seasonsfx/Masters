@@ -12,6 +12,7 @@
 #include <QStackedWidget>
 #include <QLineEdit>
 #include <QLabel>
+#include <QDoubleSpinBox>
 #include <QApplication>
 #include "model/layerlist.h"
 #include "model/cloudlist.h"
@@ -35,9 +36,7 @@ void Accuracy::initialize(Core *core){
 
     fscore_action_ = new QAction("F1", 0);
     fscore_action_->setShortcut(QKeySequence(Qt::Key_F1));
-
-//    QStyle * style = QApplication::style();
-//    fscore_action_->setIcon(style->standardIcon(QStyle::SP_CommandLink));
+    //fscore_action_->se;
 
     mw_->toolbar_->addAction(fscore_action_);
 
@@ -67,17 +66,31 @@ void Accuracy::initialize(Core *core){
     split1->addWidget(clear1);
 
 
-    precision_ = new QLineEdit(settings_);
-    precision_->setReadOnly(true);
-    recall_ = new QLineEdit(settings_);
-    recall_->setReadOnly(true);
+//    precision_ = new QLineEdit(settings_);
+//    precision_->setReadOnly(true);
+//    recall_ = new QLineEdit(settings_);
+//    recall_->setReadOnly(true);
+
+    target_accuracy_ = 0.95;
+    target_accuracy_input_ = new QDoubleSpinBox(settings_);
+    target_accuracy_input_->setRange(0, 1);
+    target_accuracy_input_->setValue(target_accuracy_);
+
 
     QHBoxLayout * split = new QHBoxLayout(settings_);
     layout->addLayout(split);
-    split->addWidget(new QLabel("Recall", settings_));
-    split->addWidget(recall_);
-    split->addWidget(new QLabel("Precision", settings_));
-    split->addWidget(precision_);
+    split->addWidget(new QLabel("Target accuracy", settings_));
+    split->addWidget(target_accuracy_input_);
+
+    connect(target_accuracy_input_, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), [=] (double value){
+        target_accuracy_ = target_accuracy_input_->value();
+    });
+
+
+//    split->addWidget(new QLabel("Recall", settings_));
+//    split->addWidget(recall_);
+//    split->addWidget(new QLabel("Precision", settings_));
+//    split->addWidget(precision_);
 
     // connect
 
@@ -115,6 +128,11 @@ void Accuracy::initialize(Core *core){
 }
 
 void Accuracy::accuracy() {
+
+    if(!cl_->active_){
+        return;
+    }
+
     auto is_label_in_set = [=] (uint16_t label, std::vector<boost::weak_ptr<Layer> > & layers){
         const LayerSet & ls = ll_->getLayersForLabel(label);
 
@@ -158,9 +176,49 @@ void Accuracy::accuracy() {
     float precision = float(true_positive_count)/selected_count;
     float fscore = 2 * (precision * recall) / (precision + recall);
 
-    recall_->setText(QString("%1").arg(recall));
-    precision_->setText(QString("%1").arg(precision));
-    fscore_action_->setText(QString("%1").arg(fscore));
+//    recall_->setText(QString("%1").arg(recall));
+//    precision_->setText(QString("%1").arg(precision));
+    QImage img(128, 128, QImage::Format_RGB32);
+    img.fill(Qt::black);
+//    if(fscore > target_accuracy_){
+//        img.fill(Qt::green);
+//    } else {
+//        img.fill(Qt::red);
+//    }
+
+    QPainter p;
+    QPen pen;
+    p.begin(&img);
+
+    pen.setStyle(Qt::SolidLine);
+    pen.setWidth(1);
+    pen.setCapStyle(Qt::RoundCap);
+    pen.setJoinStyle(Qt::RoundJoin);
+
+    if(fscore > target_accuracy_){
+        pen.setBrush(Qt::black);
+    } else {
+        pen.setBrush(Qt::white);
+    }
+
+    p.setPen(pen);
+
+    //p.setBrush(Qt::NoBrush);
+    if(fscore > target_accuracy_){
+        p.fillRect(QRect(0, 0, 128, 128), Qt::green);
+    } else {
+        p.fillRect(QRect(0, 0, 128, 128), Qt::red);
+    }
+
+
+
+    p.setFont(QFont("Arial", 50));
+    p.drawText(QRect(0, 0, 128, 128), Qt::AlignLeft | Qt::AlignVCenter, QString("%1").arg(fscore));
+    p.end();
+
+    fscore_action_->setIcon(QIcon(QPixmap::fromImage(img)));
+    //fscore_action_->setIconText(QString("%1").arg(fscore));
+
 }
 
 void Accuracy::cleanup(){

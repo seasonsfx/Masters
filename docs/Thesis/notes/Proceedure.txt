@@ -1,42 +1,120 @@
-Proceedure
-	Open deminja
+goals
+	Compare tools in terms of speed
+	Compare 2d vs 3d
+		ask user which is best
+	See if roll correction helps
+		time user an ask user
+
+	Take into account learning effects
+		randomise order?
+
+Todo:
+	hide useless tools
+	snake
+	compare
+	global flood
+	...
+
+Proceedure, open 3 windows to save time
+	
+	Open /home/rickert/testdata/tes/4.ccp
+
+		Start with roll correction off
+		Let the user explore
+		Show him or her the dots
+
+
 		Familiarise
 			explain undo
-			explain how to activate toold
+			explain how to activate tool
+			selections & deselection
+			press f1 for accuracy
+			hiding layers
 
 
-		2d:
+		Check that the camera is level
+		
+
+
+
+		Navigate from 3 different positions to target
+
+		Navigate to fort stairs purple dot
+			12.1894 1.84983 1.46332
+
+			-51.5621 40.1722 1.13081 
+			 -0.788712 0.231652 0.533016 -0.200414
+
+
+		Navigate to the cars green dot
+			-8.02417 21.1436 6.18384 
+
+			88.8624 3.13728 6.64682 
+			 -0.470303 -0.152729 0.665465 -0.559147
+
+
+		Navigate to the palm tree with the red dot
+			49.6366 3.12778 7.80194 
+
+			-44.687 86.1402 6.84156 
+			 -0.328505 0.735387 0.172716 -0.566974
+
+
+
+
+	Open  /home/rickert/testdata/scans/tes/1.ccp
+
+		Time users to 98% accuracy, why?
+		Show picture
+
+		In 2d view:
 			Segment heinz with lasso tool (count lasso actions)
 			Segmemt heinz with brush tool
 			Select heinz with depth sensitve brush tool
 
-		3d:
+		In 3d view: ask user to comment on tools
 			Segment wall with lasso
 			Segment wall with brush
 			Segment wall with plane select
 
 			Segment tree with lasso
 			Segment tree with brush
-			Random forest tool the tree and wall while hiding the rest
+			Segment tree from wall (isolated) in 10 seconds, measure accuracy
 
-			Navigate from 3 different positions to target
+		Now use any tool that you want to segment tree
+			Note down tools
 
-	Open isolatable tree
+		Many examples, sometimes it helps
+
+
+	Open  /home/rickert/testdata/scans/tes/2.ccp
 		Segment with brush depth sensitive
 		Segment with lasso
 
 
-	Open default
+	Open  /home/rickert/testdata/scans/tes/3.ccp
 		Segment far wall lasso
 		Segment far wall with brush
-		Segment close wall with wall tool
-		Use random forest tool with isolated tree and wall
+		Segment with wall tool
+		Use random forest tool with isolated tree and walls
 
 
 	Ask about 2d and 3d? Illustrate this
 
 
 
-I
+
 Noise in the sky is easy to remove in 2d
 Noise in the sky is really hard in 3d
+
+--------------------
+
+Sunrise says
+	Red makes it easier
+	Dont event need to be orientated
+	Sparseness makes it bad to orientate
+	Roll correction definitely makes it easier, but the sparseness is more problematic
+
+
+40.3675 7.46927 6.75472 
+ -0.0835597 0.451762 -0.0758349 -0.884973

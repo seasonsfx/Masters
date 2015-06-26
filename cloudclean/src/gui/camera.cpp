@@ -158,8 +158,11 @@ Eigen::Affine3f Camera::projectionMatrix() const {
 void Camera::translate(const Eigen::Vector3f& pos) {
     translation_future_ = Eigen::Translation3f(rotation_current_.inverse() * (translation_speed_ * pos)) * translation_current_;
 
-    if(translation_speed_ < 10)
+    if(translation_speed_ < 10){
         translation_speed_ *= 1.1f; // If succesive tranlations are performed, speed things up
+    }
+
+    emit modified();
 }
 
 void Camera::setRotate3D(const Eigen::Vector3f& rot) {
@@ -168,6 +171,7 @@ void Camera::setRotate3D(const Eigen::Vector3f& rot) {
     Eigen::AngleAxis<float> aaX(rot.x(), Eigen::Vector3f::UnitX());
 
     rotation_future_ = aaZ * aaY * aaX;
+    emit modified();
 }
 
 void Camera::rotate2D(float x, float y) {
@@ -212,7 +216,7 @@ void Camera::rotate2D(float x, float y) {
     rotation_future_ = roll_correction * rotation_future_;
     rotation_future_.normalize();
 
-
+    emit modified();
 }
 
 void Camera::rotate3D(float _yaw, float _pitch, float _roll) {
@@ -262,6 +266,7 @@ void Camera::rotate3D(float _yaw, float _pitch, float _roll) {
     rotation_future_ = roll_correction * rotation_future_;
     rotation_future_.normalize();
 
+    emit modified();
 }
 
 void Camera::adjustFov(int val) {

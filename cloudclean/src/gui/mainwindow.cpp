@@ -159,6 +159,14 @@ MainWindow::MainWindow(QUndoStack *us, CloudList * cl, LayerList * ll, QWidget *
     qRegisterMetaType<boost::shared_ptr<PointCloud> >("boost::shared_ptr<PointCloud>");
     qRegisterMetaType<boost::shared_ptr<Layer> >("boost::shared_ptr<Layer>");
 
+    connect(glwidget_, &GLWidget::rollCorrectionToggle, [this](bool on){
+        if(on){
+            statusbar_->showMessage("Roll correction on", 5000);
+        } else {
+            statusbar_->showMessage("Roll correction off", 5000);
+        }
+    });
+
     connect(gld_, &GLData::update, glwidget_, (void (GLWidget:: *)(void)) &GLWidget::update);
     connect(gld_, &GLData::update, flatview_, (void (FlatView:: *)(void)) &FlatView::update);
     connect(cl, &CloudList::cloudUpdate, gld_, &GLData::reloadCloud);

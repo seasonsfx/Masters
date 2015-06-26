@@ -23,6 +23,8 @@ class MainWindow;
 class QSpinbox;
 class QLabel;
 
+#include <QTime>
+
 class Lasso3D : public IPlugin {
     Q_INTERFACES(IPlugin)
     Q_OBJECT
@@ -72,6 +74,12 @@ class Lasso3D : public IPlugin {
 
     QWidget * settings_;
     Lasso * lasso_;
+
+    int invocations_;
+    int action_count_;
+    float seconds_;
+    QTime timer_;
+    QString log_;
 };
 
 #endif  // LASSO_3D_H

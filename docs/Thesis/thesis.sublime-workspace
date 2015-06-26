@@ -4,18 +4,6 @@
 		"selected_items":
 		[
 			[
-				"subsub",
-				"subsubsection*{title}	latex-document"
-			],
-			[
-				"lab",
-				"label{key}	latex-document"
-			],
-			[
-				"sec",
-				"section*{title}	latex-document"
-			],
-			[
 				"aut",
 				"autoref{label}	hyperref"
 			],
@@ -40,6 +28,14 @@
 	"buffers":
 	[
 		{
+			"file": "chapters/02-literature-review.tex",
+			"settings":
+			{
+				"buffer_size": 14493,
+				"line_ending": "Unix"
+			}
+		},
+		{
 			"file": "chapters/03-segmentation-background.tex",
 			"settings":
 			{
@@ -48,10 +44,10 @@
 			}
 		},
 		{
-			"file": "notes/testing.txt",
+			"file": "chapters/05-evaluation.tex",
 			"settings":
 			{
-				"buffer_size": 3083,
+				"buffer_size": 256,
 				"line_ending": "Unix"
 			}
 		},
@@ -72,42 +68,18 @@
 			}
 		},
 		{
+			"file": "chapters/literature.notes",
+			"settings":
+			{
+				"buffer_size": 2367,
+				"line_ending": "Unix"
+			}
+		},
+		{
 			"file": "chapters/03-design.tex",
 			"settings":
 			{
 				"buffer_size": 418,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "notes/cvbook.txt",
-			"settings":
-			{
-				"buffer_size": 15333,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "thesis.tex",
-			"settings":
-			{
-				"buffer_size": 3080,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "chapters/02-background.tex",
-			"settings":
-			{
-				"buffer_size": 64361,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "chapters/02-literature-review.tex",
-			"settings":
-			{
-				"buffer_size": 14493,
 				"line_ending": "Unix"
 			}
 		},
@@ -128,15 +100,52 @@
 			}
 		},
 		{
-			"contents": "Proceedure\n	Open deminja\n		Familiarise\n			explain undo\n			explain how to activate toold\n\n\n		2d:\n			Segment heinz with lasso tool (count lasso actions)\n			Segmemt heinz with brush tool\n			Select heinz with depth sensitve brush tool\n\n		3d:\n			Segment wall with lasso\n			Segment wall with brush\n			Segment wall with plane select\n\n			Segment tree with lasso\n			Segment tree with brush\n			Random forest tool the tree and wall while hiding the rest\n\n			Navigate from 3 different positions to target\n\n	Open isolatable tree\n		Segment with brush depth sensitive\n		Segment with lasso\n\n\n	Open default\n		Segment far wall lasso\n		Segment far wall with brush\n		Segment close wall with wall tool\n		Use random forest tool with isolated tree and wall\n\n\n	Ask about 2d and 3d? Illustrate this\n\n\n\nI\nNoise in the sky is easy to remove in 2d\nNoise in the sky is really hard in 3d\n2d has nothing behind it",
-			"file": "notes/Proceedure.txt",
-			"file_size": 857,
-			"file_write_time": 130779847943340347,
+			"file": "chapters/02-background.tex",
 			"settings":
 			{
-				"buffer_size": 882,
+				"buffer_size": 64361,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "thesis.tex",
+			"settings":
+			{
+				"buffer_size": 3080,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "notes/cvbook.txt",
+			"settings":
+			{
+				"buffer_size": 15333,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "chapters/problem.txt",
+			"settings":
+			{
+				"buffer_size": 1271,
 				"line_ending": "Unix",
-				"name": "Proceedure"
+				"name": "problem:"
+			}
+		},
+		{
+			"contents": "Genaral background that people need to understand it\n    Genral computer science persons what they need to understand\n\n    More important\n    \n\n\nLit review key paper\n    MAstery of the subject\n\n    Still gaps\n\n\n\nFrame work section\n    Design & implementation\n\n    UI\n        lll\n\n\n    Design goals\n        State\n\n    What options\n        Useable\n\n\n    Choosing features\n\n",
+			"settings":
+			{
+				"buffer_size": 371,
+				"line_ending": "Unix",
+				"name": "Genaral background that people need to understand"
+			}
+		},
+		{
+			"settings":
+			{
+				"buffer_size": 0,
+				"line_ending": "Unix"
 			}
 		}
 	],
@@ -179,16 +188,16 @@
 	"build_varint": "",
 	"command_palette":
 	{
-		"height": 285.0,
+		"height": 392.0,
 		"last_filter": "",
 		"selected_items":
 		[
 			[
-				"insta",
+				"inst",
 				"Package Control: Install Package"
 			],
 			[
-				"inst",
+				"insta",
 				"Package Control: Install Package"
 			],
 			[
@@ -240,7 +249,7 @@
 				"Package Control: Install Package"
 			]
 		],
-		"width": 467.0
+		"width": 530.0
 	},
 	"console":
 	{
@@ -271,27 +280,12 @@
 	],
 	"file_history":
 	[
-		"/home/rickert/uts/README",
-		"/home/rickert/uts/basicgui/resources.qrc",
-		"/home/rickert/github-migrate-trac-tickets/github.py",
-		"/home/rickert/Masters/docs/Thesis/chapters/03-segmentation-background.aux",
 		"/home/rickert/Masters/docs/Thesis/chapters/02-background.tex",
-		"/home/rickert/Masters/docs/Thesis/thesis.exp.gnuplot",
-		"/home/rickert/Masters/docs/Thesis/thesis.tex",
-		"/home/rickert/Masters/docs/Thesis/chapters/05-evaluation.tex",
-		"/home/rickert/Masters/docs/Thesis/notes/Framework",
-		"/home/rickert/Masters/docs/Thesis/chapters/03-segmentation-background.tex",
-		"/home/rickert/Masters/docs/Thesis/thesis.bib",
-		"/home/rickert/Masters/docs/Thesis/thesis.sublime-project",
-		"/home/rickert/Masters/docs/Thesis/slides.txt",
-		"/home/rickert/Masters/docs/Thesis/chapters/03-software-framework.tex",
-		"/home/rickert/Masters/docs/Thesis/notes/We need isolated noise and unwanted objects",
-		"/home/rickert/Masters/docs/Thesis/notes/Summary",
-		"/home/rickert/Masters/docs/Thesis/notes/JOC HH",
-		"/home/rickert/Masters/docs/Thesis/chapters/problem.txt",
-		"/home/rickert/Masters/docs/Thesis/notes/cvbook.txt",
 		"/home/rickert/Masters/docs/misc/slides.txt",
+		"/home/rickert/Masters/docs/Thesis/slides.txt",
+		"/home/rickert/Masters/docs/Thesis/thesis.sublime-project",
 		"/home/rickert/Masters/docs/Thesis/chapters/02-background.aux",
+		"/home/rickert/Masters/docs/Thesis/thesis.tex",
 		"/home/rickert/Masters/docs/Thesis/images/old/triangulate-laser-scan.ppm",
 		"/home/rickert/Masters/docs/Thesis/images/structured-light-scan.xcf",
 		"/home/rickert/Masters/docs/Thesis/chapters/literature.notes",
@@ -308,14 +302,13 @@
 	],
 	"find":
 	{
-		"height": 35.0
+		"height": 44.0
 	},
 	"find_in_files":
 	{
-		"height": 93.0,
+		"height": 102.0,
 		"where_history":
 		[
-			""
 		]
 	},
 	"find_state":
@@ -323,38 +316,50 @@
 		"case_sensitive": false,
 		"find_history":
 		[
-			"magic",
-			"ma",
-			"centre",
-			"\\centreing",
-			"centre",
-			"\\todo{Gaussian mixture model?}\n",
-			"the the",
-			"merge",
-			"Adapted",
-			"[\\value{footnote}]",
-			"group",
-			"cluster",
-			"fig:2dselect",
-			"svg",
-			"\\caption",
-			"rely",
-			"patrick",
-			"note",
-			"mesh",
-			"variation to",
-			"domain",
-			"cloud C",
-			"cloud ",
-			"VR Mes",
-			"Cloud Compare",
-			"Cloud Compa",
-			"Used many",
-			"Used\nmany\nof the\nsame\nrefs,\nfind\nsome\nothers",
-			"Carlson Pointcloud",
-			"• ",
-			"task",
-			"ICp",
+			"roll",
+			"system",
+			"color",
+			"center",
+			"methods",
+			"is",
+			"neighborin",
+			"Point",
+			"point",
+			"Point",
+			"point",
+			"Point",
+			"point",
+			"Point",
+			"point",
+			"Point",
+			"point",
+			"Point",
+			"point",
+			"Point",
+			"point",
+			"Point",
+			"point",
+			"Point",
+			"point",
+			"Point",
+			"point",
+			"Point",
+			"point",
+			"Point",
+			"point",
+			"Point",
+			"point",
+			"discrete",
+			"neighboring",
+			"laser",
+			"IO plug",
+			"as a",
+			"FIG:S",
+			"System",
+			"system",
+			"igure",
+			"roll correc",
+			"panoram",
 			"LEAp",
 			"present th",
 			"tooling",
@@ -395,10 +400,6 @@
 		"regex": false,
 		"replace_history":
 		[
-			"center",
-			"\\centering",
-			"",
-			"- ",
 			"acquire ",
 			"aquire",
 			"[ht]",
@@ -422,6 +423,36 @@
 			[
 				{
 					"buffer": 0,
+					"file": "chapters/02-literature-review.tex",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 14493,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								7866,
+								7866
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/LaTeXing/support/LaTeX.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 7,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
 					"file": "chapters/03-segmentation-background.tex",
 					"semi_transient": false,
 					"settings":
@@ -433,54 +464,53 @@
 						"selection":
 						[
 							[
-								16328,
-								16328
+								1126,
+								1126
 							]
 						],
 						"settings":
 						{
-							"spell_check": true,
-							"syntax": "Packages/LaTeXing/support/LaTeX.tmLanguage",
+							"syntax": "Packages/LaTeX/LaTeX.tmLanguage",
 							"tab_size": 2,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 6252.0,
+						"translation.y": 324.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 3,
+					"stack_index": 0,
 					"type": "text"
 				},
 				{
-					"buffer": 1,
-					"file": "notes/testing.txt",
+					"buffer": 2,
+					"file": "chapters/05-evaluation.tex",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 3083,
+						"buffer_size": 256,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2153,
-								2153
+								0,
+								0
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/Text/Plain text.tmLanguage"
+							"syntax": "Packages/LaTeXing/support/LaTeX.tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 22836.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 2,
 					"type": "text"
 				},
 				{
-					"buffer": 2,
+					"buffer": 3,
 					"file": "chapters/04-implementation.tex",
 					"semi_transient": false,
 					"settings":
@@ -492,8 +522,8 @@
 						"selection":
 						[
 							[
-								638,
-								638
+								3605,
+								3605
 							]
 						],
 						"settings":
@@ -503,14 +533,14 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 143.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 11,
+					"stack_index": 8,
 					"type": "text"
 				},
 				{
-					"buffer": 3,
+					"buffer": 4,
 					"file": "chapters/06-conclusion.tex",
 					"semi_transient": false,
 					"settings":
@@ -535,178 +565,46 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 10,
+					"stack_index": 6,
 					"type": "text"
 				},
 				{
-					"buffer": 4,
-					"file": "chapters/03-design.tex",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 418,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								113,
-								113
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/LaTeXing/support/LaTeX.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 4,
-					"type": "text"
-				}
-			]
-		},
-		{
-			"selected": 6,
-			"sheets":
-			[
-				{
 					"buffer": 5,
-					"file": "notes/cvbook.txt",
-					"semi_transient": false,
+					"file": "chapters/literature.notes",
+					"semi_transient": true,
 					"settings":
 					{
-						"buffer_size": 15333,
+						"buffer_size": 2367,
 						"regions":
 						{
-							"bookmarks":
-							{
-								"flags": 144,
-								"icon": "bookmark",
-								"regions":
-								[
-									[
-										2218,
-										2218
-									]
-								],
-								"scope": "bookmarks"
-							}
 						},
 						"selection":
 						[
 							[
-								11582,
-								11582
+								467,
+								467
 							]
 						],
 						"settings":
 						{
 							"syntax": "Packages/Text/Plain text.tmLanguage",
-							"translate_tabs_to_spaces": false
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 5082.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 7,
+					"stack_index": 3,
 					"type": "text"
 				},
 				{
 					"buffer": 6,
-					"file": "thesis.tex",
+					"file": "chapters/03-design.tex",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 3080,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								2030,
-								2030
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/LaTeXing/support/LaTeX.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 714.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
-					"type": "text"
-				},
-				{
-					"buffer": 7,
-					"file": "chapters/02-background.tex",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 64361,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								7742,
-								7742
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/LaTeXing/support/LaTeX.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 2319.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 5,
-					"type": "text"
-				},
-				{
-					"buffer": 8,
-					"file": "chapters/02-literature-review.tex",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 14493,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								5015,
-								5015
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/LaTeXing/support/LaTeX.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 745.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 6,
-					"type": "text"
-				},
-				{
-					"buffer": 9,
-					"file": "chapters/03-software-framework.tex",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 38209,
+						"buffer_size": 418,
 						"regions":
 						{
 						},
@@ -719,19 +617,52 @@
 						],
 						"settings":
 						{
-							"spell_check": true,
-							"syntax": "Packages/LaTeXing/support/LaTeX.tmLanguage",
-							"translate_tabs_to_spaces": false
+							"syntax": "Packages/LaTeXing/support/LaTeX.tmLanguage"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 8,
+					"stack_index": 4,
 					"type": "text"
 				},
 				{
-					"buffer": 10,
+					"buffer": 7,
+					"file": "chapters/03-software-framework.tex",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 38209,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								26800,
+								26800
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/LaTeXing/support/LaTeX.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 19860.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				}
+			]
+		},
+		{
+			"selected": 1,
+			"sheets":
+			[
+				{
+					"buffer": 8,
 					"file": "chapters/01-introduction.tex",
 					"semi_transient": false,
 					"settings":
@@ -743,8 +674,8 @@
 						"selection":
 						[
 							[
-								1313,
-								1313
+								536,
+								536
 							]
 						],
 						"settings":
@@ -756,36 +687,180 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 9,
+					"stack_index": 10,
 					"type": "text"
 				},
 				{
-					"buffer": 11,
-					"file": "notes/Proceedure.txt",
+					"buffer": 9,
+					"file": "chapters/02-background.tex",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 882,
+						"buffer_size": 64361,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								882,
-								882
+								12914,
+								12914
 							]
 						],
 						"settings":
 						{
-							"auto_name": "Proceedure",
+							"syntax": "Packages/LaTeX/LaTeX.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 8112.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 10,
+					"file": "thesis.tex",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3080,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/LaTeXing/support/LaTeX.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 906.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 12,
+					"type": "text"
+				},
+				{
+					"buffer": 11,
+					"file": "notes/cvbook.txt",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 15333,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 755.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 11,
+					"type": "text"
+				},
+				{
+					"buffer": 12,
+					"file": "chapters/problem.txt",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1271,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"auto_name": "problem:",
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 14,
+					"type": "text"
+				},
+				{
+					"buffer": 13,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 371,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								259,
+								259
+							]
+						],
+						"settings":
+						{
+							"auto_name": "Genaral background that people need to understand",
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 13,
+					"type": "text"
+				},
+				{
+					"buffer": 14,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 0,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
 							"syntax": "Packages/Text/Plain text.tmLanguage"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 9,
 					"type": "text"
 				}
 			]
@@ -793,7 +868,7 @@
 	],
 	"incremental_find":
 	{
-		"height": 25.0
+		"height": 44.0
 	},
 	"input":
 	{
@@ -819,7 +894,7 @@
 		"cols":
 		[
 			0.0,
-			0.481481481481,
+			0.5,
 			1.0
 		],
 		"rows":
@@ -841,7 +916,7 @@
 	"project": "thesis.sublime-project",
 	"replace":
 	{
-		"height": 64.0
+		"height": 68.0
 	},
 	"save_all_on_build": true,
 	"select_file":
@@ -850,21 +925,17 @@
 		"last_filter": "",
 		"selected_items":
 		[
-			[
-				"the",
-				"thesis.tex"
-			]
 		],
 		"width": 0.0
 	},
 	"select_project":
 	{
-		"height": 500.0,
+		"height": 0.0,
 		"last_filter": "",
 		"selected_items":
 		[
 		],
-		"width": 380.0
+		"width": 0.0
 	},
 	"select_symbol":
 	{
@@ -883,7 +954,7 @@
 	"show_open_files": false,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 387.0,
+	"side_bar_width": 246.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{

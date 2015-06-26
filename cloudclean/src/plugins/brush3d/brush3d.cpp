@@ -169,10 +169,6 @@ float getZ(Eigen::Vector3f p, Eigen::Affine3f mv, Eigen::Affine3f proj, int w, i
         viewport,
         &wx, &wy, &wz);
 
-//                                Eigen::Vector4f e = (t2*t).matrix() * q.getVector4fMap();
-//                                e[3] = 1;
-//                                wz = e.z()/e.w();
-
     return wz;
 }
 

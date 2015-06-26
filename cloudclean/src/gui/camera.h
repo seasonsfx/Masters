@@ -78,6 +78,18 @@ class GUI_API Camera : public QObject {
         setPosition(Eigen::Vector3f(x, y, z));
     }
 
+    Eigen::Vector3f getPosition(){
+        return translation_future_;
+    }
+
+    Eigen::Quaternion<float> getRotation(){
+        return rotation_future_;
+    }
+
+    void setRotation(Eigen::Quaternion<float> & rot){
+        rotation_future_ = rot;
+    }
+
     Eigen::Affine3f modelviewMatrix();
     Eigen::Affine3f projectionMatrix() const;
 
@@ -99,12 +111,17 @@ class GUI_API Camera : public QObject {
         always_update_ = on;
     }
 
+    bool roll_correction(){
+        return roll_correction_;
+    }
+
  public slots:
     void birds_eye();
     void toggleRollCorrection();
 
  signals:
     void updated();
+    void modified();
 
  private:
     void recalculateProjectionMatrix();

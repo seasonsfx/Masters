@@ -79,7 +79,7 @@ Proceedure, open 3 windows to save time
 
 			Segment tree with lasso
 			Segment tree with brush
-			Segment tree from wall (isolated) in 10 seconds, measure accuracy
+			
 
 		Now use any tool that you want to segment tree
 			Note down tools
@@ -98,6 +98,17 @@ Proceedure, open 3 windows to save time
 		Segment with wall tool
 		Use random forest tool with isolated tree and walls
 
+
+	Open 6:
+		select tools to 98%
+
+	open 8:
+		Segment tree from wall
+
+	open 10:
+		Segmeny tree from wall
+
+	Open 
 
 	Ask about 2d and 3d? Illustrate this
 

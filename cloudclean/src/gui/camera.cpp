@@ -59,8 +59,8 @@ Camera::Camera() {
     roll_correction_ = true;
     always_update_ = false;
 
-    rotation_current_ = AngleAxis<float>(-M_PI/2.0, Vector3f(1.0f, 0.0f, 0.0f));
-    rotation_future_ = AngleAxis<float>(-M_PI/2.0, Vector3f(1.0f, 0.0f, 0.0f));
+    rotation_current_ = AngleAxis<float>(0, Vector3f(1.0f, 0.0f, 0.0f));
+    rotation_future_ = AngleAxis<float>(0, Vector3f(1.0f, 0.0f, 0.0f));
 
     translation_current_ = Vector3f(0, 0, 0);
     translation_future_ = Vector3f(0, 0, 0);
@@ -100,6 +100,58 @@ Camera::Camera() {
 
 Camera::~Camera() {
     //delete mtx_;
+}
+
+double angle (Vector3f a, Vector3f b){
+    double dotp = a.dot(b);
+    if(dotp >= 1 || dotp <= -1){
+        return 0.0;
+    }
+    return acos(dotp);
+}
+
+double normalizeRad(double angle){
+    if(angle < -M_PI_2){
+        return -M_PI_2 - (angle + M_PI_2);
+    } else if(angle > M_PI_2) {
+        return M_PI_2 - (angle - M_PI_2);
+    }
+    return angle;
+}
+
+Eigen::Quaternionf rollcorrect(Eigen::Quaternionf rotation){
+    Vector3f local_z_axis = rotation.inverse() * -Vector3f::UnitZ();
+    Vector3f local_x_axis = rotation.inverse() * Vector3f::UnitX();
+    Vector3f local_y_axis = rotation.inverse() * Vector3f::UnitY();
+
+    Vector3f z_proj_zx = local_z_axis; z_proj_zx(1) = 0; z_proj_zx.normalize();
+    Vector3f x_proj_zx = local_x_axis; x_proj_zx(1) = 0; x_proj_zx.normalize();
+    Vector3f y_proj_zx = local_y_axis; y_proj_zx(1) = 0; y_proj_zx.normalize();
+
+    double pitch = angle(local_z_axis, z_proj_zx);
+    double roll = angle(local_x_axis, x_proj_zx);
+
+    int proj_side = local_x_axis.cross(x_proj_zx).dot(local_z_axis) > 0 ? -1 : 1;
+    int side_up = local_y_axis.dot(Vector3f::UnitY()) > 0 ? 1 : -1;
+
+    if(side_up == -1){
+        roll = M_PI - roll;
+    }
+
+    roll = roll * proj_side * side_up;
+
+    double norm_pitch = normalizeRad(pitch);
+    double correction_factor = (M_PI_2 - fabs(norm_pitch)) / M_PI_2;
+    correction_factor = pow(correction_factor - 0.5, 1);
+
+    if(pitch > 0.7){
+        correction_factor = 0;
+    }
+
+    AngleAxis<float> roll_correction(correction_factor*-roll, Vector3f::UnitZ());
+    rotation = roll_correction * rotation;
+
+    return rotation;
 }
 
 void Camera::setFoV(float fov) {
@@ -182,39 +234,9 @@ void Camera::rotate2D(float x, float y) {
 
     rotation_future_ = (rotX * rotY) * rotation_current_;
 
-    auto clamp = [] (double num, double low, double high) {
-        if (num > high)
-            return high;
-        if (num < low)
-            return low;
-        return num;
-    };
-
-    Eigen::Matrix3f r = rotation_future_.toRotationMatrix();
-    double roll = -atan2(r(0,2), r(1, 2));
-    double pitch = acos(r(2,2));
-    //double yaw = atan2(r(2, 0), r(2, 1));
-
-
-    Vector3f dir = rotation_future_ * Vector3f::UnitZ();
-    double dotp = dir.dot(Vector3f::UnitZ());
-
-    double sign = dir.dot(Vector3f::UnitY()) > 0 ? 1.0 : -1.0;
-    double angle = sign * acos(dotp);
-
-    double correction_factor = 1.0 - fabs(pitch-M_PI/2)/(M_PI/2);
-    correction_factor = -0.5 + 1.5 * correction_factor;
-    correction_factor = clamp(correction_factor, 0, 1);
-
-    if(angle < 0)
-        correction_factor = 0;
-
-    if(!roll_correction_)
-        correction_factor = 0;
-
-    AngleAxis<float> roll_correction(correction_factor*-roll, Vector3f::UnitZ());
-    rotation_future_ = roll_correction * rotation_future_;
-    rotation_future_.normalize();
+    if(roll_correction_){
+        rotation_future_ = rollcorrect(rotation_future_);
+    }
 
     emit modified();
 }

@@ -3,6 +3,7 @@
 
 #include <set>
 #include <boost/weak_ptr.hpp>
+#include <QTimer>
 #include "pluginsystem/iplugin.h"
 class QAction;
 class QWidget;
@@ -55,6 +56,7 @@ class Accuracy : public IPlugin {
     QAction * fscore_action_;
 
     std::vector<boost::weak_ptr<Layer> >  target_;
+    QTimer timer_;
 };
 
 #endif  // ACCURACY_H

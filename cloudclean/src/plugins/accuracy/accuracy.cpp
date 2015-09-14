@@ -124,6 +124,10 @@ void Accuracy::initialize(Core *core){
 
     connect(fscore_action_, SIGNAL(triggered()), this, SLOT(accuracy()));
 
+    connect(&timer_, &QTimer::timeout, this, &Accuracy::accuracy);
+    timer_.setInterval(1000);
+    timer_.start();
+
     layout->addStretch();
 }
 

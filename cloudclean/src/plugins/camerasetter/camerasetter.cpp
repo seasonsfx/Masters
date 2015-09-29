@@ -94,11 +94,11 @@ void CameraSetter::initialize(Core *core){
 
     QLineEdit * elapsed_time_text = new QLineEdit();
     QTextEdit * target_text_area = new QTextEdit();
-    target_text_area->setText("0, 0, 0");
+    target_text_area->setText("0 0 0");
     QPushButton * start_button = new QPushButton("Restart");
 
-    connect(camera_state_text, &QTextEdit::textChanged, [this, camera_state_text](){
-        QString str = camera_state_text->toPlainText();
+    connect(target_text_area, &QTextEdit::textChanged, [this, target_text_area](){
+        QString str = target_text_area->toPlainText();
 
         QStringList sl = str.split(QRegExp("\\s+"), QString::SkipEmptyParts);
         if(sl.size() != 3){
@@ -110,7 +110,7 @@ void CameraSetter::initialize(Core *core){
         double px, py, pz;
 
         stream >> px >> py >> pz;
-        target_ = Eigen::Vector3f(pz, py, pz);
+        target_ = Eigen::Vector3f(px, py, pz);
     });
 
 
@@ -122,13 +122,21 @@ void CameraSetter::initialize(Core *core){
         }
 
 
-        Eigen::Vector3f zvector = glwidget_->camera_.getRotation() * Eigen::Vector3f::UnitZ();
-        float rads = acos(zvector.dot(Eigen::Vector3f::UnitZ()));
+        Eigen::Vector3f lookat = glwidget_->camera_.getRotation() * -Eigen::Vector3f::UnitZ();
+        Eigen::Vector3f look_proj = lookat;
+        look_proj[1] = 0;
+        look_proj.normalize();
+        float rads = acos(lookat.dot(look_proj));
         qDebug() << "rads" << rads;
 
+
         Eigen::Vector3f pos = glwidget_->camera_.getPosition();
+
+        std::cout << "target: " << target_.transpose() << std::endl;
+        std::cout << "pos: " << pos.transpose() << std::endl;
+
         float dist = (pos - target_).norm();
-        if(dist < 2 && fabs(rads - 1.57079) < 0.2 ){
+        if(dist < 2 && fabs(rads) < 0.2 ){
             seconds_ = time_.elapsed()/1000;
             running_ = false;
 

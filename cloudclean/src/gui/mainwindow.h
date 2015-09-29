@@ -79,6 +79,10 @@ class GUI_API MainWindow : public QMainWindow {
    uint8_t select_mask_;
    bool deselect_;
    bool edit_mode_;
+
+   CloudListView * clv_;
+   LayerListView * llv_;
+
  protected:
    void closeEvent(QCloseEvent *event);
 
@@ -86,8 +90,7 @@ class GUI_API MainWindow : public QMainWindow {
     QStatusBar * statusbar_;
     QProgressBar *progressbar_;
     QTabWidget * tabs_;
-    CloudListView * clv_;
-    LayerListView * llv_;
+
     GLData * gld_;
     CloudList * cl_;
     LayerList * ll_;

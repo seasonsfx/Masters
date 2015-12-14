@@ -44,6 +44,7 @@ class MODEL_API LayerList : public QAbstractListModel {
 
     int getLayerIdxByName(QString name);
 
+    void reset();
 
  signals:
     void layerUpdate(boost::shared_ptr<Layer> layer);

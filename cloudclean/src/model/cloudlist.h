@@ -25,6 +25,7 @@ class MODEL_API CloudList : public QAbstractListModel {
     boost::shared_ptr<PointCloud> addCloud(const char* filename);
     boost::shared_ptr<PointCloud> addCloud(boost::shared_ptr<PointCloud> pc);
     void removeCloud(int idx);
+    void reset();
     
  signals:
     void cloudUpdate(boost::shared_ptr<PointCloud> pc);

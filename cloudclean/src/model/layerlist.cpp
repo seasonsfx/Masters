@@ -280,3 +280,15 @@ void LayerList::selectionChanged(const std::vector<int> &selection) {
     emit changedSelection(selection_);
     emit lookupTableUpdate();
 }
+
+void LayerList::reset(){
+    beginResetModel();
+    selection_.clear();
+    emit changedSelection(selection_);
+    emit lookupTableUpdate();
+
+    layer_id_map_.clear();
+    layers_.clear();
+    last_label_ = 0;
+    endResetModel();
+}

@@ -140,6 +140,18 @@ MainWindow::MainWindow(QUndoStack *us, CloudList * cl, LayerList * ll, QWidget *
     file_menu_->addAction(load);
     //file_menu_->addAction(save);
 
+    QAction * reset = new QAction(tr("Reset"), this);
+    connect(reset, &QAction::triggered, [this](){
+        ll_->reset();
+        gld_->reloadColorLookupBuffer();
+        for(boost::shared_ptr<PointCloud> cloud : cl_->clouds_) {
+            gld_->deleteCloud(cloud);
+        }
+        cl_->reset();
+    });
+
+    file_menu_->addAction(reset);
+
     QAction * exitAct = new QAction(tr("E&xit"), this);
     exitAct->setShortcuts(QKeySequence::Quit);
     exitAct->setStatusTip(tr("Exit the application"));

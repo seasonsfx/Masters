@@ -361,7 +361,7 @@ void MainWindow::loadFile(){
 
     QString path = settings.value("load/lastlocation", QDir::home().absolutePath()).toString();
     QString filename = QFileDialog::getOpenFileName(
-                 this, tr("Open Scan"), path , tr("PTX Files (*.ptx)"));
+                 this, tr("Open Scan"), path , tr("PTX Files (*.ptx)"), 0, QFileDialog::DontUseNativeDialog);
     if (filename.length() == 0)
         return;
 
@@ -372,7 +372,7 @@ void MainWindow::loadFile(){
 
 void MainWindow::saveLayer(){
     QString filename = QFileDialog::getSaveFileName(
-                this, tr("Save layer as PTX"), QDir::home().absolutePath(), tr("PTX Files (*.ptx)"));
+                this, tr("Save layer as PTX"), QDir::home().absolutePath(), tr("PTX Files (*.ptx)"), 0, QFileDialog::DontUseNativeDialog);
     if (filename.length() == 0)
         return;
 

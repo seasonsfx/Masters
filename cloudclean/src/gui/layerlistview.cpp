@@ -272,7 +272,7 @@ void LayerListView::contextMenu(const QPoint &pos) {
 
         connect(&save_layer, &QAction::triggered, [&] () {
                 QString filename = QFileDialog::getSaveFileName(
-                            nullptr, tr("Save layer as PTX"), QDir::home().absolutePath(), tr("PTX Files (*.ptx)"));
+                            nullptr, tr("Save layer as PTX"), QDir::home().absolutePath(), tr("PTX Files (*.ptx)"), 0, QFileDialog::DontUseNativeDialog);
                 if (filename.length() == 0)
                     return;
 

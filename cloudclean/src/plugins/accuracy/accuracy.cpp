@@ -73,6 +73,7 @@ void Accuracy::initialize(Core *core){
 
     dock_layout->addWidget(new QLabel("File:"));
     filename_text_ = new QLineEdit();
+    filename_text_->setPlaceholderText("CSV to append results to.");
     dock_layout->addWidget(filename_text_);
 
     connect(target_accuracy_input_, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), [=] (double value){
@@ -135,6 +136,7 @@ void Accuracy::initialize(Core *core){
     QPushButton * reset_button = new QPushButton("Reset");
 
     test_key_text_ = new QLineEdit();
+    test_key_text_->setPlaceholderText("Test label (for inside CSV)");
 
     QPushButton * save_button = new QPushButton("Save result");
 
@@ -161,22 +163,23 @@ void Accuracy::initialize(Core *core){
 }
 
 void Accuracy::start_stop(){
-    if(started_){
+    if(!started_){
         time_accuracy_precision_recall_.clear();
         time_.restart();
         timer_.start();
         start_button_->setText("Stop");
+        started_ = true;
     } else {
         timer_.stop();
         start_button_->setText("Start");
+        started_ = false;
     }
-
-    started_ = !started_;
 }
 
 void Accuracy::reset(){
     timer_.stop();
     time_accuracy_precision_recall_.clear();
+    started_ = false;
 }
 
 void Accuracy::save(){

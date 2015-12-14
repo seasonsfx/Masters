@@ -1,7 +1,152 @@
 %!TEX root = thesis.tex
 \chapter{Evaluation} \label{ch:eval}
 
+In this chapter the performance of roll correction and example based segmentation is evaluated.
+
+\section{Roll correction}
+
+We hypothesise that roll correction reduces disorentation that in turn leads to faster navigation of environments. To test this hypothesis three targets were chosen in a laser scan of a fort environment. Users were then tasked to navigate to these positions from two non upright starting positions. The goal is to navigate to the target position in an upright orientation as quickly as possible.
+
+A plugin was created to set up a starting position and orientation, as well as determine how long it takes a user to reach the right orientation and target position.
+
+[image here of targets, starting position and plugin]
+
+Users were tasked to nagivate to each location with roll correction on and off. Each condition was repeared twice per location so learning effects could be counterbalanced. The order of the tasks was either be abba or baab where a designates roll correction being on and b designates roll correction being turned off. Reduce learning effects users were primed via 2 test runs under each condition.
+
+The locations were mixed together to minimise learning effects.
+
+Users were sampled from the general university population. Users had varying degrees of experience with computers. As users act as their own baselines the variation in skill level is not a concern. To test whether roll correction improves navigation speed a one tailed repeated measures t-test is used.
+
+Prime on CccC
+Group A aBAbAbaB
+Group B bABaBabA
+
+\section{Depth sensitivity of brush tool}
+
+Segemnt heinz with depth sensitivity
+Segment heinz without depth senistivity
+
+Group A: AbbA
+Group B: bAAb
+
+\section{Example based segmentation}
+
+As discussed earlier, the effectiveness of example based segmentation is based on whether the a user can perform a segmentation task in less time with the help of the segmentation method than without it. With this in mind a segmentation task was created in which a user was tasked to reproduce a ground truth segmentation within a predetermined accuracy level (f-score).
+
+A repeated measures design was used. Users were asked to reproduce a segmentation using basic segmentation tools (lasso, brush, plane selection). In the first condition the user was asked to reproduce a segmentation from scratch. In the second condition the user was presented with a pre-existing segmentation as a starting point. The pre-existing segmentation was the result of example based segmentation. (provide pictures of the pre-existing segmentation)
+
+Three different segmentations were used. In the first scene the target is a tree that is growing over a house. The second scene a spade, wheelbarrow, and some pots has to be isolated. In the third scene a person has to be removed.
+
+To reduce learning effects the user is primed by via three segmentation tasks in which the 3 basic tools tool are introduced. Order effects are reduced by counterbalancing the order in which the task two condition are presented for each task.
+
+A plugin was created present the user with the current accuracy every second for the set segmentation target. It also records accuracy over time.
+
+Results are compared via a repeated measure one tailed ttest. The time taken to produce the presegmentation is added to the result of the condition where the user started with it. This accounts for the approximate time the user whould have taken if he or she use the tool him or herself. The pre-segmentation however lets us remove a source of variance.
+
+Use lasso to segment heinz for 1min
+Use wall tool to segment wall for 1min
+
+Segment tree from wall
+Segement objects of the ground
+
+Group A: AaaABbbB
+Group B: BbbBAaaB
+
+
+\section{Noise filtering}
+
+Show how the radius factor thinggie helps
+
+\section{Test the different paremeters in the tree}
+
+
 \section{Testing goals}
+
+Do proper priming
+Undo & redo
+Selections, deselections
+How to navigate, wasd qe
+
+Don't have the green selection be present on the preselection tests
+
+
+!!!!!!!!!!!!!!!!!!
+Next, set up the spreadsheet to record results, users should be assigned to group 1 or 2 which have different counterbalance profiles.
+
+The proceedures should also be outlined so that its clear that in instructions where given in the same way. Use a psych textbook or something to write this up in the correct structure.
+
+Address:
+proceedure constant
+fatugue - short tasks
+mention pilot study
+CHECK TTEST ASSUMPTIONS!
+
+!!!!!!!!!!!!!
+
+
+test if the roll correction helps
+test if the automated segmentation helps
+
+
+explicit research question
+express assumptions in operational definitions of terms
+
+test whether roll correction is better than ordinary navigation
+(btw how did we determine the roll correction factor)
+
+what population do we want to generalise?
+all people?
+
+sampling bias?
+
+need to eliminate meaurement error - repeated measures
+learning effects - prime the user so the difference does not reflect a learning effect, (latin square) randomise order, keep experiment short to limit learning
+fatigue - keep experiment short
+
+because the effect is likely to vary between people, we need multiple people to make sure the effect is consistent?
+
+
+number of needed participants is determined by error size / variance
+
+we could get one sample of experts, or measure relative speed up?
+
+between-participants design. In such a design, each person sees one—
+and only one
+
+control for order effects
+
+not between participants because we would need a large sample to reduce error, or get a very homogenous sample
+
+yes, latin square
+
+An
+experiment where each participant sees every condition (i.e., every level of ev-
+ery factor) is, naturally enough, referred to as a within-participant design
+
+
+2.2 The Elements of an Experiment
+
+check that a all the assumptions for the t-test etc is true
+
+
+For example, we can and do get better at pointing.
+Most evidence suggests, however, that B (x) will remain constant (or nearly so) for short periods of time. (2.1.3)
+
+Since the effects in most perception experiments are rather
+large, a very rough estimate of e w is sufficient to be able to get a decent idea of
+B (x). Thus, five to twenty repetitions are usually sufficient. Fewer than five rep-
+etitions do not usually provide enough information to define e w . Using more
+than twenty repetitions in a short period of time without specific precautions is likely to lead to fatigue, overlearning, or other masking effects (for more on
+what those precautions are, please refer to a text on advanced experimental de-
+sign such as Falmagne, 1985; Gescheider, 1997; Maxwell and Delaney, 1990).(2.1.3)
+
+It should be men-
+tioned that there are methods for determining the number of repetitions that
+one needs, and some of these methods are discussed in Chapter 12. The use of
+multiple measurements or repetitions of a given situation in an experiment is
+called a repeated measures design.
+
+2.1.6 Change versus Transformation
 
 \begin{itemize}
 \item User testing feedback on tools

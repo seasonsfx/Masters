@@ -69,7 +69,7 @@ void Brush3D::initialize(Core *core){
 
     QSlider * slider = new QSlider(settings_);
     slider->setOrientation(Qt::Horizontal);
-    slider->setRange(1, 300);
+    slider->setRange(1, 60);
     slider->setSingleStep(1);
     slider->setToolTip("Radius in cm");
     slider->setValue(radius_*100);

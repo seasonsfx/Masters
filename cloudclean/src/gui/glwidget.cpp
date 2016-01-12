@@ -373,6 +373,7 @@ void GLWidget::keyPressEvent(QKeyEvent * event) {
         return;
    case Qt::Key_C:
         camera_.toggleRollCorrection();
+        emit rollCorrectionToggle(camera_.roll_correction());
         return;
 
     //

@@ -167,3 +167,12 @@ bool CloudList::saveFile(QString filename, std::vector<uint16_t> labels) {
     emit progressUpdate(0);
     return true;
 }
+
+void CloudList::reset(){
+    beginResetModel();
+    selection_.clear();
+    emit changedSelection(selection_);
+    clouds_.clear();
+    active_ = nullptr;
+    endResetModel();
+}

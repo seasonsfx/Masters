@@ -96,7 +96,7 @@ void Project::save(){
     QString path = settings.value("load/lastlocation", QDir::home().absolutePath()).toString();
 
     QString filename = QFileDialog::getSaveFileName(
-                 mw_, tr("Save project"), path, tr("Cloud clean project files (*.ccp)"));
+                 mw_, tr("Save project"), path, tr("Cloud clean project files (*.ccp)"), 0, QFileDialog::DontUseNativeDialog);
     if (filename.length() == 0)
         return;
 
@@ -205,21 +205,25 @@ void Project::load(QString filename){
 
         QChar sep = QDir::separator();
         QString name = fi.fileName();
-        QStringList l = hint.split(sep);
+        QStringList pathlist = hint.split(sep);
 
-        qDebug() << l;
+        qDebug() << pathlist;
 
-        for(int i = l.size(); i > 0; i--){
+        for(int i = pathlist.size(); i > 0; i--){
             QStringList c;
             for(int j = 0; j < i; j++){
-                c << l[j];
+                c << pathlist[j];
             }
             QString candidate_dir = c.join(sep).trimmed();
             c << name;
             QString candidate_path = c.join(sep).trimmed();
             QFileInfo fi(candidate_path);
+            exists = QFile(candidate_path).exists();
 
-            qDebug() << "candidate: |" << candidate_path.toLocal8Bit().data() << '|' <<exists;
+            qDebug() << "candidate: |" << candidate_path.toLocal8Bit().data() << '|' << exists;
+
+            if(fi.exists())
+                return candidate_path;
 
             // attempt other names
             QStringList sl = QDir(candidate_dir).entryList();
@@ -230,8 +234,7 @@ void Project::load(QString filename){
                 }
             }
 
-            if(fi.exists())
-                return candidate_path;
+
         }
 
         return QString("");
@@ -316,7 +319,7 @@ void Project::load(){
     QString path = settings.value("load/lastlocation", QDir::home().absolutePath()).toString();
 
     QString filename = QFileDialog::getOpenFileName(
-                 mw_, tr("Open project"), path, tr("Cloud clean project files (*.ccp)"));
+                 mw_, tr("Open project"), path, tr("Cloud clean project files (*.ccp)"), 0, QFileDialog::DontUseNativeDialog);
     if (filename.length() == 0)
         return;
 

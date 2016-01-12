@@ -56,6 +56,7 @@ void Lasso3D::initialize(Core *core){
     mw_->tooloptions_->addWidget(settings_);
 
     lasso_ = new Lasso();
+
 }
 
 void Lasso3D::cleanup(){
@@ -82,6 +83,15 @@ bool Lasso3D::is3d(){
 
 bool Lasso3D::mouseClickEvent(QMouseEvent * event){
     lasso_->addScreenPoint(event->x(), event->y(), core_->mw_->glwidget_->width(), core_->mw_->glwidget_->height());
+
+    // Test code
+    if(lasso_->getPolygon().size() == 2){
+        timer_.restart();
+        timer_.start();
+    }
+
+    action_count_++;
+
     return true;
 }
 
@@ -90,6 +100,15 @@ bool Lasso3D::mouseDblClickEvent(QMouseEvent *){
         disable();
         return false;
     }
+
+
+    // Test code
+    if(action_count_ > 2){
+        invocations_++;
+        action_count_--; // Extra click removed
+        seconds_ += float(timer_.elapsed())/1000;
+    }
+
 
 
     auto cloud = cl_->active_;
@@ -167,6 +186,12 @@ void Lasso3D::enable() {
         disable();
         return;
     }
+
+    // Test code
+    invocations_ = 0;
+    action_count_ = 0;
+    seconds_ = 0;
+
 //    QTabWidget * tabs = qobject_cast<QTabWidget *>(glwidget_->parent()->parent());
 //    tabs->setCurrentWidget(glwidget_);
     enable_->setChecked(true);
@@ -192,6 +217,17 @@ void Lasso3D::enable() {
 }
 
 void Lasso3D::disable() {
+
+    // Test code
+    QFile file("lasso.txt");
+    if ( file.open(QIODevice::Append) ) {
+        QTextStream stream( &file );
+        stream << invocations_ << ", " << action_count_ << ", " << seconds_ << ", " <<  seconds_/action_count_ << "\n";
+    }
+    file.flush();
+    file.close();
+
+
     enable_->setChecked(false);
     disconnect(core_, SIGNAL(endEdit()), this, SLOT(disable()));
     disconnect(glwidget_, SIGNAL(pluginPaint(Eigen::Affine3f, Eigen::Affine3f)),

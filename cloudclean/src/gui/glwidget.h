@@ -53,6 +53,7 @@ protected:
 
  signals:
    void pluginPaint(const Eigen::Affine3f& proj, const Eigen::Affine3f& mv);
+   void rollCorrectionToggle(bool on);
 
  private slots:
   void contextMenu(const QPoint &pos);

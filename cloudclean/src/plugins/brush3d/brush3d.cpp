@@ -69,7 +69,7 @@ void Brush3D::initialize(Core *core){
 
     QSlider * slider = new QSlider(settings_);
     slider->setOrientation(Qt::Horizontal);
-    slider->setRange(1, 300);
+    slider->setRange(1, 60);
     slider->setSingleStep(1);
     slider->setToolTip("Radius in cm");
     slider->setValue(radius_*100);
@@ -168,10 +168,6 @@ float getZ(Eigen::Vector3f p, Eigen::Affine3f mv, Eigen::Affine3f proj, int w, i
         proj1,
         viewport,
         &wx, &wy, &wz);
-
-//                                Eigen::Vector4f e = (t2*t).matrix() * q.getVector4fMap();
-//                                e[3] = 1;
-//                                wz = e.z()/e.w();
 
     return wz;
 }

@@ -140,6 +140,18 @@ MainWindow::MainWindow(QUndoStack *us, CloudList * cl, LayerList * ll, QWidget *
     file_menu_->addAction(load);
     //file_menu_->addAction(save);
 
+    QAction * reset = new QAction(tr("Reset"), this);
+    connect(reset, &QAction::triggered, [this](){
+        ll_->reset();
+        gld_->reloadColorLookupBuffer();
+        for(boost::shared_ptr<PointCloud> cloud : cl_->clouds_) {
+            gld_->deleteCloud(cloud);
+        }
+        cl_->reset();
+    });
+
+    file_menu_->addAction(reset);
+
     QAction * exitAct = new QAction(tr("E&xit"), this);
     exitAct->setShortcuts(QKeySequence::Quit);
     exitAct->setStatusTip(tr("Exit the application"));
@@ -158,6 +170,14 @@ MainWindow::MainWindow(QUndoStack *us, CloudList * cl, LayerList * ll, QWidget *
     // SIGNALS
     qRegisterMetaType<boost::shared_ptr<PointCloud> >("boost::shared_ptr<PointCloud>");
     qRegisterMetaType<boost::shared_ptr<Layer> >("boost::shared_ptr<Layer>");
+
+    connect(glwidget_, &GLWidget::rollCorrectionToggle, [this](bool on){
+        if(on){
+            statusbar_->showMessage("Roll correction on", 5000);
+        } else {
+            statusbar_->showMessage("Roll correction off", 5000);
+        }
+    });
 
     connect(gld_, &GLData::update, glwidget_, (void (GLWidget:: *)(void)) &GLWidget::update);
     connect(gld_, &GLData::update, flatview_, (void (FlatView:: *)(void)) &FlatView::update);
@@ -353,7 +373,7 @@ void MainWindow::loadFile(){
 
     QString path = settings.value("load/lastlocation", QDir::home().absolutePath()).toString();
     QString filename = QFileDialog::getOpenFileName(
-                 this, tr("Open Scan"), path , tr("PTX Files (*.ptx)"));
+                 this, tr("Open Scan"), path , tr("PTX Files (*.ptx)"), 0, QFileDialog::DontUseNativeDialog);
     if (filename.length() == 0)
         return;
 
@@ -364,7 +384,7 @@ void MainWindow::loadFile(){
 
 void MainWindow::saveLayer(){
     QString filename = QFileDialog::getSaveFileName(
-                this, tr("Save layer as PTX"), QDir::home().absolutePath(), tr("PTX Files (*.ptx)"));
+                this, tr("Save layer as PTX"), QDir::home().absolutePath(), tr("PTX Files (*.ptx)"), 0, QFileDialog::DontUseNativeDialog);
     if (filename.length() == 0)
         return;
 

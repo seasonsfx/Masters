@@ -1,0 +1,158 @@
+ui
+
+2d vs 3d, is one better than other?
+ 	qualitative
+ 	near vs far?
+ 	just cite away
+
+does the depth sensitive brush tool provide a speed up?
+ 	time users doing segmentation
+ 	do quick user test segment things
+ 
+does the plane tool provide speedup?
+ 	ask user to segment a target
+ 	do quick user test segment things
+
+does the auto plane segment tool provide speed up?
+	Too general, what if we isolate the region?
+
+is the roll correction useful
+	research on evaluation
+	how to speed up navigtion in 3d scenes
+	user friendly camera movement
+
+
+sample size low and variance low, that is a good indicator
+
+radius filter
+	clear
+
+
+Find wall
+Find noisey wall
+
+------------------------------------
+
+
+Test data
+	need things to segment
+
+	things & manifestations
+
+	wall, tree, ground, free starning object
+
+
+Things to clean
+	Objects
+		isolated, embedded
+		noisey, clearcut
+		walls, trees, free standing objects
+	Noise
+
+
+Critical to user test:
+	Reference segmentations
+	Plugin to constantly provide accuracy info
+	Tool to save camera position and orientation
+
+
+
+Test brush tool:
+	brush tool is good for embedded objects
+	better than the lasso tool
+	lasso tool selects the background
+
+	Show that the depth correction makes segmentation faster
+		segment wheel barrow in 2d
+			with depth correct
+			without depth correct
+
+		segment heinz in 2d and 3d
+			with depth correct
+			without depth correct
+
+	Show cases where it breaks down
+
+
+Test plane tool:
+	plane tool is good for quickly selecting planes
+
+		Ask user to segment the wall at the demenja scene
+			lasso
+			brush
+			plane select
+		Ask user to segment the wall on my default scene
+			lasso
+			brush
+			plane select
+
+		possible to use all?
+
+
+Test random forest tool:
+	how that tool is useful to disabiguate thing
+
+	open the deminja scan
+		disambiguate the tree and house
+	open the defaul scan
+		disambiguate the wall from the tree
+
+
+Test roll correction:
+	show that roll correction supports quicker navigation as it avoids disorientation
+
+		Open the deminja scene
+			create disorientating position
+			ask the user to navigate to the to the steps where the two people are
+
+			ask on lickert scale if you felt less disorientated
+
+
+		test if camera is in radius plugin
+		mark target?
+
+
+
+Mention time contraints
+	Say how the automated tool could help
+	Show how
+	
+
+
+Test user simulation:
+	user needs to meet some accuracy
+	count the number of vertices
+	count the number of lasso invocations 
+	time how long it takes to create a lasso
+
+	segment heinz
+	segment the tree thats easy to get from below
+	segment wall
+
+	dimensions: how complex the shape is
+				how embedded its
+
+
+2D vs 3D view
+	ask users if 2d or 3d view makes more sense
+	when is which one beneficial
+
+Manual tests:
+	Test global plane select tool:
+		user testing would take to long
+		inconclusive results are sure
+		would be good for scenes with many planar surfaces
+
+
+	Noise filter
+		Cleans up systematic noise
+		Not special
+		Deals with non uniform density
+
+	Get noisy scene
+		filter with depth correction
+		filter without depth correction
+
+		find good case, average case, bad case
+
+

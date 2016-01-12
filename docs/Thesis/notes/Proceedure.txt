@@ -1,0 +1,131 @@
+goals
+	Compare tools in terms of speed
+	Compare 2d vs 3d
+		ask user which is best
+	See if roll correction helps
+		time user an ask user
+
+	Take into account learning effects
+		randomise order?
+
+Todo:
+	hide useless tools
+	snake
+	compare
+	global flood
+	...
+
+Proceedure, open 3 windows to save time
+	
+	Open /home/rickert/testdata/tes/4.ccp
+
+		Start with roll correction off
+		Let the user explore
+		Show him or her the dots
+
+
+		Familiarise
+			explain undo
+			explain how to activate tool
+			selections & deselection
+			press f1 for accuracy
+			hiding layers
+
+
+		Check that the camera is level
+		
+
+
+
+		Navigate from 3 different positions to target
+
+		Navigate to fort stairs purple dot
+
+	Camera: -49.8897 3.16079 -27.7327 
+ -0.619427 0.780004 0.0792979 0.0402049c
+
+	Pos: 12.1286 2.85192 -1.06628
+
+
+		Navigate to the cars green dot
+
+		Pos: -9.30199 6.48174 -21.1006 
+		Camera: 82.845 7.28544 11.4591 
+ 0.581243 0.806937 -0.0158002 0.10373
+
+
+		Navigate to the palm tree with the red dot
+		Pos: 50.0815 8.53228 -2.88214 
+		Camera: -16.1394 -3.40856 11.9336 
+ 0.971071 -0.237642 0.00251629 0.0232399
+
+
+
+
+	Open  /home/rickert/testdata/scans/tes/1.ccp
+
+		Time users to 98% accuracy, why?
+		Show picture
+
+		In 2d view:
+			Segment heinz with lasso tool (count lasso actions)
+			Segmemt heinz with brush tool
+			Select heinz with depth sensitve brush tool
+
+		In 3d view: ask user to comment on tools
+			Segment wall with lasso
+			Segment wall with brush
+			Segment wall with plane select
+
+			Segment tree with lasso
+			Segment tree with brush
+			
+
+		Now use any tool that you want to segment tree
+			Note down tools
+
+		Many examples, sometimes it helps
+
+
+	Open  /home/rickert/testdata/scans/tes/2.ccp
+		Segment with brush depth sensitive
+		Segment with lasso
+
+
+	Open  /home/rickert/testdata/scans/tes/3.ccp
+		Segment far wall lasso
+		Segment far wall with brush
+		Segment with wall tool
+		Use random forest tool with isolated tree and walls
+
+
+	Open 6:
+		select tools to 98%
+
+	open 8:
+		Segment tree from wall
+
+	open 10:
+		Segmeny tree from wall
+
+	Open 
+
+	Ask about 2d and 3d? Illustrate this
+
+
+
+
+Noise in the sky is easy to remove in 2d
+Noise in the sky is really hard in 3d
+
+--------------------
+
+Sunrise says
+	Red makes it easier
+	Dont event need to be orientated
+	Sparseness makes it bad to orientate
+	Roll correction definitely makes it easier, but the sparseness is more problematic
+
+
+40.3675 7.46927 6.75472 
+ -0.0835597 0.451762 -0.0758349 -0.884973

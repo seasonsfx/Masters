@@ -47,7 +47,7 @@
 			"file": "chapters/05-evaluation.tex",
 			"settings":
 			{
-				"buffer_size": 256,
+				"buffer_size": 7188,
 				"line_ending": "Unix"
 			}
 		},
@@ -188,16 +188,24 @@
 	"build_varint": "",
 	"command_palette":
 	{
-		"height": 392.0,
-		"last_filter": "",
+		"height": 484.0,
+		"last_filter": "insta",
 		"selected_items":
 		[
 			[
-				"inst",
+				"insta",
 				"Package Control: Install Package"
 			],
 			[
-				"insta",
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"remove",
+				"Package Control: Remove Package"
+			],
+			[
+				"inst",
 				"Package Control: Install Package"
 			],
 			[
@@ -241,19 +249,15 @@
 				"Package Control: Install Package"
 			],
 			[
-				"remove",
-				"Package Control: Remove Package"
-			],
-			[
 				"instal",
 				"Package Control: Install Package"
 			]
 		],
-		"width": 530.0
+		"width": 675.0
 	},
 	"console":
 	{
-		"height": 139.0,
+		"height": 317.0,
 		"history":
 		[
 			"print(\"hello \" * 8)",
@@ -440,7 +444,7 @@
 						],
 						"settings":
 						{
-							"syntax": "Packages/LaTeXing/support/LaTeX.tmLanguage",
+							"syntax": "Packages/Text/Plain text.tmLanguage",
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
@@ -464,8 +468,8 @@
 						"selection":
 						[
 							[
-								1126,
-								1126
+								135,
+								135
 							]
 						],
 						"settings":
@@ -487,7 +491,7 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 256,
+						"buffer_size": 7188,
 						"regions":
 						{
 						},
@@ -500,7 +504,7 @@
 						],
 						"settings":
 						{
-							"syntax": "Packages/LaTeXing/support/LaTeX.tmLanguage"
+							"syntax": "Packages/Text/Plain text.tmLanguage"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
@@ -529,7 +533,7 @@
 						"settings":
 						{
 							"spell_check": true,
-							"syntax": "Packages/LaTeXing/support/LaTeX.tmLanguage",
+							"syntax": "Packages/Text/Plain text.tmLanguage",
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
@@ -559,7 +563,7 @@
 						"settings":
 						{
 							"history_list_is_closing": true,
-							"syntax": "Packages/LaTeXing/support/LaTeX.tmLanguage"
+							"syntax": "Packages/Text/Plain text.tmLanguage"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
@@ -617,7 +621,7 @@
 						],
 						"settings":
 						{
-							"syntax": "Packages/LaTeXing/support/LaTeX.tmLanguage"
+							"syntax": "Packages/Text/Plain text.tmLanguage"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
@@ -645,7 +649,7 @@
 						],
 						"settings":
 						{
-							"syntax": "Packages/LaTeXing/support/LaTeX.tmLanguage",
+							"syntax": "Packages/Text/Plain text.tmLanguage",
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
@@ -738,7 +742,7 @@
 						],
 						"settings":
 						{
-							"syntax": "Packages/LaTeXing/support/LaTeX.tmLanguage"
+							"syntax": "Packages/Text/Plain text.tmLanguage"
 						},
 						"translation.x": 0.0,
 						"translation.y": 906.0,
@@ -930,12 +934,12 @@
 	},
 	"select_project":
 	{
-		"height": 0.0,
+		"height": 750.0,
 		"last_filter": "",
 		"selected_items":
 		[
 		],
-		"width": 0.0
+		"width": 570.0
 	},
 	"select_symbol":
 	{

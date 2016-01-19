@@ -143,9 +143,9 @@ void Flood::initialize2(PluginManager * pm) {
     //connect(global_flood_, &QAction::triggered, this, &Flood::global_flood);
     //mw_->toolbar_->addAction(global_flood_);
 
-    global_flood2_ = new QAction(QIcon(":/images/flood2.png"), "Global floodfill 2", 0);
-    connect(global_flood2_, &QAction::triggered, this, &Flood::global_flood2);
-    mw_->toolbar_->addAction(global_flood2_);
+//    global_flood2_ = new QAction(QIcon(":/images/flood2.png"), "Global floodfill 2", 0);
+//    connect(global_flood2_, &QAction::triggered, this, &Flood::global_flood2);
+//    mw_->toolbar_->addAction(global_flood2_);
 
 }
 

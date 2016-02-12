@@ -307,3 +307,7 @@ void Camera::birds_eye() {
 void Camera::toggleRollCorrection(){
     roll_correction_ = !roll_correction_;
 }
+
+void Camera::toggleRollCorrection(bool on){
+    roll_correction_ = on;
+}

@@ -317,7 +317,7 @@ foreach(component ${PCL_TO_FIND_COMPONENTS})
     HINTS ${PCL_DIR} "$ENV{PROGRAMFILES}/PCL" "$ENV{PROGRAMW6432}/PCL" 
     ${${PC_PCL_COMPONENT}_LIBDIR} ${${PC_PCL_COMPONENT}_LIBRARY_DIRS}
     "${PCL_ROOT}" "$ENV{PCL_ROOT}"
-    PATH_SUFFIXES lib bin
+    PATH_SUFFIXES lib bin lib/x86_64-linux-gnu
     DOC "path to ${pcl_component} library")
   get_filename_component(${component}_library_path 
     ${${PCL_COMPONENT_LIBRARY}}
@@ -328,7 +328,7 @@ foreach(component ${PCL_TO_FIND_COMPONENTS})
     "$ENV{PROGRAMFILES}/PCL" "$ENV{PROGRAMW6432}/PCL"
     ${${PC_PCL_COMPONENT}_LIBDIR} ${${PC_PCL_COMPONENT}_LIBRARY_DIRS}
     "${PCL_ROOT}" "$ENV{PCL_ROOT}"
-    PATH_SUFFIXES lib bin
+    PATH_SUFFIXES lib bin lib/x86_64-linux-gnu
     DOC "path to ${pcl_component} library debug")
   # if only release found let release be debug too
   # NOTE: this is only for non Makefile sake

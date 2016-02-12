@@ -118,6 +118,7 @@ class GUI_API Camera : public QObject {
  public slots:
     void birds_eye();
     void toggleRollCorrection();
+    void toggleRollCorrection(bool on);
 
  signals:
     void updated();

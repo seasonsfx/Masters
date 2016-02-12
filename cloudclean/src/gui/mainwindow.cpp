@@ -167,16 +167,23 @@ MainWindow::MainWindow(QUndoStack *us, CloudList * cl, LayerList * ll, QWidget *
     window_menu_->addAction(llv_->toggleViewAction());
     window_menu_->addAction(options_dock_->toggleViewAction());
 
+    QAction * roll_correction_action = new QAction(tr("Toggle roll correction"), this);
+    roll_correction_action->setCheckable(true);
+    roll_correction_action->setChecked(true);
+
+    view_menu_->addAction(roll_correction_action);
+
     // SIGNALS
     qRegisterMetaType<boost::shared_ptr<PointCloud> >("boost::shared_ptr<PointCloud>");
     qRegisterMetaType<boost::shared_ptr<Layer> >("boost::shared_ptr<Layer>");
 
-    connect(glwidget_, &GLWidget::rollCorrectionToggle, [this](bool on){
+    connect(roll_correction_action, &QAction::toggled, [this](bool on){
         if(on){
             statusbar_->showMessage("Roll correction on", 5000);
         } else {
             statusbar_->showMessage("Roll correction off", 5000);
         }
+        glwidget_->camera_.toggleRollCorrection(on);
     });
 
     connect(gld_, &GLData::update, glwidget_, (void (GLWidget:: *)(void)) &GLWidget::update);

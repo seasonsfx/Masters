@@ -13,7 +13,7 @@
 \section{Layers and selections}
 In order to segment a point cloud, one needs to be able to group sets of points. To promote ease of use we decided to adopt a system of selections and layers as is prevalent in many image and point cloud editing programs. Selections are used to temporarily select points and layers are used to manage more than one selection.
 
-While traditional systems only support binary selections, our system supports 8 color selections. This is achieved through a 8 bit mask annotation attached to each point. The reason for eight color selections are two fold. Firstly a byte the smallest attribute that OpenGL lets one attach to a shader. Secondly, its useful to have more than one type of select when labeling point for use in classification algorithms. A larger number of selection colors would consume memory that has no foreseeable use. Managing an arbitrary number of point sets is what we designed layers for.
+While traditional systems only support binary selections, our system supports 8 colour selections. This is achieved through a 8 bit mask annotation attached to each point. The reason for eight colour selections are two fold. Firstly a byte the smallest attribute that OpenGL lets one attach to a shader. Secondly, its useful to have more than one type of select when labelling point for use in classification algorithms. A larger number of selection colours would consume memory that has no foreseeable use. Managing an arbitrary number of point sets is what we designed layers for.
 
 Beyond managing an arbitrary amount of point sets, it was thought useful \todo{This sounds a bit willy nilly...} to support set operations between layers. In this way, the results from different segmentations can be combined. E.g, if one has a crudely selected wall and meticulously segmented tree against the wall, one can remove tree points from the wall by subtracting the tree layer from the wall layer.
 
@@ -21,17 +21,17 @@ In order to support effective manipulation of multiple concurrently loaded point
 
 It was reported by our collaborators that the Cyclone \todo{Need source?} point cloud editing tool used excessive memory when creating many layers. Due to the propriety nature of the software we can only speculate as to the reason. It was however a design goal to make layer creation cheap. 
 
-A naive approach to layer creation would be simply create a vector and fill it with indices corresponding to the points in the set. However this would lead to a linear increase in memory consumption as the number of points in layers grew. This is likely how Cyclone was implemented. It would also lead to $O(n^{2})$ set operations and manging indices from multiple clouds with such a data structure would be difficult.
+A naive approach to layer creation would be simply create a vector and fill it with indices corresponding to the points in the set. However this would lead to a linear increase in memory consumption as the number of points in layers grew. This is likely how Cyclone was implemented. It would also lead to $O(n^{2})$ set operations and managing indices from multiple clouds with such a data structure would be difficult.
 
 Our approach is to add a numerical label to each point in a cloud and then keep a separate data structure that maps a label to its associate layers.
 
 % One can thus determine what layers a point belongs to by looking up its label, then seeing what layers are mapped to that label.
 
-In this scheme, each point initially carries a 0 label that doesn't map to a layer. When the first layer set is created, the points in that set are labeled with 1. An entry is then created associating the new layer with the label 1 (see figure~\ref{fig:layer2}).
+In this scheme, each point initially carries a 0 label that doesn't map to a layer. When the first layer set is created, the points in that set are labelled with 1. An entry is then created associating the new layer with the label 1 (see figure~\ref{fig:layer2}).
 
-When a second layer is created, the points in that layer are labeled with the next available integer label (see figure~\ref{fig:layer3}).
+When a second layer is created, the points in that layer are labelled with the next available integer label (see figure~\ref{fig:layer3}).
 
-If a layer is created that contain points already in another layer, the newly labeled points will simply get the next available label. Overlapping points however need to be relabeled with the next available label. The label associated with with the overlapping points is then assigned to both the old layer and the new layer (see figure~\ref{fig:layer4}).
+If a layer is created that contain points already in another layer, the newly labelled points will simply get the next available label. Overlapping points however need to be relabelled with the next available label. The label associated with with the overlapping points is then assigned to both the old layer and the new layer (see figure~\ref{fig:layer4}).
 
 
 \begin{figure}[ht]

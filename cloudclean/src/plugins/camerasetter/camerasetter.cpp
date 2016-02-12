@@ -96,6 +96,7 @@ void CameraSetter::initialize(Core *core){
     target_ = Eigen::Vector3f(0, 0, 0);
 
     QLineEdit * elapsed_time_text = new QLineEdit();
+    distance_text_ = new QLineEdit();
     QTextEdit * target_text_area = new QTextEdit();
     target_text_area->setText("0 0 0");
     QPushButton * start_button = new QPushButton("Start / Restart");
@@ -120,18 +121,7 @@ void CameraSetter::initialize(Core *core){
     });
 
 
-    // Start when moving the camera
-    connect(&glwidget_->camera_, &Camera::modified, [this, elapsed_time_text](){
-        if(!running_){
-            if(ready_to_start_){
-                time_.restart();
-                running_ = true;
-            } else {
-                return;
-            }
-        }
-
-
+    auto isAtTarget = [this](){
         Eigen::Vector3f lookat = glwidget_->camera_.getRotation() * -Eigen::Vector3f::UnitZ();
         Eigen::Vector3f look_proj = lookat;
         look_proj[1] = 0;
@@ -146,28 +136,53 @@ void CameraSetter::initialize(Core *core){
         std::cout << "pos: " << pos.transpose() << std::endl;
 
         float dist = (pos - target_).norm();
-        if(dist < 2 && fabs(rads) < 0.2 ){
-            seconds_ = time_.elapsed()/1000;
-            running_ = false;
-            ready_to_start_ = false;
-            elapsed_time_text->setStyleSheet("QLineEdit { background: #C2DC5F;}");
+        distance_text_->setText(QString::number(dist));
+//        qDebug() << "dist" << dist;
 
-            qDebug() << "done";
-        } else {
-            qDebug() << "dist" << dist;
+        return dist < 2 && fabs(rads) < 0.2;
+    };
+
+    // Start when moving the camera
+    connect(&glwidget_->camera_, &Camera::modified, [this, isAtTarget, elapsed_time_text](){
+        if(!running_){
+            if(ready_to_start_){
+                time_.restart();
+                running_ = true;
+            } else {
+                return;
+            }
         }
+
+        if(isAtTarget()){
+            elapsed_time_text->setStyleSheet("QLineEdit { background: #C2DC5F;}");
+        } else {
+            elapsed_time_text->setStyleSheet("QLineEdit { background: #FFFFFF;}");
+        }
+
     });
+
 
 
     // Timer code
 
-    timer_.connect(&timer_, &QTimer::timeout, [this, elapsed_time_text] () {
+    timer_.connect(&timer_, &QTimer::timeout, [this, isAtTarget, elapsed_time_text] () {
         if(!running_){
             //elapsed_time_text->setText("0");
         } else {
             seconds_ = time_.elapsed()/1000;
-            elapsed_time_text->setStyleSheet("QLineEdit { background: #FFFFFF;}");
             elapsed_time_text->setText(QString::number(seconds_));
+
+            if(isAtTarget()){
+                if(at_target_){
+                    seconds_ = time_.elapsed()/1000;
+                    running_ = false;
+                    ready_to_start_ = false;
+                    qDebug() << "done";
+                }
+                at_target_ = true;
+            } else {
+                at_target_ = false;
+            }
         }
     });
     timer_.start(1000);
@@ -184,6 +199,8 @@ void CameraSetter::initialize(Core *core){
     layout->addWidget(camera_state_text);
     layout->addWidget(new QLabel("Target"));
     layout->addWidget(target_text_area);
+    layout->addWidget(new QLabel("Distance"));
+    layout->addWidget(distance_text_);
     layout->addWidget(new QLabel("Time"));
     layout->addWidget(elapsed_time_text);
     layout->addWidget(start_button);

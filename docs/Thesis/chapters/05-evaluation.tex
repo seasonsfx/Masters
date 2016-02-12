@@ -5,49 +5,48 @@ In this chapter the performance of roll correction and example based segmentatio
 
 \section{Roll correction}
 
-We hypothesise that roll correction reduces disorentation that in turn leads to faster navigation in virtual 3D environments. To test this hypothesis three targets were chosen in a laser scan of a fort. Users were then tasked to navigate to these positions from two non upright starting positions. The goal is to navigate to the target position in an upright orientation as quickly as possible.
+We hypothesise that roll correction reduces disorientation that in turn leads to faster navigation in virtual 3D environments. To test this, two target positions were chosen in a laser scan of an old fort. Users were tasked to navigate to these positions from two non upright starting positions with roll correction switched on or off. The goal is to navigate to the target position in an upright orientation as quickly as possible.
 
 A plugin was created to set up a starting position and orientation, as well as measure how long it takes a user to reach the right orientation and target position.
 
 [image here of targets, starting position and plugin]
 
-Users were tasked to nagivate to each location with roll correction on and off. Each condition was repeated twice per location so learning effects could be counterbalanced. The order of the tasks was either be abba or baab where a designates roll correction being on and b designates roll correction being turned off. Reduce learning effects users were primed via 2 test runs under each condition.
+As user performance is expected to improve due to learning effects, they were instructed to navigate freely for a two minutes. Users were then further primed for the task with one iteration of a test navigation task.
 
-The locations were mixed together to minimise learning effects.
+To reduce the random error, each task condition was repeated 3 times. The average time for each condition was recorded. The two conditions were interlaced and order was counterbalanced.
 
-Users were sampled from the general university population. Users had varying degrees of experience with computers. As users act as their own baselines the variation in skill level is not a concern. To test whether roll correction improves navigation speed a one tailed repeated measures t-test is used.
+Users were sampled from the general university population. Users had varying degrees of experience with computers. Because users acted as their own baselines the variation in skill level was not a concern. To test whether roll correction improves navigation speed a one tailed repeated measures t-test is used.
 
-Prime on CccC
-Group A aBAbAbaB
-Group B bABaBabA
+Group A: PppPaAAaBbbB
+Group B: pPPpAaaAbBBb
 
 \section{Depth sensitivity of brush tool}
 
-Segemnt heinz with depth sensitivity
-Segment heinz without depth senistivity
+Segment heinz with depth sensitivity
+Segment heinz without depth sensitivity
 
 Group A: AbbA
 Group B: bAAb
 
 \section{Example based segmentation}
 
-As discussed earlier, the effectiveness of example based segmentation is based on whether the a user can perform a segmentation task in less time with the help of the segmentation method than without it. With this in mind a segmentation task was created in which a user was tasked to reproduce a ground truth segmentation within a predetermined accuracy level (f-score).
+As discussed earlier, the effectiveness of example based segmentation is determined by whether a task can be performed more quickly with the help of the method. With this in mind a segmentation task was created in which a user was tasked to reproduce a ground truth segmentation within a predetermined accuracy level (f-score).
 
-A repeated measures design was used. Users were asked to reproduce a segmentation using basic segmentation tools (lasso, brush, plane selection). In the first condition the user was asked to reproduce a segmentation from scratch. In the second condition the user was presented with a pre-existing segmentation as a starting point. The pre-existing segmentation was the result of example based segmentation. (provide pictures of the pre-existing segmentation)
+A repeated measures design was used. Users were asked to reproduce a segmentation using basic segmentation tools (lasso, brush, plane selection). In the first condition the user was tasked to reproduce a segmentation from scratch. In the second condition the user was presented with a pre-existing segmentation as a starting point. The pre-existing segmentation was the result of example based segmentation. (provide pictures of the pre-existing segmentation)
 
-Three different segmentations were used. In the first scene the target is a tree that is growing over a house. The second scene a spade, wheelbarrow, and some pots has to be isolated. In the third scene a person has to be removed.
+Three different segmentations were used. In the first scene the target is a tree that hanging over a house. The second scene contains a spade, wheelbarrow, and some pots that needs to be isolated. In the third scene a person has to be removed.
 
 To reduce learning effects the user is primed by via three segmentation tasks in which the 3 basic tools tool are introduced. Order effects are reduced by counterbalancing the order in which the task two condition are presented for each task.
 
 A plugin was created present the user with the current accuracy every second for the set segmentation target. It also records accuracy over time.
 
-Results are compared via a repeated measure one tailed ttest. The time taken to produce the presegmentation is added to the result of the condition where the user started with it. This accounts for the approximate time the user whould have taken if he or she use the tool him or herself. The pre-segmentation however lets us remove a source of variance.
+Results are compared via a repeated measure one tailed t-test. The time taken to produce the pre-segmentation is added to the result of the condition where the user started with it. This accounts for the approximate time the user would have taken if he or she use the tool him or herself. The pre-segmentation however lets us remove a source of variance.
 
 Use lasso to segment heinz for 1min
 Use wall tool to segment wall for 1min
 
 Segment tree from wall
-Segement objects of the ground
+Segment objects of the ground
 
 Group A: AaaABbbB
 Group B: BbbBAaaB
@@ -57,8 +56,9 @@ Group B: BbbBAaaB
 
 Show how the radius factor thinggie helps
 
-\section{Test the different paremeters in the tree}
+\section{Test the different parameters in the random forrest}
 
+Do this!!
 
 \section{Testing goals}
 

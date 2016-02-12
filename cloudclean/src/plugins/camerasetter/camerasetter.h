@@ -47,6 +47,7 @@ class CameraSetter : public IPlugin {
 
     Eigen::Vector3f target_;
     bool running_;
+    bool ready_to_start_ = true;
     int seconds_;
     QTimer timer_;
     QTime time_;

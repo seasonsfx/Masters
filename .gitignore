@@ -1,4 +1,5 @@
 # Code
+.~lock.*
 cloudclean/.excludes
 cloudclean/cloudclean.json
 cloudclean/manifest.json

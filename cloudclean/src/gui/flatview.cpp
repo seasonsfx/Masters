@@ -228,7 +228,8 @@ void FlatView::initializeGL() {
         }
     #endif
 
-    glClearColor(0.0, 0.0, 0.0, 1.0); CE();
+    //glClearColor(0.0, 0.0, 0.0, 1.0); CE();
+    glClearColor(1.0, 1.0, 1.0, 1.0); CE();
     //glEnable(GL_CULL_FACE);
     glEnable(GL_MULTISAMPLE); CE();
 

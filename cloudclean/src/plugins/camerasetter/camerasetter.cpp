@@ -63,12 +63,15 @@ void CameraSetter::initialize(Core *core){
     };
 
     auto textToCamera = [this, camera_state_text](){
-        QString str = camera_state_text->toPlainText();
+        QString str = camera_state_text->toPlainText().trimmed();
 
         QStringList sl = str.split(QRegExp("\\s+"), QString::SkipEmptyParts);
         if(sl.size() != 7){
             qDebug() << "No good";
+            camera_state_text->setStyleSheet("QTextEdit { background: #FFCCCC;}");
             return;
+        } else {
+            camera_state_text->setStyleSheet("QTextEdit { background: #FFFFFF;}");
         }
 
         QTextStream stream(&str);
@@ -95,15 +98,18 @@ void CameraSetter::initialize(Core *core){
     QLineEdit * elapsed_time_text = new QLineEdit();
     QTextEdit * target_text_area = new QTextEdit();
     target_text_area->setText("0 0 0");
-    QPushButton * start_button = new QPushButton("Restart");
+    QPushButton * start_button = new QPushButton("Start / Restart");
 
     connect(target_text_area, &QTextEdit::textChanged, [this, target_text_area](){
-        QString str = target_text_area->toPlainText();
+        QString str = target_text_area->toPlainText().trimmed();
 
         QStringList sl = str.split(QRegExp("\\s+"), QString::SkipEmptyParts);
         if(sl.size() != 3){
+            target_text_area->setStyleSheet("QTextEdit { background: #FFCCCC;}");
             qDebug() << "No good";
             return;
+        } else {
+            target_text_area->setStyleSheet("QTextEdit { background: #FFFFFF;}");
         }
 
         QTextStream stream(&str);
@@ -117,8 +123,12 @@ void CameraSetter::initialize(Core *core){
     // Start when moving the camera
     connect(&glwidget_->camera_, &Camera::modified, [this, elapsed_time_text](){
         if(!running_){
-            time_.restart();
-            running_ = true;
+            if(ready_to_start_){
+                time_.restart();
+                running_ = true;
+            } else {
+                return;
+            }
         }
 
 
@@ -139,8 +149,7 @@ void CameraSetter::initialize(Core *core){
         if(dist < 2 && fabs(rads) < 0.2 ){
             seconds_ = time_.elapsed()/1000;
             running_ = false;
-
-
+            ready_to_start_ = false;
             elapsed_time_text->setStyleSheet("QLineEdit { background: #C2DC5F;}");
 
             qDebug() << "done";
@@ -168,6 +177,7 @@ void CameraSetter::initialize(Core *core){
         elapsed_time_text->setStyleSheet("QLineEdit { background: #FFFFFF;}");
         seconds_ = 0;
         running_ = false;
+        ready_to_start_ = true;
     });
 
     layout->addWidget(new QLabel("Camera state"));

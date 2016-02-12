@@ -25,8 +25,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.979899"
-     inkscape:cx="160.65956"
-     inkscape:cy="43.061933"
+     inkscape:cx="221.26871"
+     inkscape:cy="123.87414"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -47,7 +47,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -57,7 +57,7 @@
      id="layer1"
      transform="translate(-102.44147,-83.668574)">
     <path
-       style="fill:#bfbfbf;fill-opacity:1;stroke:#bfbfbf;stroke-opacity:1"
+       style="fill:#5b5b5b;fill-opacity:1;stroke:#5b5b5b;stroke-opacity:1"
        d="m 67.8125,178.25 0,40.40625 8.09375,0 0,-16.65625 449.90625,0 0,16.65625 8.09375,0 0,-40.40625 -8.09375,0 0,15.65625 -449.90625,0 0,-15.65625 -8.09375,0 z"
        transform="translate(102.44147,83.668574)"
        id="rect3767"
@@ -65,7 +65,10 @@
     <g
        id="g4018-3"
        transform="matrix(0.64284311,0,0,0.64284311,93.193903,95.395274)"
-       style="stroke:#bfbfbf;stroke-opacity:1">
+       style="stroke:#5b5b5b;stroke-opacity:1"
+       inkscape:export-filename="/home/rickert/Masters/docs/progresspres4/pics/mouse.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
       <title
          id="title4020-5">Layer 1</title>
       <metadata
@@ -74,7 +77,7 @@
          d="M 201.45399,112.872 18.385411,12.7151 96.994012,207.909 128.29202,157.233 190.176,224.875 213.61301,202.03799 150.34502,135.04401 201.454,112.872 z"
          id="path827-4"
          inkscape:connector-curvature="0"
-         style="fill:#ffffff;fill-rule:evenodd;stroke:#bfbfbf;stroke-width:8;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1" />
+         style="fill:#ffffff;fill-rule:evenodd;stroke:#5b5b5b;stroke-width:8;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1" />
     </g>
     <g
        id="g3005"
@@ -104,7 +107,7 @@
     <g
        id="g3010"
        transform="matrix(0.33321446,0,0,0.33321446,537.64509,73.429478)"
-       style="stroke:#bfbfbf;stroke-opacity:1">
+       style="stroke:#5b5b5b;stroke-opacity:1">
       <path
          transform="matrix(0.90707302,0,0,1.0045271,-20.192963,27.415252)"
          d="m 255.67117,146.16386 c 0,33.24047 -29.84183,60.18719 -66.65358,60.18719 -36.81175,0 -66.65357,-26.94672 -66.65357,-60.18719 0,-33.24046 29.84182,-60.187179 66.65357,-60.187179 36.81175,0 66.65358,26.946719 66.65358,60.187179 z"
@@ -113,14 +116,14 @@
          sodipodi:cy="146.16386"
          sodipodi:cx="189.01759"
          id="path1306"
-         style="fill:none;stroke:#bfbfbf;stroke-width:12;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+         style="fill:none;stroke:#5b5b5b;stroke-width:12;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
          sodipodi:type="arc" />
       <text
          sodipodi:linespacing="100%"
          id="text7437"
          y="200.48495"
          x="127.28323"
-         style="font-size:72px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#bfbfbf;fill-opacity:1;stroke:#bfbfbf;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Galilee Unicode Gk"
+         style="font-size:72px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#5b5b5b;fill-opacity:1;stroke:#5b5b5b;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Galilee Unicode Gk"
          xml:space="preserve"><tspan
            y="200.48495"
            x="127.28323"

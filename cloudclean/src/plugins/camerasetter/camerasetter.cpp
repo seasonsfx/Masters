@@ -67,7 +67,7 @@ void CameraSetter::initialize(Core *core){
 
         QStringList sl = str.split(QRegExp("\\s+"), QString::SkipEmptyParts);
         if(sl.size() != 7){
-            qDebug() << "No good";
+//            qDebug() << "No good";
             camera_state_text->setStyleSheet("QTextEdit { background: #FFCCCC;}");
             return;
         } else {
@@ -107,7 +107,7 @@ void CameraSetter::initialize(Core *core){
         QStringList sl = str.split(QRegExp("\\s+"), QString::SkipEmptyParts);
         if(sl.size() != 3){
             target_text_area->setStyleSheet("QTextEdit { background: #FFCCCC;}");
-            qDebug() << "No good";
+            //qDebug() << "No good";
             return;
         } else {
             target_text_area->setStyleSheet("QTextEdit { background: #FFFFFF;}");
@@ -127,7 +127,7 @@ void CameraSetter::initialize(Core *core){
         look_proj[1] = 0;
         look_proj.normalize();
         float rads = acos(lookat.dot(look_proj));
-        qDebug() << "rads" << rads;
+        //qDebug() << "rads" << rads;
 
 
         Eigen::Vector3f pos = glwidget_->camera_.getPosition();
@@ -177,7 +177,7 @@ void CameraSetter::initialize(Core *core){
                     seconds_ = time_.elapsed()/1000;
                     running_ = false;
                     ready_to_start_ = false;
-                    qDebug() << "done";
+                    //qDebug() << "done";
                 }
                 at_target_ = true;
             } else {
@@ -208,7 +208,7 @@ void CameraSetter::initialize(Core *core){
 }
 
 void CameraSetter::set() {
-    qDebug() << "hello, this is where the action happens";
+//    qDebug() << "hello, this is where the action happens";
 }
 
 void CameraSetter::cleanup(){

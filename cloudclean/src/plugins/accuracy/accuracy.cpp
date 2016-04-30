@@ -280,9 +280,9 @@ void Accuracy::sample() {
     float precision = float(true_positive_count)/selected_count;
     float fscore = 2 * (precision * recall) / (precision + recall);
 
-    fscore = isnan(fscore) ? 0 : fscore;
-    precision = isnan(precision) ? 0 : precision;
-    recall = isnan(recall) ? 0 : recall;
+    fscore = std::isnan(fscore) ? 0 : fscore;
+    precision = std::isnan(precision) ? 0 : precision;
+    recall = std::isnan(recall) ? 0 : recall;
 
     accuracy_text_->setText(QString::number(fscore));
 

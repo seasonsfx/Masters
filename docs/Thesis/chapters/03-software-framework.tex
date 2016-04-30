@@ -104,10 +104,10 @@ If we instead revert to assigning integer labels to points, and represent layers
 		\end{tabular}
 		\hfill
 	\end{minipage}
-	\caption[Label state after creation of the first layer.]{ After the first layer is created the associated points are labeled with `1'. The label is associated with the red layer. \label{fig:layer2}}
+	\caption[Label state after creation of the first layer.]{ After the first layer is created the associated points are labeled with `1'. The label is associated with the red layer. \label{fig:3-layer2}}
 \end{figure}
 
-To illustrate the solution we developed, picture the labels associated with a set of points. We initially assign 0 to all points which we designate as being the state in which a point is not associated with any layers (see figure~\ref{fig:layer2}). If we wish to create a layer, we need to change the label of the points that belong to this layer. In our example we assign 1 to the points in our new red layer (see figure~\ref{fig:layer2}). The new label now has to be associated with the label set of the red layer. We thus add 1 to the label set.
+To illustrate the solution we developed, picture the labels associated with a set of points. We initially assign 0 to all points which we designate as being the state in which a point is not associated with any layers (see figure~\ref{fig:3-layer2}). If we wish to create a layer, we need to change the label of the points that belong to this layer. In our example we assign 1 to the points in our new red layer (see figure~\ref{fig:3-layer2}). The new label now has to be associated with the label set of the red layer. We thus add 1 to the label set.
 
 
 \begin{figure}[ht]
@@ -139,10 +139,10 @@ To illustrate the solution we developed, picture the labels associated with a se
 		\end{tabular}
 		\hfill
 	\end{minipage}
-	\caption[Two non overlapping layers]{ The creation of a second layer that does not overlap with others results in the creation of a new label which is assigned to the layer. \label{fig:layer3}}
+	\caption[Two non overlapping layers]{ The creation of a second layer that does not overlap with others results in the creation of a new label which is assigned to the layer. \label{fig:3-layer3}}
 \end{figure}
 
-To add an additional non overlapping layer we follow the same process. First a new label is generated (2 in this example) and the points in the layer are labeled with it. The new label is then added to the label set of the new green layer (see figure~\ref{fig:layer3}.
+To add an additional non overlapping layer we follow the same process. First a new label is generated (2 in this example) and the points in the layer are labeled with it. The new label is then added to the label set of the new green layer (see figure~\ref{fig:3-layer3}.
 
 
 
@@ -178,10 +178,10 @@ To add an additional non overlapping layer we follow the same process. First a n
 		\end{tabular}
 		\hfill
 	\end{minipage}
-	\caption[Three layers with one overlap]{Creating a layer that overlaps with others results in overlapping points be assigned a new label which is assigned to both layers.\label{fig:layer4}}
+	\caption[Three layers with one overlap]{Creating a layer that overlaps with others results in overlapping points be assigned a new label which is assigned to both layers.\label{fig:3-layer4}}
 \end{figure}
 
-Overlapping layers are more interesting. In figure~\ref{fig:layer4} we create a new blue layer that overlaps with the red layer. It is clear that we cannot follow the same procedure, as assigning a new integer label to the points in the blue segment would remove the overlapping points from the red layer. We solve this problem by creating two new labels. First we assign 3 to the points that do not overlap with the red layer. This label is then added to the blue layer's label set. The overlapping points are given the label 4. This label is then added to the label set of both the red and blue label. The blue and red layer now have a label in common.
+Overlapping layers are more interesting. In figure~\ref{fig:3-layer4} we create a new blue layer that overlaps with the red layer. It is clear that we cannot follow the same procedure, as assigning a new integer label to the points in the blue segment would remove the overlapping points from the red layer. We solve this problem by creating two new labels. First we assign 3 to the points that do not overlap with the red layer. This label is then added to the blue layer's label set. The overlapping points are given the label 4. This label is then added to the label set of both the red and blue label. The blue and red layer now have a label in common.
 
 Set operations can now be achieved by simply adding and removing labels from layers without accessing individual point labels. The number of labels that we can create is dependent on the number of layer intersections.
 

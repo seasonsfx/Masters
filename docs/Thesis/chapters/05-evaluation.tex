@@ -1,11 +1,80 @@
 %!TEX root = thesis.tex
 \chapter{Evaluation} \label{ch:eval}
 
-In this chapter the performance of roll correction and example based segmentation is evaluated.
+In this chapter the performance of roll correction and machine learning assisted segmentation is evaluated.
+
+\section{Hypothesis}
+
+Our first hypothesis is that roll correction will reduce the disorientation experienced by users when virtual 3D environments and that this will result in faster navigation. The second hypothesis is that example based machine learning will reduce the total time a user requires to completing a segmentation task.
+
+\section{Design}
+
+To test the above state hypothesis two user experiments were conducted.
+
+\subsection{Roll correction}
+In the first experiment users were given a timed navigation task. The task required them to use CloudClean to navigate from one position in a scan to another. The starting camera orientation was rolled and the the final camera orientation had to be level with the ground. Each task was performed under two conditions. In the control condition condition roll correction was disabled and in the experimental condition roll correction was enabled. 
+
+An within subject counterbalanced design was used. A between subject design was impractical as a user's level of experience is large source of variance. A between subject design would have necessitated a very large sample to control for this variance. User's were randomly assigned to one of two groups which determined the order in which the experimental and control conditions were presented to them. The first group performed the task under the control condition first.
+
+To counter learning effects users where primed by giving them time familiarise themselves with the environment. Users were also given a trial run with each task. Users were asked to repeat each navigation task 3 times under control and experimental conditions in order to reduce random error.
+
+\subsection{Machine learning assisted segmentation}
+In the second experiment users were presented with a timed segmentation task. Users were asked to recreate a reference segmentation that was presented to them in a CloudClean layer. The segmentation had to be recreated with 97\% or 95\% accuracy, depending on the task. In the control condition for this experiment users started with a clean project file with nothing selected. In the experimental condition users were presented with an existing segmentation that was created by applying machine learning.
+
+A within subject counterbalanced design was also used. Users were randomly assigned to two groups. The first group was given the control segmentation task first.
+
+Users were primed before starting the experiment. During priming procedure users were told and shown how the lasso, brush and plane fill look works. Users were then given 3 targets to that they could test each tool on.
+
+\section{Apparatus} \label{sec:apparatus}
+To accurately measure the two timed experiments plug-ins to cloudclean was created.
+
+The first plug-in let the experimenter set the load the starting state for both navigation tasks by setting camera position and orientation. The plug-in also let the experimenter set the target location. After this state has been loaded, the plug-in starts a timer upon first interaction with the controls. This timer stops when the camera's position is within 2 meters of the target and is level to the ground within a 2 radians. The camera needs to maintain this position and orientation for one second for the timer to remain stopped. This prevents a user from accidentally completing the task when moving past the target.
+
+The second plug-in lets the experimenter specify the segmentation target via a CloudClean layer and specify the accuracy level to be achieved. Accuracy is measured as the F score of the current selections relative to the target selection. When the start button on the plug-ins tool bar is clicked, a timer is started and the segmentation accuracy is measured and displayed to the user once every second. Once the target accuracy is achieved the timer stops.
+
+The computer used for this study was a had a Intel Core i5-4590 3.30GHz CPU, 8GB of RAM, a GeForce GTX 960 graphic card, two 1080p 23 inch monitors and ran Ubuntu 14.04.
+
+\section{Pilot study}
+To test the procedure 3 pilot studies were conducted. These studies were used to find problems with the procedure. Several issues were discovered.
+
+In the first pilot study had users perform 3 navigation tasks with under two conditions with 3 trials for each condition. Each trial was also counterbalanced. The segmentation task had 3 segmentation tasks that had to be performed under two conditions. It was found that users could not complete the study in the allocated 1 hour.
+
+In the following pilot study the repeated navigation trials were reduce to one. It was found that removing the repetitions added noise to the results. This was likely due large learning effects over a small number of trials. The segmentation experiment was reduced to two tasks under two conditions. In the second task people ran over the allocated time mainly because they had a hard time getting to 97\% accuracy on the 2nd task.
+
+In the final pilot study the navigation experiment had users perform two tasks under two conditions repeated three times. Instead of counterbalancing each trial, it was decided to counterbalance between groups. This saved time in that the experimenter did not have to take over controls to toggle roll correction after each trial. The target accuracy of the 2nd segmentation task was also reduced to from 97\% to 95\%. Participants all finished in time.
+
+During all three trials it was found that users that were less experienced with computer took substantially longer to complete the task.
+
+The pilot study also uncovered bugs in the plug-in code. As mentioned in \autoref{sec:apparatus}, a user could accidentally complete a task when moving past a target. Users could also compete a task when completely upside down. These bugs were fix for the final study.
+
+\section{Participants}
+University students from the general campus population were recruited via noticeboards around the campus. In order to save time, general computer proficiency was required as task duration is highly correlated with a participant's computer literacy. Participants were compensated for their participation regardless of whether they completed the experiment. No personally identifiable information was collected.
+
+
+\section{Procedure}
+user get informed consent
+user reads brief so that all users get the same information
+explain brief here
+user is again told the controls
+user asked to look: left right up down, move forward back, left right, up down
+asked to explore the scene, get used to controls and find targets, up to 3 minutes
+
+user given brief shown told where the targets are, told about two states, give 2 trail runs to both targets
+
+user randomly assigned to group A or B
+group a does roll correction on first
+group b does roll correction off first
+
+
+
+
+\section{Proceedure}
+
+To test this, two target positions were chosen in a laser scan of an old fort. Users were tasked to navigate to these positions from two non upright starting positions with roll correction switched on or off. The goal is to navigate to the target position in an upright orientation as quickly as possible.
 
 \section{Roll correction}
 
-We hypothesise that roll correction reduces disorientation that in turn leads to faster navigation in virtual 3D environments. To test this, two target positions were chosen in a laser scan of an old fort. Users were tasked to navigate to these positions from two non upright starting positions with roll correction switched on or off. The goal is to navigate to the target position in an upright orientation as quickly as possible.
+
 
 A plugin was created to set up a starting position and orientation, as well as measure how long it takes a user to reach the right orientation and target position.
 
@@ -16,6 +85,10 @@ As user performance is expected to improve due to learning effects, they were in
 To reduce the random error, each task condition was repeated 3 times. The average time for each condition was recorded. The two conditions were interlaced and order was counterbalanced.
 
 Users were sampled from the general university population. Users had varying degrees of experience with computers. Because users acted as their own baselines the variation in skill level was not a concern. To test whether roll correction improves navigation speed a one tailed repeated measures t-test is used.
+
+Notes:
+Need to pause for one seconds at the position in order to avoid flying by and hitting it by accident.
+
 
 Group A: PppPaAAaBbbB
 Group B: pPPpAaaAbBBb
@@ -63,7 +136,7 @@ Do this!!
 \section{Testing goals}
 
 Do proper priming
-Undo & redo
+Undo + redo
 Selections, deselections
 How to navigate, wasd qe
 

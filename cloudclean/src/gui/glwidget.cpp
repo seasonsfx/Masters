@@ -164,39 +164,21 @@ void GLWidget::paintEvent(QPaintEvent *event) {
     // Make sure the labels are updates
     // Make sure nothing has changed
 
-      program_bg_.bind(); CE();
+//    program_bg_.bind(); CE();
 
-      glUniform2f(uni_resolution_, width(), height()); CE();
+//    glUniform2f(uni_resolution_, width(), height()); CE();
 
-      glBindVertexArray(vao_bg_); CE();
-      bg_buff_.bind(); CE();
-      glEnableVertexAttribArray(0); CE();
-      glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0); CE();
+//    glBindVertexArray(vao_bg_); CE();
+//    bg_buff_.bind(); CE();
+//    glEnableVertexAttribArray(0); CE();
+//    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0); CE();
 
-      glDrawArrays(GL_TRIANGLE_STRIP, 0, 4); CE();
-      bg_buff_.release(); CE();
-      glBindVertexArray(0); CE();
-      program_bg_.release(); CE();
+//    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4); CE();
+//    bg_buff_.release(); CE();
+//    glBindVertexArray(0); CE();
+//    program_bg_.release(); CE();
 
-//    QPainter p(this);
-
-//    QRadialGradient gradient;
-//    gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
-//    gradient.setCenter(0.45, 0.50);
-//    gradient.setFocalPoint(0.40, 0.45);
-//    gradient.setColorAt(0.0, QColor(105, 146, 182));
-//    gradient.setColorAt(0.4, QColor(81, 113, 150));
-//    gradient.setColorAt(0.8, QColor(16, 56, 121)); 0.062745098, 0.219607843, 0.474509804
-
-//    p.setRenderHint(QPainter::Antialiasing);
-//    p.setPen(Qt::NoPen);
-//    p.setPen(Qt::NoPen);
-//    p.setBrush(gradient);
-//    p.drawRect(0, 0, size().width(), size().height());
-
-//    p.beginNativePainting();
-
-    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClear(GL_DEPTH_BUFFER_BIT); CE();
     glEnable(GL_DEPTH_TEST); CE();
 

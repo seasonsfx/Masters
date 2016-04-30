@@ -10,6 +10,7 @@ class LayerList;
 class FlatView;
 class GLWidget;
 class MainWindow;
+class QLineEdit;
 
 #include <Eigen/Core>
 #include <QTimer>
@@ -47,9 +48,12 @@ class CameraSetter : public IPlugin {
 
     Eigen::Vector3f target_;
     bool running_;
+    bool ready_to_start_ = true;
+    bool at_target_ = false;
     int seconds_;
     QTimer timer_;
     QTime time_;
+    QLineEdit * distance_text_;
 };
 
 #endif  // CAMERASETTER_H
